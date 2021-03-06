@@ -139,18 +139,18 @@ target_link_libraries(${PROJECT_NAME}
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SteamSdk_LIBRARY_PATHS}/steam_api.dll"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
-		
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${ZLIB_INCLUDE_DIRS}/zlib.dll"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
-		
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${SteamSdk_LIBRARY_PATHS}/steam_api64.dll"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${Fmod_LIBRARY_PATHS}/fmod.dll"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
-		
-	COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${Storm_SOURCE_DIR}/techniques"
-        "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/techniques"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${STORM_SOURCE_DIR}/techniques"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resource/techniques"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${STORM_SOURCE_DIR}/shared"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resource/shared"
 )

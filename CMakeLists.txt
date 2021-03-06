@@ -2,14 +2,21 @@ cmake_minimum_required(VERSION 3.17)
 
 project(storm-engine)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(STORM_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(Storm_RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
-set(Storm_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(Storm_EXTERN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern")
+# Setup third-party dependencies
+include(conan)
+conan_cmake_run(CONANFILE conanfile.txt
+    BASIC_SETUP CMAKE_TARGETS
+    BUILD missing
+)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/modules")
+option(STORM_ENABLE_STEAM "Enable Steam integration" OFF)
+
+set(STORM_RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
+set(STORM_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(STORM_EXTERN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 add_subdirectory(src)

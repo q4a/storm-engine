@@ -1,9 +1,30 @@
-add_definitions(-DUNICODE -D_UNICODE)
+add_definitions(-DUNICODE -D_UNICODE) # Use Unicode
+add_definitions(-DNOMINMAX) # Use std::max()/std::min()
+add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Disable deprecation of unsafe functions
+
+if (STORM_ENABLE_STEAM)
+    add_definitions(-DSTORM_ENABLE_STEAM=1)
+endif()
 
 if (MSVC)
-    add_compile_options(/W1 /WX)
-else()
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
+    # Always generate PDBs
+    add_compile_options(/Zi)
+    add_link_options(/DEBUG)
+
+    add_compile_options(/W2) # Warning level
+    add_compile_options(/WX) # Treats compiler warnings as errors
+    add_compile_options(/std:c++latest) # Language Standard Version
+    add_compile_options(/MP) # Build with Multiple Processes
+    add_compile_options(/arch:AVX) # 95% of CPUs support it (https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam?platform=pc)
+
+    add_compile_options("$<$<CONFIG:Release>:/Gy>") # Enable Function-Level Linking
+    add_compile_options("$<$<CONFIG:Release>:/Oi>") # Generate intrinsic functions
+    add_compile_options("$<$<CONFIG:Release>:/Ot>") # Favor fast code, should be implied by /O2 though
+    add_compile_options("$<$<CONFIG:Release>:/GL>") # Whole program optimization
+
+    add_link_options("$<$<CONFIG:Release>:/OPT:REF>") # Eliminate functions and data that are never referenced, needs to be explicitly specified with /DEBUG
+    add_link_options("$<$<CONFIG:Release>:/OPT:ICF>") # Perform identical COMDAT folding, needs to be explicitly specified with /DEBUG
+    add_link_options("$<$<CONFIG:Release>:/LTCG>") # Enable link-time code generation
 endif()
 
 add_subdirectory(apps)
