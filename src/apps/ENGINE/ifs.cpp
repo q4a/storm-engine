@@ -556,9 +556,10 @@ bool IFS::FlushFile()
     char buff[2];
 
     if (bDataChanged == false)
+    {
         return true;
+    }
 
-    fs->_SetFileAttributes(FileName, FILE_ATTRIBUTE_NORMAL);
     fs->_DeleteFile(FileName);
     auto fileS = fio->_CreateFile(FileName, std::ios::binary | std::ios::out);
     if (!fileS.is_open())
@@ -657,7 +658,9 @@ bool IFS::FlushFile()
                 }
             }
             else
+            {
                 throw "invalid key flag";
+            }
             node = node->GetRightNode();
         }
         section_node = section_node->GetRightNode();
