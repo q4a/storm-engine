@@ -1,6 +1,7 @@
 project(engine)
 
 find_package(Fmod REQUIRED) # required to set ${Fmod_LIBRARY_PATHS}
+find_package(SDL2 REQUIRED)
 
 add_executable(${PROJECT_NAME} WIN32
     compiler.cpp
@@ -121,13 +122,18 @@ target_link_libraries(${PROJECT_NAME}
     CONAN_PKG::zlib
     comctl32.lib
     dbghelp.lib
+    SDL2::SDL2
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${Fmod_LIBRARY_PATHS}/fmod.dll"
         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-        
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${SDL2_DIR}/lib/x64/SDL2.dll"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${STORM_SOURCE_DIR}/techniques"
         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resource/techniques"

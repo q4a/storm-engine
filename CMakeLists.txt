@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.17)
 project(storm-engine)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern/sdl2")
 
 # Setup third-party dependencies
 include(conan)
