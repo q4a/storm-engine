@@ -440,7 +440,7 @@ void ISLAND::CalcBoxParameters(CVECTOR &_vBoxCenter, CVECTOR &_vBoxSize)
 
 void ISLAND::CreateDirectories(char *pDir)
 {
-    char sCurDir[256], sTemp[256];
+    char sCurDir[MAX_PATH * 4], sTemp[MAX_PATH * 4];
 
     strcpy(sCurDir, fio->_GetCurrentDirectory().c_str());
     if (strlen(sCurDir) && sCurDir[strlen(sCurDir) - 1] != '\\')

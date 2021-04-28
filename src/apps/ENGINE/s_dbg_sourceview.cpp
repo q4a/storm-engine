@@ -532,7 +532,7 @@ bool SOURCE_VIEW::OpenSourceFile(const char *_filename)
         CDebug.SaveRecentFileALine(SourceFileName, nActiveLine);
     }
 
-    char DirectoryName[MAX_PATH];
+    char DirectoryName[MAX_PATH * 4];
     strcpy(DirectoryName, fio->_GetCurrentDirectory().c_str());
 
     strcat_s(DirectoryName, "\\");
