@@ -1,9 +1,0 @@
-[requires]
-zlib/1.2.11
-spdlog/1.8.2
-
-# Development dependencies
-catch2/2.13.4
-
-[generators]
-cmake

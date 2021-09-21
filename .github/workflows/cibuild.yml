@@ -1,26 +1,33 @@
-name: CI
+name: CI Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - develop
+    paths-ignore:
+      - 'docs/**'
+      - 'tools/**'
+      - '*.md'
+  pull_request:
+    branches:
+      - develop
+    paths-ignore:
+      - 'docs/**'
+      - 'tools/**'
+      - '*.md'
 
 jobs:
-  formatting-check:
-    name: Formatting Check
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: Run clang-format style check for C/C++ programs.
-      uses: jidicula/clang-format-action@v3.2.0
-      with:
-        clang-format-version: '11'
-        check-path: 'src'
   build-windows:
     runs-on: windows-2019
     strategy:
       fail-fast: false
       matrix:
-        configuration: [msvc-debug, msvc-release]#, clang-debug]
+        configuration: [msvc-debug, msvc-release]
+        enable_steam: [false]
+        include:
+          - enable_steam: true
+            configuration: msvc-release
+    name: 'build-windows [${{ matrix.configuration}}, steam: ${{ matrix.enable_steam }}]'
     steps:
     - uses: actions/checkout@v2
       with:
@@ -36,10 +43,9 @@ jobs:
         useVcpkgToolchainFile: false
         buildDirectory: '${{ github.workspace }}/build'
         configurationRegexFilter: '${{ matrix.configuration }}'
+        cmakeAppendedArgs: '-DSTORM_ENABLE_STEAM=${{ matrix.enable_steam }} -DSTORM_ENABLE_CRASH_REPORTS=ON'
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: storm-engine.${{ matrix.configuration }}
+        name: storm-engine.${{ matrix.configuration }}-steam-${{ matrix.enable_steam}}
         path: build\${{ matrix.configuration }}\bin
-    - name: Run tests
-      run: '${{ github.workspace }}/build/${{ matrix.configuration }}/bin/test-all.exe'
