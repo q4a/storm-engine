@@ -16,7 +16,7 @@ class StormEngine(ConanFile):
 
     # dependencies used in deploy binaries
     # conan-center
-    requires = ["zlib/1.2.11", "spdlog/1.9.2", "sentry-native/0.4.12@storm/patched", "7zip/19.00",
+    requires = ["zlib/1.2.11", "spdlog/1.9.2", "sentry-native/0.4.12@storm/patched",
     # bincrafters
     "sdl2/2.0.16@bincrafters/stable",
     # storm.jfrog.io
@@ -26,6 +26,9 @@ class StormEngine(ConanFile):
 
     # optional dependencies
     def requirements(self):
+        if self.settings.os == "Windows":
+            # conan-center
+            self.requires("7zip/19.00")
         if self.options.steam:
             self.requires("steamworks/1.5.1@storm/prebuilt")
 
@@ -34,8 +37,11 @@ class StormEngine(ConanFile):
     default_options = {
         "sdl2:sdl2main": False,
         "sentry-native:backend": "crashpad",
-        "sentry-native:transport": "winhttp"
     }
+
+    def configure(self):
+        if self.settings.os == "Windows":
+            self.default_options["sentry-native:transport"] = "winhttp"
 
     def imports(self):
         self.__dest = str(self.options.output_directory) + "/" + getenv("CONAN_IMPORT_PATH", "bin")

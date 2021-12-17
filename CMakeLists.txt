@@ -7,6 +7,7 @@ include(StormSetup)
 
 option(STORM_ENABLE_CRASH_REPORTS "Enable automatic crash reports" OFF)
 option(STORM_ENABLE_STEAM "Enable Steam integration" OFF)
+OPTION(STORM_ENABLE_DXVK "Use dxvk-native for D3D9 API in Linux" ON)
 
 ### Set up output paths
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
@@ -35,6 +36,31 @@ conan_cmake_run(CONANFILE conanfile.py
         crash_reports=${STORM_ENABLE_CRASH_REPORTS}
         steam=${STORM_ENABLE_STEAM}
 )
+
+if (NOT CMAKE_HOST_WIN32 AND STORM_ENABLE_DXVK)
+    message("Using DXVK-native for D3D9 API")
+
+    include(ExternalProject)
+    ExternalProject_Add(dxvk-native
+            GIT_REPOSITORY    https://github.com/Joshua-Ashton/dxvk-native
+            GIT_TAG           origin/master
+            GIT_SHALLOW       ON
+            BUILD_ALWAYS      OFF
+            CONFIGURE_HANDLED_BY_BUILD ON
+            CONFIGURE_COMMAND meson ../dxvk-native
+            BUILD_COMMAND     ninja
+            INSTALL_COMMAND   ""
+    )
+    ExternalProject_Get_property(dxvk-native SOURCE_DIR BINARY_DIR)
+    set(DXVK_NATIVE_INCLUDE_DIRS
+            "${SOURCE_DIR}/include/native/directx"
+            "${SOURCE_DIR}/include/native/windows"
+    )
+    set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
+
+    #set(perimeter_LINK_LIBS ${perimeter_LINK_LIBS} ${DXVK_NATIVE_D3D9_LIB})
+    include_directories("${DXVK_NATIVE_INCLUDE_DIRS}")
+endif()
 
 ### Define library ALIASes for use without CONAN_PKG:: prefix
 foreach (conan_target ${CONAN_TARGETS})
