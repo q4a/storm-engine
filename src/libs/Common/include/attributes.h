@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "storm_assert.h"
-#include "storm/string_compare.hpp"
+#include "../../util/include/storm/string_compare.hpp"
 
 class VSTRING_CODEC
 {
@@ -95,7 +95,7 @@ class ATTRIBUTES
     {
         if (!str || !str[0])
             return false;
-        return storm::iEquals(std::string_view(pVStringCodec->Convert(nNameCode)), std::string_view(str)) == 0;
+        return storm::iEquals(std::string_view(pVStringCodec->Convert(nNameCode)), std::string_view(str));
     };
 
     auto GetThisName() const
@@ -168,7 +168,7 @@ class ATTRIBUTES
     ATTRIBUTES *GetAttributeClass(const char *name)
     {
         for (const auto &attribute : pAttributes)
-            if (storm::iEquals(std::string_view(name), std::string_view(attribute->GetThisName())) == 0)
+            if (storm::iEquals(std::string_view(name), std::string_view(attribute->GetThisName())))
                 return attribute;
         return nullptr;
     };
@@ -199,7 +199,7 @@ class ATTRIBUTES
         if (name == nullptr)
             return nullptr;
         for (const auto &attribute : pAttributes)
-            if (storm::iEquals(std::string_view(name), std::string_view(attribute->GetThisName())) == 0)
+            if (storm::iEquals(std::string_view(name), std::string_view(attribute->GetThisName())))
                 return attribute->Attribute;
         return nullptr;
     }
