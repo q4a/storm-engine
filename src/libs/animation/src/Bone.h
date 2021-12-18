@@ -16,8 +16,6 @@
 #include "math3d/Matrix.h"
 #include "math3d/Quaternion.h"
 #include "defines.h"
-
-#include <d3dx9.h>
 //============================================================================================
 
 #define ANI_COMPRESS_ENABLE
