@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <SDL_system.h>
 #include <SDL_video.h>
-#include <Windows.h>
+#include <windows.h>
 #include <map>
 
 namespace storm
@@ -12,6 +12,7 @@ namespace
 {
 // TODO: Use scancodes everywhere instead of Windows virtual key
 static const std::map<unsigned int, unsigned int> VK_TO_SDL_MAP{
+#ifdef _WIN32 // FIX_LINUX
     {VK_CANCEL, SDL_SCANCODE_CANCEL},
     {VK_BACK, SDL_SCANCODE_BACKSPACE},
     {VK_TAB, SDL_SCANCODE_TAB},
@@ -38,6 +39,7 @@ static const std::map<unsigned int, unsigned int> VK_TO_SDL_MAP{
     {VK_INSERT, SDL_SCANCODE_INSERT},
     {VK_DELETE, SDL_SCANCODE_DELETE},
     {VK_HELP, SDL_SCANCODE_HELP},
+#endif
     {'0', SDL_SCANCODE_0},
     {'1', SDL_SCANCODE_1},
     {'2', SDL_SCANCODE_2},
@@ -74,6 +76,7 @@ static const std::map<unsigned int, unsigned int> VK_TO_SDL_MAP{
     {'X', SDL_SCANCODE_X},
     {'Y', SDL_SCANCODE_Y},
     {'Z', SDL_SCANCODE_Z},
+#ifdef _WIN32 // FIX_LINUX
     {VK_LWIN, SDL_SCANCODE_LGUI},
     {VK_RWIN, SDL_SCANCODE_RGUI},
     {VK_APPS, SDL_SCANCODE_MENU},
@@ -139,9 +142,11 @@ static const std::map<unsigned int, unsigned int> VK_TO_SDL_MAP{
     {VK_VOLUME_MUTE, SDL_SCANCODE_MUTE},
     {VK_VOLUME_DOWN, SDL_SCANCODE_VOLUMEDOWN},
     {VK_VOLUME_UP, SDL_SCANCODE_VOLUMEUP},
+#endif
 };
 
 static const std::map<unsigned int, unsigned int> SDL_TO_VK_MAP{
+#ifdef _WIN32 // FIX_LINUX
     {SDL_SCANCODE_CANCEL, VK_CANCEL},
     {SDL_SCANCODE_BACKSPACE, VK_BACK},
     {SDL_SCANCODE_TAB, VK_TAB},
@@ -168,6 +173,7 @@ static const std::map<unsigned int, unsigned int> SDL_TO_VK_MAP{
     {SDL_SCANCODE_INSERT, VK_INSERT},
     {SDL_SCANCODE_DELETE, VK_DELETE},
     {SDL_SCANCODE_HELP, VK_HELP},
+#endif
     {SDL_SCANCODE_0, '0'},
     {SDL_SCANCODE_1, '1'},
     {SDL_SCANCODE_2, '2'},
@@ -204,6 +210,7 @@ static const std::map<unsigned int, unsigned int> SDL_TO_VK_MAP{
     {SDL_SCANCODE_X, 'X'},
     {SDL_SCANCODE_Y, 'Y'},
     {SDL_SCANCODE_Z, 'Z'},
+#ifdef _WIN32 // FIX_LINUX
     {SDL_SCANCODE_LGUI, VK_LWIN},
     {SDL_SCANCODE_RGUI, VK_RWIN},
     {SDL_SCANCODE_MENU, VK_APPS},
@@ -269,6 +276,7 @@ static const std::map<unsigned int, unsigned int> SDL_TO_VK_MAP{
     {SDL_SCANCODE_MUTE, VK_VOLUME_MUTE},
     {SDL_SCANCODE_VOLUMEDOWN, VK_VOLUME_DOWN},
     {SDL_SCANCODE_VOLUMEUP, VK_VOLUME_UP},
+#endif
 };
 
 inline KeyboardKey sdlToKey(unsigned int code)
@@ -429,7 +437,11 @@ bool SDLInput::MouseKeyState(const MouseKey &key) const
 uint32_t SDLInput::GetWheelFactor() const
 {
     // TODO: use platform specific values
+#ifdef _WIN32
     return WHEEL_DELTA;
+#else
+    return 120; // FIX_LINUX
+#endif // _WIN32
 }
 
 int SDLInput::SDLEventHandler(void *userdata, SDL_Event *evt)

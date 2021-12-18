@@ -1,11 +1,12 @@
 #pragma once
 
-#include <Windows.h>
+#include <windows.h>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
 
 #include "storm_assert.h"
+#include "storm/string_compare.hpp"
 
 class VSTRING_CODEC
 {
@@ -39,27 +40,6 @@ constexpr size_t TSE_MAX_EVENT_LENGTH = 64;
 
 class ATTRIBUTES
 {
-    void xtrace(const char *data_PTR, ...) const
-    {
-        char xBuffer_4k[4096];
-        if (data_PTR == nullptr)
-            return;
-
-        auto *const file_h = CreateFile(TEXT("attributes.log"), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_ALWAYS,
-                                        FILE_ATTRIBUTE_NORMAL, nullptr);
-        SetFilePointer(file_h, 0, nullptr, FILE_END);
-        va_list args;
-
-        va_start(args, data_PTR);
-        _vsnprintf_s(xBuffer_4k, sizeof(xBuffer_4k) - 4, data_PTR, args);
-        strcat_s(xBuffer_4k, "\x0d\x0a");
-        uint32_t bytes;
-        WriteFile(file_h, xBuffer_4k, static_cast<DWORD>(strlen(xBuffer_4k)), (LPDWORD)&bytes, nullptr);
-        va_end(args);
-        CloseHandle(file_h);
-        _flushall();
-    }
-
     VSTRING_CODEC *pVStringCodec;
     uint32_t nNameCode;
     char *Attribute;
@@ -115,7 +95,7 @@ class ATTRIBUTES
     {
         if (!str || !str[0])
             return false;
-        return _stricmp(pVStringCodec->Convert(nNameCode), str) == 0;
+        return storm::iEquals(std::string_view(pVStringCodec->Convert(nNameCode)), std::string_view(str)) == 0;
     };
 
     auto GetThisName() const
@@ -147,7 +127,7 @@ class ATTRIBUTES
         const auto len = GetLen(strlen(_val) + 1);
         auto *const oldPtr = Attribute;
         Attribute = new char[len];
-        strcpy_s(Attribute, len, _val);
+        std::copy(_val, _val + len, Attribute);
         delete[] oldPtr;
 
         if (bBreak)
@@ -188,7 +168,7 @@ class ATTRIBUTES
     ATTRIBUTES *GetAttributeClass(const char *name)
     {
         for (const auto &attribute : pAttributes)
-            if (_stricmp(name, attribute->GetThisName()) == 0)
+            if (storm::iEquals(std::string_view(name), std::string_view(attribute->GetThisName())) == 0)
                 return attribute;
         return nullptr;
     };
@@ -219,7 +199,7 @@ class ATTRIBUTES
         if (name == nullptr)
             return nullptr;
         for (const auto &attribute : pAttributes)
-            if (_stricmp(name, attribute->GetThisName()) == 0)
+            if (storm::iEquals(std::string_view(name), std::string_view(attribute->GetThisName())) == 0)
                 return attribute->Attribute;
         return nullptr;
     }
@@ -281,7 +261,7 @@ class ATTRIBUTES
     auto SetAttributeUseDword(const char *name, uint32_t val)
     {
         char buffer[128];
-        _ultoa_s(val, buffer, 10);
+        sprintf(buffer, "%lu", val);
         if (name)
             return SetAttribute(name, buffer) != 0;
         SetValue(buffer);
@@ -291,7 +271,7 @@ class ATTRIBUTES
     auto SetAttributeUseFloat(const char *name, FLOAT val)
     {
         char buffer[128];
-        sprintf_s(buffer, "%g", val);
+        sprintf(buffer, "%g", val);
         if (name)
             return SetAttribute(name, buffer) != 0;
         SetValue(buffer);
@@ -312,7 +292,7 @@ class ATTRIBUTES
         {
             const auto len = GetLen(strlen(attribute) + 1);
             attr->Attribute = new char[len];
-            strcpy_s(attr->Attribute, len, attribute);
+            std::copy(attribute, attribute + len, attr->Attribute);
         }
 
         return attr;
@@ -455,7 +435,7 @@ class ATTRIBUTES
         {
             const auto len = GetLen(strlen(attribute) + 1);
             attr->Attribute = new char[len];
-            strcpy_s(attr->Attribute, len, attribute);
+            std::copy(attribute, attribute + len, attr->Attribute);
         }
 
         return attr;
@@ -486,7 +466,7 @@ class ATTRIBUTES
                 {
                     auto *const oldPtr = pAttributes[n]->Attribute;
                     pAttributes[n]->Attribute = new char[len];
-                    strcpy_s(pAttributes[n]->Attribute, len, attribute);
+                    std::copy(attribute, attribute + len, pAttributes[n]->Attribute);
                     delete[] oldPtr;
                 }
                 else
@@ -506,7 +486,7 @@ class ATTRIBUTES
         if (attribute)
         {
             pAttributes[n]->Attribute = new char[len];
-            strcpy_s(pAttributes[n]->Attribute, len, attribute);
+            std::copy(attribute, attribute + len, pAttributes[n]->Attribute);
         }
 
         return pAttributes.size() - 1;
@@ -520,25 +500,5 @@ class ATTRIBUTES
     void SetNameCode(uint32_t n)
     {
         nNameCode = n;
-    }
-
-    void Dump(ATTRIBUTES *pA, long level)
-    {
-        char buffer[128];
-        if (pA == nullptr)
-            return;
-
-        if (level >= 128)
-            level = 127;
-        if (level != 0)
-            memset(buffer, ' ', level);
-        buffer[level] = 0;
-
-        for (uint32_t n = 0; n < pA->GetAttributesNum(); n++)
-        {
-            //~!~
-            xtrace("%s%s = %s", buffer, pA->GetAttributeName(n), pA->GetAttribute(n));
-            Dump(pA->GetAttributeClass(pA->GetAttributeName(n)), level + 2);
-        }
     }
 };

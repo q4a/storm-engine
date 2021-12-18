@@ -1,7 +1,9 @@
 #pragma once
 #include <spdlog/spdlog.h>
 
-#define EX_OFF
+#ifdef _WIN32
+    #define EX_OFF
+#endif
 
 inline void __Storm_Assert__(bool expression, const char *file, long line, const char *str)
 {
