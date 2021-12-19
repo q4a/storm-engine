@@ -975,6 +975,7 @@ void Grass::CreateVertexDeclaration() const
         rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
     }
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     fx_ = rs->GetEffectPointer("Grass");
     if (fx_ != nullptr)
     {
@@ -988,4 +989,5 @@ void Grass::CreateVertexDeclaration() const
         hfDataScale_ = fx_->GetParameterByName(nullptr, "fDataScale");
         haSize_ = fx_->GetParameterByName(nullptr, "aSize");
     }
+#endif
 }

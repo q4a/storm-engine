@@ -2,20 +2,12 @@
 
 #include "Cvector.h"
 #include "SoundDefines.h"
-#include "VSoundService.h"
 #include "service.h"
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////
 // DEFINES & TYPES
 ///////////////////////////////////////////////////////////////////
-
-using tSoundDriverDescriptor = struct
-{
-    LPGUID guid;
-    char description[COMMON_STRING_LENGTH];
-    char driverName[COMMON_STRING_LENGTH];
-};
 
 using TSD_ID = uint32_t;
 

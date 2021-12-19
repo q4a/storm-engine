@@ -33,6 +33,11 @@ inline unsigned long HashNoCase(const char *str)
 #define _FL __FILE__, __LINE__
 #define _FILELINE_ _FL_
 
+struct LPOINT
+{
+    long x, y;
+};
+
 struct FPOINT
 {
     float x, y;
@@ -70,6 +75,7 @@ constexpr float PIm2 = (PI * 2.0f);
 constexpr float PId2 = (PI / 2.0f);
 constexpr float PId4 = (PI / 4.0f);
 
+#ifdef _WIN32
 #define RDTSC_B(x)                                                                                                     \
     {                                                                                                                  \
         LARGE_INTEGER li;                                                                                              \
@@ -82,9 +88,13 @@ constexpr float PId4 = (PI / 4.0f);
         QueryPerformanceCounter(&li);                                                                                  \
         x = li.QuadPart - x;                                                                                           \
     }
+#else
+#include<limits.h> +
+#define MAX_PATH PATH_MAX
 
-//#define RDTSC_B(x)    { x = __rdtsc(); }
-//#define RDTSC_E(x)    { x = __rdtsc() - x; }
+#define RDTSC_B(x)    { x = __rdtsc(); }
+#define RDTSC_E(x)    { x = __rdtsc() - x; }
+#endif
 
 // Defines
 #ifdef RGB

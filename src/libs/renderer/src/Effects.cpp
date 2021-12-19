@@ -136,6 +136,7 @@ bool Effects::next()
     return false;
 }
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *Effects::getEffectPointer(const std::string &techniqueName)
 {
     // transform to lowercase to be compliant with the original code
@@ -146,3 +147,4 @@ ID3DXEffect *Effects::getEffectPointer(const std::string &techniqueName)
     const auto technique = techniques_.find(name_in_lowercase);
     return technique != techniques_.end() ? technique->second.fx : nullptr;
 }
+#endif

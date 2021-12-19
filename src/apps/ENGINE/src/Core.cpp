@@ -324,10 +324,12 @@ HWND CORE::GetAppHWND()
     return App_Hwnd;
 }
 
+#ifdef _WIN32
 HINSTANCE CORE::GetAppInstance()
 {
     return hInstance;
 }
+#endif
 
 void CORE::SetTimeScale(float _scale)
 {
@@ -935,7 +937,7 @@ void CORE::stopFrameProcessing()
     stopFrameProcessing_ = true;
 }
 
-void CORE:: collectCrashInfo()
+void CORE::collectCrashInfo()
 {
     Compiler->collectCallStack();
 }

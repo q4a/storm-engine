@@ -40,11 +40,11 @@ bool BIUtils::ReadStringFromAttr(ATTRIBUTES *pA, const char *name, char *buf, lo
     {
         if (static_cast<int>(strlen(strGet)) > bufSize - 1)
         {
-            strncpy_s(buf, bufSize, strGet, bufSize - 1);
+            strncpy(buf, strGet, bufSize - 1);
             buf[bufSize - 1] = 0;
         }
         else
-            strcpy_s(buf, bufSize, strGet);
+            strcpy(buf, strGet);
     }
     else
         bRet = false;
@@ -141,11 +141,12 @@ long BIUtils::GetAlignmentFromAttr(ATTRIBUTES *pA, const char *name, long nDefAl
         char *pcTmp = pA->GetAttribute(name);
         if (pcTmp)
         {
-            if (_stricmp(pcTmp, "left") == 0)
+            std::string_view pcView = std::string_view(pcTmp);
+            if (storm::iEquals(pcView, "left"))
                 return PR_ALIGN_LEFT;
-            if (_stricmp(pcTmp, "center") == 0)
+            if (storm::iEquals(pcView, "center"))
                 return PR_ALIGN_CENTER;
-            if (_stricmp(pcTmp, "right") == 0)
+            if (storm::iEquals(pcView, "right"))
                 return PR_ALIGN_RIGHT;
         }
     }

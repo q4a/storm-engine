@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <limits.h>
 
 // returns random float
 inline float rand(float r)

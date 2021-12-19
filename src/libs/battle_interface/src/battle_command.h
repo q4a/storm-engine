@@ -103,8 +103,8 @@ class BICommandList
     bool m_bLeftArrow;
     bool m_bRightArrow;
 
-    POINT m_pntActiveIconOffset;
-    POINT m_pntActiveIconSize;
+    LPOINT m_pntActiveIconOffset;
+    LPOINT m_pntActiveIconSize;
     std::string m_sActiveIconTexture;
     FRECT m_frActiveIconUV1;
     FRECT m_frActiveIconUV2;
@@ -115,23 +115,23 @@ class BICommandList
     std::string m_sUpDownArrowTexture;
     FRECT m_frUpArrowUV;
     FRECT m_frDownArrowUV;
-    POINT m_pntUpDownArrowSize;
-    POINT m_pntUpArrowOffset;
-    POINT m_pntDownArrowOffset;
+    LPOINT m_pntUpDownArrowSize;
+    LPOINT m_pntUpArrowOffset;
+    LPOINT m_pntDownArrowOffset;
 
     std::string m_sCurrentCommandName;
     long m_nCurrentCommandCharacterIndex;
     long m_nCurrentCommandMode;
 
-    POINT m_LeftTopPoint;
-    POINT m_IconSize;
+    LPOINT m_LeftTopPoint;
+    LPOINT m_IconSize;
     long m_nIconSpace;
 
     long m_NoteFontID;
     uint32_t m_NoteFontColor;
     float m_NoteFontScale;
-    POINT m_NotePos;
-    POINT m_NoteOffset;
+    LPOINT m_NotePos;
+    LPOINT m_NoteOffset;
     std::string m_NoteText;
 
     struct CoolDownUpdateData

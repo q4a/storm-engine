@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "storm_assert.h"
-#include "../../util/include/storm/string_compare.hpp"
+#include <storm/string_compare.hpp>
 
 class VSTRING_CODEC
 {
@@ -261,7 +261,7 @@ class ATTRIBUTES
     auto SetAttributeUseDword(const char *name, uint32_t val)
     {
         char buffer[128];
-        sprintf(buffer, "%lu", val);
+        sprintf(buffer, "%u", val);
         if (name)
             return SetAttribute(name, buffer) != 0;
         SetValue(buffer);

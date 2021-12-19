@@ -34,7 +34,7 @@ void TSeagulls::LoadSettings()
         maxDistance = SEAGULL_DISTANCE;
         relaxTime = SEAGULL_RELAX_TIME;
         screamTime = SEAGULL_SCREAM_TIME;
-        strcpy_s(screamFilename, ANIMALS_SEAGULLS_SCREAM_FILENAME);
+        strcpy(screamFilename, ANIMALS_SEAGULLS_SCREAM_FILENAME);
 
         return;
     }

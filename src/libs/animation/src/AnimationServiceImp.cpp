@@ -92,8 +92,10 @@ uint32_t AnimationServiceImp::RunSection()
 // Execution functions
 void AnimationServiceImp::RunStart()
 {
+#ifdef _WIN32 // FIX_LINUX
     if (core.Controls->GetDebugAsyncKeyState(VK_F4))
         return;
+#endif
     auto dltTime = core.GetDeltaTime();
     if (dltTime > 1000)
         dltTime = 1000;
@@ -178,9 +180,9 @@ long AnimationServiceImp::LoadAnimation(const char *animationName)
 {
     // Form the file name
     static char path[MAX_PATH];
-    strcpy_s(path, ASKW_PATH_ANI);
-    strcat_s(path, animationName);
-    strcat_s(path, ".ani");
+    strcpy(path, ASKW_PATH_ANI);
+    strcat(path, animationName);
+    strcat(path, ".ani");
     // Open the ini file describing the animation
     auto ani = fio->OpenIniFile(path);
     if (!ani)
@@ -189,7 +191,7 @@ long AnimationServiceImp::LoadAnimation(const char *animationName)
         return -1;
     }
     // Get the name of the jfa file with the skeleton
-    strcpy_s(path, ASKW_PATH_JFA);
+    strcpy(path, ASKW_PATH_JFA);
     const size_t l = strlen(path);
     if (!ani->ReadString(nullptr, ASKW_JFA_FILE, path + l, MAX_PATH - l - 1, nullptr))
     {
@@ -244,13 +246,13 @@ long AnimationServiceImp::LoadAnimation(const char *animationName)
         auto type = at_normal;
         if (ani->ReadString(path, ASKW_TYPE, key, 256, ASKWAT_NORMAL))
         {
-            if (_stricmp(key, ASKWAT_NORMAL) == 0)
+            if (storm::iEquals(key, ASKWAT_NORMAL))
                 type = at_normal;
-            else if (_stricmp(key, ASKWAT_REVERSE) == 0)
+            else if (storm::iEquals(key, ASKWAT_REVERSE))
                 type = at_reverse;
-            else if (_stricmp(key, ASKWAT_PINGPONG) == 0)
+            else if (storm::iEquals(key, ASKWAT_PINGPONG))
                 type = at_pingpong;
-            else if (_stricmp(key, ASKWAT_RPINGPONG) == 0)
+            else if (storm::iEquals(key, ASKWAT_RPINGPONG))
                 type = at_rpingpong;
             else
             {
@@ -263,9 +265,9 @@ long AnimationServiceImp::LoadAnimation(const char *animationName)
         auto isLoop = true;
         if (ani->ReadString(path, ASKW_LOOP, key, 256, "false"))
         {
-            if (_stricmp(key, ASKWAL_TRUE) == 0)
+            if (storm::iEquals(key, ASKWAL_TRUE))
                 isLoop = true;
-            else if (_stricmp(key, ASKWAL_FALSE) == 0)
+            else if (storm::iEquals(key, ASKWAL_FALSE))
                 isLoop = false;
             else
             {
@@ -365,18 +367,19 @@ long AnimationServiceImp::LoadAnimation(const char *animationName)
                         if (!(key[p] >= 'A' && key[p] <= 'Z') && !(key[p] >= 'a' && key[p] <= 'z'))
                             break;
                     key[p] = 0;
+                    auto emView = std::string_view(em);
                     if (em[0] == 0)
                     {
                     }
-                    else if (_stricmp(em, ASKWAE_ALWAYS) == 0)
+                    else if (storm::iEquals(emView, ASKWAE_ALWAYS))
                     {
                         ev = eae_always;
                     }
-                    else if (_stricmp(em, ASKWAE_NORMAL) == 0)
+                    else if (storm::iEquals(emView, ASKWAE_NORMAL))
                     {
                         ev = eae_normal;
                     }
-                    else if (_stricmp(em, ASKWAE_REVERSE) == 0)
+                    else if (storm::iEquals(emView, ASKWAE_REVERSE))
                     {
                         ev = eae_reverse;
                     }

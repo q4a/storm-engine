@@ -326,7 +326,9 @@ void AnimationImp::BuildAnimationMatrices()
         else
         {
             core.Trace("AnimationImp::BuildAnimationMatrices -> Not support mode");
+#ifdef _WIN32
             __debugbreak();
+#endif
             /*_asm int 3;*/
             //    float frame = 0.0f;
             //    for(long j = 0; j < nbones; j++)

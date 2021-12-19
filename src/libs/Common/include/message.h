@@ -185,7 +185,12 @@ class MESSAGE final
     }
 
   private:
+#ifdef _WIN32 // FIX_LINUX
     static storm::MessageParam GetParamValue(const char c, va_list &args)
+#else
+    // avoid error: non-const lvalue reference to type 'va_list' (aka '__builtin_va_list') cannot bind to a value of unrelated type '__va_list_tag *'
+    static storm::MessageParam GetParamValue(const char c, va_list args)
+#endif
     {
         switch (c)
         {

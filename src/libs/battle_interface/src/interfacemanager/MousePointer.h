@@ -27,14 +27,14 @@ class MousePointer : public BI_MousePointerBase
 
     struct MouseCursorInfo
     {
-        POINT offset;
+        LPOINT offset;
         std::string texture;
         FRECT uv;
     };
 
     MouseCursorInfo m_aCursors[BI_CURSORS_QUANTITY];
     long m_nCurrentCursor;
-    POINT m_cursorsize;
+    LPOINT m_cursorsize;
 
     void InitMouseCursors();
     void MoveCursor();

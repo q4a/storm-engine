@@ -50,6 +50,8 @@ class Effects final
     bool begin(const std::string &techniqueName);
     // Execute next technique
     bool next();
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     // Get effect pointer by technique name
     ID3DXEffect *getEffectPointer(const std::string &techniqueName);
+#endif
 };

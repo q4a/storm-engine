@@ -4230,8 +4230,10 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                     if (CDebug->GetTraceMode() == TMODE_MAKESTEP_OVER && bDebugWaitForThisFunc == false)
                         break;
 
+#ifdef _WIN32
                     if (!CDebug->IsDebug())
                         CDebug->OpenDebugWindow(core.GetAppInstance());
+#endif
                     // else
                     ShowWindow(CDebug->GetWindowHandle(), SW_NORMAL);
 
@@ -4252,8 +4254,10 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                     // check for breakpoint
                     if (CDebug->Breaks.Find(fi.decl_file_name.c_str(), nDebugTraceLineCode))
                     {
+#ifdef _WIN32
                         if (!CDebug->IsDebug())
                             CDebug->OpenDebugWindow(core.GetAppInstance());
+#endif
 
                         ShowWindow(CDebug->GetWindowHandle(), SW_NORMAL);
                         // CDebug->OpenDebugWindow(core.hInstance);

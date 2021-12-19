@@ -902,7 +902,7 @@ void SoundService::SoundStop(TSD_ID _id, long _time)
 void SoundService::AnalyseNameStringAndAddToAlias(tAlias *_alias, const char *in_string) const
 {
     static char tempString2[COMMON_STRING_LENGTH];
-    strncpy_s(tempString2, in_string, COMMON_STRING_LENGTH);
+    strncpy(tempString2, in_string, COMMON_STRING_LENGTH);
 
     tAliasSound snd;
 
@@ -1012,7 +1012,9 @@ void SoundService::DebugDraw()
     if (core.Controls->GetDebugAsyncKeyState('J') < 0)
     {
         bShowDebugInfo = !bShowDebugInfo;
+#ifdef _WIN32 // FIX_LINUX
         Sleep(200);
+#endif
     }
 
     if (!bShowDebugInfo)
@@ -1205,7 +1207,10 @@ void SoundService::DebugPrint3D(const CVECTOR &pos3D, float rad, long line, floa
 {
     static char buf[256];
     // print to the buffer
-    long len = _vsnprintf_s(buf, sizeof(buf) - 1, format, (char *)(&format + 1));
+    va_list args;
+    va_start(args, format);
+    long len = vsnprintf(buf, sizeof(buf) - 1, format, args);
+    va_end(args);
     buf[sizeof(buf) - 1] = 0;
     // Looking for a point position on the screen
     static CMatrix mtx, view, prj;
@@ -1388,7 +1393,7 @@ bool SoundService::AddScheme(const char *_schemeName)
 bool SoundService::AddSoundSchemeChannel(char *in_string, bool _looped /*= false*/)
 {
     static char tempString2[COMMON_STRING_LENGTH];
-    strncpy_s(tempString2, in_string, COMMON_STRING_LENGTH);
+    strncpy(tempString2, in_string, COMMON_STRING_LENGTH);
 
     char *col = strchr(tempString2, ',');
     if (!col)

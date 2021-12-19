@@ -10,6 +10,7 @@
 
 #include "ActionInfo.h"
 #include "storm_assert.h"
+#include <storm/string_compare.hpp>
 
 // ============================================================================================
 // Construction, destruction
@@ -22,7 +23,7 @@ ActionInfo::ActionInfo(const char *aname, long startframe, long endframe)
     Assert(strlen(aname) < 64);
     Assert(startframe >= 0);
     Assert(startframe <= endframe);
-    strcpy_s(name, aname);
+    strcpy(name, aname);
     startFrame = startframe;
     endFrame = endframe;
     kRate = 1.0f;
@@ -51,7 +52,7 @@ bool ActionInfo::AddEvent(const char *ename, float frame, ExtAnimationEventType 
     if (t > 1.0f)
         t = 1.0f;
     // fill in the structure
-    strcpy_s(event[numEvents].name, ename);
+    strcpy(event[numEvents].name, ename);
     event[numEvents].time = t;
     event[numEvents].event = eventType;
     numEvents++;
@@ -64,7 +65,7 @@ bool ActionInfo::AddEvent(const char *ename, float frame, ExtAnimationEventType 
 // Compare with current name
 bool ActionInfo::operator==(const char *actionName) const
 {
-    return _stricmp(actionName, name) == 0;
+    return storm::iEquals(std::string_view(actionName), std::string_view(name));
 }
 
 // check if the event generation condition is satisfied

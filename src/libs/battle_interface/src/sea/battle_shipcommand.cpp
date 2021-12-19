@@ -329,7 +329,7 @@ long BIShipCommandList::ChargeAdding()
         tmpDat->Get(m_aChargeQuantity[i], i + 1);
 
         char param[128];
-        sprintf_s(param, sizeof(param), "charge%d", i + 1);
+        sprintf(param, "charge%d", i + 1);
         auto *pA = pAList ? pAList->GetAttributeClass(param) : nullptr;
         const long nNormalPicIndex = pA ? pA->GetAttributeAsDword("picNum", -1) : -1;
         const long nSelectPicIndex = pA ? pA->GetAttributeAsDword("selPicNum", -1) : -1;
