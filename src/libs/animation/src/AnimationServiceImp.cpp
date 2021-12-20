@@ -92,7 +92,7 @@ uint32_t AnimationServiceImp::RunSection()
 // Execution functions
 void AnimationServiceImp::RunStart()
 {
-#ifdef _WIN32 // FIX_LINUX
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_F4))
         return;
 #endif

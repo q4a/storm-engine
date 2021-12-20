@@ -17,7 +17,7 @@ VGEOMETRY::ANIMATION_VB avb[AVB_MAX]; //!!! temporary
 
 GEOMETRY::GEOMETRY()
 {
-    strcpy_s(texturePath, "");
+    strcpy(texturePath, "");
 }
 
 const char *GEOMETRY::GetTexturePath()
@@ -27,7 +27,7 @@ const char *GEOMETRY::GetTexturePath()
 
 void GEOMETRY::SetTexturePath(const char *path)
 {
-    strcpy_s(texturePath, path);
+    strcpy(texturePath, path);
 }
 
 //=================================================================================================
@@ -35,7 +35,7 @@ void GEOMETRY::SetTexturePath(const char *path)
 //=================================================================================================
 void GEOMETRY::SetTechnique(const char *name)
 {
-    strcpy_s(technique, name);
+    strcpy(technique, name);
 }
 
 GEOMETRY::ANIMATION_VB GEOMETRY::GetAnimationVBDesc(long vb)
@@ -88,7 +88,7 @@ GEOS *GEOMETRY::CreateGeometry(const char *file_name, const char *light_file_nam
     char fnt[256], lfn[256];
     if (light_file_name != nullptr)
     {
-        sprintf_s(lightPath, "%s\\%s", lmPath, file_name);
+        sprintf(lightPath, "%s\\%s", lmPath, file_name);
         // strcpy_s(lightPath, light_file_name);
         auto *const bs = strrchr(lightPath, '\\');
         if (bs != nullptr)
@@ -109,7 +109,7 @@ GEOS *GEOMETRY::CreateGeometry(const char *file_name, const char *light_file_nam
     GEOS *gp;
     try
     {
-        sprintf_s(fnt, "resource\\models\\%s.gm", file_name);
+        sprintf(fnt, "resource\\models\\%s.gm", file_name);
         if (light_file_name == nullptr || strlen(light_file_name) == 0)
         {
             gp = ::CreateGeometry(fnt, nullptr, GSR, flags);
@@ -122,7 +122,7 @@ GEOS *GEOMETRY::CreateGeometry(const char *file_name, const char *light_file_nam
                 elf++;
             if (elf[0] == '\\')
                 elf++;
-            sprintf_s(lfn, "resource\\models\\%s_%s.col", file_name, elf);
+            sprintf(lfn, "resource\\models\\%s_%s.col", file_name, elf);
             gp = ::CreateGeometry(fnt, lfn, GSR, flags);
         }
     }
@@ -194,7 +194,7 @@ std::fstream GEOM_SERVICE_R::OpenFile(const char *fname)
     auto fileS = fio->_CreateFile(fname, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        if (_strcmpi(&fname[strlen(fname) - 4], ".col") == 0)
+        if (storm::iEquals(std::string_view(&fname[strlen(fname) - 4]), ".col"))
         {
             //    core.Trace("geometry::can't open file %s", fname);
         }
@@ -235,14 +235,14 @@ void GEOM_SERVICE_R::free(void *ptr)
 GEOS::ID GEOM_SERVICE_R::CreateTexture(const char *fname)
 {
     char tex[256];
-    if (_strcmpi(fname, "shadow.tga") == 0)
+    if (storm::iEquals(std::string_view(fname), "shadow.tga"))
     {
-        sprintf_s(tex, "lighting\\%s\\%s", lightPath, fname);
+        sprintf(tex, "lighting\\%s\\%s", lightPath, fname);
     }
     else
     {
-        strcpy_s(tex, texturePath);
-        strcat_s(tex, fname);
+        strcpy(tex, texturePath);
+        strcat(tex, fname);
     }
     if (RenderService)
     {

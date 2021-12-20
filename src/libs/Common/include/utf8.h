@@ -122,7 +122,7 @@ inline int Utf8ToCodepoint(const char *utf8)
     if (u0 >= 0xC0 && u0 <= 0xDF)
         return (u0 - 192) * 64 + (u1 - 128);
 
-    if (utf8[0] == 0xed && (utf8[1] & 0xa0) == 0xa0)
+    if (u0 == 0xED && (u1 & 0xA0) == 0xA0)
         return -1; // code points, 0xd800 to 0xdfff
 
     if (l < 3)

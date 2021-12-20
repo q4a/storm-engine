@@ -31,9 +31,9 @@ class CSaveLoad
         {
             const auto size = dwCurSize * 2 + 8 + 1;
             auto *const pFFSave = new char[size];
-            sprintf_s(pFFSave, size, "%.8x", dwCurSize);
+            sprintf(pFFSave, "%.8x", dwCurSize);
             for (uint32_t i = 0; i < dwCurSize; i++)
-                sprintf_s(&pFFSave[8 + i * 2], 3, "%.2x", static_cast<uint8_t>(pSaveBuffer[i]));
+                sprintf(&pFFSave[8 + i * 2], "%.2x", static_cast<uint8_t>(pSaveBuffer[i]));
 
             auto *pV = core.Event("SeaLoad_GetPointer", "sl", "seasave", -1);
             if (pV)
@@ -63,13 +63,13 @@ class CSaveLoad
         auto *const pSave = pV->GetAClass()->GetAttribute("save");
         uint32_t dwSize;
         char str[256];
-        strncpy_s(str, pSave, 8);
+        strncpy(str, pSave, 8);
         str[8] = 0;
         sscanf(str, "%x", &dwSize);
         pSaveBuffer = static_cast<char *>(malloc(dwSize));
         for (uint32_t i = 0; i < dwSize; i++)
         {
-            strncpy_s(str, &pSave[8 + i * 2], 2);
+            strncpy(str, &pSave[8 + i * 2], 2);
             str[2] = 0;
             uint32_t dwValue;
             sscanf(str, "%x", &dwValue);

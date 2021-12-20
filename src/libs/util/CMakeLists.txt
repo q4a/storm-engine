@@ -1,5 +1,6 @@
 STORM_SETUP(
     TARGET_NAME util
     TYPE library
+    DEPENDENCIES sdl2
     TEST_DEPENDENCIES catch2
 )
