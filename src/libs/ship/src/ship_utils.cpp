@@ -169,7 +169,7 @@ bool SHIP::BuildMasts()
         }
         const auto *const cNodeName = pNode->GetName();
 
-        if (_strnicmp(cNodeName, MAST_IDENTIFY, _countof(MAST_IDENTIFY) - 1) == 0)
+        if (storm::iEquals(std::string_view(cNodeName), MAST_IDENTIFY, _countof(MAST_IDENTIFY) - 1))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 
@@ -245,7 +245,7 @@ bool SHIP::BuildHulls()
         if (!pNode)
             break;
         const auto *const cNodeName = pNode->GetName();
-        if (_strnicmp(cNodeName, HULL_IDENTIFY, _countof(HULL_IDENTIFY) - 1) == 0)
+        if (storm::iEquals(std::string_view(cNodeName), HULL_IDENTIFY, _countof(HULL_IDENTIFY) - 1))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 

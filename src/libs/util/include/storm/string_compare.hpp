@@ -47,6 +47,36 @@ template <typename Range1T, typename Range2T = Range1T> bool iEquals(const Range
     return std::equal(first_begin, first_end, second_begin, second_end, comp);
 }
 
+template <typename Range1T, typename Range2T = Range1T>
+bool iEquals(const Range1T &first, const Range2T &second, const size_t count)
+{
+    detail::is_iequal comp;
+
+    const auto first_begin = std::begin(first);
+    const auto second_begin = std::begin(second);
+
+    const auto first_end = std::end(first);
+    const auto second_end = std::end(second);
+
+    const auto first_length = std::distance(first_begin, first_end);
+    const auto second_length = std::distance(second_begin, second_end);
+    if (first_length < count || second_length < count)
+    {
+        if (first_length != second_length)
+        {
+            return false;
+        }
+        else
+        {
+            return std::equal(first_begin, first_end, second_begin, second_end, comp);
+        }
+    }
+    else
+    {
+        return std::equal(first_begin, first_begin + count, second_begin, second_begin + count, comp);
+    }
+}
+
 template <typename Range1T, typename Range2T = Range1T> bool iLess(const Range1T &first, const Range2T &second)
 {
     return std::lexicographical_compare(std::begin(first), std::end(first), std::begin(second), std::end(second),
