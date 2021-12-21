@@ -24,7 +24,7 @@ class VSoundService;
 
 #define CHARACTER_ATTACK_DIST 2.4f // Maximum attack distance (m)
 #define CHARACTER_ATTACK_ANG 60.0f // Maximum angle of attack (degrees)
-#define CHARACTER_BLOCK_ANG 50.0f // Maximum angle of block (degrees)
+#define CHARACTER_BLOCK_ANG 50.0f  // Maximum angle of block (degrees)
 #define CHARACTER_MAX_JMP_STEPS 50
 
 class Character : public Entity
@@ -834,5 +834,6 @@ inline bool Character::IsSetBlade() const
 inline bool Character::PriorityActionIsJump() const
 {
     return (priorityAction.name &&
-            (_stricmp(priorityAction.name, jump.name) == 0 || _stricmp(priorityAction.name, fall.name) == 0));
+            (storm::iEquals(std::string_view(priorityAction.name), std::string_view(jump.name)) ||
+             storm::iEquals(std::string_view(priorityAction.name), std::string_view(fall.name))));
 }

@@ -498,21 +498,21 @@ Character::Character()
     char buf[64];
     for (long i = 0; i < 4; i++)
     {
-        sprintf_s(buf, sizeof(buf) - 1, "attack_fast_%i", i + 1);
+        sprintf(buf, "attack_fast_%i", i + 1);
         attackFast[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "attack_force_%i", i + 1);
+        sprintf(buf, "attack_force_%i", i + 1);
         attackForce[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "attack_round_%i", i + 1);
+        sprintf(buf, "attack_round_%i", i + 1);
         attackRound[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "attack_break_%i", i + 1);
+        sprintf(buf, "attack_break_%i", i + 1);
         attackBreak[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "attack_feint_%i", i + 1);
+        sprintf(buf, "attack_feint_%i", i + 1);
         attackFeint[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "attack_feintc_%i", i + 1);
+        sprintf(buf, "attack_feintc_%i", i + 1);
         attackFeintC[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "hit_attack_%i", i + 1);
+        sprintf(buf, "hit_attack_%i", i + 1);
         hit[i].SetName(buf);
-        sprintf_s(buf, sizeof(buf) - 1, "parry_%i", i + 1);
+        sprintf(buf, "parry_%i", i + 1);
         parry[i].SetName(buf);
     }
     numAttackFast = 3;
@@ -672,7 +672,7 @@ bool Character::Init()
         id = "<none>";
     const long len = strlen(id) + 1;
     characterID = new char[len];
-    strcpy_s(characterID, len, id);
+    strcpy(characterID, id);
     // Add to the group
     core.Send_Message(EntityManager::GetEntityId("CharactersGroups"), "sis", "MoveCharacter", GetId(), group);
     SetSignModel();
@@ -809,15 +809,15 @@ uint32_t Character::AttributeChanged(ATTRIBUTES *apnt)
         return 0;
     if (!apnt || !apnt->GetThisName())
         return 0;
-    if (_stricmp(apnt->GetThisName(), "model") == 0)
+    if (storm::iEquals(std::string_view(apnt->GetThisName()), "model"))
     {
         SetSignModel();
     }
-    else if (_stricmp(apnt->GetThisName(), "technique") == 0)
+    else if (storm::iEquals(std::string_view(apnt->GetThisName()), "technique"))
     {
         SetSignTechnique();
     }
-    else if (_stricmp(apnt->GetThisName(), "id") == 0 && apnt->GetParent() && !apnt->GetParent()->GetParent())
+    else if (storm::iEquals(std::string_view(apnt->GetThisName()), "id") && apnt->GetParent() && !apnt->GetParent()->GetParent())
     {
         const char *id = apnt->GetThisAttr();
         if (!id)
@@ -825,9 +825,9 @@ uint32_t Character::AttributeChanged(ATTRIBUTES *apnt)
         delete characterID;
         const long len = strlen(id) + 1;
         characterID = new char[len];
-        strcpy_s(characterID, len, id);
+        strcpy(characterID, id);
     }
-    else if (_stricmp(apnt->GetThisName(), "actions") == 0 && apnt->GetParent() && !apnt->GetParent()->GetParent())
+    else if (storm::iEquals(std::string_view(apnt->GetThisName()), "actions") && apnt->GetParent() && !apnt->GetParent()->GetParent())
     {
         // Reading move actions
         // Simple
@@ -1206,7 +1206,7 @@ void Character::DelSavePosition(bool isTeleport)
     if (aPosLocator)
     {
         const char *pcLocGroupName = aPosLocator->GetAttribute("group");
-        if (pcLocGroupName && _stricmp(pcLocGroupName, "sit") == 0)
+        if (pcLocGroupName && storm::iEquals(std::string_view(pcLocGroupName), "sit"))
             isTeleport = false;
     }
 
@@ -1381,7 +1381,7 @@ bool Character::IsFireFindTarget() const
 {
     if (!priorityAction.name || !shot.name)
         return false;
-    if (_stricmp(priorityAction.name, shot.name) == 0)
+    if (storm::iEquals(std::string_view(priorityAction.name), std::string_view(shot.name)))
         return !isFired;
     return false;
 }
@@ -2289,7 +2289,7 @@ void Character::Update(float dltTime)
     PtcData &ptc = location->GetPtcData();
     if (deadName)
     {
-        if (!priorityAction.name || _stricmp(priorityAction.name, deadName) != 0)
+        if (!priorityAction.name || !storm::iEquals(std::string_view(priorityAction.name), std::string_view(deadName)))
         {
             priorityAction.SetName(deadName);
             isSetPriorityAction = false;
@@ -2464,9 +2464,9 @@ void Character::ActionEvent(const char *actionName, Animation *animation, long i
     if (fgtCurType != fgt_block)
         fgtCurType = fgt_none;
     isTurnLock = false;
-    if (priorityAction.name && _stricmp(actionName, priorityAction.name) == 0)
+    if (priorityAction.name && storm::iEquals(std::string_view(actionName), std::string_view(priorityAction.name)))
     {
-        if (_stricmp(priorityAction.name, CHARACTER_NORM_TO_FIGHT) == 0)
+        if (storm::iEquals(std::string_view(priorityAction.name), CHARACTER_NORM_TO_FIGHT))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 1);
@@ -2477,7 +2477,7 @@ void Character::ActionEvent(const char *actionName, Animation *animation, long i
                 animation->Player(0).SetPosition(1.0f);
             }
         }
-        else if (_stricmp(priorityAction.name, CHARACTER_FIGHT_TO_NORM) == 0)
+        else if (storm::iEquals(std::string_view(priorityAction.name), CHARACTER_FIGHT_TO_NORM))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 1);
@@ -2488,7 +2488,7 @@ void Character::ActionEvent(const char *actionName, Animation *animation, long i
                 animation->Player(0).SetPosition(1.0f);
             }
         }
-        else if (shot.name && _stricmp(priorityAction.name, shot.name) == 0)
+        else if (shot.name && storm::iEquals(std::string_view(priorityAction.name), std::string_view(shot.name)))
         {
             core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
             if (event == ae_end)
@@ -2503,13 +2503,13 @@ void Character::ActionEvent(const char *actionName, Animation *animation, long i
                 }
             }
         }
-        else if (recoil.name && _stricmp(priorityAction.name, recoil.name) == 0)
+        else if (recoil.name && storm::iEquals(std::string_view(priorityAction.name), std::string_view(recoil.name)))
         {
             if (rand() % 10 > 7)
                 recoilLook = true; // able to play the teaser
             priorityAction.SetName(nullptr);
         }
-        else if (deadName && _stricmp(priorityAction.name, deadName) == 0)
+        else if (deadName && storm::iEquals(std::string_view(priorityAction.name), std::string_view(deadName)))
         {
             animation->Player(0).Pause();
             animation->Player(0).SetPosition(1.0f);
@@ -2533,8 +2533,8 @@ void Character::ActionEvent(const char *actionName, Animation *animation, long i
             else
                 SetPriorityAction(fall_land.name);
         }
-        else if (_stricmp(priorityAction.name, fall_land.name) == 0 ||
-                 _stricmp(priorityAction.name, fall_water.name) == 0)
+        else if (storm::iEquals(std::string_view(priorityAction.name), std::string_view(fall_land.name)) ||
+                 storm::iEquals(std::string_view(priorityAction.name), std::string_view(fall_water.name)))
         {
             priorityAction.SetName(nullptr);
             animation->Player(0).Pause();
@@ -2543,7 +2543,7 @@ void Character::ActionEvent(const char *actionName, Animation *animation, long i
     }
     else if (userIdle.name)
     {
-        if (_stricmp(actionName, userIdle.name) != 0)
+        if (!storm::iEquals(std::string_view(actionName), std::string_view(userIdle.name)))
             return;
         core.Event("Location_Character_EndAction", "i", GetId());
     }
@@ -2557,15 +2557,15 @@ void Character::ActionEvent(Animation *animation, long playerIndex, const char *
     const char *alliace = nullptr;
     if (!actionName)
         return;
-    if (_stricmp(eventName, "LStep") == 0)
+    if (storm::iEquals(std::string_view(eventName), "LStep"))
     {
         soundStep = true;
     }
-    else if (_stricmp(eventName, "RStep") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "RStep"))
     {
         soundStep = true;
     }
-    else if (_stricmp(eventName, "swim") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "swim"))
     {
         PlaySound("swiming");
     }
@@ -2603,31 +2603,31 @@ void Character::ActionEvent(Animation *animation, long playerIndex, const char *
         {
           PlaySound("sword_wind_feintend");
         }else*/
-        if (_stricmp(eventName, "Resact") == 0)
+        if (storm::iEquals(std::string_view(eventName), "Resact"))
     {
         fgtSetType = fgt_none;
         fgtSetIndex = -1;
     }
-    else if (_stricmp(eventName, "Attack") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "Attack"))
     {
         CheckAttackHit();
     }
-    else if (_stricmp(eventName, "Parry start") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "Parry start"))
     {
         isParryState = true;
         isFeintState = false;
     }
-    else if (_stricmp(eventName, "Parry end") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "Parry end"))
     {
         isParryState = false;
         isFeintState = false;
     }
-    else if (_stricmp(eventName, "Feint start") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "Feint start"))
     {
         isParryState = false;
         isFeintState = true;
     }
-    else if (_stricmp(eventName, "Feint end") == 0)
+    else if (storm::iEquals(std::string_view(eventName), "Feint end"))
     {
         isParryState = false;
         isFeintState = false;
@@ -2653,7 +2653,7 @@ if(_stricmp(eventName, "Blade to belt") == 0)
         if(pos < 0.99f) PlaySound("sword_out");
     }
 }else */
-        if (_stricmp(eventName, "Death sound") == 0)
+        if (storm::iEquals(std::string_view(eventName), "Death sound"))
     {
         core.Event("Event_ChrSnd_Body", "i", GetId());
     }
@@ -2676,31 +2676,31 @@ if(_stricmp(eventName, "Blade to belt") == 0)
         if (pcActionName)
             core.Event("Location_CharacterItemAction", "isl", GetId(), pcActionName, nIdx);
     }
-    else if (priorityAction.name && _stricmp(actionName, priorityAction.name) == 0)
+    else if (priorityAction.name && storm::iEquals(std::string_view(actionName), std::string_view(priorityAction.name)))
     {
-        if (_stricmp(priorityAction.name, CHARACTER_NORM_TO_FIGHT) == 0)
+        if (storm::iEquals(std::string_view(priorityAction.name), CHARACTER_NORM_TO_FIGHT))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 1);
         }
-        else if (_stricmp(priorityAction.name, CHARACTER_FIGHT_TO_NORM) == 0)
+        else if (storm::iEquals(std::string_view(priorityAction.name), CHARACTER_FIGHT_TO_NORM))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 1);
         }
-        else if (shot.name && _stricmp(priorityAction.name, shot.name) == 0)
+        else if (shot.name && storm::iEquals(std::string_view(priorityAction.name), std::string_view(shot.name)))
         {
             if (eventName)
             {
-                if (_stricmp(eventName, CHARACTER_FIGHT_GUNBELT) == 0)
+                if (storm::iEquals(std::string_view(eventName), CHARACTER_FIGHT_GUNBELT))
                 {
                     core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
                 }
-                else if (_stricmp(eventName, CHARACTER_FIGHT_GUNHAND) == 0)
+                else if (storm::iEquals(std::string_view(eventName), CHARACTER_FIGHT_GUNHAND))
                 {
                     core.Send_Message(blade, "l", MSG_BLADE_GUNHAND);
                 }
-                else if (_stricmp(eventName, CHARACTER_FIGHT_GUNFIRE) == 0)
+                else if (storm::iEquals(std::string_view(eventName), CHARACTER_FIGHT_GUNFIRE))
                 {
                     core.Send_Message(blade, "l", MSG_BLADE_GUNFIRE);
                     // PlaySound("pistol_shot");
@@ -2719,7 +2719,7 @@ if(_stricmp(eventName, "Blade to belt") == 0)
         }
         else if (isJump && PriorityActionIsJump())
         {
-            if (eventName && _stricmp("Jump pause", eventName) == 0)
+            if (eventName && storm::iEquals(std::string_view(eventName), "Jump pause"))
             {
                 animation->Player(playerIndex).Pause();
             }
@@ -2727,21 +2727,21 @@ if(_stricmp(eventName, "Blade to belt") == 0)
     }
     else if (userIdle.name)
     {
-        if (_stricmp(actionName, userIdle.name) == 0)
+        if (storm::iEquals(std::string_view(actionName), std::string_view(userIdle.name)))
         {
-            if (shot.name && _stricmp(actionName, shot.name) == 0)
+            if (shot.name && storm::iEquals(std::string_view(actionName), std::string_view(shot.name)))
             {
                 if (eventName)
                 {
-                    if (_stricmp(eventName, CHARACTER_FIGHT_GUNBELT) == 0)
+                    if (storm::iEquals(std::string_view(eventName), CHARACTER_FIGHT_GUNBELT))
                     {
                         core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
                     }
-                    else if (_stricmp(eventName, CHARACTER_FIGHT_GUNHAND) == 0)
+                    else if (storm::iEquals(std::string_view(eventName), CHARACTER_FIGHT_GUNHAND))
                     {
                         core.Send_Message(blade, "l", MSG_BLADE_GUNHAND);
                     }
-                    else if (_stricmp(eventName, CHARACTER_FIGHT_GUNFIRE) == 0)
+                    else if (storm::iEquals(std::string_view(eventName), CHARACTER_FIGHT_GUNFIRE))
                     {
                         core.Send_Message(blade, "l", MSG_BLADE_GUNFIRE);
                         core.Event("ActorMakeShot", "i", GetId());
@@ -2789,39 +2789,39 @@ void Character::PlayStep()
             const char *mtl = location->GetPtcData().GetMaterial(currentNode);
             if (mtl)
             {
-                if (_stricmp(mtl, "run_grass") == 0)
+                if (storm::iEquals(std::string_view(mtl), "run_grass"))
                 {
                     defSnd = "run_grass";
                 }
-                else if (_stricmp(mtl, "snd_wood") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_wood"))
                 {
                     defSnd = "run_wood";
                 }
-                else if (_stricmp(mtl, "snd_ground") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_ground"))
                 {
                     defSnd = "run_ground";
                 }
-                else if (_stricmp(mtl, "snd_sand") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_sand"))
                 {
                     defSnd = "run_sand";
                 }
-                else if (_stricmp(mtl, "snd_stone") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_stone"))
                 {
                     defSnd = "run_stone";
                 }
-                else if (_stricmp(mtl, "snd_stairway") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_stairway"))
                 {
                     defSnd = "run_stairway";
                 }
-                else if (_stricmp(mtl, "snd_carpet") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_carpet"))
                 {
                     defSnd = "run_carpet";
                 }
-                else if (_stricmp(mtl, "snd_church") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_church"))
                 {
                     defSnd = "run_church";
                 }
-                else if (_stricmp(mtl, "snd_echo") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_echo"))
                 {
                     defSnd = "run_echo";
                 }
@@ -2846,43 +2846,43 @@ void Character::PlayStep()
             const char *mtl = location->GetPtcData().GetMaterial(currentNode);
             if (mtl)
             {
-                if (_stricmp(mtl, "snd_grass") == 0)
+                if (storm::iEquals(std::string_view(mtl), "snd_grass"))
                 {
                     defSnd = "step_grass";
                 }
-                else if (_stricmp(mtl, "snd_wood") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_wood"))
                 {
                     defSnd = "step_wood";
                 }
-                else if (_stricmp(mtl, "snd_ground") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_ground"))
                 {
                     defSnd = "step_ground";
                 }
-                else if (_stricmp(mtl, "snd_sand") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_sand"))
                 {
                     defSnd = "step_sand";
                 }
-                else if (_stricmp(mtl, "snd_stone") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_stone"))
                 {
                     defSnd = "step_stone";
                 }
-                else if (_stricmp(mtl, "snd_stairway") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_stairway"))
                 {
                     defSnd = "step_stairway";
                 }
-                else if (_stricmp(mtl, "snd_carpet") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_carpet"))
                 {
                     defSnd = "step_carpet";
                 }
-                else if (_stricmp(mtl, "snd_church") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_church"))
                 {
                     defSnd = "step_church";
                 }
-                else if (_stricmp(mtl, "snd_echo") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_echo"))
                 {
                     defSnd = "step_echo";
                 }
-                else if (_stricmp(mtl, "snd_iron") == 0)
+                else if (storm::iEquals(std::string_view(mtl), "snd_iron"))
                 {
                     defSnd = "step_iron";
                 }
@@ -2942,8 +2942,8 @@ bool Character::zLoadModel(MESSAGE &message)
     if (gs)
         gs->SetTexturePath("characters\\");
     // Path to the model
-    strcpy_s(mpath, "characters\\");
-    strcat_s(mpath, name.c_str());
+    strcpy(mpath, "characters\\");
+    strcat(mpath, name.c_str());
     // Create and load the model
     if (!(mdl = EntityManager::CreateEntity("modelr")))
     {
@@ -3024,7 +3024,7 @@ bool Character::zAddDetector(MESSAGE &message)
     // Checking for creation
     for (long i = 0; i < numDetectors; i++)
     {
-        if (_stricmp(detector[i]->la->GetGroupName(), group.c_str()) == 0)
+        if (storm::iEquals(std::string_view(detector[i]->la->GetGroupName()), group))
             return false;
     }
     // Looking for a group
@@ -3041,7 +3041,7 @@ bool Character::zDelDetector(MESSAGE &message)
     const std::string &group = message.String();
     for (long i = 0; i < numDetectors; i++)
     {
-        if (_stricmp(detector[i]->la->GetGroupName(), group.c_str()) == 0)
+        if (storm::iEquals(std::string_view(detector[i]->la->GetGroupName()), group))
         {
             detector[i]->Exit(this);
             delete detector[i];
@@ -3198,7 +3198,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
     long i;
     VDATA *v;
     CVECTOR pos;
-    if (_stricmp(msg.c_str(), "TieItem") == 0)
+    if (storm::iEquals(msg, "TieItem"))
     {
         i = message.Long();
         const std::string &modelName = message.String();
@@ -3212,14 +3212,14 @@ uint32_t Character::zExMessage(MESSAGE &message)
         core.Send_Message(blade, "lilss", 1001, mdl, i, modelName.c_str(), locatorName.c_str());
         return 1;
     }
-    if (_stricmp(msg.c_str(), "UntieItem") == 0)
+    if (storm::iEquals(msg, "UntieItem"))
     {
         i = message.Long();
         core.Send_Message(blade, "ll", 1002, i);
         return 1;
     }
     auto *const location = GetLocation();
-    if (_stricmp(msg.c_str(), "HandLightOn") == 0)
+    if (storm::iEquals(msg, "HandLightOn"))
     {
         // remove the old source
         if (m_nHandLightID >= 0)
@@ -3229,33 +3229,33 @@ uint32_t Character::zExMessage(MESSAGE &message)
         m_nHandLightID = location->GetLights()->AddMovingLight(secondMsg.c_str(), GetHandLightPos());
         return 1;
     }
-    if (_stricmp(msg.c_str(), "HandLightOff") == 0)
+    if (storm::iEquals(msg, "HandLightOff"))
     {
         if (m_nHandLightID >= 0)
             location->GetLights()->DelMovingLight(m_nHandLightID);
         m_nHandLightID = -1;
         return 1;
     }
-    if (_stricmp(msg.c_str(), "PlaySound") == 0)
+    if (storm::iEquals(msg, "PlaySound"))
     {
         const std::string &secondMsg = message.String();
         return PlaySound(secondMsg.c_str()) != SOUND_INVALID_ID;
     }
-    if (_stricmp(msg.c_str(), "IsFightMode") == 0)
+    if (storm::iEquals(msg, "IsFightMode"))
     {
         return IsFight();
     }
-    if (_stricmp(msg.c_str(), "IsSetBalde") == 0)
+    if (storm::iEquals(msg, "IsSetBalde"))
     {
         return IsSetBlade();
     }
-    if (_stricmp(msg.c_str(), "IsDead") == 0)
+    if (storm::iEquals(msg, "IsDead"))
     {
         return deadName != nullptr;
     }
     if (!deadName)
     {
-        if (_stricmp(msg.c_str(), "FindDialogCharacter") == 0)
+        if (storm::iEquals(msg, "FindDialogCharacter"))
         {
             Character *chr = FindDialogCharacter();
             if (chr && chr->AttributesPointer)
@@ -3264,15 +3264,15 @@ uint32_t Character::zExMessage(MESSAGE &message)
             }
             return -1;
         }
-        if (_stricmp(msg.c_str(), "SetFightMode") == 0)
+        if (storm::iEquals(msg, "SetFightMode"))
         {
             return SetFightMode(message.Long() != 0, false);
         }
-        if (_stricmp(msg.c_str(), "ChangeFightMode") == 0)
+        if (storm::iEquals(msg, "ChangeFightMode"))
         {
             return SetFightMode(message.Long() != 0, true);
         }
-        if (_stricmp(msg.c_str(), "FindForvardLocator") == 0)
+        if (storm::iEquals(msg, "FindForvardLocator"))
         {
             // Group name
             const std::string &grp = message.String();
@@ -3289,7 +3289,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
             v->Set((char *)la->LocatorName(i));
             return 1;
         }
-        if (_stricmp(msg.c_str(), "DistToLocator") == 0)
+        if (storm::iEquals(msg, "DistToLocator"))
         {
             // Group name
             const std::string &grp = message.String();
@@ -3309,38 +3309,39 @@ uint32_t Character::zExMessage(MESSAGE &message)
             v->Set(sqrtf(~(pos - curPos)));
             return 1;
         }
-        if (_stricmp(msg.c_str(), "InDialog") == 0)
+        if (storm::iEquals(msg, "InDialog"))
         {
             isDialog = message.Long() != 0;
             return 1;
         }
-        if (_stricmp(msg.c_str(), "SetSex") == 0)
+        if (storm::iEquals(msg, "SetSex"))
         {
             isMale = message.Long() != 0;
             return 1;
         }
-        if (_stricmp(msg.c_str(), "SetFightWOWeapon") == 0)
+        if (storm::iEquals(msg, "SetFightWOWeapon"))
         {
             isFightWOWps = message.Long() != 0;
             UpdateWeapons();
             return 1;
         }
-        if (_stricmp(msg.c_str(), "LockFightMode") == 0)
+        if (storm::iEquals(msg, "LockFightMode"))
         {
             lockFightMode = message.Long() != 0;
             return 1;
         }
-        if (_stricmp(msg.c_str(), "CheckFightMode") == 0)
+        if (storm::iEquals(msg, "CheckFightMode"))
         {
             return isFight;
         }
-        if (_stricmp(msg.c_str(), "IsActive") == 0)
+        if (storm::iEquals(msg, "IsActive"))
         {
             return isActiveState;
         }
-        if (_stricmp(msg.c_str(), "CheckID") == 0)
+        if (storm::iEquals(msg, "CheckID"))
         {
 #ifdef _DEBUG
+#ifdef _WIN32 // FIX_LINUX
             const std::string &msg = message.String();
             if (AttributesPointer)
             {
@@ -3356,9 +3357,10 @@ uint32_t Character::zExMessage(MESSAGE &message)
             if (strcmp(msg.c_str(), characterID) != 0)
                 __debugbreak();
 #endif
+#endif
             return 1;
         }
-        if (_stricmp(msg.c_str(), "GunBelt") == 0)
+        if (storm::iEquals(msg, "GunBelt"))
         {
             if (message.Long() != 0)
                 core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
@@ -3702,7 +3704,7 @@ bool Character::SetAction(const char *actionName, float tblend, float movespeed,
     if (a->Player(0).IsPlaying() && !a->Player(0).IsPause())
     {
         curAction = a->Player(0).GetAction();
-        if (!forceStart && curAction && actionName && _stricmp(curAction, actionName) == 0)
+        if (!forceStart && curAction && actionName && storm::iEquals(std::string_view(curAction), std::string_view(actionName)))
             return true;
     }
     if (noBlendTime > 0.0f)
@@ -3809,8 +3811,8 @@ void Character::UpdateAnimation()
             {
                 isNFHit = false;
                 curMove = nullptr;
-                if (userIdle.name &&
-                    (_stricmp(userIdle.name, "Ground_SitDown") == 0 || _stricmp(userIdle.name, "Ground_StandUp") == 0))
+                if (userIdle.name && (storm::iEquals(std::string_view(userIdle.name), "Ground_SitDown") ||
+                                      storm::iEquals(std::string_view(userIdle.name), "Ground_StandUp")))
                 {
                     core.Trace("Not int: \"%s\"", userIdle.name);
                 }
@@ -4119,7 +4121,7 @@ void Character::UpdateAnimation()
                     }
                     break;
                 case fgt_attack_force: // Slash and lunge with a slashing blow
-                    if (_stricmp(pWeaponID, "topor") == 0 && fgtSetIndex == 3)
+                    if (storm::iEquals(std::string_view(pWeaponID), "topor") && fgtSetIndex == 3)
                     {
                         // if with an ax, then the lunge is changed to a chopping blow
                         fgtSetIndex = rand() % 2;
@@ -4298,7 +4300,7 @@ void Character::UpdateAnimation()
                 }
                 case fgt_block: // Saber protection
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
-                    if (_stricmp(pWeaponID, "topor") == 0)
+                    if (storm::iEquals(std::string_view(pWeaponID), "topor"))
                     {
                         if (!(isSet = SetAction(blockaxe.name, blockaxe.tblend, 0.0f, 5.0f, true)))
                         {
@@ -4314,14 +4316,14 @@ void Character::UpdateAnimation()
                     }
                     break;
                 case fgt_blockhit: // Saber protection
-                    if (_stricmp(characterID, "Blaze") == 0)
+                    if (storm::iEquals(std::string_view(characterID), "Blaze"))
                     // boal did not find a better one, but ours always has this ID, it will work
                     {
                         if (rand() % 100 >= 65)
                             break; // boal doesn't always break into animation
                     }
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
-                    if (_stricmp(pWeaponID, "topor") == 0)
+                    if (storm::iEquals(std::string_view(pWeaponID), "topor"))
                     {
                         if (!(isSet = SetAction(blockaxehit.name, blockaxehit.tblend, 0.0f, 2.0f, true)))
                         {
@@ -4983,13 +4985,13 @@ void Character::FindNearCharacters(MESSAGE &message)
         auto *e = (VDATA *)array->GetArrayElement(i);
         // Setting fields
         e->Set("index", fc.c->AttributesPointer->GetAttribute("index"));
-        sprintf_s(buf, "%f", sqrtf(fc.d2));
+        sprintf(buf, "%f", sqrtf(fc.d2));
         e->Set("dist", buf);
-        sprintf_s(buf, "%f", fc.dx);
+        sprintf(buf, "%f", fc.dx);
         e->Set("dx", buf);
-        sprintf_s(buf, "%f", fc.dy);
+        sprintf(buf, "%f", fc.dy);
         e->Set("dy", buf);
-        sprintf_s(buf, "%f", fc.dz);
+        sprintf(buf, "%f", fc.dz);
         e->Set("dz", buf);
     }
     num->Set(nn);

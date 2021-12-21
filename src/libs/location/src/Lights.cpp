@@ -67,7 +67,7 @@ bool Lights::Init()
         long i;
         for (i = 0; i < numTypes; i++)
         {
-            if (_stricmp(lName, types[i].name) == 0)
+            if (storm::iEquals(std::string_view(lName), std::string_view(types[i].name)))
             {
                 core.Trace("Location lights redefinition light: %s", lName);
                 break;
@@ -147,11 +147,13 @@ bool Lights::Init()
 // Execution
 void Lights::Execute(uint32_t delta_time)
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
         for (long i = 0; i < numTypes; i++)
             UpdateLightTypes(i);
     }
+#endif
     for (long i = 0; i < numLights; i++)
     {
         // See what is there
@@ -362,11 +364,13 @@ void Lights::Realize(uint32_t delta_time)
     }
     rs->SetTransform(D3DTS_VIEW, camMtx);
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     // Debug
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_SPACE) < 0)
     {
         PrintDebugInfo();
     }
+#endif
 }
 
 // Find source index
@@ -375,7 +379,7 @@ long Lights::FindLight(const char *name)
     if (!name || !name[0])
         return -1;
     for (long i = 0; i < numTypes; i++)
-        if (_stricmp(name, types[i].name) == 0)
+        if (storm::iEquals(std::string_view(name), std::string_view(types[i].name)))
             return i;
     return -1;
 }

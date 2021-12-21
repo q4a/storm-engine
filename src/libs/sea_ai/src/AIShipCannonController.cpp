@@ -398,7 +398,9 @@ CVECTOR AIShipCannonController::GetFirePos(const CVECTOR &vFireDir)
     {
         return CVECTOR(1e5f, 0.0f, 1e5f);
 
+#ifdef _WIN32
         __debugbreak();
+#endif
         bTempFlag = true;
         dwBort = GetFirstFireBort(vTempFirePos);
         Assert(dwBort != INVALID_BORT_INDEX);
@@ -668,7 +670,7 @@ bool AIShipCannonController::Init(ATTRIBUTES *_pAShip)
 
         // create damages
         char str[512];
-        sprintf_s(str, "%s.damages", (char *)pBort->sName.c_str());
+        sprintf(str, "%s.damages", (char *)pBort->sName.c_str());
         pABorts->CreateSubAClass(pABorts, str);
     }
 
@@ -700,7 +702,7 @@ bool AIShipCannonController::ScanShipForCannons()
             pNode->geo->GetLabel(i, label);
             for (j = 0; j < aShipBorts.size(); j++)
                 //       if (aShipBorts[j] == label.group_name) {
-                if (_strcmpi(aShipBorts[j].sName.c_str(), label.group_name) == 0)
+                if (storm::iEquals(aShipBorts[j].sName, std::string_view(label.group_name)))
                 {
                     // ugeen : akella bug fix
                     aShipBorts[j].aCannons.push_back(AICannon{});
@@ -710,9 +712,9 @@ bool AIShipCannonController::ScanShipForCannons()
                     aShipBorts[j].fOurBortFireHeight += m.Pos().y;
                     pCannon->Init(GetAIShip(), GetAIShip()->GetShipEID(), label);
 
-                    sprintf_s(str, "%s.damages", label.group_name);
+                    sprintf(str, "%s.damages", label.group_name);
                     ATTRIBUTES *pADamages = pABorts->FindAClass(pABorts, str);
-                    sprintf_s(str, "c%zd", aShipBorts[j].aCannons.size() - 1);
+                    sprintf(str, "c%zd", aShipBorts[j].aCannons.size() - 1);
                     const float fDamage = pADamages->GetAttributeAsFloat(str, 0.0f);
                     pADamages->SetAttributeUseFloat(str, fDamage);
                     pCannon->SetDamage(fDamage);
@@ -819,7 +821,7 @@ void AIShipCannonController::CheckCannonsBoom(float fTmpCannonDamage, const CVEC
     {
         AISHIP_BORT *pBort = &aShipBorts[i];
 
-        sprintf_s(str, "%s.damages", (char *)pBort->sName.c_str());
+        sprintf(str, "%s.damages", (char *)pBort->sName.c_str());
         ATTRIBUTES *pADamages = pABorts->FindAClass(pABorts, str);
         Assert(pADamages);
         ATTRIBUTES *pACurBort = pABorts->FindAClass(pABorts, (char *)pBort->sName.c_str());
@@ -838,7 +840,7 @@ void AIShipCannonController::CheckCannonsBoom(float fTmpCannonDamage, const CVEC
             VDATA *pVData = core.Event(CANNON_DAMAGE, "affffff", GetAIShip()->GetACharacter(), fTmpCannonDamage,
                                        pC->GetDamage(), fDistance, vPnt.x, vPnt.y, vPnt.z);
 
-            sprintf_s(str, "c%d", j);
+            sprintf(str, "c%d", j);
 
             pC->SetDamage(pVData->GetFloat());
             pADamages->SetAttributeUseFloat(str, pC->GetDamage());
@@ -872,7 +874,7 @@ void AIShipCannonController::ResearchCannons()
     {
         AISHIP_BORT *pBort = &aShipBorts[i];
 
-        sprintf_s(str, "%s.damages", (char *)pBort->sName.c_str());
+        sprintf(str, "%s.damages", (char *)pBort->sName.c_str());
         ATTRIBUTES *pADamages = pABorts->FindAClass(pABorts, str);
         Assert(pADamages);
         ATTRIBUTES *pACurBort = pABorts->FindAClass(pABorts, (char *)pBort->sName.c_str());
@@ -882,7 +884,7 @@ void AIShipCannonController::ResearchCannons()
         for (j = 0; j < pBort->aCannons.size(); j++)
         {
             AICannon *pC = &pBort->aCannons[j];
-            sprintf_s(str, "c%d", j);
+            sprintf(str, "c%d", j);
             const float fDamage = pADamages->GetAttributeAsFloat(str, 0.0f);
             pC->SetDamage(fDamage);
             pADamages->SetAttributeUseFloat(str, pC->GetDamage());

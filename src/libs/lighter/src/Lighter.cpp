@@ -89,6 +89,7 @@ void Lighter::Execute(uint32_t delta_time)
     }
     if (waitChange <= 0.0f)
     {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (GetAsyncKeyState(VK_NUMPAD0) < 0)
         {
             waitChange = 0.5f;
@@ -102,6 +103,7 @@ void Lighter::Execute(uint32_t delta_time)
                 isInited = true;
             }
         }
+#endif
     }
     else
         waitChange -= dltTime;
@@ -166,12 +168,14 @@ void Lighter::PreparingData()
 
 void Lighter::Realize(uint32_t delta_time)
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(VK_DECIMAL) < 0)
     {
         window.isNoPrepared = !isInited;
         geometry.DrawNormals(rs);
     }
     else
+#endif
         window.isNoPrepared = false;
     window.Draw(delta_time * 0.001f);
 }
@@ -180,25 +184,25 @@ void Lighter::Realize(uint32_t delta_time)
 uint64_t Lighter::ProcessMessage(MESSAGE &message)
 {
     const std::string &command = message.String();
-    if (_stricmp(command.c_str(), "AddModel") == 0)
+    if (storm::iEquals(command, "AddModel"))
     {
         // Adding the model
         MsgAddModel(message);
         return true;
     }
-    if (_stricmp(command.c_str(), "ModelsPath") == 0)
+    if (storm::iEquals(command, "ModelsPath"))
     {
         // Adding the model
         MsgModelsPath(message);
         return true;
     }
-    if (_stricmp(command.c_str(), "LightPath") == 0)
+    if (storm::iEquals(command, "LightPath"))
     {
         // Adding the model
         MsgLightPath(message);
         return true;
     }
-    if (_stricmp(command.c_str(), "AddLight") == 0)
+    if (storm::iEquals(command, "AddLight"))
     {
         // Adding the model
         MsgAddLight(message);

@@ -172,7 +172,7 @@ uint32_t AISeaGoods::AttributeChanged(ATTRIBUTES *pAttribute)
     }
     if (*pAttribute == "Good")
     {
-        strcpy_s(TmpItem.sGoodName, pAttribute->GetThisAttr());
+        strcpy(TmpItem.sGoodName, pAttribute->GetThisAttr());
         return 0;
     }
 

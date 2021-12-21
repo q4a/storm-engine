@@ -35,10 +35,10 @@ class GeomNameParser
     void Tokenize(const char *names)
     {
         Tokens.clear();
-        strncpy_s(NamesString, names, MAX_STRING_SIZE);
+        strncpy(NamesString, names, MAX_STRING_SIZE);
         int StrLen = strlen(NamesString);
         if (StrLen > 0 && NamesString[StrLen - 1] != ';')
-            strcat_s(NamesString, ";");
+            strcat(NamesString, ";");
         StrLen = strlen(NamesString);
 
         auto FromChar = 0;

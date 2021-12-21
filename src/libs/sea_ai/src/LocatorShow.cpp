@@ -155,7 +155,9 @@ void SeaLocatorShow::Realize(uint32_t Delta_Time)
     if (core.Controls->GetDebugAsyncKeyState('5') < 0)
     {
         bShow ^= 1;
+#ifdef _WIN32 // FIX_LINUX
         Sleep(200);
+#endif
     }
     if (!bShow || !pALocators)
         return;

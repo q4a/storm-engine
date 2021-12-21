@@ -53,7 +53,9 @@ bool CoastFoam::Init()
 
 void CoastFoam::Execute(uint32_t Delta_Time)
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     bEditMode = (bCanEdit) ? LOWORD(core.Controls->GetDebugKeyState(VK_NUMLOCK)) != 0 : false;
+#endif
     auto fDeltaTime = static_cast<float>(Delta_Time) * 0.001f;
 }
 
@@ -205,12 +207,17 @@ void CoastFoam::Realize(uint32_t Delta_Time)
             rs->DrawRects(aRects.data(), aRects.size(), "FoamPoints");
         }
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     auto bShift = core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0;
     auto bMenu = core.Controls->GetDebugAsyncKeyState(VK_MENU) < 0;
     if (bShift && core.Controls->GetDebugAsyncKeyState('L') < 0)
         Load();
     if (bShift && core.Controls->GetDebugAsyncKeyState('S') < 0)
         Save();
+#else
+    short bShift = 0;
+    short bMenu = 0;
+#endif
 
     if (bEditMode)
     {
@@ -784,22 +791,22 @@ void CoastFoam::Save()
     for (long i = 0; i < aFoams.size(); i++)
     {
         auto *pF = aFoams[i];
-        sprintf_s(cSection, "foam_%d", i);
+        sprintf(cSection, "foam_%d", i);
         pI->WriteLong(cSection, "NumParts", pF->aFoamParts.size());
 
-        sprintf_s(cTemp, "%.0f, %.0f", pF->fAlphaMin, pF->fAlphaMax);
+        sprintf(cTemp, "%.0f, %.0f", pF->fAlphaMin, pF->fAlphaMax);
         pI->WriteString(cSection, "Alpha", cTemp);
 
-        sprintf_s(cTemp, "%.3f, %.3f", pF->fSpeedMin, pF->fSpeedMax);
+        sprintf(cTemp, "%.3f, %.3f", pF->fSpeedMin, pF->fSpeedMax);
         pI->WriteString(cSection, "Speed", cTemp);
 
-        sprintf_s(cTemp, "%.3f, %.3f", pF->fBrakingMin, pF->fBrakingMax);
+        sprintf(cTemp, "%.3f, %.3f", pF->fBrakingMin, pF->fBrakingMax);
         pI->WriteString(cSection, "Braking", cTemp);
 
-        sprintf_s(cTemp, "%.3f, %.3f", pF->fAppearMin, pF->fAppearMax);
+        sprintf(cTemp, "%.3f, %.3f", pF->fAppearMin, pF->fAppearMax);
         pI->WriteString(cSection, "Appear", cTemp);
 
-        sprintf_s(cTemp, "%.3f", pF->fTexScaleX);
+        sprintf(cTemp, "%.3f", pF->fTexScaleX);
         pI->WriteString(cSection, "TexScaleX", cTemp);
 
         pI->WriteLong(cSection, "NumFoams", pF->iNumFoams);
@@ -810,12 +817,14 @@ void CoastFoam::Save()
         for (long j = 0; j < pF->aFoamParts.size(); j++)
         {
             auto *pFP = &pF->aFoamParts[j];
-            sprintf_s(cKey, "key_%d", j);
-            sprintf_s(cTemp, "%.4f, %.4f, %.4f, %.4f", pFP->v[0].x, pFP->v[0].z, pFP->v[1].x, pFP->v[1].z);
+            sprintf(cKey, "key_%d", j);
+            sprintf(cTemp, "%.4f, %.4f, %.4f, %.4f", pFP->v[0].x, pFP->v[0].z, pFP->v[1].x, pFP->v[1].z);
             pI->WriteString(cSection, cKey, cTemp);
         }
     }
+#ifdef _WIN32 // FIX_LINUX
     _flushall();
+#endif
 }
 
 void CoastFoam::clear()
@@ -848,7 +857,7 @@ void CoastFoam::Load()
         aFoams.push_back(new Foam);
         auto *pF = aFoams.back();
 
-        sprintf_s(cSection, "foam_%d", i);
+        sprintf(cSection, "foam_%d", i);
 
         const long iNumParts = pI->GetLong(cSection, "NumParts", 0);
 
@@ -876,7 +885,7 @@ void CoastFoam::Load()
 
         for (long j = 0; j < ((iNumParts) ? iNumParts : 100000); j++)
         {
-            sprintf_s(cKey, "key_%d", j);
+            sprintf(cKey, "key_%d", j);
             CVECTOR v1, v2;
             v1.y = v2.y = 0.0f;
             pI->ReadString(cSection, cKey, cTemp, sizeof(cTemp), "");
