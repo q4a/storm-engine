@@ -416,7 +416,7 @@ void Sharks::Shark::Event(Animation *animation, long index, long eventID, Animat
         animation->Player(0).SetAction(actSwim);
         aniTime = 3.0f + rand() * 3.0f / RAND_MAX;
     }
-    if (_stricmp(act, actSwim) == 0 || (rnd & 1))
+    if (storm::iEquals(std::string_view(act), std::string_view(actSwim)) || (rnd & 1))
     {
         animation->Player(0).SetAction(actStand);
         aniTime = 3.0f + rand() * 3.0f / RAND_MAX;
@@ -511,7 +511,7 @@ Sharks::Sharks() : sea(0), island(0), indeces{}, vrt{}
 {
     rs = nullptr;
     camPos = 0.0f;
-    numShakes = 3 + (GetTickCount() & 3);
+    numShakes = 3 + (time(nullptr) & 3);
     trackTx = -1;
     periscope.time = -1.0;
     waitPTime = -1.0f;
@@ -555,8 +555,8 @@ bool Sharks::Init()
         auto *root = v->GetAClass();
         if (root)
         {
-            const auto time = root->GetAttributeAsFloat("time");
-            if (time > 9.0f && time < 20.0f)
+            const auto theTime = root->GetAttributeAsFloat("time");
+            if (theTime > 9.0f && theTime < 20.0f)
             {
                 root = root->FindAClass(root, "date");
                 if (root)
@@ -570,7 +570,7 @@ bool Sharks::Init()
                             const auto day = root->GetAttributeAsDword("day");
                             if (day == 7)
                             {
-                                if ((GetTickCount() & 7) == 5)
+                                if ((time(nullptr) & 7) == 5)
                                 {
                                     waitPTime = 60.0f + rand() * 500.0f / RAND_MAX;
                                 }

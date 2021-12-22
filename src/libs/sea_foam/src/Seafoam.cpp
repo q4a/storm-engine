@@ -561,7 +561,7 @@ uint32_t SEAFOAM::AttributeChanged(ATTRIBUTES *pA)
 {
     const auto *const nm = pA->GetThisName();
 
-    if (!_stricmp(nm, "storm"))
+    if (storm::iEquals(std::string_view(nm), "storm"))
     {
         if (!strcmp(pA->GetThisAttr(), "true"))
             isStorm = true;

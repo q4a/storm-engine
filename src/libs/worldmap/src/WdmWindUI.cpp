@@ -21,18 +21,18 @@
 
 WdmWindUI::WdmWindUI()
 {
-    strcpy_s(month[0], "january");
-    strcpy_s(month[1], "february");
-    strcpy_s(month[2], "march");
-    strcpy_s(month[3], "april");
-    strcpy_s(month[4], "may");
-    strcpy_s(month[5], "june");
-    strcpy_s(month[6], "july");
-    strcpy_s(month[7], "august");
-    strcpy_s(month[8], "september");
-    strcpy_s(month[9], "october");
-    strcpy_s(month[10], "november");
-    strcpy_s(month[11], "december");
+    strcpy(month[0], "january");
+    strcpy(month[1], "february");
+    strcpy(month[2], "march");
+    strcpy(month[3], "april");
+    strcpy(month[4], "may");
+    strcpy(month[5], "june");
+    strcpy(month[6], "july");
+    strcpy(month[7], "august");
+    strcpy(month[8], "september");
+    strcpy(month[9], "october");
+    strcpy(month[10], "november");
+    strcpy(month[11], "december");
     txBack = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\back.tga");
     txSky = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\sky.tga");
     txSkyMask = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\sky_mask.tga");
@@ -94,7 +94,7 @@ void WdmWindUI::SetAttributes(ATTRIBUTES *apnt)
         const auto *coordinate = ap->GetAttribute("coordinate");
         if (coordinate != nullptr)
         {
-            strcpy_s(wdmObjects->stCoordinate, coordinate);
+            strcpy(wdmObjects->stCoordinate, coordinate);
         }
         auto *a = ap->FindAClass(ap, "monthnames");
         if (a)
@@ -222,7 +222,7 @@ void WdmWindUI::LRender(VDX9RENDER *rs)
     DrawRects(buf, 1, "WdmDrawMapBlend");
     // writing a date
     char tbuf[128];
-    sprintf_s(tbuf, sizeof(tbuf) - 1, "%i %s %i", wdmObjects->wm->day, month[wdmObjects->wm->mon - 1],
+    sprintf(tbuf, "%i %s %i", wdmObjects->wm->day, month[wdmObjects->wm->mon - 1],
               wdmObjects->wm->year);
     tbuf[sizeof(tbuf) - 1] = 0;
     long font = dateFont >= 0 ? dateFont : FONT_DEFAULT;
@@ -260,7 +260,7 @@ void WdmWindUI::LRender(VDX9RENDER *rs)
     // write the number of supplies
     float foodRumSpacing = rum ? 24.0f : 0.0f;
 
-    sprintf_s(tbuf, sizeof(tbuf) - 1, "%i%s", food > 99999 ? 99999 : food, food > 99999 ? "+" : "");
+    sprintf(tbuf, "%i%s", food > 99999 ? 99999 : food, food > 99999 ? "+" : "");
     tbuf[sizeof(tbuf) - 1] = 0;
     fw = rs->StringWidth(tbuf, font, resizeRatio, static_cast<long>(w));
 
@@ -270,7 +270,7 @@ void WdmWindUI::LRender(VDX9RENDER *rs)
     // write the amount of rum
     if (rum)
     {
-        _snprintf(tbuf, sizeof(tbuf) - 1, "%i", rum.value());
+        snprintf(tbuf, sizeof(tbuf) - 1, "%i", rum.value());
         tbuf[sizeof(tbuf) - 1] = 0;
         fw = rs->StringWidth(tbuf, font, resizeRatio, static_cast<long>(w));
 
@@ -291,7 +291,7 @@ void WdmWindUI::LRender(VDX9RENDER *rs)
         DrawRects(buf, 1, "WdmDrawMapBlend");
 
         // display a line with coordinates
-        _snprintf(tbuf, sizeof(tbuf) - 1, "%s", wdmObjects->coordinate.c_str());
+        snprintf(tbuf, sizeof(tbuf) - 1, "%s", wdmObjects->coordinate.c_str());
         tbuf[sizeof(tbuf) - 1] = 0;
         fw = rs->StringWidth(tbuf, font, resizeRatio, static_cast<long>(w));
         fh = rs->CharHeight(font);
@@ -299,7 +299,7 @@ void WdmWindUI::LRender(VDX9RENDER *rs)
         rs->ExtPrint(font, 0xffffffff, 0x00000000, PR_ALIGN_CENTER, true, resizeRatio, 0, 0, long(cx),
                      long(cy + (64.0f + 32.0f) * resizeRatio), tbuf);
 
-        _snprintf(tbuf, sizeof(tbuf) - 1, "%s", wdmObjects->stCoordinate);
+        snprintf(tbuf, sizeof(tbuf) - 1, "%s", wdmObjects->stCoordinate);
         tbuf[sizeof(tbuf) - 1] = 0;
         fw = rs->StringWidth(tbuf, font, resizeRatio, static_cast<long>(w));
         fh = rs->CharHeight(font);

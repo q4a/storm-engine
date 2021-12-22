@@ -296,12 +296,12 @@ void SKY::LoadTextures()
 
     for (long i = 0; i < SKY_NUM_TEXTURES; i++)
     {
-        sprintf_s(str, "%s%s", static_cast<const char *>(sSkyDir.c_str()), names[i]);
+        sprintf(str, "%s%s", static_cast<const char *>(sSkyDir.c_str()), names[i]);
         TexturesID[i] = pRS->TextureCreate(str);
 
         if (aSkyDirArray.size() > 1)
         {
-            sprintf_s(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
+            sprintf(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
             TexturesNextID[i] = pRS->TextureCreate(str);
         }
     }
@@ -585,7 +585,7 @@ void SKY::UpdateTimeFactor()
                 pRS->TextureRelease(TexturesID[i]);
             TexturesID[i] = TexturesNextID[i];
 
-            sprintf_s(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
+            sprintf(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
             TexturesNextID[i] = pRS->TextureCreate(str);
         }
     }

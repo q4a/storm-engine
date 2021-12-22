@@ -7,12 +7,14 @@
 #endif
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 class Effects final
 {
   private:
     struct Technique
     {
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
         Technique(ID3DXEffect *fx, D3DXHANDLE handle, D3DXTECHNIQUE_DESC desc) : fx(fx), handle(handle), desc(desc)
         {
         }
@@ -20,11 +22,14 @@ class Effects final
         ID3DXEffect *fx;
         D3DXHANDLE handle;
         D3DXTECHNIQUE_DESC desc;
+#endif
     };
 
     IDirect3DDevice9 *device_;
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     std::vector<ID3DXEffect *> effects_;
+#endif
     std::unordered_map<std::string, Technique> techniques_;
 
     const Technique *currentTechnique_;

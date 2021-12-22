@@ -298,7 +298,7 @@ void Shadow::Realize(uint32_t Delta_Time)
 
     rs->SetRenderState(D3DRS_TEXTUREFACTOR, DENSITY);
     char tech[256];
-    strcpy_s(tech, node->GetTechnique());
+    strcpy(tech, node->GetTechnique());
     node->SetTechnique("shadow_model");
     node->flags &= ~NODE::VISIBLE_TREE;
 

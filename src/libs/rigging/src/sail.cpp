@@ -256,8 +256,12 @@ void SAIL::Execute(uint32_t Delta_Time)
     int i;
 
     // test slaughter of masts
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (gdata && core.Controls->GetDebugAsyncKeyState(VK_MENU) < 0 &&
         core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0 && core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
+#else
+    if (false)
+#endif
     {
         long nTmpMastNum = -1;
         if (core.Controls->GetDebugAsyncKeyState('1') < 0)
@@ -282,7 +286,7 @@ void SAIL::Execute(uint32_t Delta_Time)
             if ((pTmpMdl = static_cast<MODEL *>(EntityManager::GetEntityPointer(gdata[0].modelEI))) != nullptr)
             {
                 char pcTmpMastName[256];
-                sprintf_s(pcTmpMastName, "mast%d", nTmpMastNum);
+                sprintf(pcTmpMastName, "mast%d", nTmpMastNum);
                 auto *nod = pTmpMdl->FindNode(pcTmpMastName);
                 if (nod)
                 {
@@ -1001,7 +1005,7 @@ uint64_t SAIL::ProcessMessage(MESSAGE &message)
                 {
                     throw std::runtime_error("allocate memory error");
                 }
-                strcpy_s(m_sMastName, param.size() + 1, param.c_str());
+                strcpy(m_sMastName, param.c_str());
             }
         }
         break;
@@ -1215,7 +1219,7 @@ void SAIL::SetAllSails(int groupNum)
             if (pA != nullptr)
             {
                 char param[256];
-                sprintf_s(param, "%d", gdata[groupNum].maxHole);
+                sprintf(param, "%d", gdata[groupNum].maxHole);
                 pA->SetValue(param);
                 for (int i = 0; i < static_cast<int>(pA->GetAttributesNum()); i++)
                 {
@@ -2045,7 +2049,10 @@ void sailPrint(VDX9RENDER *rs, const CVECTOR &pos3D, float rad, long line, const
 {
     static char buf[256];
     // print to the buffer
-    long len = _vsnprintf_s(buf, sizeof(buf) - 1, format, (char *)(&format + 1));
+    va_list args;
+    va_start(args, format);
+    long len = vsnprintf(buf, sizeof(buf) - 1, format, args);
+    va_end(args);
     buf[sizeof(buf) - 1] = 0;
     // Looking for a point position on the screen
     static CMatrix mtx, view, prj;
@@ -2120,7 +2127,7 @@ void SAIL::SetSailTextures(long grNum, VDATA *pvd) const
         if (so == nullptr || so->hostNode == nullptr)
             continue;
         char param[256];
-        sprintf_s(param, "%s", so->hostNode->GetName());
+        sprintf(param, "%s", so->hostNode->GetName());
         ATTRIBUTES *pAGerald = pA->GetAttributeClass(param);
         if (pAGerald)
         {
@@ -2266,7 +2273,7 @@ uint32_t SAIL::ScriptProcessing(const char *name, MESSAGE &message)
     if (name == nullptr)
         return 0;
 
-    if (_stricmp(name, "RandomSailsDmg") == 0)
+    if (storm::iEquals(std::string_view(name), "RandomSailsDmg"))
     {
         const long chrIdx = message.Long();
         const float fDmg = message.Float();
@@ -2275,7 +2282,7 @@ uint32_t SAIL::ScriptProcessing(const char *name, MESSAGE &message)
             DoRandomsSailsDmg(chrIdx, gn, fDmg);
     }
 
-    if (_stricmp(name, "SailRollSpeed") == 0)
+    if (storm::iEquals(std::string_view(name), "SailRollSpeed"))
     {
         const long chrIdx = message.Long();
         const float fSpeed = message.Float();
@@ -2284,7 +2291,7 @@ uint32_t SAIL::ScriptProcessing(const char *name, MESSAGE &message)
             gdata[gn].fRollingSpeed = fSpeed * ROLLINGSPEED;
     }
 
-    if (_stricmp(name, "GetSailStatus") == 0)
+    if (storm::iEquals(std::string_view(name), "GetSailStatus"))
     {
         long chrIdx = message.Long();
         int gn = FindGroupForCharacter(chrIdx);

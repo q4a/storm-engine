@@ -12,6 +12,7 @@
 
 #include <stack>
 #include <vector>
+#include <chrono>
 
 #define MAX_STEXTURES 10240
 #define MAX_BUFFERS 10240
@@ -25,7 +26,7 @@ struct D3DERRORS
 
 struct texpaths_t
 {
-    char str[_MAX_PATH];
+    char str[MAX_PATH];
 };
 
 struct STEXTURE
@@ -143,8 +144,10 @@ class DX9RENDER : public VDX9RENDER
 
     // VideoCapture section
     HDC hDesktopDC, hCaptureDC;
+#ifdef _WIN32 // FIX_LINUX BITMAP_AND_OTHER
     HBITMAP hCaptureBitmap;
     LPBITMAPINFO lpbi;
+#endif
     long iCaptureFrameIndex;
     bool bPreparedCapture;
     bool bVideoCapture;
@@ -685,7 +688,7 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
     long loadFrame;
     long progressSafeCounter;
     bool isInPViewProcess;
-    uint32_t progressUpdateTime;
+    std::chrono::time_point<std::chrono::system_clock> progressUpdateTime;
     float progressFramesPosX;
     float progressFramesPosY;
     float progressFramesWidth;

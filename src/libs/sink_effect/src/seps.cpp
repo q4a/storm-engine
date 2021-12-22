@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "core.h"
 #include "object.h"
+#include "defines.h"
 
 SEPS_PS::SEPS_PS()
 {

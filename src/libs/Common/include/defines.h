@@ -89,11 +89,35 @@ constexpr float PId4 = (PI / 4.0f);
         x = li.QuadPart - x;                                                                                           \
     }
 #else
-#include<limits.h>
-#define MAX_PATH PATH_MAX
-
 #define RDTSC_B(x)    { x = __rdtsc(); }
 #define RDTSC_E(x)    { x = __rdtsc() - x; }
+
+#include <ctype.h>
+#include <limits.h>
+
+#define MAX_PATH PATH_MAX
+#define _MAX_FNAME NAME_MAX
+#define MAKELONG(low, hi) ((long)(((unsigned short)(low)) | (((unsigned long)((unsigned short)(hi))) << 16)))
+
+inline char *strupr(char *str)
+{
+    while (*str != '\0')
+    {
+        *str = toupper(*str);
+        str++;
+    }
+    return str;
+}
+
+inline char *strlwr(char *str)
+{
+    while (*str != '\0')
+    {
+        *str = tolower(*str);
+        str++;
+    }
+    return str;
+}
 #endif
 
 // Defines

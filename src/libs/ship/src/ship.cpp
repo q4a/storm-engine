@@ -96,7 +96,7 @@ bool SHIP::Init()
     Strength[STRENGTH_MAIN].vSpeed = 0.0f;
     Strength[STRENGTH_MAIN].vRotate = 0.0f;
 
-    srand(GetTickCount());
+    srand(time(nullptr));
 
     LoadServices();
 
@@ -919,7 +919,7 @@ void SHIP::HullFall(hull_t *pM)
         EntityManager::AddToLayer(RealizeLayer, ent, iShipPriorityRealize + 1);
 
         char str[256];
-        sprintf_s(str, "%s", pM->pNode->GetName());
+        sprintf(str, "%s", pM->pNode->GetName());
         auto *pAHulls = GetACharacter()->FindAClass(GetACharacter(), "Ship.Hulls");
         if (!pAHulls)
             pAHulls = GetACharacter()->CreateSubAClass(GetACharacter(), "Ship.Hulls");
@@ -935,8 +935,8 @@ void SHIP::MastFall(mast_t *pM)
     {
         long iNum, iBase;
         char cMastNodeName[256];
-        sprintf_s(cMastNodeName, "%s", pM->pNode->GetName());
-        sscanf((char *)&cMastNodeName[_countof(MAST_IDENTIFY) - 1], "%d", &iNum);
+        sprintf(cMastNodeName, "%s", pM->pNode->GetName());
+        sscanf((char *)&cMastNodeName[sizeof(MAST_IDENTIFY) - 1], "%d", &iNum);
         iBase = iNum / TOPMAST_BEGIN;
         //        core.Trace("SHIP::MastFall : nodeName %s  iNum = %d base = %d iNumMasts = %d", cMastNodeName, iNum,
         // iBase, iNumMasts );
@@ -947,8 +947,8 @@ void SHIP::MastFall(mast_t *pM)
             long iMastNum;
             if (pMast && pMast->pNode && !pMasts[i].bBroken)
             {
-                sprintf_s(str, "%s", pMast->pNode->GetName());
-                sscanf((char *)&str[_countof(MAST_IDENTIFY) - 1], "%d", &iMastNum);
+                sprintf(str, "%s", pMast->pNode->GetName());
+                sscanf((char *)&str[sizeof(MAST_IDENTIFY) - 1], "%d", &iMastNum);
                 bool bOk = false;
                 if (iNum < TOPMAST_BEGIN) // mast, bring down all the topmills
                 {
@@ -1395,7 +1395,7 @@ bool SHIP::Mount(ATTRIBUTES *_pAShip)
         return false;
     }
 
-    strcpy_s(cShipIniName, pName);
+    strcpy(cShipIniName, pName);
 
     // core.Trace("Create ship with type = %s", cShipIniName);
 
@@ -1417,7 +1417,7 @@ bool SHIP::Mount(ATTRIBUTES *_pAShip)
     bUse = uniIDX == 0;
 
     char temp_str[1024];
-    sprintf_s(temp_str, "ships\\%s\\%s", cShipIniName, cShipIniName);
+    sprintf(temp_str, "ships\\%s\\%s", cShipIniName, cShipIniName);
 
     model_id = EntityManager::CreateEntity("MODELR");
     core.Send_Message(GetModelEID(), "ls", MSG_MODEL_LOAD_GEO, temp_str);
@@ -1564,7 +1564,7 @@ bool SHIP::Mount(ATTRIBUTES *_pAShip)
         fUpperShipAY = pAUpperShipModel->GetAttributeAsFloat("ay", 0.0f);
         fUpperShipY = pAUpperShipModel->GetAttributeAsFloat("y", State.vBoxSize.y * 2.0f + 10.0f);
 
-        strcpy_s(temp_str, pAUpperShipModel->GetThisAttr());
+        strcpy(temp_str, pAUpperShipModel->GetThisAttr());
 
         bModelUpperShip = true;
         model_uppership_id = EntityManager::CreateEntity("MODELR");
@@ -1954,7 +1954,7 @@ void SHIP::Load(CSaveLoad *pSL)
     RealizeLayer = pSL->LoadDword();
     ExecuteLayer = pSL->LoadDword();
     const std::string sTmp = pSL->LoadString();
-    strcpy_s(cShipIniName, sTmp.c_str());
+    strcpy(cShipIniName, sTmp.c_str());
     iShipPriorityExecute = pSL->LoadLong();
     fGravity = pSL->LoadFloat();
     fSailState = pSL->LoadFloat();

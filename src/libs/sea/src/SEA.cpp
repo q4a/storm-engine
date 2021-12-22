@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <execution>
+#include <thread>
 
 #include "core.h"
 #include "SSE.h"
@@ -224,7 +225,7 @@ bool SEA::Init()
         char str[256];
         char *pFBuffer = nullptr;
         uint32_t dwSize;
-        sprintf_s(str, "resource\\sea\\sea%.4d.tga", i);
+        sprintf(str, "resource\\sea\\sea%.4d.tga", i);
         // sprintf_s(str, "resource\\sea\\sea0000.tga", i);
         fio->LoadFile(str, &pFBuffer, &dwSize);
         if (!pFBuffer)
@@ -1292,7 +1293,11 @@ void SEA::Realize(uint32_t dwDeltaTime)
 {
     static float fTmp = 0.0f;
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState('S') < 0)
+#else
+    if (false)
+#endif
     {
         if (bTempFullMode)
         {
@@ -1310,7 +1315,7 @@ void SEA::Realize(uint32_t dwDeltaTime)
             fLodScale = 0.5f;
         }
 
-        Sleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     if (bStop)

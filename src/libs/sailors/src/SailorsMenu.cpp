@@ -164,6 +164,7 @@ void Menu::Update(SailorsPoints &sailorsPoints)
 
 void Menu::ChangeControl1(int key, SailorsPoints &sailorsPoints) // Change people count
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (key == VK_RIGHT)
         sailrs->shipWalk[0].CreateNewMan(sailrs->shipWalk[0].sailorsPoints);
 
@@ -187,6 +188,7 @@ void Menu::ChangeControl1(int key, SailorsPoints &sailorsPoints) // Change peopl
 
         sailrs->shipWalk[0].DeleteMan(0);
     }
+#endif
 
     Update(sailorsPoints);
 };
@@ -195,6 +197,7 @@ void Menu::ChangeControl1(int key, SailorsPoints &sailorsPoints) // Change peopl
 
 void Menu::ChangeControl2(int key, SailorsPoints &sailorsPoints) // Change points
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (shiftKey && sailorsPoints.points.selected >= 0 && sailorsPoints.points.selected < sailorsPoints.points.count)
     {
         switch (key)
@@ -345,12 +348,14 @@ void Menu::ChangeControl2(int key, SailorsPoints &sailorsPoints) // Change point
         sailorsPoints.points.Delete(sailorsPoints.points.selected);
         Update(sailorsPoints);
     }
+#endif
 };
 
 //--------------------------------------------------------------------------------------------------------------
 
 void Menu::ChangeControl3(int key, SailorsPoints &sailorsPoints) // Change links
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (key == VK_INSERT)
     {
         sailorsPoints.links.Add();
@@ -448,6 +453,7 @@ void Menu::ChangeControl3(int key, SailorsPoints &sailorsPoints) // Change links
                 sailorsPoints.links.link[selLnk].next = sailorsPoints.points.count - 1;
         }
     }
+#endif
 
     sailrs->shipWalk[0].sailorsPoints.UpdateLinks();
     Update(sailorsPoints);
@@ -457,6 +463,7 @@ void Menu::ChangeControl3(int key, SailorsPoints &sailorsPoints) // Change links
 
 void Menu::ChangeControl(int key, SailorsPoints &sailorsPoints)
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (key == VK_F10)
     {
         sailrs->shipWalk[0].ReloadCannons(0);
@@ -523,6 +530,7 @@ void Menu::ChangeControl(int key, SailorsPoints &sailorsPoints)
       };
       sailrs->shipWalk[0].sailorsPoints.UpdateLinks();*/
     }
+#endif
 
     if (blocked != selected)
         return;
@@ -551,6 +559,7 @@ void Menu::OnKeyPress(SailorsPoints &sailorsPoints)
     key = 0;
     shiftKey = 0;
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(VK_UP) < 0)
         key = VK_UP;
     else if (GetAsyncKeyState(VK_DOWN) < 0)
@@ -647,6 +656,7 @@ void Menu::OnKeyPress(SailorsPoints &sailorsPoints)
         ChangeControl(key, sailorsPoints);
         break;
     }
+#endif
 
     keyPressed = true;
 };

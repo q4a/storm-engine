@@ -638,7 +638,7 @@ void VANT::LoadIni()
         throw std::runtime_error("rigging.ini file not found!");
     }
 
-    sprintf_s(section, "VANTS");
+    sprintf(section, "VANTS");
 
     // texture name
     ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");

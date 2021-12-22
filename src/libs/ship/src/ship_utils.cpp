@@ -43,7 +43,9 @@ BOOL SHIP::BuildContour(CVECTOR *vContour, long &iNumVContour)
     {
         core.Trace("SHIP: Up trace error, ship %s", GetAShip()->GetAttribute("Name"));
         bDefaultContour = true;
+#ifdef _WIN32 // FIX_LINUX
         Beep(1000, 200);
+#endif
     }
     // Assert(fRes<=1.0f);
 
@@ -57,7 +59,9 @@ BOOL SHIP::BuildContour(CVECTOR *vContour, long &iNumVContour)
     {
         core.Trace("SHIP: Down trace error, ship %s", GetAShip()->GetAttribute("Name"));
         bDefaultContour = true;
+#ifdef _WIN32 // FIX_LINUX
         Beep(1000, 200);
+#endif
     }
     // Assert(fRes<=1.0f);
 
@@ -169,7 +173,7 @@ bool SHIP::BuildMasts()
         }
         const auto *const cNodeName = pNode->GetName();
 
-        if (storm::iEquals(std::string_view(cNodeName), MAST_IDENTIFY, _countof(MAST_IDENTIFY) - 1))
+        if (storm::iEquals(std::string_view(cNodeName), MAST_IDENTIFY, sizeof(MAST_IDENTIFY) - 1))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 
@@ -177,7 +181,7 @@ bool SHIP::BuildMasts()
             if (!pAMasts)
                 pAMasts = GetACharacter()->CreateSubAClass(GetACharacter(), "Ship.Masts");
 
-            sscanf(static_cast<const char *>(&cNodeName[_countof(MAST_IDENTIFY) - 1]), "%d", &iNum);
+            sscanf(static_cast<const char *>(&cNodeName[sizeof(MAST_IDENTIFY) - 1]), "%d", &iNum);
             pMasts.resize(iNumMasts + 1);
 
             auto *pM = &pMasts[iNumMasts];
@@ -208,7 +212,7 @@ bool SHIP::BuildMasts()
                 pM->vDst = CVECTOR(vTemp.x, vUp.y, vTemp.z);
             }
 
-            sprintf_s(str, "%s", pNode->GetName());
+            sprintf(str, "%s", pNode->GetName());
             auto *pAMast = pAMasts->FindAClass(pAMasts, str);
             if (pAMast && pAMast->GetAttributeAsFloat() >= 1.0f)
             {
@@ -245,7 +249,7 @@ bool SHIP::BuildHulls()
         if (!pNode)
             break;
         const auto *const cNodeName = pNode->GetName();
-        if (storm::iEquals(std::string_view(cNodeName), HULL_IDENTIFY, _countof(HULL_IDENTIFY) - 1))
+        if (storm::iEquals(std::string_view(cNodeName), HULL_IDENTIFY, sizeof(HULL_IDENTIFY) - 1))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 
@@ -253,7 +257,7 @@ bool SHIP::BuildHulls()
             if (!pAHulls)
                 pAHulls = GetACharacter()->CreateSubAClass(GetACharacter(), "Ship.Hulls");
 
-            sscanf((const char *)&cNodeName[_countof(HULL_IDENTIFY) - 1], "%d", &iNum);
+            sscanf((const char *)&cNodeName[sizeof(HULL_IDENTIFY) - 1], "%d", &iNum);
             pHulls.resize(iNumHulls + 1);
 
             hull_t *pM = &pHulls[iNumHulls];
@@ -276,7 +280,7 @@ bool SHIP::BuildHulls()
             pM->vSrc = CVECTOR(vTemp.x, vDown.y, vTemp.z);
             pM->vDst = CVECTOR(vTemp.x, vUp.y, vTemp.z);
 
-            sprintf_s(str, "%s", pNode->GetName());
+            sprintf(str, "%s", pNode->GetName());
             auto *pAHull = pAHulls->FindAClass(pAHulls, str);
             if (pAHull && pAHull->GetAttributeAsFloat() >= 1.0f)
             {

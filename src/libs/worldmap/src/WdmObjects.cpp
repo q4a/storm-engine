@@ -23,7 +23,7 @@ WdmObjects *wdmObjects = nullptr;
 WdmObjects::WdmObjects()
 {
     Assert(!wdmObjects);
-    srand(GetTickCount());
+    srand(time(nullptr));
     wdmObjects = this;
     wm = nullptr;
     rs = nullptr;
@@ -143,7 +143,7 @@ GEOS *WdmObjects::CreateGeometry(const char *path)
     {
         if (models[i].hash == hash)
         {
-            if (_stricmp(models[i].path.c_str(), path) == 0)
+            if (storm::iEquals(models[i].path, std::string_view(path)))
             {
                 return models[i].geo;
             }
