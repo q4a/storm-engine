@@ -1,3 +1,4 @@
+#include <thread>
 #include "LocatorShow.h"
 
 CREATE_CLASS(SeaLocatorShow)
@@ -155,9 +156,7 @@ void SeaLocatorShow::Realize(uint32_t Delta_Time)
     if (core.Controls->GetDebugAsyncKeyState('5') < 0)
     {
         bShow ^= 1;
-#ifdef _WIN32 // FIX_LINUX
-        Sleep(200);
-#endif
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
     if (!bShow || !pALocators)
         return;

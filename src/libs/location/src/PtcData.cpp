@@ -21,7 +21,7 @@
 PtcData::PtcData()
     : isSlide(false), slideDir(), isBearing(false), stepPos{}
 {
-    srand(GetTickCount());
+    srand(time(nullptr));
     data = nullptr;
     triangle = nullptr;
     numTriangles = 0;

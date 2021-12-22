@@ -7,6 +7,7 @@
 #include "DataString.h"
 #include "DataUV.h"
 #include "defines.h"
+#include <storm/string_compare.hpp>
 
 FieldList::FieldList()
 {
@@ -299,7 +300,7 @@ DataColor *FieldList::FindColor(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataColor *>(Fields[n].pPointer);
                 }
@@ -319,7 +320,7 @@ DataBool *FieldList::FindBool(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataBool *>(Fields[n].pPointer);
                 }
@@ -339,7 +340,7 @@ DataFloat *FieldList::FindFloat(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataFloat *>(Fields[n].pPointer);
                 }
@@ -360,7 +361,7 @@ DataGraph *FieldList::FindGraph(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataGraph *>(Fields[n].pPointer);
                 }
@@ -381,7 +382,7 @@ DataString *FieldList::FindString(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataString *>(Fields[n].pPointer);
                 }
@@ -402,7 +403,7 @@ DataPosition *FieldList::FindPosition(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataPosition *>(Fields[n].pPointer);
                 }
@@ -423,7 +424,7 @@ DataUV *FieldList::FindUV(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (_stricmp(Fields[n].Name.c_str(), AttrName) == 0)
+                if (storm::iEquals(Fields[n].Name, std::string_view(AttrName)))
                 {
                     return static_cast<DataUV *>(Fields[n].pPointer);
                 }
@@ -441,7 +442,7 @@ FieldList::FieldDesc *FieldList::FindField(const char *Name)
     {
         if (SearchHash == Fields[n].HashValue)
         {
-            if (_stricmp(Fields[n].Name.c_str(), Name) == 0)
+            if (storm::iEquals(Fields[n].Name, std::string_view(Name)))
             {
                 return &Fields[n];
             }

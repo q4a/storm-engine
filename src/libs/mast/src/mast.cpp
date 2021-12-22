@@ -1,4 +1,4 @@
-#include "MAST.h"
+#include "mast.h"
 #include "Island_Base.h"
 #include "shared/mast_msg.h"
 #include "shared/sail_msg.h"
@@ -434,7 +434,7 @@ void MAST::LoadIni()
         throw std::runtime_error("mast.ini file not found!");
     }
 
-    sprintf_s(section, "MAST");
+    sprintf(section, "MAST");
 
     /*=========================================================================
      =============================================================================

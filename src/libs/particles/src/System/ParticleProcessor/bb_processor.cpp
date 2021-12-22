@@ -179,7 +179,7 @@ void BillBoardProcessor::AddParticle(ParticleSystem *pSystem, const Vector &velo
     pData->KTrackZ = FRAND(1.0f);
 
     const auto *const pEmitterName = pFields->GetString(ATTACHEDEMITTER_NAME);
-    if (_stricmp(pEmitterName, "none") == 0)
+    if (storm::iEquals(std::string_view(pEmitterName), "none"))
     {
         pData->AttachedEmitter = nullptr;
     }

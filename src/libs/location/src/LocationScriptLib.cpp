@@ -1,3 +1,4 @@
+#include <thread>
 #include "LocationScriptLib.h"
 #include "Entity.h"
 #include "Fader.h"
@@ -28,7 +29,7 @@ struct LocationFindCacheElement
     {
         if (v.size != size)
             return false;
-        if (_stricmp(v.name, name) == 0)
+        if (storm::iEquals(std::string_view(v.name), std::string_view(name)))
             return true;
         return false;
     };
@@ -70,7 +71,7 @@ inline bool CheckID(VDATA *vd, const char *id, bool &res)
     auto *const attr = a->GetThisAttr();
     if (!attr)
         return true;
-    res = _stricmp(attr, id) == 0;
+    res = storm::iEquals(std::string_view(attr), std::string_view(id));
     return true;
 }
 
@@ -263,7 +264,7 @@ uint32_t slNativeSleep(VS_STACK *pS)
         return IFUNCRESULT_FAILED;
     if (delay < 1)
         delay = 1;
-    Sleep(delay);
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     return IFUNCRESULT_OK;
 }
 

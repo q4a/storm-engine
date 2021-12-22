@@ -58,6 +58,12 @@ class Lights : public Entity
     {
         long id;
         long light;
+
+        MovingLight(long id, long light)
+        {
+            this->id = id;
+            this->light = light;
+        }
     };
 
     struct Vertex

@@ -367,19 +367,18 @@ long AnimationServiceImp::LoadAnimation(const char *animationName)
                         if (!(key[p] >= 'A' && key[p] <= 'Z') && !(key[p] >= 'a' && key[p] <= 'z'))
                             break;
                     key[p] = 0;
-                    auto emView = std::string_view(em);
                     if (em[0] == 0)
                     {
                     }
-                    else if (storm::iEquals(emView, ASKWAE_ALWAYS))
+                    else if (storm::iEquals(std::string_view(em), ASKWAE_ALWAYS))
                     {
                         ev = eae_always;
                     }
-                    else if (storm::iEquals(emView, ASKWAE_NORMAL))
+                    else if (storm::iEquals(std::string_view(em), ASKWAE_NORMAL))
                     {
                         ev = eae_normal;
                     }
-                    else if (storm::iEquals(emView, ASKWAE_REVERSE))
+                    else if (storm::iEquals(std::string_view(em), ASKWAE_REVERSE))
                     {
                         ev = eae_reverse;
                     }

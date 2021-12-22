@@ -2,7 +2,9 @@
 
 #include <cstdint>
 #include <d3d9.h>
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
 #include <d3dx9.h>
+#endif
 #include <unordered_map>
 #include <vector>
 

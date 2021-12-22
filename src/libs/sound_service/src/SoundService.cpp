@@ -1,3 +1,4 @@
+#include <thread>
 #include "SoundService.h"
 #include "Entity.h"
 #include "Matrix.h"
@@ -1012,9 +1013,7 @@ void SoundService::DebugDraw()
     if (core.Controls->GetDebugAsyncKeyState('J') < 0)
     {
         bShowDebugInfo = !bShowDebugInfo;
-#ifdef _WIN32 // FIX_LINUX
-        Sleep(200);
-#endif
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
     if (!bShowDebugInfo)

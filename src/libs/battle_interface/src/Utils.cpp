@@ -141,12 +141,11 @@ long BIUtils::GetAlignmentFromAttr(ATTRIBUTES *pA, const char *name, long nDefAl
         char *pcTmp = pA->GetAttribute(name);
         if (pcTmp)
         {
-            std::string_view pcView = std::string_view(pcTmp);
-            if (storm::iEquals(pcView, "left"))
+            if (storm::iEquals(std::string_view(pcTmp), "left"))
                 return PR_ALIGN_LEFT;
-            if (storm::iEquals(pcView, "center"))
+            if (storm::iEquals(std::string_view(pcTmp), "center"))
                 return PR_ALIGN_CENTER;
-            if (storm::iEquals(pcView, "right"))
+            if (storm::iEquals(std::string_view(pcTmp), "right"))
                 return PR_ALIGN_RIGHT;
         }
     }

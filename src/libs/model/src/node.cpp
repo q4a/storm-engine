@@ -221,7 +221,7 @@ bool NODER::Init(const char *lightPath, const char *pname, const char *oname, co
 
     parent = par;
     if (parent == nullptr)
-        strcpy_s(name, pname);
+        strcpy(name, pname);
     // calculate number of labels
     const auto idGeo = geo->FindName("geometry");
     nnext = 0;
@@ -252,7 +252,7 @@ bool NODER::Init(const char *lightPath, const char *pname, const char *oname, co
             if (!next[l]->Init(lightPath, pname, lb.name, mt, glob_mtx, this, lmPath))
                 return false;
 
-            strcpy_s(static_cast<NODER *>(next[l])->name, lb.name);
+            strcpy(static_cast<NODER *>(next[l])->name, lb.name);
             l++;
         }
     }
@@ -447,7 +447,7 @@ void NODER::Draw()
 //----------------------------------------------------------
 NODER *NODER::FindNode(const char *cNodeName)
 {
-    if (_stricmp(cNodeName, name) == 0)
+    if (storm::iEquals(std::string_view(cNodeName), std::string_view(name)))
         return this;
     for (long i = 0; i < nnext; i++)
     {
@@ -574,7 +574,7 @@ void NODER::Link(entid_t id, bool transform)
 //-------------------------------------------------------------------
 void NODER::SetTechnique(const char *name)
 {
-    strcpy_s(technique, name);
+    strcpy(technique, name);
 }
 
 //-------------------------------------------------------------------
