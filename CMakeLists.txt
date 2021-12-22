@@ -47,7 +47,7 @@ if (NOT CMAKE_HOST_WIN32 AND STORM_ENABLE_DXVK)
             GIT_SHALLOW       ON
             BUILD_ALWAYS      OFF
             CONFIGURE_HANDLED_BY_BUILD ON
-            CONFIGURE_COMMAND export CC=gcc-10 && export CXX=g++-10 && meson ../dxvk-native
+            CONFIGURE_COMMAND CC=gcc-10 && CXX=g++-10 && meson ../dxvk-native
             BUILD_COMMAND     ninja
             INSTALL_COMMAND   ""
     )
