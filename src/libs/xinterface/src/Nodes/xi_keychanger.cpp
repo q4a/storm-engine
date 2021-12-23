@@ -79,7 +79,7 @@ void CXI_KEYCHANGER::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -118,7 +118,7 @@ void CXI_KEYCHANGER::SetChoosingControls(ATTRIBUTES *pA)
     char contrlName[128];
     for (auto i = 0; i < m_keysQuantity; i++)
     {
-        sprintf_s(contrlName, "cntrl_%d", i);
+        sprintf(contrlName, "cntrl_%d", i);
         m_pbControlsStick[i] = false;
         m_pControlsID[i] = core.Controls->CreateControl(contrlName);
         auto *const keyCode = pA->GetAttribute(i);

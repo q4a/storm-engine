@@ -378,11 +378,11 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     // set parameters for blind
     for (i = 0; i < m_nSlotsQnt; i++)
     {
-        sprintf_s(param, "dwNormalColorARGB%d", i + 1);
+        sprintf(param, "dwNormalColorARGB%d", i + 1);
         m_dwCurColor[i] = m_dwNormalColor[i] = GetIniARGB(ini1, name1, ini2, name2, param, ARGB(255, 128, 128, 128));
-        sprintf_s(param, "dwSelectColorARGB%d", i + 1);
+        sprintf(param, "dwSelectColorARGB%d", i + 1);
         m_dwSelectColor[i] = GetIniARGB(ini1, name1, ini2, name2, param, ARGB(255, 64, 64, 64));
-        sprintf_s(param, "PicOffset%d", i + 1);
+        sprintf(param, "PicOffset%d", i + 1);
         m_pPicOffset[i] = GetIniLong(ini1, name1, ini2, name2, param, 0);
     }
 
@@ -396,13 +396,13 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
 
     for (i = 0; i < m_nStringQuantity; i++)
     {
-        sprintf_s(param1, sizeof(param1), "scale%d", i + 1);
+        sprintf(param1, "scale%d", i + 1);
         m_pStrParam[i].m_fScale = GetIniFloat(ini1, name1, ini2, name2, param1, 1.f);
-        sprintf_s(param1, sizeof(param1), "font%d", i + 1);
+        sprintf(param1, "font%d", i + 1);
         if (ReadIniString(ini1, name1, ini2, name2, param1, param, sizeof(param), ""))
             if ((m_pStrParam[i].m_nFont = m_rs->LoadFont(param)) == -1)
                 core.Trace("can not load font:'%s'", param);
-        sprintf_s(param1, sizeof(param1), "dwXOffset%d", i + 1);
+        sprintf(param1, "dwXOffset%d", i + 1);
         m_pStrParam[i].m_nStrX = GetIniLong(ini1, name1, ini2, name2, param1, 0);
         if (m_pStrParam[i].m_nStrX > 0)
             m_pStrParam[i].m_nAlign = PR_ALIGN_RIGHT;
@@ -410,23 +410,23 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
             m_pStrParam[i].m_nAlign = PR_ALIGN_LEFT;
         else
             m_pStrParam[i].m_nAlign = PR_ALIGN_CENTER;
-        sprintf_s(param1, sizeof(param1), "align%d", i + 1);
+        sprintf(param1, "align%d", i + 1);
         if (ReadIniString(ini1, name1, ini2, name2, param1, param, sizeof(param), ""))
         {
-            if (_stricmp(param, "left") == 0)
+            if (storm::iEquals(param, "left"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_LEFT;
-            else if (_stricmp(param, "right") == 0)
+            else if (storm::iEquals(param, "right") == 0)
                 m_pStrParam[i].m_nAlign = PR_ALIGN_RIGHT;
-            else if (_stricmp(param, "center") == 0)
+            else if (storm::iEquals(param, "center") == 0)
                 m_pStrParam[i].m_nAlign = PR_ALIGN_CENTER;
             else
                 core.Trace("Warning! unknown align: %s", param);
         }
-        sprintf_s(param1, sizeof(param1), "dwYOffset%d", i + 1);
+        sprintf(param1, "dwYOffset%d", i + 1);
         m_pStrParam[i].m_nStrY = GetIniLong(ini1, name1, ini2, name2, param1, 0);
-        sprintf_s(param1, sizeof(param1), "dwForeColor%d", i + 1);
+        sprintf(param1, "dwForeColor%d", i + 1);
         m_pStrParam[i].m_dwForeColor = GetIniARGB(ini1, name1, ini2, name2, param1, 0xFFFFFFFF);
-        sprintf_s(param1, sizeof(param1), "dwBackColor%d", i + 1);
+        sprintf(param1, "dwBackColor%d", i + 1);
         m_pStrParam[i].m_dwBackColor = GetIniARGB(ini1, name1, ini2, name2, param1, 0);
     }
 
@@ -504,7 +504,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
         for (n = 0; n < m_nSlotsQnt; n++)
         {
             char *sBadPict;
-            sprintf_s(param, "BadPicture%d", n + 1);
+            sprintf(param, "BadPicture%d", n + 1);
             if ((sBadPict = pAttribute->GetAttribute(param)) != nullptr)
             {
                 m_idBadTexture[n] = m_rs->TextureCreate(sBadPict);
@@ -512,11 +512,11 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
             }
             else
             {
-                sprintf_s(param, "BadTex%d", n + 1);
+                sprintf(param, "BadTex%d", n + 1);
                 m_idBadTexture[n] = pAttribute->GetAttributeAsDword(param, -1);
                 if (m_idBadTexture[n] >= 0)
                 {
-                    sprintf_s(param, "BadPic%d", n + 1);
+                    sprintf(param, "BadPic%d", n + 1);
                     m_idBadPic[n] =
                         pPictureService->GetImageNum(m_sGroupName[m_idBadTexture[n]], pAttribute->GetAttribute(param));
                 }
@@ -532,7 +532,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
         {
             char attrName[256];
             char *sStringName;
-            sprintf_s(attrName, "pic%d", i + 1);
+            sprintf(attrName, "pic%d", i + 1);
             auto *pListEntity = pAttribute->GetAttributeClass(attrName);
 
             // Fill image descriptor by default value
@@ -587,7 +587,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
                 // set strings
                 for (k = 0; k < m_nStringQuantity; k++)
                 {
-                    sprintf_s(param1, sizeof(param1) - 1, "str%d", k + 1);
+                    sprintf(param1, "str%d", k + 1);
                     sStringName = pListEntity->GetAttribute(param1);
                     if (sStringName != nullptr && sStringName[0] == '#')
                     {
@@ -605,7 +605,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
                 char *tmpStr;
                 for (n = 0; n < m_nSlotsQnt; n++)
                 {
-                    sprintf_s(param, "name%d", n + 1);
+                    sprintf(param, "name%d", n + 1);
                     tmpStr = pListEntity->GetAttribute(param);
                     if (tmpStr != nullptr)
                     {
@@ -616,15 +616,15 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
                         }
                         memcpy(m_Image[i].saveName[n], tmpStr, len);
                     }
-                    sprintf_s(param, "tex%d", n + 1);
+                    sprintf(param, "tex%d", n + 1);
                     m_Image[i].tex[n] = pListEntity->GetAttributeAsDword(param, -1);
-                    sprintf_s(param, "img%d", n + 1);
+                    sprintf(param, "img%d", n + 1);
                     if (m_Image[i].tex[n] != -1)
                         m_Image[i].img[n] = pPictureService->GetImageNum(m_sGroupName[m_Image[i].tex[n]],
                                                                          pListEntity->GetAttribute(param));
                     else
                         m_Image[i].img[n] = -1;
-                    sprintf_s(param, "spec%d", n + 1);
+                    sprintf(param, "spec%d", n + 1);
                     m_Image[i].bUseSpecTechnique[n] = pListEntity->GetAttributeAsDword(param, 0) != 0;
                 }
             }
@@ -1032,7 +1032,7 @@ void CXI_VIMAGESCROLL::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rAbsolutePosition.left, m_rAbsolutePosition.top,
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rAbsolutePosition.left, m_rAbsolutePosition.top,
               m_rAbsolutePosition.right, m_rAbsolutePosition.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
@@ -1068,14 +1068,14 @@ void CXI_VIMAGESCROLL::ChangeScroll(int nScrollItemNum)
         {
             m_Image[i].Clear(m_nSlotsQnt, m_nStringQuantity);
 
-            sprintf_s(sAttrName, "pic%d", i + 1);
+            sprintf(sAttrName, "pic%d", i + 1);
             pAttribute = pAttr->GetAttributeClass(sAttrName);
 
             if (pAttribute != nullptr)
             {
                 for (n = 0; n < m_nStringQuantity; n++)
                 {
-                    sprintf_s(param, sizeof(param), "str%d", n + 1);
+                    sprintf(param, "str%d", n + 1);
                     sStringName = pAttribute->GetAttribute(param);
                     if (sStringName != nullptr && sStringName[0] == '#')
                     {
@@ -1093,7 +1093,7 @@ void CXI_VIMAGESCROLL::ChangeScroll(int nScrollItemNum)
                 char *tmpStr;
                 for (n = 0; n < m_nSlotsQnt; n++)
                 {
-                    sprintf_s(param, "name%d", n + 1);
+                    sprintf(param, "name%d", n + 1);
                     tmpStr = pAttribute->GetAttribute(param);
                     if (tmpStr != nullptr)
                     {
@@ -1102,15 +1102,15 @@ void CXI_VIMAGESCROLL::ChangeScroll(int nScrollItemNum)
                             throw std::runtime_error("allocate memory error");
                         memcpy(m_Image[i].saveName[n], tmpStr, len);
                     }
-                    sprintf_s(param, "tex%d", n + 1);
+                    sprintf(param, "tex%d", n + 1);
                     m_Image[i].tex[n] = pAttribute->GetAttributeAsDword(param, -1);
-                    sprintf_s(param, "img%d", n + 1);
+                    sprintf(param, "img%d", n + 1);
                     if (m_Image[i].tex[n] != -1)
                         m_Image[i].img[n] = pPictureService->GetImageNum(m_sGroupName[m_Image[i].tex[n]],
                                                                          pAttribute->GetAttribute(param));
                     else
                         m_Image[i].img[n] = -1;
-                    sprintf_s(param, "spec%d", n + 1);
+                    sprintf(param, "spec%d", n + 1);
                     m_Image[i].bUseSpecTechnique[n] = pAttribute->GetAttributeAsDword(param, 0) != 0;
                 }
             }
@@ -1271,7 +1271,7 @@ void CXI_VIMAGESCROLL::RefreshScroll()
         for (n = 0; n < m_nSlotsQnt; n++)
         {
             char *sBadPict;
-            sprintf_s(param, "BadPicture%d", n + 1);
+            sprintf(param, "BadPicture%d", n + 1);
             if ((sBadPict = pAttribute->GetAttribute(param)) != nullptr)
             {
                 m_idBadTexture[n] = m_rs->TextureCreate(sBadPict);
@@ -1279,11 +1279,11 @@ void CXI_VIMAGESCROLL::RefreshScroll()
             }
             else
             {
-                sprintf_s(param, "BadTex%d", n + 1);
+                sprintf(param, "BadTex%d", n + 1);
                 m_idBadTexture[n] = pAttribute->GetAttributeAsDword(param, -1);
                 if (m_idBadTexture[n] >= 0)
                 {
-                    sprintf_s(param, "BadPic%d", n + 1);
+                    sprintf(param, "BadPic%d", n + 1);
                     m_idBadPic[n] =
                         pPictureService->GetImageNum(m_sGroupName[m_idBadTexture[n]], pAttribute->GetAttribute(param));
                 }
@@ -1299,7 +1299,7 @@ void CXI_VIMAGESCROLL::RefreshScroll()
         {
             char attrName[256];
             char *sStringName;
-            sprintf_s(attrName, "pic%d", i + 1);
+            sprintf(attrName, "pic%d", i + 1);
             ATTRIBUTES *pListEntity = pAttribute->GetAttributeClass(attrName);
 
             // Fill image descriptor by default value
@@ -1354,7 +1354,7 @@ void CXI_VIMAGESCROLL::RefreshScroll()
                 // set strings
                 for (k = 0; k < m_nStringQuantity; k++)
                 {
-                    sprintf_s(param, sizeof(param) - 1, "str%d", k + 1);
+                    sprintf(param, "str%d", k + 1);
                     sStringName = pListEntity->GetAttribute(param);
                     if (sStringName != nullptr && sStringName[0] == '#')
                     {
@@ -1372,7 +1372,7 @@ void CXI_VIMAGESCROLL::RefreshScroll()
                 char *tmpStr;
                 for (n = 0; n < m_nSlotsQnt; n++)
                 {
-                    sprintf_s(param, "name%d", n + 1);
+                    sprintf(param, "name%d", n + 1);
                     tmpStr = pListEntity->GetAttribute(param);
                     if (tmpStr != nullptr)
                     {
@@ -1383,15 +1383,15 @@ void CXI_VIMAGESCROLL::RefreshScroll()
                         }
                         memcpy(m_Image[i].saveName[n], tmpStr, len);
                     }
-                    sprintf_s(param, "tex%d", n + 1);
+                    sprintf(param, "tex%d", n + 1);
                     m_Image[i].tex[n] = pListEntity->GetAttributeAsDword(param, -1);
-                    sprintf_s(param, "img%d", n + 1);
+                    sprintf(param, "img%d", n + 1);
                     if (m_Image[i].tex[n] != -1)
                         m_Image[i].img[n] = pPictureService->GetImageNum(m_sGroupName[m_Image[i].tex[n]],
                                                                          pListEntity->GetAttribute(param));
                     else
                         m_Image[i].img[n] = -1;
-                    sprintf_s(param, "spec%d", n + 1);
+                    sprintf(param, "spec%d", n + 1);
                     m_Image[i].bUseSpecTechnique[n] = pListEntity->GetAttributeAsDword(param, 0) != 0;
                 }
             }
@@ -1641,7 +1641,7 @@ int CXI_VIMAGESCROLL::FindTexGroupFromOld(char **pGroupList, char *groupName, in
         return -1;
     for (int i = 0; i < listSize; i++)
     {
-        if (pGroupList[i] != nullptr && _stricmp(pGroupList[i], groupName) == 0)
+        if (pGroupList[i] != nullptr && storm::iEquals(std::string_view(pGroupList[i]), std::string_view(groupName)))
             return i;
     }
     return -1;

@@ -222,8 +222,11 @@ bool SCRSHOTER::MakeScreenShot()
             IDirect3DSurface9 *pSurf1 = nullptr, *pSurf2 = nullptr;
             rs->GetSurfaceLevel(texture_, 0, &pSurf1);
             rs->GetSurfaceLevel(pScrShotTex, 0, &pSurf2);
-            // rs->UpdateSurface(pSurf2,null,0,pSurf1,null);
+#ifdef _WIN32 // FIX_LINUX
             hr = D3DXLoadSurfaceFromSurface(pSurf1, nullptr, nullptr, pSurf2, nullptr, nullptr, D3DX_DEFAULT, 0);
+//#else
+            hr = rs->UpdateSurface(pSurf2, nullptr, 0, pSurf1, nullptr);
+#endif
             if (pSurf1)
                 rs->Release(pSurf1);
             if (pSurf2)
@@ -281,7 +284,7 @@ long SCRSHOTER::FindSaveTexture(const char *fileName) const
     auto *ps = m_list;
     while (ps)
     {
-        if (ps->fileName && _stricmp(fileName, ps->fileName) == 0)
+        if (ps->fileName && storm::iEquals(std::string_view(fileName), std::string_view(ps->fileName)))
             return ps->textureId;
         ps = ps->next;
     }
@@ -295,7 +298,7 @@ char *SCRSHOTER::FindSaveData(const char *fileName) const
     SAVETEXTURES *ps = m_list;
     while (ps)
     {
-        if (ps->fileName && _stricmp(fileName, ps->fileName) == 0)
+        if (ps->fileName && storm::iEquals(std::string_view(fileName), std::string_view(ps->fileName)))
             return ps->dataString;
         ps = ps->next;
     }
@@ -309,7 +312,7 @@ long SCRSHOTER::AddSaveTexture(const char *dirName, const char *fileName)
     long rval = FindSaveTexture(fileName);
     if (rval != -1)
         return rval;
-    if (_stricmp(fileName, "newsave") == 0)
+    if (storm::iEquals(std::string_view(fileName), "newsave"))
         return textureIndex_;
     auto *ps = new SAVETEXTURES;
     if (ps == nullptr)
@@ -328,9 +331,9 @@ long SCRSHOTER::AddSaveTexture(const char *dirName, const char *fileName)
     memcpy(m_list->fileName, fileName, len);
     char param[1024];
     if (dirName == nullptr || dirName[0] == 0)
-        sprintf_s(param, "%s", fileName);
+        sprintf(param, "%s", fileName);
     else
-        sprintf_s(param, "%s\\%s", dirName, fileName);
+        sprintf(param, "%s\\%s", dirName, fileName);
     m_list->textureId = GetTexFromSave(param, &ps->dataString);
     return m_list->textureId;
 }
@@ -343,7 +346,7 @@ void SCRSHOTER::DelSaveTexture(const char *fileName)
     SAVETEXTURES *ps = m_list;
     while (ps)
     {
-        if (ps->fileName && _stricmp(fileName, ps->fileName) == 0)
+        if (ps->fileName && storm::iEquals(std::string_view(fileName), std::string_view(ps->fileName)))
         {
             if (oldps)
                 oldps->next = ps->next;
@@ -400,7 +403,7 @@ long SCRSHOTER::GetTexFromSave(char *fileName, char **pDatStr) const
         {
             throw std::runtime_error("allocate memory error");
         }
-        strncpy_s(*pDatStr, strLen + 1, stringData, strLen);
+        strncpy(*pDatStr, stringData, strLen);
         (*pDatStr)[strLen] = 0;
     }
     /*    else

@@ -280,7 +280,7 @@ bool HELPCHOOSER::RunChooser(const char *ChooserGroup)
             {
                 throw std::runtime_error("Allocate memory error");
             }
-            strcpy_s(m_psRectName[i], j + 2, param2);
+            strcpy(m_psRectName[i], param2);
         }
 
         tmpStr = XI_ParseStr(tmpStr, param2, sizeof(param2));

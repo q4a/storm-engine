@@ -192,7 +192,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
     }
 
     // This language is already set
-    if (m_sLanguage != nullptr && _stricmp(sLanguage, m_sLanguage) == 0)
+    if (m_sLanguage != nullptr && storm::iEquals(std::string_view(sLanguage), std::string_view(m_sLanguage)))
         return;
 
     // initialize ini file
@@ -250,7 +250,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         // compare the current language with the default
         if (langIni->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
         {
-            if (_stricmp(m_sLanguage, param) == 0)
+            if (storm::iEquals(std::string_view(m_sLanguage), param))
                 break;
             core.Trace("WARNING! Language %s not exist some ini parameters. Language set to default %s", m_sLanguage,
                        param);
@@ -275,12 +275,12 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         char fullIniPath[512];
         if (langIni->ReadString("FONTS", m_sLanguage, param, sizeof(param) - 1, ""))
         {
-            sprintf_s(fullIniPath, "resource\\ini\\%s", param);
+            sprintf(fullIniPath, "resource\\ini\\%s", param);
         }
         else
         {
             core.Trace("Warning: Not found font record for language %s", m_sLanguage);
-            sprintf_s(fullIniPath, "resource\\ini\\fonts.ini");
+            sprintf(fullIniPath, "resource\\ini\\fonts.ini");
         }
         RenderService->SetFontIniFileName(fullIniPath);
     }
@@ -307,7 +307,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
     }
 
     // initialize ini file
-    sprintf_s(param, "resource\\ini\\texts\\%s\\%s", m_sLanguageDir, m_sIniFileName);
+    sprintf(param, "resource\\ini\\texts\\%s\\%s", m_sLanguageDir, m_sIniFileName);
     auto ini = fio->OpenIniFile(param);
     if (!ini)
     {
@@ -355,7 +355,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             m_psStrName[i] = new char[len];
             if (m_psStrName[i] == nullptr)
                 throw std::runtime_error("allocate memory error");
-            strcpy_s(m_psStrName[i], len, strName);
+            strcpy(m_psStrName[i], strName);
 
             // fill string self
             len = strlen(string) + 1;
@@ -415,7 +415,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
                 {
                     if (pUSB->psStrName[itmp2] == nullptr)
                         continue;
-                    if (_stricmp(pUSB->psStrName[itmp2], pUTmp->psStrName[itmp1]) == 0)
+                    if (storm::iEquals(std::string_view(pUSB->psStrName[itmp2]), std::string_view(pUTmp->psStrName[itmp1])))
                         break;
                 }
                 if (itmp2 >= pUSB->nStringsQuantity)
@@ -430,7 +430,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
                 {
                     if (pUTmp->psStrName[itmp2] == nullptr)
                         continue;
-                    if (_stricmp(pUTmp->psStrName[itmp2], pUSB->psStrName[itmp1]) == 0)
+                    if (storm::iEquals(std::string_view(pUTmp->psStrName[itmp2]), std::string_view(pUSB->psStrName[itmp1])))
                         break;
                 }
                 if (itmp2 >= pUTmp->nStringsQuantity)
@@ -465,7 +465,7 @@ char *STRSERVICE::GetString(const char *stringName, char *sBuffer, size_t buffer
 
     if (stringName != nullptr)
         for (int i = 0; i < m_nStringQuantity; i++)
-            if (!_stricmp(m_psStrName[i], stringName))
+            if (storm::iEquals(std::string_view(m_psStrName[i]), std::string_view(stringName)))
             {
                 auto len = strlen(m_psString[i]) + 1;
                 if (sBuffer == nullptr)
@@ -474,7 +474,7 @@ char *STRSERVICE::GetString(const char *stringName, char *sBuffer, size_t buffer
                     len = bufferSize;
 
                 if (len > 0)
-                    strcpy_s(sBuffer, bufferSize, m_psString[i]);
+                    strcpy(sBuffer, m_psString[i]);
 
                 return m_psString[i];
             }
@@ -514,7 +514,7 @@ void STRSERVICE::LoadIni()
     if (!ini->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
     {
         core.Trace("WARNING! Language ini file have not default language.");
-        strcpy_s(param, "English");
+        strcpy(param, "English");
     }
 
     if (param[0] != 0)
@@ -534,7 +534,7 @@ long STRSERVICE::GetStringNum(const char *stringName)
 
     if (stringName != nullptr)
         for (long i = 0; i < m_nStringQuantity; i++)
-            if (!_stricmp(m_psStrName[i], stringName))
+            if (storm::iEquals(std::string_view(m_psStrName[i]), std::string_view(stringName)))
                 return i;
     return -1L;
 
@@ -575,7 +575,7 @@ long STRSERVICE::OpenUsersStringFile(const char *fileName)
     UsersStringBlock *itUSB;
     for (itUSB = m_pUsersBlocks; itUSB != nullptr; itUSB = itUSB->next)
     {
-        if (itUSB->fileName != nullptr && _stricmp(itUSB->fileName, fileName) == 0)
+        if (itUSB->fileName != nullptr && storm::iEquals(std::string_view(itUSB->fileName), std::string_view(fileName)))
         {
             break;
         }
@@ -591,7 +591,7 @@ long STRSERVICE::OpenUsersStringFile(const char *fileName)
 
     // strings reading
     char param[512];
-    sprintf_s(param, "resource\\ini\\TEXTS\\%s\\%s", m_sLanguageDir, fileName);
+    sprintf(param, "resource\\ini\\TEXTS\\%s\\%s", m_sLanguageDir, fileName);
     auto fileS = fio->_CreateFile(param, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
@@ -739,7 +739,7 @@ char *STRSERVICE::TranslateFromUsers(long id, const char *inStr)
         return nullptr;
 
     for (i = 0; i < pUSB->nStringsQuantity; i++)
-        if (pUSB->psStrName[i] != nullptr && _stricmp(pUSB->psStrName[i], inStr) == 0)
+        if (pUSB->psStrName[i] != nullptr && storm::iEquals(std::string_view(pUSB->psStrName[i]), std::string_view(inStr)))
             break;
     if (i < pUSB->nStringsQuantity)
         return pUSB->psString[i];
@@ -896,7 +896,7 @@ bool STRSERVICE::GetNextUsersString(char *src, long &idx, char **strName, char *
         *strName = new char[nameEnd - nameBeg + 2];
         if (*strName == nullptr)
             throw std::runtime_error("Allocate memory error");
-        strncpy_s(*strName, nameEnd - nameBeg + 2, nameBeg, nameEnd - nameBeg + 1);
+        strncpy(*strName, nameBeg, nameEnd - nameBeg + 1);
         strName[0][nameEnd - nameBeg + 1] = 0;
     }
 
@@ -905,7 +905,7 @@ bool STRSERVICE::GetNextUsersString(char *src, long &idx, char **strName, char *
         *strData = new char[dataEnd - dataBeg + 2];
         if (*strData == nullptr)
             throw std::runtime_error("Allocate memory error");
-        strncpy_s(*strData, dataEnd - dataBeg + 2, dataBeg, dataEnd - dataBeg + 1);
+        strncpy(*strData, dataBeg, dataEnd - dataBeg + 1);
         strData[0][dataEnd - dataBeg + 1] = 0;
         Assert(utf8::IsValidUtf8(*strData));
     }
@@ -1062,16 +1062,16 @@ uint32_t _LanguageGetFaderPic(VS_STACK *pS)
                     break;
             if (nInLen > 0)
             {
-                strncpy_s(newPicName, strPicName, nInLen);
+                strncpy(newPicName, strPicName, nInLen);
                 newPicName[nInLen] = 0;
             }
-            strcat_s(newPicName, g_StringServicePointer->GetLanguage());
-            strcat_s(newPicName, "\\");
-            strcat_s(newPicName, &strPicName[nInLen]);
+            strcat(newPicName, g_StringServicePointer->GetLanguage());
+            strcat(newPicName, "\\");
+            strcat(newPicName, &strPicName[nInLen]);
         }
         else
         {
-            strcpy_s(newPicName, strPicName);
+            strcpy(newPicName, strPicName);
         }
     }
 
@@ -1292,19 +1292,6 @@ uint32_t _InterfaceCreateFolder(VS_STACK *pS)
     if (!pDat)
         return IFUNCRESULT_FAILED;
     const char *sFolderName = pDat->GetString();
-
-    // precreate directory
-    const char *pcCurPtr = sFolderName;
-    while ((pcCurPtr = strchr(pcCurPtr, '\\')) != nullptr)
-    {
-        const char tmpchr = pcCurPtr[0];
-        ((char *)pcCurPtr)[0] = 0;
-        std::wstring FolderNameW = utf8::ConvertUtf8ToWide(sFolderName);
-        CreateDirectory(FolderNameW.c_str(), nullptr);
-        ((char *)pcCurPtr)[0] = tmpchr;
-        pcCurPtr++;
-    }
-    // create self directory
     const long nSuccess = fio->_CreateDirectory(sFolderName);
 
     pDat = (VDATA *)pS->Push();
@@ -1377,7 +1364,7 @@ uint32_t _InterfaceFindFolders(VS_STACK *pS)
     for (std::string curName : vFilenames)
     {
         char pctmp[64];
-        sprintf_s(pctmp, "f%d", n++);
+        sprintf(pctmp, "f%d", n++);
         pA->SetAttribute(pctmp, curName.c_str());
     }
     pDat = (VDATA *)pS->Push();
@@ -1443,11 +1430,11 @@ uint32_t _DialogAddParamToStr(VS_STACK *pS)
     {
         if (pcSrcStr && pcSrcStr[0] != 0)
         {
-            sprintf_s(param, sizeof(param), "%s@<%s>%s", pcSrcStr, pcDatID, pcDatVal);
+            sprintf(param, "%s@<%s>%s", pcSrcStr, pcDatID, pcDatVal);
         }
         else
         {
-            sprintf_s(param, sizeof(param), "@<%s>%s", pcDatID, pcDatVal);
+            sprintf(param, "@<%s>%s", pcDatID, pcDatVal);
         }
     }
 
@@ -1491,21 +1478,23 @@ uint32_t _IsKeyPressed(VS_STACK *pS)
     pDat->Get(strKeyName);
     // data process
     bool bIsPressed = false;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (strKeyName)
     {
-        if (_stricmp(strKeyName, "shift") == 0)
+        if (storm::iEquals(std::string_view(strKeyName), "shift"))
         {
             bIsPressed = (GetAsyncKeyState(VK_SHIFT) < 0);
         }
-        else if (_stricmp(strKeyName, "control") == 0)
+        else if (storm::iEquals(std::string_view(strKeyName), "control"))
         {
             bIsPressed = (GetAsyncKeyState(VK_CONTROL) < 0);
         }
-        else if (_stricmp(strKeyName, "alt") == 0)
+        else if (storm::iEquals(std::string_view(strKeyName), "alt"))
         {
             bIsPressed = (GetAsyncKeyState(VK_MENU) < 0);
         }
     }
+#endif
     // set return data
     pDat = (VDATA *)pS->Push();
     if (!pDat)

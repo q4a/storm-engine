@@ -85,7 +85,7 @@ void XI_TableLineDescribe::SetData(long nRowIndex, ATTRIBUTES *pLA, bool bHeader
     long c;
     for (c = 0; c < 10000; c++)
     {
-        sprintf_s(pcAttrName, "td%d", c + 1);
+        sprintf(pcAttrName, "td%d", c + 1);
         auto *const pA = (pLA ? pLA->GetAttributeClass(pcAttrName) : nullptr);
         if (!pA || c >= m_pTable->m_nColQuantity)
             break;
@@ -203,7 +203,7 @@ void XI_TableCellDescribe::SetData(long nColIndex, ATTRIBUTES *pAttr, bool bHead
         char tmpaname[16];
         while (true)
         {
-            sprintf_s(tmpaname, sizeof(tmpaname), "icon%d", nIconQuantity + 1);
+            sprintf(tmpaname, "icon%d", nIconQuantity + 1);
             pA = pAttr->GetAttributeClass(tmpaname);
             if (!pA)
                 break;
@@ -230,21 +230,21 @@ void XI_TableCellDescribe::SetData(long nColIndex, ATTRIBUTES *pAttr, bool bHead
     pcTmpStr = pAttr->GetAttribute("align");
     if (pcTmpStr)
     {
-        if (_stricmp(pcTmpStr, "left") == 0)
+        if (storm::iEquals(std::string_view(pcTmpStr), "left"))
             m_nAlignment = PR_ALIGN_LEFT;
-        if (_stricmp(pcTmpStr, "center") == 0)
+        if (storm::iEquals(std::string_view(pcTmpStr), "center"))
             m_nAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(pcTmpStr, "right") == 0)
+        if (storm::iEquals(std::string_view(pcTmpStr), "right"))
             m_nAlignment = PR_ALIGN_RIGHT;
     }
     pcTmpStr = pAttr->GetAttribute("valign");
     if (pcTmpStr)
     {
-        if (_stricmp(pcTmpStr, "top") == 0)
+        if (storm::iEquals(std::string_view(pcTmpStr), "top"))
             m_nVAlignment = ALIGN_TOP;
-        if (_stricmp(pcTmpStr, "center") == 0)
+        if (storm::iEquals(std::string_view(pcTmpStr), "center"))
             m_nVAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(pcTmpStr, "bottom") == 0)
+        if (storm::iEquals(std::string_view(pcTmpStr), "bottom"))
             m_nVAlignment = ALIGN_BOTTOM;
     }
 
@@ -340,9 +340,9 @@ void XI_TableCellDescribe::LoadImageParam(ImgDescribe *pImg, ATTRIBUTES *pA) con
     if ((pcStr = pA->GetAttribute("valign")) != nullptr)
     {
         nImgAlign = ALIGN_TOP;
-        if (_stricmp(pcStr, "center") == 0)
+        if (storm::iEquals(std::string_view(pcStr), "center"))
             nImgAlign = PR_ALIGN_CENTER;
-        else if (_stricmp(pcStr, "bottom") == 0)
+        else if (storm::iEquals(std::string_view(pcStr), "bottom"))
             nImgAlign = ALIGN_BOTTOM;
         if (nImgAlign != ALIGN_TOP)
         {
@@ -686,7 +686,7 @@ void CXI_TABLE::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 
     // save cols width
@@ -776,7 +776,7 @@ void CXI_TABLE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const c
     {
         for (n = 0; n < 100; n++)
         {
-            sprintf_s(pctmp, sizeof(pctmp), "fontlist%d", n + 1);
+            sprintf(pctmp, "fontlist%d", n + 1);
             if (!ini1->ReadString(name1, pctmp, param, sizeof(param), ""))
                 break;
             m_anFontList.push_back(m_rs->LoadFont(param));
@@ -795,16 +795,16 @@ void CXI_TABLE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const c
     m_nFontCellVAlignment = ALIGN_TOP;
     if (ReadIniString(ini1, name1, ini2, name2, "fontcellalignment", param, sizeof(param), ""))
     {
-        if (_stricmp(param, "center") == 0)
+        if (storm::iEquals(std::string_view(param), "center"))
             m_nFontCellAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(param, "right") == 0)
+        if (storm::iEquals(std::string_view(param), "right"))
             m_nFontCellAlignment = PR_ALIGN_RIGHT;
     }
     if (ReadIniString(ini1, name1, ini2, name2, "fontcellvalignment", param, sizeof(param), ""))
     {
-        if (_stricmp(param, "center") == 0)
+        if (storm::iEquals(std::string_view(param), "center"))
             m_nFontCellVAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(param, "bottom") == 0)
+        if (storm::iEquals(std::string_view(param), "bottom"))
             m_nFontCellVAlignment = ALIGN_BOTTOM;
     }
 
@@ -817,16 +817,16 @@ void CXI_TABLE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const c
     m_nFontTitleVAlignment = ALIGN_TOP;
     if (ReadIniString(ini1, name1, ini2, name2, "fonttitlealignment", param, sizeof(param), ""))
     {
-        if (_stricmp(param, "center") == 0)
+        if (storm::iEquals(std::string_view(param), "center"))
             m_nFontTitleAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(param, "right") == 0)
+        if (storm::iEquals(std::string_view(param), "right"))
             m_nFontTitleAlignment = PR_ALIGN_RIGHT;
     }
     if (ReadIniString(ini1, name1, ini2, name2, "fonttitlevalignment", param, sizeof(param), ""))
     {
-        if (_stricmp(param, "center") == 0)
+        if (storm::iEquals(std::string_view(param), "center"))
             m_nFontTitleVAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(param, "bottom") == 0)
+        if (storm::iEquals(std::string_view(param), "bottom"))
             m_nFontTitleVAlignment = ALIGN_BOTTOM;
     }
 
@@ -1184,7 +1184,7 @@ void CXI_TABLE::UpdateTableCells()
     q = m_bVariableLineHeight ? 1000 : (m_nRowQuantity - (m_pHeader ? 1 : 0));
     for (r = 0; (nY < m_rect.bottom) && (r < q); r++)
     {
-        sprintf_s(pcTmp, "tr%d", r + m_nTopIndex + 1);
+        sprintf(pcTmp, "tr%d", r + m_nTopIndex + 1);
         pAttr = pARoot->GetAttributeClass(pcTmp);
         if (!pAttr)
             break;
@@ -1399,7 +1399,7 @@ void CXI_TABLE::UpdateLineQuantity()
     // find the minimum element
     while (true)
     {
-        sprintf_s(pcAttrName, "tr%d", nmin * 2);
+        sprintf(pcAttrName, "tr%d", nmin * 2);
         if (pARoot->GetAttributeClass(pcAttrName))
             nmin *= 2;
         else
@@ -1413,7 +1413,7 @@ void CXI_TABLE::UpdateLineQuantity()
         const long n = (nmin + nmax) / 2;
         if (n == nmin)
             break;
-        sprintf_s(pcAttrName, "tr%d", n);
+        sprintf(pcAttrName, "tr%d", n);
         if (pARoot->GetAttributeClass(pcAttrName)) // there is an element - it means that the older half can have an end
         {
             nmin = n;

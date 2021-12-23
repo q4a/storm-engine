@@ -10,8 +10,6 @@
 #include "xservice.h"
 #include <cstdio>
 
-#include <direct.h>
-
 #define CHECK_FILE_NAME "PiratesReadme.txt"
 
 #define TT_TITLE_OFFSET 4
@@ -543,7 +541,8 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
     case MSG_INTERFACE_ENABLE_STRING: {
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
-            if (m_stringes[i].sStringName != nullptr && _stricmp(param.c_str(), m_stringes[i].sStringName) == 0)
+            if (m_stringes[i].sStringName != nullptr &&
+                storm::iEquals(param, std::string_view(m_stringes[i].sStringName)))
             {
                 m_stringes[i].bUsed = true;
                 break;
@@ -554,7 +553,8 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
     case MSG_INTERFACE_DISABLE_STRING: {
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
-            if (m_stringes[i].sStringName != nullptr && _stricmp(param.c_str(), m_stringes[i].sStringName) == 0)
+            if (m_stringes[i].sStringName != nullptr &&
+                storm::iEquals(param, std::string_view(m_stringes[i].sStringName)))
             {
                 m_stringes[i].bUsed = false;
                 break;
@@ -605,7 +605,8 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         int l;
         for (l = 0; l < m_nStringQuantity; l++)
         {
-            if (m_stringes[l].sStringName != nullptr && _stricmp(m_stringes[l].sStringName, param.c_str()) == 0)
+            if (m_stringes[l].sStringName != nullptr &&
+                storm::iEquals(param, std::string_view(m_stringes[l].sStringName)))
                 break;
         }
         if (l == m_nStringQuantity)
@@ -650,7 +651,8 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
         {
-            if (m_stringes[i].sStringName != nullptr && _stricmp(m_stringes[i].sStringName, param.c_str()) == 0)
+            if (m_stringes[i].sStringName != nullptr &&
+                storm::iEquals(param, std::string_view(m_stringes[i].sStringName)))
             {
                 STORM_DELETE(m_stringes[i].sStringName);
                 FONT_RELEASE(pRenderService, m_stringes[i].fontNum);
@@ -666,7 +668,8 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
         {
-            if (m_stringes[i].sStringName != nullptr && _stricmp(m_stringes[i].sStringName, param.c_str()) == 0)
+            if (m_stringes[i].sStringName != nullptr &&
+                storm::iEquals(param, std::string_view(m_stringes[i].sStringName)))
             {
                 m_stringes[i].dwColor = message.Long();
                 break;
@@ -680,7 +683,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         IMAGE_Entity *pImg = m_imgLists;
         while (pImg != nullptr)
         {
-            if (pImg->sImageName != nullptr && _stricmp(pImg->sImageName, param.c_str()) == 0)
+            if (pImg->sImageName != nullptr && storm::iEquals(param, std::string_view(pImg->sImageName)))
                 break;
             pImg = pImg->next;
         }
@@ -794,7 +797,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
             subText[0] = 0;
             sscanf(pCur, "%[^,]", subText);
             int subSize = strlen(subText);
-            if (_stricmp(subText, param.c_str()) == 0)
+            if (storm::iEquals(param, std::string_view(subText)))
                 return 1;
             pCur += subSize;
             if (*pCur == ',')
@@ -889,7 +892,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         IMAGE_Entity *pImg = m_imgLists;
         while (pImg != nullptr)
         {
-            if (pImg->sImageName != nullptr && _stricmp(pImg->sImageName, param.c_str()) == 0)
+            if (pImg->sImageName != nullptr && storm::iEquals(param, std::string_view(pImg->sImageName)))
                 break;
             pImg = pImg->next;
         }
@@ -1069,7 +1072,9 @@ void XINTERFACE::LoadIni()
         throw std::runtime_error("ini file not found!");
 
     RECT Screen_Rect;
+#ifdef _WIN32 // FIX_LINUX
     GetWindowRect(core.GetAppHWND(), &Screen_Rect);
+#endif
 
     fScale = 1.0f;
     const auto screenSize = core.GetScreenSize();
@@ -1082,7 +1087,7 @@ void XINTERFACE::LoadIni()
     GlobalScreenRect.left = (dwScreenWidth - screenSize.width) / 2;
     GlobalScreenRect.right = screenSize.width + GlobalScreenRect.left;
 
-    sprintf_s(section, "COMMON");
+    sprintf(section, "COMMON");
 
     // set screen parameters
     if (ini->GetLong(platform, "bDynamicScaling", 0) == 0)
@@ -1135,7 +1140,9 @@ void XINTERFACE::LoadIni()
     //  GetWindowRect(core.GetAppHWND(), &Screen_Rect);
     lock_x = Screen_Rect.left + (Screen_Rect.right - Screen_Rect.left) / 2;
     lock_y = Screen_Rect.top + (Screen_Rect.bottom - Screen_Rect.top) / 2;
+#ifdef _WIN32 // FIX_LINUX Cursor
     SetCursorPos(lock_x, lock_y);
+#endif
     fXMousePos = static_cast<float>(dwScreenWidth / 2);
     fYMousePos = static_cast<float>(dwScreenHeight / 2);
     for (int i = 0; i < 4; i++)
@@ -1144,7 +1151,9 @@ void XINTERFACE::LoadIni()
     vMouse[2].tu = vMouse[3].tu = 1.f;
     vMouse[0].tv = vMouse[2].tv = 0.f;
     vMouse[1].tv = vMouse[3].tv = 1.f;
+#ifdef _WIN32 // FIX_LINUX Cursor
     ShowCursor(false);
+#endif
 
     // set blind parameters
     m_fBlindSpeed = ini->GetFloat(section, "BlindTime", 1.f);
@@ -1186,7 +1195,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
     }
     auto ownerIni = fio->OpenIniFile("RESOURCE\\INI\\INTERFACES\\defaultnode.ini");
 
-    sprintf_s(section, "MAIN");
+    sprintf(section, "MAIN");
 
     // load items
     CINODE *curnod = m_pNodes;
@@ -1204,27 +1213,27 @@ void XINTERFACE::LoadDialog(const char *sFileName)
                 tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
             else
                 priority = 80;
-            if (!_stricmp(param, "PC") || !_stricmp(param, "XBOX") || !_stricmp(param, "LANG"))
+            if (storm::iEquals(param, "PC") || storm::iEquals(param, "XBOX") || storm::iEquals(param, "LANG"))
             {
                 const bool bThisXBOX = false;
-                if (!_stricmp(param, "PC"))
+                if (storm::iEquals(param, "PC"))
                 {
                     if (bThisXBOX)
                         param[0] = 0;
                     tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
                 }
-                else if (!_stricmp(param, "XBOX"))
+                else if (storm::iEquals(param, "XBOX"))
                 {
                     if constexpr (!bThisXBOX)
                         param[0] = 0;
                     else
                         tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
                 }
-                else if (!_stricmp(param, "LANG"))
+                else if (storm::iEquals(param, "LANG"))
                 {
                     tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
                     char *strLangName = pStringService->GetLanguage();
-                    if (strLangName == nullptr || _stricmp(param, strLangName))
+                    if (strLangName == nullptr || !storm::iEquals(param, std::string_view(strLangName)))
                         param[0] = 0;
                     else
                         tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
@@ -1235,7 +1244,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
                 SFLB_CreateNode(ownerIni.get(), ini.get(), param, nodeName, priority);
 
             i = 0;
-            if (findName && _stricmp(findName, "item") == 0)
+            if (findName && storm::iEquals(std::string_view(findName), "item"))
             {
                 ini->ReadString(section, findName, skey, sizeof(skey) - 1);
                 for (; i < keyNum; i++)
@@ -1246,7 +1255,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
             if (i < keyNum)
             {
                 // not more items
-                if (findName && _stricmp(findName, "item") == 0)
+                if (findName && storm::iEquals(std::string_view(findName), "item"))
                 {
                     findName = "glow";
                     if (m_pGlowCursorNode == nullptr)
@@ -1347,7 +1356,7 @@ void XINTERFACE::SFLB_CreateNode(INIFILE *pOwnerIni, INIFILE *pUserIni, const ch
 
     char param[1024];
     if (!pOwnerIni->ReadString(sNodeType, "class", param, sizeof(param) - 1, ""))
-        sprintf_s(param, "%s", sNodeType);
+        sprintf(param, "%s", sNodeType);
 
     CINODE *pNewNod = nullptr;
     pNewNod = NewNode(param);
@@ -1462,77 +1471,78 @@ CINODE *XINTERFACE::NewNode(const char *pcNodType)
     if (!pcNodType)
         return nullptr;
     CINODE *pNewNod = nullptr;
-    if (!_stricmp(pcNodType, "BUTTON"))
+    const auto pcNodTypeView = std::string_view(pcNodType);
+    if (storm::iEquals(pcNodTypeView, "BUTTON"))
         pNewNod = new CXI_BUTTON;
-    else if (!_stricmp(pcNodType, "VIDEO"))
+    else if (storm::iEquals(pcNodTypeView, "VIDEO"))
         pNewNod = new CXI_VIDEO;
-    else if (!_stricmp(pcNodType, "SCROLLIMAGE"))
+    else if (storm::iEquals(pcNodTypeView, "SCROLLIMAGE"))
         pNewNod = new CXI_SCROLLIMAGE;
-    else if (!_stricmp(pcNodType, "IMAGECOLLECTION"))
+    else if (storm::iEquals(pcNodTypeView, "IMAGECOLLECTION"))
         pNewNod = new CXI_IMGCOLLECTION;
-    else if (!_stricmp(pcNodType, "STRINGCOLLECTION"))
+    else if (storm::iEquals(pcNodTypeView, "STRINGCOLLECTION"))
         pNewNod = new CXI_STRCOLLECTION;
-    else if (!_stricmp(pcNodType, "FOURIMAGES"))
+    else if (storm::iEquals(pcNodTypeView, "FOURIMAGES"))
         pNewNod = new CXI_FOURIMAGE;
-    else if (!_stricmp(pcNodType, "RECTANGLE"))
+    else if (storm::iEquals(pcNodTypeView, "RECTANGLE"))
         pNewNod = new CXI_RECTANGLE;
-    else if (!_stricmp(pcNodType, "BOUNDER"))
+    else if (storm::iEquals(pcNodTypeView, "BOUNDER"))
         pNewNod = new CXI_BOUNDER;
-    else if (!_stricmp(pcNodType, "TITLE"))
+    else if (storm::iEquals(pcNodTypeView, "TITLE"))
         pNewNod = new CXI_TITLE;
-    else if (!_stricmp(pcNodType, "TEXTBUTTON"))
+    else if (storm::iEquals(pcNodTypeView, "TEXTBUTTON"))
         pNewNod = new CXI_TEXTBUTTON;
-    else if (!_stricmp(pcNodType, "SCROLLBAR"))
+    else if (storm::iEquals(pcNodTypeView, "SCROLLBAR"))
         pNewNod = new CXI_SCROLLBAR;
-    else if (!_stricmp(pcNodType, "LINECOLLECTION"))
+    else if (storm::iEquals(pcNodTypeView, "LINECOLLECTION"))
         pNewNod = new CXI_LINECOLLECTION;
-    else if (!_stricmp(pcNodType, "STATUSLINE"))
+    else if (storm::iEquals(pcNodTypeView, "STATUSLINE"))
         pNewNod = new CXI_STATUSLINE;
-    else if (!_stricmp(pcNodType, "CHANGER"))
+    else if (storm::iEquals(pcNodTypeView, "CHANGER"))
         pNewNod = new CXI_CHANGER;
-    else if (!_stricmp(pcNodType, "PICTURE"))
+    else if (storm::iEquals(pcNodTypeView, "PICTURE"))
         pNewNod = new CXI_PICTURE;
-    else if (!_stricmp(pcNodType, "GLOWS"))
+    else if (storm::iEquals(pcNodTypeView, "GLOWS"))
         pNewNod = new CXI_GLOWER;
-    else if (!_stricmp(pcNodType, "LRCHANGER"))
+    else if (storm::iEquals(pcNodTypeView, "LRCHANGER"))
         pNewNod = new CXI_LRCHANGER;
-    else if (!_stricmp(pcNodType, "TWO_PICTURE"))
+    else if (storm::iEquals(pcNodTypeView, "TWO_PICTURE"))
         pNewNod = new CXI_TWOPICTURE;
-    else if (!_stricmp(pcNodType, "SCROLLER"))
+    else if (storm::iEquals(pcNodTypeView, "SCROLLER"))
         pNewNod = new CXI_SCROLLER;
-    else if (!_stricmp(pcNodType, "QUESTTITLE"))
+    else if (storm::iEquals(pcNodTypeView, "QUESTTITLE"))
         pNewNod = new CXI_QUESTTITLE;
-    else if (!_stricmp(pcNodType, "QUESTTEXT"))
+    else if (storm::iEquals(pcNodTypeView, "QUESTTEXT"))
         pNewNod = new CXI_QUESTTEXTS;
-    else if (!_stricmp(pcNodType, "SLIDEPICTURE"))
+    else if (storm::iEquals(pcNodTypeView, "SLIDEPICTURE"))
         pNewNod = new CXI_SLIDEPICTURE;
-    else if (!_stricmp(pcNodType, "FORMATEDTEXT"))
+    else if (storm::iEquals(pcNodTypeView, "FORMATEDTEXT"))
         pNewNod = new CXI_FORMATEDTEXT;
-    else if (!_stricmp(pcNodType, "EDITBOX"))
+    else if (storm::iEquals(pcNodTypeView, "EDITBOX"))
         pNewNod = new CXI_EDITBOX;
-    else if (!_stricmp(pcNodType, "SLIDER"))
+    else if (storm::iEquals(pcNodTypeView, "SLIDER"))
         pNewNod = new CXI_SLIDELINE;
-    else if (!_stricmp(pcNodType, "KEYCHOOSER"))
+    else if (storm::iEquals(pcNodTypeView, "KEYCHOOSER"))
         pNewNod = new CXI_KEYCHANGER;
-    else if (!_stricmp(pcNodType, "VIDEORECTANGLE"))
+    else if (storm::iEquals(pcNodTypeView, "VIDEORECTANGLE"))
         pNewNod = new CXI_VIDEORECT;
-    else if (!_stricmp(pcNodType, "VIMAGESCROLL"))
+    else if (storm::iEquals(pcNodTypeView, "VIMAGESCROLL"))
         pNewNod = new CXI_VIMAGESCROLL;
-    else if (!_stricmp(pcNodType, "PCEDITBOX"))
+    else if (storm::iEquals(pcNodTypeView, "PCEDITBOX"))
         pNewNod = new CXI_PCEDITBOX;
-    else if (!_stricmp(pcNodType, "SCROLLEDPICTURE"))
+    else if (storm::iEquals(pcNodTypeView, "SCROLLEDPICTURE"))
         pNewNod = new CXI_SCROLLEDPICTURE;
-    else if (!_stricmp(pcNodType, "WINDOW"))
+    else if (storm::iEquals(pcNodTypeView, "WINDOW"))
         pNewNod = new CXI_WINDOW;
-    else if (!_stricmp(pcNodType, "CHECKBUTTON"))
+    else if (storm::iEquals(pcNodTypeView, "CHECKBUTTON"))
         pNewNod = new CXI_CHECKBUTTONS;
-    else if (!_stricmp(pcNodType, "TABLE"))
+    else if (storm::iEquals(pcNodTypeView, "TABLE"))
         pNewNod = new CXI_TABLE;
-    else if (!_stricmp(pcNodType, "FRAME"))
+    else if (storm::iEquals(pcNodTypeView, "FRAME"))
         pNewNod = new CXI_BORDER;
-    else if (!_stricmp(pcNodType, "CONTEXTHELP"))
+    else if (storm::iEquals(pcNodTypeView, "CONTEXTHELP"))
         m_pContHelp = pNewNod = new CXI_CONTEXTHELP;
-    else if (!_stricmp(pcNodType, "GLOWCURSOR"))
+    else if (storm::iEquals(pcNodTypeView, "GLOWCURSOR"))
         m_pGlowCursorNode = pNewNod = new CXI_GLOWCURSOR;
     else
         core.Trace("Not supported node type:\"%s\"", pcNodType);
@@ -1548,7 +1558,7 @@ void XINTERFACE::DeleteNode(const char *pcNodeName)
     CINODE *pNod;
     for (pNod = m_pNodes; pNod; pNod = pNod->m_next)
     {
-        if (pNod->m_nodeName && _stricmp(pNod->m_nodeName, pcNodeName) == 0)
+        if (pNod->m_nodeName && storm::iEquals(std::string_view(pNod->m_nodeName), std::string_view(pcNodeName)))
             break;
         pPrevNod = pNod;
     }
@@ -2598,7 +2608,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
     if (patr != nullptr && patr->GetParent() != nullptr && patr->GetParent()->GetParent() != nullptr)
     {
         const char *sParentName = patr->GetParent()->GetParent()->GetThisName();
-        if (sParentName == nullptr || _stricmp(sParentName, "pictures") != 0)
+        if (sParentName == nullptr || !storm::iEquals(std::string_view(sParentName), "pictures"))
             return 0;
         const char *sImageName = patr->GetParent()->GetThisName();
         if (sImageName == nullptr)
@@ -2607,7 +2617,8 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
         IMAGE_Entity *pImList = m_imgLists;
         while (pImList != nullptr)
         {
-            if (pImList->sImageName != nullptr && _stricmp(pImList->sImageName, sImageName) == 0)
+            if (pImList->sImageName != nullptr &&
+                storm::iEquals(std::string_view(pImList->sImageName), std::string_view(sImageName)))
                 break;
             pImList = pImList->next;
         }
@@ -2633,7 +2644,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
         if (patr->GetThisName() == nullptr)
             return 0;
         // set picture
-        if (_stricmp(patr->GetThisName(), "pic") == 0)
+        if (storm::iEquals(std::string_view(patr->GetThisName()), "pic"))
         {
             STORM_DELETE(pImList->sPicture);
             if (patr->GetThisAttr() != nullptr)
@@ -2650,7 +2661,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
             pImList->imageID = pPictureService->GetImageNum(pImList->sImageListName, pImList->sPicture);
         }
         // set texture
-        if (_stricmp(patr->GetThisName(), "tex") == 0)
+        if (storm::iEquals(std::string_view(patr->GetThisName()), "tex"))
         {
             if (pImList->sImageListName != nullptr)
                 pPictureService->ReleaseTextureID(pImList->sImageListName);
@@ -2859,7 +2870,7 @@ char *XINTERFACE::SaveFileFind(long saveNum, char *buffer, size_t bufSize, long 
         if (q >= static_cast<int>(bufSize))
             q = bufSize - 1;
         if (q > 0)
-            strncpy_s(buffer, bufSize, pSFD->save_file_name, q);
+            strncpy(buffer, pSFD->save_file_name, q);
         if (q >= 0)
             buffer[q] = 0;
     }
@@ -2969,7 +2980,8 @@ void XINTERFACE::ReleaseDinamicPic(const char *sPicName)
     IMAGE_Entity *findImg;
     for (findImg = m_imgLists; findImg != nullptr; findImg = findImg->next)
     {
-        if (findImg->sImageName != nullptr && _stricmp(findImg->sImageName, sPicName) == 0)
+        if (findImg->sImageName != nullptr &&
+            storm::iEquals(std::string_view(findImg->sImageName), std::string_view(sPicName)))
             break;
         prevImg = findImg;
     }
@@ -3038,7 +3050,7 @@ long XINTERFACE::PrintIntoWindow(long wl, long wr, long idFont, uint32_t dwFCol,
             int maxWidth = 0;
             const int nPrev = -1;
             char strLocTmp[1024];
-            strcpy_s(strLocTmp, str);
+            strcpy(strLocTmp, str);
             while (true) //~!~
             {
                 int nStart = FindMaxStrForWidth(pRenderService, nWidthForScaleCorrecting, strLocTmp, idFont, scale);
@@ -3139,7 +3151,7 @@ char *AddAttributesStringsToBuffer(char *inBuffer, char *prevStr, ATTRIBUTES *pA
 {
     size_t prevLen = 0;
     if (prevStr != nullptr)
-        prevLen = strlen(prevStr) + _countof(".") - 1;
+        prevLen = strlen(prevStr) + sizeof(".") - 1;
 
     const int q = pAttr->GetAttributesNum();
     for (int k = 0; k < q; k++)
@@ -3152,7 +3164,7 @@ char *AddAttributesStringsToBuffer(char *inBuffer, char *prevStr, ATTRIBUTES *pA
         const char *attrName = pA->GetThisName();
         if (attrName && attrVal && attrVal[0])
         {
-            int nadd = _countof("\n") - 1 + strlen(attrName) + _countof("=") - 1 + strlen(attrVal) + 1;
+            int nadd = sizeof("\n") - 1 + strlen(attrName) + sizeof("=") - 1 + strlen(attrVal) + 1;
             nadd += prevLen;
             if (inBuffer != nullptr)
                 nadd += strlen(inBuffer);
@@ -3164,19 +3176,19 @@ char *AddAttributesStringsToBuffer(char *inBuffer, char *prevStr, ATTRIBUTES *pA
 
             if (inBuffer)
             {
-                strcat_s(pNew, nadd, inBuffer);
-                strcat_s(pNew, nadd, "\n");
+                strcat(pNew, inBuffer);
+                strcat(pNew, "\n");
             }
 
             if (prevStr)
             {
-                strcat_s(pNew, nadd, prevStr);
-                strcat_s(pNew, nadd, ".");
+                strcat(pNew, prevStr);
+                strcat(pNew, ".");
             }
 
-            strcat_s(pNew, nadd, attrName);
-            strcat_s(pNew, nadd, "=");
-            strcat_s(pNew, nadd, attrVal);
+            strcat(pNew, attrName);
+            strcat(pNew, "=");
+            strcat(pNew, attrVal);
 
             delete inBuffer;
             inBuffer = pNew;
@@ -3187,8 +3199,8 @@ char *AddAttributesStringsToBuffer(char *inBuffer, char *prevStr, ATTRIBUTES *pA
             char param[512];
             param[0] = 0;
             if (prevStr)
-                sprintf_s(param, "%s.", prevStr);
-            strcat_s(param, pA->GetThisName());
+                sprintf(param, "%s.", prevStr);
+            strcat(param, pA->GetThisName());
             inBuffer = AddAttributesStringsToBuffer(inBuffer, param, pA);
         }
     }
@@ -3204,7 +3216,7 @@ void XINTERFACE::SaveOptionsFile(const char *fileName, ATTRIBUTES *pAttr)
     {
         return;
     }
-    strcpy_s(FullPath, fileName);
+    strcpy(FullPath, fileName);
 
     PrecreateDirForFile(FullPath);
     auto fileS = fio->_CreateFile(FullPath, std::ios::binary | std::ios::out);
@@ -3370,7 +3382,7 @@ int XINTERFACE::LoadIsExist()
             {
                 i++;
             }
-            if (_stricmp(sCurLngName, &datBuf[i]) == 0)
+            if (storm::iEquals(std::string_view(sCurLngName), std::string_view(&datBuf[i])))
             {
                 bFindFile = true;
                 break;
@@ -3385,7 +3397,7 @@ void XINTERFACE::PrecreateDirForFile(const char *pcFullFileName)
     if (!pcFullFileName)
         return;
     char path[MAX_PATH];
-    sprintf_s(path, sizeof(path), "%s", pcFullFileName);
+    sprintf(path, "%s", pcFullFileName);
     long n;
     for (n = strlen(pcFullFileName) - 1; n > 0; n--)
         if (path[n] == '\\')
@@ -3594,7 +3606,7 @@ CONTROLS_CONTAINER::CONTEINER_DESCR *CONTROLS_CONTAINER::FindContainer(const cha
         return nullptr;
     CONTEINER_DESCR *pCont = pContainers;
     while (pCont)
-        if (pCont->resultName != nullptr && _stricmp(pCont->resultName, sContainer) == 0)
+        if (pCont->resultName != nullptr && storm::iEquals(std::string_view(pCont->resultName), std::string_view(sContainer)))
             return pCont;
     return nullptr;
 }
@@ -3608,7 +3620,7 @@ CONTROLS_CONTAINER::CONTEINER_DESCR::CONTROL_DESCR *CONTROLS_CONTAINER::CONTEINE
     CONTROL_DESCR *pCtrl = pControls;
     while (pCtrl)
     {
-        if (pCtrl->controlName && _stricmp(pCtrl->controlName, cntrlName) == 0)
+        if (pCtrl->controlName && storm::iEquals(std::string_view(pCtrl->controlName), std::string_view(cntrlName)))
             return pCtrl;
         pCtrl = pCtrl->next;
     }

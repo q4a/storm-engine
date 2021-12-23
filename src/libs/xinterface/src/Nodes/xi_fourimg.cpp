@@ -355,7 +355,7 @@ void CXI_FOURIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
 
         for (i = 0; i < 4; i++)
         {
-            sprintf_s(param, "pic%d", i + 1);
+            sprintf(param, "pic%d", i + 1);
             auto *pAttrTmp = pAttribute->GetAttributeClass(param);
             if (pAttrTmp != nullptr)
             {
@@ -424,7 +424,7 @@ void CXI_FOURIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
     const auto bRelativeRect = !GetIniLong(ini1, name1, ini2, name2, "bAbsoluteRectangle");
     for (i = 0; i < 4; i++)
     {
-        sprintf_s(param, "position%d", i + 1);
+        sprintf(param, "position%d", i + 1);
         m_imgRect[i] = GetIniLongRect(ini1, name1, ini2, name2, param, XYRECT(0, 0, 0, 0));
         if (bRelativeRect)
             GetRelativeRect(m_imgRect[i]);
@@ -436,7 +436,7 @@ void CXI_FOURIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
         tmpstr = GetSubStr(param, param1, sizeof(param1));
         if ((m_sBorderGroupName = new char[sizeof param1]) == nullptr)
             throw std::runtime_error("allocate memory error");
-        strcpy_s(m_sBorderGroupName, sizeof param1, param1);
+        strcpy(m_sBorderGroupName, param1);
         m_texBorder = pPictureService->GetTextureID(m_sBorderGroupName);
         m_nBorderPicture = pPictureService->GetImageNum(m_sBorderGroupName, tmpstr);
         m_bShowBorder = m_texBorder != -1 && m_nBorderPicture != -1;
@@ -695,9 +695,9 @@ void CXI_FOURIMAGE::SaveParametersToIni()
     char pcWriteKeyName[256];
     for (long n = 0; n < 4; n++)
     {
-        sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_imgRect[n].left, m_imgRect[n].top,
+        sprintf(pcWriteParam, "%d,%d,%d,%d", m_imgRect[n].left, m_imgRect[n].top,
                   m_imgRect[n].right, m_imgRect[n].bottom);
-        sprintf_s(pcWriteKeyName, sizeof(pcWriteKeyName), "position%d", n);
+        sprintf(pcWriteKeyName, "position%d", n);
         pIni->WriteString(m_nodeName, pcWriteKeyName, pcWriteParam);
     }
 }
@@ -720,7 +720,7 @@ void CXI_FOURIMAGE::ChangeItem(int nItemNum)
                 delete m_pTwoStr[i];
                 m_pTwoStr[i] = nullptr;
             }
-            sprintf_s(param, "pic%d", i + 1);
+            sprintf(param, "pic%d", i + 1);
             auto *pAttrTmp = pAttribute->GetAttributeClass(param);
             if (pAttrTmp != nullptr)
             {

@@ -139,7 +139,7 @@ void CXI_CHECKBUTTONS::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     char pcKeyName[128];
     for (long n = 0; n < 100; n++)
     {
-        sprintf_s(pcKeyName, "section%d", n + 1);
+        sprintf(pcKeyName, "section%d", n + 1);
         if (!ReadIniString(ini1, name1, ini2, name2, pcKeyName, param, sizeof(param), ""))
             break;
         const char *pTmpChar = param;
@@ -153,7 +153,7 @@ void CXI_CHECKBUTTONS::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     {
         for (long n = 0; n < m_aButton.size(); n++)
         {
-            sprintf_s(pcKeyName, "pos%d", n + 1);
+            sprintf(pcKeyName, "pos%d", n + 1);
             if (ReadIniString(ini1, name1, ini2, name2, pcKeyName, param, sizeof(param), ""))
             {
                 const char *pTmpChar = param;
@@ -167,9 +167,9 @@ void CXI_CHECKBUTTONS::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     m_nFontAlignment = PR_ALIGN_LEFT;
     if (ReadIniString(ini1, name1, ini2, name2, "alignment", param, sizeof(param), ""))
     {
-        if (_stricmp(param, "center") == 0)
+        if (storm::iEquals(param, "center"))
             m_nFontAlignment = PR_ALIGN_CENTER;
-        if (_stricmp(param, "right") == 0)
+        if (storm::iEquals(param, "right"))
             m_nFontAlignment = PR_ALIGN_RIGHT;
     }
 
@@ -245,17 +245,17 @@ void CXI_CHECKBUTTONS::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 
     if (m_bIndividualPos)
     {
         for (long n = 0; n < m_aButton.size(); n++)
         {
-            sprintf_s(pcWriteKeyName, "pos%d", n + 1);
+            sprintf(pcWriteKeyName, "pos%d", n + 1);
             if (m_aButton[n]->bSetPos)
             {
-                sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d", static_cast<int>(m_aButton[n]->pos.x),
+                sprintf(pcWriteParam, "%d,%d", static_cast<int>(m_aButton[n]->pos.x),
                           static_cast<int>(m_aButton[n]->pos.y));
                 pIni->WriteString(m_nodeName, pcWriteKeyName, pcWriteParam);
             }
@@ -553,7 +553,7 @@ void CXI_CHECKBUTTONS::WriteToAttributeButtonState(long nButtonIndex)
     if (nButtonIndex < 0 || nButtonIndex >= m_aButton.size())
         return;
     char atrName[128];
-    sprintf_s(atrName, sizeof(atrName), "state%d", nButtonIndex + 1);
+    sprintf(atrName, "state%d", nButtonIndex + 1);
     ATTRIBUTES *pA = ptrOwner->AttributesPointer->GetAttributeClass(m_nodeName);
     if (!pA)
         pA = ptrOwner->AttributesPointer->CreateSubAClass(ptrOwner->AttributesPointer, m_nodeName);

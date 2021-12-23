@@ -161,7 +161,7 @@ void CXI_PCEDITBOX::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -190,9 +190,9 @@ void CXI_PCEDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
     m_nStringAlign = PR_ALIGN_LEFT;
     if (ReadIniString(ini1, name1, ini2, name2, "stringalign", param, sizeof(param), "center"))
     {
-        if (_stricmp(param, "center") == 0)
+        if (storm::iEquals(param, "center"))
             m_nStringAlign = PR_ALIGN_CENTER;
-        else if (_stricmp(param, "right") == 0)
+        else if (storm::iEquals(param, "right"))
             m_nStringAlign = PR_ALIGN_RIGHT;
     }
     // m_pntFontOffset.x += m_rect.left;
@@ -307,6 +307,7 @@ void CXI_PCEDITBOX::UpdateString(std::string &str)
             {
                 if (pKeys[n].bSystem)
                 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
                     switch (pKeys[n].ucVKey.c)
                     {
                         // control symbols
@@ -337,6 +338,7 @@ void CXI_PCEDITBOX::UpdateString(std::string &str)
                             m_nEditPos--;
                         break;
                     }
+#endif
                 }
                 else
                     InsertSymbol(str, pKeys[n].ucVKey);
@@ -385,7 +387,7 @@ void CXI_PCEDITBOX::UpdateString(std::string &str)
             // defining the first character to display
             char param[2048];
             param[sizeof(param) - 1] = 0;
-            sprintf_s(param, sizeof(param) - 1, "%s", str.c_str());
+            sprintf(param, "%s", str.c_str());
             for (m_nFirstShowCharacterIndex = 0; m_nFirstShowCharacterIndex < m_nEditPos; m_nFirstShowCharacterIndex++)
             {
                 int offset = utf8::u8_offset(param, m_nFirstShowCharacterIndex);

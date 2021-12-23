@@ -284,7 +284,7 @@ void CXI_BUTTON::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -320,7 +320,7 @@ uint32_t CXI_BUTTON::MessageProc(long msgcode, MESSAGE &message)
         if (len == 1)
             break;
 
-        if (m_sGroupName == nullptr || _stricmp(m_sGroupName, param.c_str()) != 0)
+        if (m_sGroupName == nullptr || !storm::iEquals(std::string_view(m_sGroupName), param))
         {
             PICTURE_TEXTURE_RELEASE(pPictureService, m_sGroupName, m_idTex);
             STORM_DELETE(m_sGroupName);

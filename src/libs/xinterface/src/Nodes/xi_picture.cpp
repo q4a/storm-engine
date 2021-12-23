@@ -169,7 +169,7 @@ void CXI_PICTURE::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -208,7 +208,7 @@ void CXI_PICTURE::SetNewPictureFromDir(const char *dirName)
 
 void CXI_PICTURE::SetNewPictureByGroup(const char *groupName, const char *picName)
 {
-    if (!m_pcGroupName || _stricmp(m_pcGroupName, groupName) != 0)
+    if (!m_pcGroupName || !storm::iEquals(std::string_view(m_pcGroupName), std::string_view(groupName)))
     {
         ReleasePicture();
         if (groupName)

@@ -37,7 +37,7 @@ void CXI_SCROLLTEXT::Draw(bool bSelected, uint32_t Delta_Time)
                 auto chQuant = m_pStrList[i].data.strDescr.charQuantity;
                 if (chQuant > MAX_PICE_STRING_SIZE - 1)
                     chQuant = MAX_PICE_STRING_SIZE - 1;
-                strncpy_s(param, &m_pText[chStart], chQuant);
+                strncpy(param, &m_pText[chStart], chQuant);
                 param[chQuant] = 0;
                 m_rs->Print(curX, curY, "%s", param);
             }
@@ -152,7 +152,7 @@ void CXI_SCROLLTEXT::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -197,7 +197,7 @@ long CXI_SCROLLTEXT::FillPices(char *pt, size_t beg, size_t size, long &idx, STR
             if (sw == 0)
                 break;
             chQuantity += sw;
-            strncpy_s(resStr, pstr, chQuantity);
+            strncpy(resStr, pstr, chQuantity);
             if ((retVal = m_rs->StringWidth(resStr, m_idFont)) > showWidth)
             {
                 retVal = 0;

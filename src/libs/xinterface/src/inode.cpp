@@ -167,7 +167,7 @@ CINODE *CINODE::FindNode(CINODE *pNod, const char *sNodName)
         return nullptr;
     while (pNod)
     {
-        if (pNod->m_nodeName && _stricmp(sNodName, pNod->m_nodeName) == 0)
+        if (pNod->m_nodeName && storm::iEquals(std::string_view(sNodName), std::string_view(pNod->m_nodeName)))
             break;
         if (pNod->m_list)
         {
@@ -361,7 +361,7 @@ bool CINODE::GetMidStr(const char *inStr, char *buf, size_t bufSize, const char 
 
     if (lcn - fcn > static_cast<int>(bufSize) - 1)
         lcn = fcn + bufSize - 1;
-    strncpy_s(buf, bufSize, &inStr[fcn], lcn - fcn);
+    strncpy(buf, &inStr[fcn], lcn - fcn);
     buf[lcn - fcn] = 0;
     return true;
 }
@@ -594,7 +594,7 @@ bool CINODE::ReadIniString(INIFILE *ini1, const char *name1, INIFILE *ini2, cons
             if (strDefLen > static_cast<int>(bufSize) - 1)
                 strDefLen = bufSize - 1;
             if (strDefLen > 0)
-                strncpy_s(buf, bufSize, strDef, strDefLen);
+                strncpy(buf, strDef, strDefLen);
             buf[strDefLen] = 0;
         }
     }

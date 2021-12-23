@@ -33,7 +33,9 @@ void InterfaceBackScene::LightParam::UpdateParams(float fTime)
         if (jjj > 10000)
         {
             core.Trace("jjj: %f, %f", fColorTimer, fColorPeriod);
+#ifdef _WIN32 // FIX_LINUX
             __debugbreak();
+#endif
         }
     }
     const auto fPer = fColorPeriod + fAddPeriod;
@@ -216,6 +218,7 @@ void InterfaceBackScene::Execute(uint32_t Delta_Time)
         ExecuteMenu(m_nSelectMenuIndex);
     }
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
     {
         CMatrix mtx;
@@ -249,6 +252,7 @@ void InterfaceBackScene::Execute(uint32_t Delta_Time)
         if (core.Controls->GetDebugAsyncKeyState(VK_RIGHT) < 0)
             m_vCamAng.y += fRotateSpeed;
     }
+#endif
 
     m_pRS->SetCamera(m_vCamPos, m_vCamAng, m_fCamPerspective);
 
@@ -484,7 +488,7 @@ bool InterfaceBackScene::FindLocator(const char *pcLocName, CMatrix *pMtx, CVECT
         for (long l = 0; l < ginf.nlabels; l++)
         {
             pNod->geo->GetLabel(l, lbl);
-            if (lbl.name && _stricmp(pcLocName, lbl.name) == 0)
+            if (lbl.name && storm::iEquals(std::string_view(pcLocName), std::string_view(lbl.name)))
             {
                 if (pMtx)
                 {
@@ -523,7 +527,7 @@ void InterfaceBackScene::SetLocatorPosition(MODEL *pModel, const char *pcLocName
             for (long l = 0; l < ginf.nlabels; l++)
             {
                 pNod->geo->GetLabel(l, lbl);
-                if (lbl.name && _stricmp(pcLocName, lbl.name) == 0)
+                if (lbl.name && storm::iEquals(std::string_view(pcLocName), std::string_view(lbl.name)))
                 {
                     pos.x = lbl.m[3][0];
                     pos.y = lbl.m[3][1];

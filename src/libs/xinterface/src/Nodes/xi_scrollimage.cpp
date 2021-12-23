@@ -394,11 +394,11 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
     // set parameters for blind
     for (i = 0; i < m_nSlotsQnt; i++)
     {
-        sprintf_s(param, "dwNormalColorARGB%d", i + 1);
+        sprintf(param, "dwNormalColorARGB%d", i + 1);
         m_dwCurColor[i] = m_dwNormalColor[i] = GetIniARGB(ini1, name1, ini2, name2, param, ARGB(255, 128, 128, 128));
-        sprintf_s(param, "dwSelectColorARGB%d", i + 1);
+        sprintf(param, "dwSelectColorARGB%d", i + 1);
         m_dwSelectColor[i] = GetIniARGB(ini1, name1, ini2, name2, param, ARGB(255, 64, 64, 64));
-        sprintf_s(param, "PicOffset%d", i + 1);
+        sprintf(param, "PicOffset%d", i + 1);
         m_pPicOffset[i] = GetIniLong(ini1, name1, ini2, name2, param, 0);
         m_idBadTexture[i] = -1;
         m_idBadPic[i] = -1;
@@ -502,7 +502,7 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
         for (n = 0; n < m_nSlotsQnt; n++)
         {
             char *sBadPict;
-            sprintf_s(param, "BadPicture%d", n + 1);
+            sprintf(param, "BadPicture%d", n + 1);
             if ((sBadPict = pAttribute->GetAttribute(param)) != nullptr)
             {
                 m_idBadTexture[n] = m_rs->TextureCreate(sBadPict);
@@ -510,11 +510,11 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
             }
             else
             {
-                sprintf_s(param, "BadTex%d", n + 1);
+                sprintf(param, "BadTex%d", n + 1);
                 m_idBadTexture[n] = pAttribute->GetAttributeAsDword(param, -1);
                 if (m_idBadTexture[n] >= 0)
                 {
-                    sprintf_s(param, "BadPic%d", n + 1);
+                    sprintf(param, "BadPic%d", n + 1);
                     m_idBadPic[n] =
                         pPictureService->GetImageNum(m_sGroupName[m_idBadTexture[n]], pAttribute->GetAttribute(param));
                 }
@@ -530,7 +530,7 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
         {
             char attrName[256];
             char *sStringName;
-            sprintf_s(attrName, "pic%d", i + 1);
+            sprintf(attrName, "pic%d", i + 1);
             ATTRIBUTES *pListEntity = pAttribute->GetAttributeClass(attrName);
 
             // Fill image descriptor by default value
@@ -575,15 +575,15 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
                 char *tmpStr;
                 for (n = 0; n < m_nSlotsQnt; n++)
                 {
-                    sprintf_s(param, "name%d", n + 1);
+                    sprintf(param, "name%d", n + 1);
                     tmpStr = pListEntity->GetAttribute(param);
                     if (tmpStr != nullptr)
                     {
                         m_Image[i].slots[n].saveName = tmpStr;
                     }
-                    sprintf_s(param, "tex%d", n + 1);
+                    sprintf(param, "tex%d", n + 1);
                     m_Image[i].slots[n].tex = pListEntity->GetAttributeAsDword(param, -1);
-                    sprintf_s(param, "img%d", n + 1);
+                    sprintf(param, "img%d", n + 1);
                     if (m_Image[i].slots[n].tex != -1)
                     {
                         m_Image[i].slots[n].img = pPictureService->GetImageNum(m_sGroupName[m_Image[i].slots[n].tex],
@@ -593,7 +593,7 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
                     {
                         m_Image[i].slots[n].img = -1;
                     }
-                    sprintf_s(param, "spec%d", n + 1);
+                    sprintf(param, "spec%d", n + 1);
                     m_Image[i].slots[n].useSpecTechnique = pListEntity->GetAttributeAsDword(param, 0) != 0;
                 }
             }
@@ -994,7 +994,7 @@ void CXI_SCROLLIMAGE::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rAbsolutePosition.left, m_rAbsolutePosition.top,
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rAbsolutePosition.left, m_rAbsolutePosition.top,
               m_rAbsolutePosition.right, m_rAbsolutePosition.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
@@ -1027,7 +1027,7 @@ void CXI_SCROLLIMAGE::ChangeScroll(int nScrollItemNum)
         {
             m_Image[i].Clear();
 
-            sprintf_s(sAttrName, "pic%d", i + 1);
+            sprintf(sAttrName, "pic%d", i + 1);
             pAttribute = pAttr->GetAttributeClass(sAttrName);
 
             if (pAttribute != nullptr)
@@ -1060,15 +1060,15 @@ void CXI_SCROLLIMAGE::ChangeScroll(int nScrollItemNum)
                 char *tmpStr;
                 for (n = 0; n < m_nSlotsQnt; n++)
                 {
-                    sprintf_s(param, "name%d", n + 1);
+                    sprintf(param, "name%d", n + 1);
                     tmpStr = pAttribute->GetAttribute(param);
                     if (tmpStr != nullptr)
                     {
                         m_Image[i].slots[n].saveName = tmpStr;
                     }
-                    sprintf_s(param, "tex%d", n + 1);
+                    sprintf(param, "tex%d", n + 1);
                     m_Image[i].slots[n].tex = pAttribute->GetAttributeAsDword(param, -1);
-                    sprintf_s(param, "img%d", n + 1);
+                    sprintf(param, "img%d", n + 1);
                     if (m_Image[i].slots[n].tex != -1)
                     {
                         m_Image[i].slots[n].img = pPictureService->GetImageNum(m_sGroupName[m_Image[i].slots[n].tex],
@@ -1078,7 +1078,7 @@ void CXI_SCROLLIMAGE::ChangeScroll(int nScrollItemNum)
                     {
                         m_Image[i].slots[n].img = -1;
                     }
-                    sprintf_s(param, "spec%d", n + 1);
+                    sprintf(param, "spec%d", n + 1);
                     m_Image[i].slots[n].useSpecTechnique = pAttribute->GetAttributeAsDword(param, 0) != 0;
                 }
             }
@@ -1222,7 +1222,7 @@ void CXI_SCROLLIMAGE::RefreshScroll()
         for (n = 0; n < m_nSlotsQnt; n++)
         {
             char *sBadPict;
-            sprintf_s(param, "BadPicture%d", n + 1);
+            sprintf(param, "BadPicture%d", n + 1);
             if ((sBadPict = pAttribute->GetAttribute(param)) != nullptr)
             {
                 m_idBadTexture[n] = m_rs->TextureCreate(sBadPict);
@@ -1230,11 +1230,11 @@ void CXI_SCROLLIMAGE::RefreshScroll()
             }
             else
             {
-                sprintf_s(param, "BadTex%d", n + 1);
+                sprintf(param, "BadTex%d", n + 1);
                 m_idBadTexture[n] = pAttribute->GetAttributeAsDword(param, -1);
                 if (m_idBadTexture[n] >= 0)
                 {
-                    sprintf_s(param, "BadPic%d", n + 1);
+                    sprintf(param, "BadPic%d", n + 1);
                     m_idBadPic[n] =
                         pPictureService->GetImageNum(m_sGroupName[m_idBadTexture[n]], pAttribute->GetAttribute(param));
                 }
@@ -1250,7 +1250,7 @@ void CXI_SCROLLIMAGE::RefreshScroll()
         {
             char attrName[256];
             char *sStringName;
-            sprintf_s(attrName, "pic%d", i + 1);
+            sprintf(attrName, "pic%d", i + 1);
             ATTRIBUTES *pListEntity = pAttribute->GetAttributeClass(attrName);
 
             // Fill image descriptor by default value
@@ -1295,15 +1295,15 @@ void CXI_SCROLLIMAGE::RefreshScroll()
                 char *tmpStr;
                 for (n = 0; n < m_nSlotsQnt; n++)
                 {
-                    sprintf_s(param, "name%d", n + 1);
+                    sprintf(param, "name%d", n + 1);
                     tmpStr = pListEntity->GetAttribute(param);
                     if (tmpStr != nullptr)
                     {
                         m_Image[i].slots[n].saveName = tmpStr;
                     }
-                    sprintf_s(param, "tex%d", n + 1);
+                    sprintf(param, "tex%d", n + 1);
                     m_Image[i].slots[n].tex = pListEntity->GetAttributeAsDword(param, -1);
-                    sprintf_s(param, "img%d", n + 1);
+                    sprintf(param, "img%d", n + 1);
                     if (m_Image[i].slots[n].tex != -1)
                     {
                         m_Image[i].slots[n].img = pPictureService->GetImageNum(m_sGroupName[m_Image[i].slots[n].tex],
@@ -1313,7 +1313,7 @@ void CXI_SCROLLIMAGE::RefreshScroll()
                     {
                         m_Image[i].slots[n].img = -1;
                     }
-                    sprintf_s(param, "spec%d", n + 1);
+                    sprintf(param, "spec%d", n + 1);
                     m_Image[i].slots[n].useSpecTechnique = pListEntity->GetAttributeAsDword(param, 0) != 0;
                 }
             }
@@ -1565,7 +1565,7 @@ int CXI_SCROLLIMAGE::FindTexGroupFromOld(char **pGroupList, char *groupName, int
         return -1;
     for (int i = 0; i < listSize; i++)
     {
-        if (pGroupList[i] != nullptr && _stricmp(pGroupList[i], groupName) == 0)
+        if (pGroupList[i] != nullptr && storm::iEquals(std::string_view(pGroupList[i]), std::string_view(groupName)))
             return i;
     }
     return -1;
