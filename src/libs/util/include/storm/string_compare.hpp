@@ -41,8 +41,16 @@ template <typename Range1T, typename Range2T = Range1T> bool iEquals(const Range
     const auto first_begin = std::begin(first);
     const auto second_begin = std::begin(second);
 
-    const auto first_end = std::end(first);
-    const auto second_end = std::end(second);
+    auto first_end = std::end(first);
+    auto second_end = std::end(second);
+    if (std::is_array<std::remove_reference_t<decltype(first)>>::value)
+    {
+        first_end = first_end - 1; // exclude '\0'
+    }
+    if (std::is_array<std::remove_reference_t<decltype(second)>>::value)
+    {
+        second_end = second_end - 1; // exclude '\0'
+    }
 
     return std::equal(first_begin, first_end, second_begin, second_end, comp);
 }
