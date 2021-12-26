@@ -247,7 +247,7 @@ std::unique_ptr<INIFILE> FILE_SERVICE::OpenIniFile(const char *file_name)
     {
         if (OpenFiles[n] == nullptr || OpenFiles[n]->GetFileName() == nullptr)
             continue;
-        if (_stricmp(OpenFiles[n]->GetFileName(), file_name) == 0)
+        if (storm::iEquals(std::string_view(OpenFiles[n]->GetFileName()), std::string_view(file_name)))
         {
             OpenFiles[n]->IncReference();
 

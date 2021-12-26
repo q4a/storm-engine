@@ -1,3 +1,4 @@
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_dbg_sourceview.h"
 #include "core.h"
 #include "data.h"
@@ -581,7 +582,7 @@ bool SOURCE_VIEW::OpenSourceFile(const char *_filename)
     pBookmarks.resize(nLinesNum);
     UpdateGDIControls();
     InvalidateRect(hOwn, nullptr, true);
-    strcpy_s(SourceFileName, _filename);
+    strcpy(SourceFileName, _filename);
     SetFocus(hOwn);
 
     // set bookmarks]
@@ -727,7 +728,7 @@ void SOURCE_VIEW::OnPaint()
                     CopyPasteRect.bottom = y + nFontHeight;
 
                     char *str = new char[nTo - nFrom + 1];
-                    strncpy_s(str, nTo - nFrom + 1, pSourceFile + pLineOffset[n] + nFrom, nTo - nFrom);
+                    strncpy(str, pSourceFile + pLineOffset[n] + nFrom, nTo - nFrom);
                     str[nTo - nFrom] = 0;
                     sCopyPasteBuffer = str;
                     delete[] str;
@@ -789,7 +790,7 @@ void SOURCE_VIEW::LineUpDown(bool down, uint32_t _nlines)
 void SOURCE_VIEW::SetProgramDirectory(const char *dir_name)
 {
     if (dir_name)
-        strcpy_s(ProgramDirectory, dir_name);
+        strcpy(ProgramDirectory, dir_name);
 }
 
 void SOURCE_VIEW::SetActiveLine(uint32_t line)
@@ -1346,3 +1347,4 @@ void SOURCE_VIEW::FindNext()
         }
     }
 }
+#endif

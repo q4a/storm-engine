@@ -1,3 +1,4 @@
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_dbg_breaktable.h"
 #include "file_service.h"
 
@@ -34,7 +35,7 @@ void BREAKPOINTS_TABLE::Release()
             {
                 if (!pTable[n].pFileName)
                     continue;
-                sprintf_s(buffer, "%s,%d", pTable[n].pFileName, pTable[n].nLineNumber);
+                sprintf(buffer, "%s,%d", pTable[n].pFileName, pTable[n].nLineNumber);
                 ini->AddString(SECTION_NAME, "B", buffer);
             }
         }
@@ -67,7 +68,7 @@ void BREAKPOINTS_TABLE::UpdateProjectFile()
             {
                 if (!pTable[n].pFileName)
                     continue;
-                sprintf_s(buffer, "%s,%d", pTable[n].pFileName, pTable[n].nLineNumber);
+                sprintf(buffer, "%s,%d", pTable[n].pFileName, pTable[n].nLineNumber);
                 ini->AddString(SECTION_NAME, "B", buffer);
             }
         }
@@ -105,7 +106,7 @@ bool BREAKPOINTS_TABLE::ReadProject(const char *filename)
     auto ini = fio->OpenIniFile(filename);
     if (ini)
     {
-        strcpy_s(ProjectName, filename);
+        strcpy(ProjectName, filename);
         if (ini->ReadString(SECTION_NAME, "B", buffer, sizeof(buffer), ""))
         {
             if (MakeLineCode(buffer, nLineNumber))
@@ -195,3 +196,4 @@ bool BREAKPOINTS_TABLE::Find(const char *filename, uint32_t line)
     }
     return false;
 }
+#endif

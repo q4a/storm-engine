@@ -1,10 +1,15 @@
+#include <thread>
 #include "LifecycleDiagnosticsService.hpp"
 #include "logging.hpp"
 
 #include "SteamApi.hpp"
 #include "compiler.h"
 #include "file_service.h"
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
+#else
+#include "core.h"
+#endif
 #include "storm/fs.h"
 #include "watermark.hpp"
 
@@ -77,13 +82,21 @@ void HandleWindowEvent(const storm::OSWindow::Event &event)
     }
 }
 
+#ifdef _WIN32 // FIX_LINUX
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+#else
+int main(int argc, char *argv[])
+#endif
 {
     // Prevent multiple instances
+#ifdef _WIN32 // FIX_LINUX
     if (!CreateEventA(nullptr, false, false, "Global\\FBBD2286-A9F1-4303-B60C-743C3D7AA7BE") ||
         GetLastError() == ERROR_ALREADY_EXISTS)
+#else
+    if (false)
+#endif
     {
-        MessageBoxA(nullptr, "Another instance is already running!", "Error", MB_ICONERROR);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance is already running!", nullptr);
         return EXIT_SUCCESS;
     }
 
@@ -102,7 +115,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #endif
     if (!lifecycleDiagnosticsGuard)
     {
-        MessageBoxA(nullptr, "Unable to initialize lifecycle service!", "Warning", MB_ICONWARNING);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Warning", "Unable to initialize lifecycle service!", nullptr);
+        
     }
     else
     {
@@ -120,9 +134,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core.Init();
 
     // Init script debugger
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     S_DEBUG debug;
     debug.Init();
     CDebug = &debug;
+#endif
 
     // Read config
     auto ini = fio->OpenIniFile(fs::ENGINE_INI_FILE_NAME);
@@ -167,8 +183,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // Init core
     core.InitBase();
 
+#ifdef _WIN32 // FIX_LINUX MaxFPS
     // Message loop
     auto dwOldTime = GetTickCount();
+#endif
 
     isRunning = true;
     while (isRunning)
@@ -178,6 +196,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
         if (bActive)
         {
+#ifdef _WIN32 // FIX_LINUX MaxFPS
             if (dwMaxFPS)
             {
                 const auto dwMS = 1000u / dwMaxFPS;
@@ -186,12 +205,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                     continue;
                 dwOldTime = dwNewTime;
             }
+#endif
 
             RunFrameWithOverflowCheck();
         }
         else
         {
-            Sleep(50);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
 
@@ -199,7 +219,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core.Event("ExitApplication", nullptr);
     core.CleanUp();
     core.ReleaseBase();
+#ifdef _WIN32 // FIX_LINUX
     ClipCursor(nullptr);
+#endif
     SDL_Quit();
 
     return EXIT_SUCCESS;

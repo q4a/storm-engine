@@ -40,7 +40,7 @@ void KEY_NODE::SetName(const char *name)
     key_name = new char[name_size];
     if (key_name == nullptr)
         throw std::runtime_error("Failed to allocate memory");
-    strcpy_s(key_name, name_size, name);
+    strcpy(key_name, name);
 }
 
 void KEY_NODE::SetValue(const char *value)
@@ -54,7 +54,7 @@ void KEY_NODE::SetValue(const char *value)
     key_val = new char[val_size];
     if (key_val == nullptr)
         throw std::runtime_error("Failed to allocate memory");
-    strcpy_s(key_val, val_size, value);
+    strcpy(key_val, value);
 }
 
 char *KEY_NODE::GetName()
@@ -177,7 +177,7 @@ void SECTION::SetName(const char *name)
         Name = new char[len];
         if (Name == nullptr)
             throw std::runtime_error("Failed to allocate memory");
-        strcpy_s(Name, len, name);
+        strcpy(Name, name);
     }
 }
 
@@ -230,7 +230,7 @@ KEY_NODE *SECTION::FindKey(KEY_NODE *from, const char *key_name, const char *key
         const auto flags = node->SetFlags(0);
         if (flags & KNF_KEY)
         {
-            if (_stricmp(key_name, node->GetName()) == 0)
+            if (storm::iEquals(std::string_view(key_name), std::string_view(node->GetName())))
             {
                 if (key_value == nullptr)
                     return node;
@@ -238,7 +238,7 @@ KEY_NODE *SECTION::FindKey(KEY_NODE *from, const char *key_name, const char *key
                 auto *const char_PTR = node->GetValue();
                 if (char_PTR != nullptr)
                 {
-                    if (_stricmp(key_value, char_PTR) == 0)
+                    if (storm::iEquals(std::string_view(key_value), std::string_view(char_PTR)))
                         return node;
                 }
             }
@@ -400,7 +400,7 @@ bool IFS::LoadFile(const char *_file_name)
         fs->_CloseFile(fileS);
         return false;
     }
-    strcpy_s(FileName, name_size, _file_name);
+    strcpy(FileName, _file_name);
 
     Format(file_data, file_size + 1);
 
@@ -709,7 +709,7 @@ SECTION *IFS::FindSection(const char *section_name)
             return nullptr;
         }
         if (node->GetName() != nullptr)
-            if (_stricmp(section_name, node->GetName()) == 0)
+            if (storm::iEquals(std::string_view(section_name), std::string_view(node->GetName())))
                 return node;
         node = node->GetRightNode();
     }
@@ -730,7 +730,7 @@ SECTION *IFS::FindSection(const char *section_name, SECTION *snode)
             // if node exist and name is correct return ok
             if (section_name != nullptr)
             {
-                if (_stricmp(section_name, node->GetName()) == 0)
+                if (storm::iEquals(std::string_view(section_name), std::string_view(node->GetName())))
                     return node;
             }
             else
@@ -754,7 +754,7 @@ SECTION *IFS::FindSection(const char *section_name, SECTION *snode)
                 return node;
         }
         if (node->GetName() != nullptr)
-            if (_stricmp(section_name, node->GetName()) == 0)
+            if (storm::iEquals(std::string_view(section_name), std::string_view(node->GetName())))
                 return node;
         node = node->GetRightNode();
     }
@@ -849,7 +849,7 @@ bool IFS::ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_
             // throw std::runtime_error(string not found);
         }
         else if (buffer)
-            strcpy_s(buffer, buffer_size, def_string);
+            strcpy(buffer, def_string);
         return false;
     }
 
@@ -863,7 +863,7 @@ bool IFS::ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_
     {
         if (def_string == nullptr)
             throw std::runtime_error("no key value");
-        strcpy_s(buffer, buffer_size, def_string);
+        strcpy(buffer, def_string);
         return false;
     }
 
@@ -871,7 +871,7 @@ bool IFS::ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_
     // commented out because it didn't let to load new ani
     // if(write_size > buffer_size) throw std::runtime_error(buffer size too small);
 
-    strcpy_s(buffer, buffer_size, node->GetValue());
+    strcpy(buffer, node->GetValue());
     return true;
 }
 
@@ -891,7 +891,7 @@ bool IFS::ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *
         if (start == true)
         {
             // if(CompareStrings(node->GetName(),key_name) == 0)
-            if (_stricmp(node->GetName(), key_name) == 0)
+            if (storm::iEquals(std::string_view(node->GetName()), std::string_view(key_name)))
             {
                 if (buffer == nullptr)
                     throw std::runtime_error("zero buffer");
@@ -908,7 +908,7 @@ bool IFS::ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *
                 if (write_size > buffer_size)
                     throw std::runtime_error("buffer size too small");
 
-                strcpy_s(buffer, buffer_size, node->GetValue());
+                strcpy(buffer, node->GetValue());
                 sd->Key = node;
                 sd->Section = snode;
                 return true;
@@ -1042,21 +1042,21 @@ void IFS::WriteString(const char *section_name, const char *key_name, const char
 void IFS::WriteLong(const char *section_name, const char *key_name, long value)
 {
     char buffer[256];
-    _ltoa(value, buffer, 10);
+    sprintf(buffer, "%ld", value);
     WriteString(section_name, key_name, buffer);
 }
 
 void IFS::WriteDouble(const char *section_name, const char *key_name, double value)
 {
     char buffer[256];
-    sprintf_s(buffer, "%g", value);
+    sprintf(buffer, "%g", value);
     WriteString(section_name, key_name, buffer);
 }
 
 void IFS::WriteFloat(const char *section_name, const char *key_name, float value)
 {
     char buffer[256];
-    sprintf_s(buffer, "%g", value);
+    sprintf(buffer, "%g", value);
     WriteString(section_name, key_name, buffer);
 }
 
@@ -1088,7 +1088,7 @@ bool IFS::GetSectionName(char *section_name_buffer, long buffer_size)
     const long len = strlen(node->GetName());
     if (len > buffer_size)
         throw std::runtime_error("buffer too small");
-    strcpy_s(section_name_buffer, buffer_size, node->GetName());
+    strcpy(section_name_buffer, node->GetName());
     SectionSNode = node;
     return true;
 }
@@ -1113,7 +1113,7 @@ bool IFS::GetSectionNameNext(char *section_name_buffer, long buffer_size)
             const long len = strlen(node->GetName());
             if (len > buffer_size)
                 throw std::runtime_error("buffer too small");
-            strcpy_s(section_name_buffer, buffer_size, node->GetName());
+            strcpy(section_name_buffer, node->GetName());
             SectionSNode = node;
             return true;
         }

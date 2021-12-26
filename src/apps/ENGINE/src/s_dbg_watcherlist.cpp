@@ -1,3 +1,4 @@
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_dbg_watcherlist.h"
 #include "s_debug.h"
 
@@ -27,14 +28,14 @@ WATCHER_LIST::WATCHER_LIST(HWND hwnd, HINSTANCE hinst)
     if (ini)
     {
         long n = 0;
-        sprintf_s(buffer, "E%d", n);
+        sprintf(buffer, "E%d", n);
         if (ini->ReadString(nullptr, buffer, buffer, sizeof(buffer), ""))
         {
             SetItemText(n, 0, buffer);
             SetItemText(n, 1, CDebug->ProcessExpression(buffer));
             n++;
 
-            sprintf_s(buffer, "E%d", n);
+            sprintf(buffer, "E%d", n);
             while (ini->ReadStringNext(nullptr, buffer, buffer, sizeof(buffer)))
             {
                 if (n < 11)
@@ -43,7 +44,7 @@ WATCHER_LIST::WATCHER_LIST(HWND hwnd, HINSTANCE hinst)
                     SetItemText(n, 1, CDebug->ProcessExpression(buffer));
                 }
                 n++;
-                sprintf_s(buffer, "E%d", n);
+                sprintf(buffer, "E%d", n);
             }
         }
         else
@@ -51,7 +52,7 @@ WATCHER_LIST::WATCHER_LIST(HWND hwnd, HINSTANCE hinst)
             // try read 11 elements
             for (auto n = 0; n < 11; n++)
             {
-                sprintf_s(buffer, "E%d", n);
+                sprintf(buffer, "E%d", n);
                 if (ini->ReadString(nullptr, buffer, buffer, sizeof(buffer), ""))
                 {
                     SetItemText(n, 0, buffer);
@@ -87,7 +88,7 @@ void WATCHER_LIST::ItemChanged(long Item_index, long Subitem_index)
     {
     case 0:
         SetItemText(Item_index, 1, CDebug->ProcessExpression(buffer));
-        sprintf_s(keyname, "E%d", Item_index);
+        sprintf(keyname, "E%d", Item_index);
         ini->WriteString(nullptr, keyname, buffer);
         break;
     case 1:
@@ -194,3 +195,4 @@ void WATCHER_LIST::ProcessMessage(uint64_t iMsg, uint64_t wParam, uint64_t lPara
       break;
     }*/
 }
+#endif
