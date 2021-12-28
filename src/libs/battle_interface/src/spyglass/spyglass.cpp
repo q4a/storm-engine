@@ -5,7 +5,7 @@
 #include "../sea/ships_list.h"
 #include "controls.h"
 #include "core.h"
-#include "entity.h"
+#include "Entity.h"
 #include "math3d/Sphere.h"
 #include "message.h"
 #include "shared/battle_interface/msg_control.h"

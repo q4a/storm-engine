@@ -25,7 +25,7 @@
 #include "WdmWarringShip.h"
 #include "WdmWindUI.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 
 CREATE_CLASS(WorldMap)
 

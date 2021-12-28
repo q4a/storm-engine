@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Cvector.h"
-#include "entity.h"
+#include "Entity.h"
 
 #define MAX_FLOAT_PARAMS 128
 #define MAX_LONG_PARAMS 64
