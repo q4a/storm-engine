@@ -4,7 +4,7 @@
 
 #include "Weather_Base.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 #include "shared/battle_interface/msg_control.h"
 #include "shared/mast_msg.h"
 #include "shared/sail_msg.h"

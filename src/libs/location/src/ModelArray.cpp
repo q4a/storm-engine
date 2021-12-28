@@ -12,7 +12,7 @@
 
 #include "ModelArray.h"
 #include "core.h"
-#include "entity.h"
+#include "Entity.h"
 #include "shared/messages.h"
 
 // ============================================================================================

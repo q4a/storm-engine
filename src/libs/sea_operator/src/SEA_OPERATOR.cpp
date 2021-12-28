@@ -3,7 +3,7 @@
 #include "core.h"
 
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 #include "rands.h"
 #include "shared/messages.h"
 

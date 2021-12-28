@@ -1,6 +1,6 @@
 #include "core.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 #include "modelr.h"
 #include "shared/messages.h"
 

@@ -4,7 +4,7 @@
 #include "core.h"
 #include "defines.h"
 
-#include "entity.h"
+#include "Entity.h"
 #include "shared/interface/messages.h"
 
 #define IRELEASE(i)                                                                                                    \

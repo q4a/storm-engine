@@ -1,7 +1,7 @@
 #include "SKY.h"
 #include "SunGlow.h"
 #include "core.h"
-#include <attributes.h>
+#include <Attributes.h>
 
 namespace
 {

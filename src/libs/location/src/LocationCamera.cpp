@@ -14,7 +14,7 @@
 
 #include "Character.h"
 #include "Location.h"
-#include "entity.h"
+#include "Entity.h"
 #include "sea_base.h"
 #include "shared/messages.h"
 

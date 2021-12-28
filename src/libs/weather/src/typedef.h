@@ -4,7 +4,7 @@
 #include "collide.h"
 #include "defines.h"
 #include "dx9render.h"
-#include "entity.h"
+#include "Entity.h"
 #include "geometry.h"
 #include "geos.h"
 #include "shared/messages.h"

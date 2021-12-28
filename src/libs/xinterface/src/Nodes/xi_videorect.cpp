@@ -1,6 +1,6 @@
 #include "xi_videorect.h"
 #include "../base_video.h"
-#include "entity.h"
+#include "Entity.h"
 
 CXI_VIDEORECT::CXI_VIDEORECT()
     : m_dwColor(0), m_eiVideo(0)

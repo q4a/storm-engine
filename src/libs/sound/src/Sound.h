@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dx9render.h"
-#include "entity.h"
+#include "Entity.h"
 
 ///////////////////////////////////////////////////////////////////
 // DEFINES & TYPES

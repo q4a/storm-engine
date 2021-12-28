@@ -14,7 +14,7 @@
 
 #include "Character.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 
 // ============================================================================================
 

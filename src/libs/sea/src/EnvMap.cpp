@@ -1,7 +1,7 @@
 #include "core.h"
 
 #include "Entity.h"
-#include "sea.h"
+#include "SEA.h"
 #include "shared/messages.h"
 
 #include "shared/layers.h"

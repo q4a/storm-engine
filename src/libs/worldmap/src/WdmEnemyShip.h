@@ -11,7 +11,7 @@
 #pragma once
 
 #include "WdmShip.h"
-#include "attributes.h"
+#include "Attributes.h"
 
 class WdmEnemyShip : public WdmShip
 {

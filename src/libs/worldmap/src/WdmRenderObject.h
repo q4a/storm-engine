@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "attributes.h"
+#include "Attributes.h"
 #include "dx9render.h"
 
 class WdmRenderObject

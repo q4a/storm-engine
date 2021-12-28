@@ -1,7 +1,7 @@
 #include "particles.h"
 #include "core.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 #include "particles/iparticlemanager.h"
 #include "particles/iparticlesservice.h"
 #include "particles/iparticlesystem.h"

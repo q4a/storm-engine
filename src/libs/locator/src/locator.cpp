@@ -1,6 +1,6 @@
 #include "locator.h"
 #include "core.h"
-#include "entity.h"
+#include "Entity.h"
 #include "shared/messages.h"
 
 CREATE_CLASS(LOCATOR)

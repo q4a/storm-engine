@@ -2,7 +2,7 @@
 
 #include "core.h"
 
-#include "entity.h"
+#include "Entity.h"
 #include "inlines.h"
 #include "s_import_func.h"
 #include "texture.h"
