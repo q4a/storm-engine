@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CVECTOR.h"
+#include "Cvector.h"
 #include "SinkSplashDefines.h"
 #include "TSink.h"
 #include "dx9render.h"

@@ -266,12 +266,14 @@ void AnimationImp::BuildAnimationMatrices()
             for (long j = 0; j < nbones; j++)
             {
                 auto &bn = aniInfo->GetBone(j);
+                Matrix tmpMtx;
                 CMatrix inmtx;
-                D3DXQUATERNION qt0, qt1, qt;
+                Quaternion qt0, qt1, qt;
                 bn.BlendFrame(f0, ki0, qt0);
                 bn.BlendFrame(f1, ki1, qt1);
-                D3DXQuaternionSlerp(&qt, &qt0, &qt1, kBlend);
-                D3DXMatrixRotationQuaternion(inmtx, &qt);
+                qt.SLerp(qt0, qt1, kBlend);
+                qt.GetMatrix(tmpMtx);
+                inmtx = tmpMtx;
                 inmtx.Pos() = bn.pos0;
                 if (j == 0)
                 {
@@ -308,10 +310,12 @@ void AnimationImp::BuildAnimationMatrices()
             for (long j = 0; j < nbones; j++)
             {
                 auto &bn = aniInfo->GetBone(j);
+                Matrix tmpMtx;
                 CMatrix inmtx;
-                D3DXQUATERNION qt;
+                Quaternion qt;
                 bn.BlendFrame(f, ki, qt);
-                D3DXMatrixRotationQuaternion(inmtx, &qt);
+                qt.GetMatrix(tmpMtx);
+                inmtx = tmpMtx;
                 inmtx.Pos() = bn.pos0;
                 if (j == 0)
                     inmtx.Pos() = bn.pos[f] + ki * (bn.pos[f + 1] - bn.pos[f]);
@@ -344,10 +348,12 @@ void AnimationImp::BuildAnimationMatrices()
             for (long j = 0; j < nbones; j++)
             {
                 auto &bn = aniInfo->GetBone(j);
+                Matrix tmpMtx;
                 CMatrix inmtx;
-                D3DXQUATERNION qt;
+                Quaternion qt;
                 bn.BlendFrame(f, ki, qt);
-                D3DXMatrixRotationQuaternion(inmtx, &qt);
+                qt.GetMatrix(tmpMtx);
+                inmtx = tmpMtx;
                 inmtx.Pos() = bn.pos0;
                 if (j == 0)
                     inmtx.Pos() = bn.pos[f] + ki * (bn.pos[f + 1] - bn.pos[f]);
@@ -368,7 +374,9 @@ void AnimationImp::BuildAnimationMatrices()
         else
         {
             core.Trace("AnimationImp::BuildAnimationMatrices -> Not support mode");
+#ifdef _WIN32
             __debugbreak();
+#endif
             /*_asm int 3;*/
             //    float frame = 0.0f;
             //    for(long j = 0; j < nbones; j++)

@@ -14,7 +14,7 @@
 
 #include "Character.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 
 // ============================================================================================
 
@@ -55,7 +55,7 @@ Grass::Grass()
     winForce = 0.3f;
     winDir = !CVECTOR(0.0f, 0.0f, 1.0f);
 
-    strcpy_s(textureName, GRASS_DEFTEXTURE);
+    strcpy(textureName, GRASS_DEFTEXTURE);
 
     vb = ib = -1;
     vbuffer = nullptr;
@@ -139,6 +139,7 @@ bool Grass::Init()
     }
     rs->UnLockIndexBuffer(ib);
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     // Constants
     static const auto pi2 = 2.0f * 3.141592653f;
     for (size_t i = 0; i < 16; i++)
@@ -149,6 +150,7 @@ bool Grass::Init()
         // Uv table
         aUV[i] = {static_cast<float>(i & 3) * (1.0f / 4.0f), static_cast<float>((i >> 2) & 3) * (1.0f / 4.0f)};
     }
+#endif
 
     return true;
 }
@@ -254,11 +256,11 @@ void Grass::SetTexture(const char *texName)
 {
     if (!texName || !texName[0] || strlen(texName) > 63)
     {
-        strcpy_s(textureName, GRASS_DEFTEXTURE);
+        strcpy(textureName, GRASS_DEFTEXTURE);
     }
     else
     {
-        strcpy_s(textureName, texName);
+        strcpy(textureName, texName);
     }
 }
 
@@ -364,8 +366,13 @@ void Grass::Execute(uint32_t delta_time)
 
 void Grass::Realize(uint32_t delta_time)
 {
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     if (quality == rq_off || fx_ == nullptr)
         return;
+#else
+    if (quality == rq_off)
+        return;
+#endif
     rs->SetTransform(D3DTS_WORLD, CMatrix());
     // Remove textures
     rs->TextureSet(0, -1);
@@ -503,6 +510,7 @@ void Grass::Realize(uint32_t delta_time)
         lColor = 0.3f;
     }
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     // recalculate the parameters of the angles
     for (long i = 0; i < 16; i++)
     {
@@ -512,6 +520,7 @@ void Grass::Realize(uint32_t delta_time)
         if (aAngles[i].z > 1.0f)
             aAngles[i].z = 1.0f;
     }
+#endif
 
     // matrix
     CMatrix view, prj;
@@ -544,6 +553,7 @@ void Grass::Realize(uint32_t delta_time)
     rs->TextureSet(0, texture);
     rs->TextureSet(1, texture);
     // set constants
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     fx_->SetMatrix(hgVP_, cmtx);
     fx_->SetValue(haAngles_, &aAngles[0], sizeof(D3DXVECTOR3) * 16);
     fx_->SetValue(haUV_, &aUV[0], sizeof(D3DXVECTOR2) * 16);
@@ -553,6 +563,7 @@ void Grass::Realize(uint32_t delta_time)
     fx_->SetFloat(hkLitWF_, kLitWF);
     fx_->SetFloat(hfDataScale_, m_fDataScale);
     fx_->SetValue(haSize_, D3DXVECTOR2(m_fMaxWidth, m_fMaxHeight), sizeof(D3DXVECTOR2));
+#endif
 
     // Camera position on the map
     long camx = static_cast<long>((pos.x / m_fDataScale - startX) / GRASS_BLK_DST);
@@ -975,6 +986,7 @@ void Grass::CreateVertexDeclaration() const
         rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
     }
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     fx_ = rs->GetEffectPointer("Grass");
     if (fx_ != nullptr)
     {
@@ -988,4 +1000,5 @@ void Grass::CreateVertexDeclaration() const
         hfDataScale_ = fx_->GetParameterByName(nullptr, "fDataScale");
         haSize_ = fx_->GetParameterByName(nullptr, "aSize");
     }
+#endif
 }

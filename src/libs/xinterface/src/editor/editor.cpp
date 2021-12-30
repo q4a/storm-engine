@@ -84,6 +84,7 @@ bool GIEditor::ProcessControl()
 {
     if (!m_bShowMode)
     {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0 &&
             core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState('E') < 0)
         {
@@ -91,13 +92,16 @@ bool GIEditor::ProcessControl()
             m_bSubNameOn = false;
             return true;
         }
+#endif
     }
 
     if (m_bShowMode)
     {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0 &&
             core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState('Q') < 0)
             m_bShowMode = false;
+#endif
 
         CONTROL_STATE cs;
         core.Controls->GetControlState("IStartButton", cs);
@@ -121,10 +125,12 @@ bool GIEditor::ProcessControl()
             }
         }
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (m_bSubNameOn && core.Controls->GetDebugAsyncKeyState(VK_ESCAPE) < 0)
         {
             m_bSubNameOn = false;
         }
+#endif
 
         return true;
     }
@@ -134,6 +140,7 @@ bool GIEditor::ProcessControl()
 
     auto bMove = false;
     auto bSize = false;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0) // moving
     {
         bMove = true;
@@ -153,10 +160,12 @@ bool GIEditor::ProcessControl()
         m_pEditableNode->SaveParametersToIni();
         m_pEditableNode->m_rect = orig_rect;
     }
+#endif
 
     if (bMove || bSize)
     {
         long nHorz = 0;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (core.Controls->GetDebugAsyncKeyState(VK_LEFT) < 0)
             if (core.Controls->GetDebugAsyncKeyState(VK_MENU) < 0)
                 nHorz -= 10;
@@ -167,7 +176,9 @@ bool GIEditor::ProcessControl()
                 nHorz += 10;
             else
                 nHorz++;
+#endif
         long nVert = 0;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (core.Controls->GetDebugAsyncKeyState(VK_UP) < 0)
             if (core.Controls->GetDebugAsyncKeyState(VK_MENU) < 0)
                 nVert -= 10;
@@ -178,6 +189,7 @@ bool GIEditor::ProcessControl()
                 nVert += 10;
             else
                 nVert++;
+#endif
 
         if (nHorz != 0 || nVert != 0)
         {
@@ -270,7 +282,12 @@ void GIEditor::DrawSizeBox() const
 {
     if (!m_pEditableNode)
         return;
+
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0) // showing
+#else
+    if (false)
+#endif
     {
         RS_LINE rsl[8];
         for (long n = 0; n < 8; n++)

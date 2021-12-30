@@ -1,8 +1,10 @@
 #pragma once
 
 #include <filesystem>
-
+#include <SDL.h>
+#ifdef _WIN32
 #include <ShlObj.h>
+#endif
 
 /* Filesystem proxy */
 namespace fs
@@ -14,11 +16,17 @@ inline path GetStashPath()
     static path path;
     if (path.empty())
     {
+#ifdef _WIN32
         wchar_t *str = nullptr;
         SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST, nullptr, &str);
         path = str;
         path = path / "My Games" / "Sea Dogs";
         CoTaskMemFree(str);
+#else
+        char *pref_path = nullptr;
+        pref_path = SDL_GetPrefPath("Akella", "Sea Dogs");
+        path = pref_path;
+#endif
     }
     return path;
 }

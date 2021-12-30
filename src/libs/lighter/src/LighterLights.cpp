@@ -9,6 +9,7 @@
 //============================================================================================
 
 #include "LighterLights.h"
+#include <storm/string_compare.hpp>
 
 // ============================================================================================
 // Construction, destruction
@@ -108,7 +109,7 @@ void LighterLights::PostInit()
             continue;
         long j;
         for (j = 0; j < numGrp; j++)
-            if (_stricmp(grp[j], light[i].group) == 0)
+            if (storm::iEquals(std::string_view(grp[j]), std::string_view(light[i].group)))
                 break;
         if (j == numGrp)
             grp[numGrp++] = light[i].group;
@@ -133,7 +134,7 @@ void LighterLights::PostInit()
         auto nrm = 0.0f;
         for (long j = 0; j < numLights; j++)
         {
-            if (light[j].group && _stricmp(light[j].group, grp[i]) == 0)
+            if (light[j].group && storm::iEquals(std::string_view(light[j].group), std::string_view(grp[i])))
             {
                 nrm += 1.0f;
                 light[numLights].color += light[j].color;
@@ -192,7 +193,7 @@ void LighterLights::UpdateLights(long lit)
             {
                 if (light[j].type == Light::t_point && light[j].group)
                 {
-                    if (_stricmp(light[j].group, light[i].group) == 0)
+                    if (storm::iEquals(std::string_view(light[j].group), std::string_view(light[i].group)))
                     {
                         light[j].color = light[i].color;
                         light[j].cosine = light[i].cosine;

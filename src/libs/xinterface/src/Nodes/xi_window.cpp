@@ -61,7 +61,7 @@ void CXI_WINDOW::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 
     for (long n = 0; n < m_aNodeNameList.size(); n++)

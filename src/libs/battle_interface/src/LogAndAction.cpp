@@ -126,7 +126,7 @@ uint64_t ILogAndActions::ProcessMessage(MESSAGE &message)
                     {
                         throw std::runtime_error("allocate memory error");
                     }
-                    strcpy_s(last->str, len, param.c_str());
+                    strcpy(last->str, param.c_str());
                 }
                 else
                 {
@@ -182,7 +182,7 @@ uint64_t ILogAndActions::ProcessMessage(MESSAGE &message)
         break;
     case LI_OTHER_MSG: {
         const std::string &param = message.String();
-        if (_stricmp(param.c_str(), "SetTimeScale") == 0)
+        if (storm::iEquals(param, "SetTimeScale"))
         {
             core.SetTimeScale(message.Float());
         }
@@ -233,7 +233,7 @@ void ILogAndActions::Realize(uint32_t delta_time)
     if (m_bShowActiveCommand)
     {
         CMatrix matw;
-        rs->SetTransform(D3DTS_WORLD, (D3DXMATRIX *)&matw);
+        rs->SetTransform(D3DTS_WORLD, matw);
         // show icon
         if ((m_idIconTexture != -1L) && m_bThatRealAction)
         {
@@ -428,7 +428,7 @@ void ILogAndActions::SetString(const char *str, bool immortal)
             last = last->next;
 
     // Return if such a line already exists and it is last
-    if (last != nullptr && last->str != nullptr && _stricmp(last->str, str) == 0)
+    if (last != nullptr && last->str != nullptr && storm::iEquals(std::string_view(last->str), std::string_view(str)))
         return;
 
     // create a new line descriptor
@@ -445,7 +445,7 @@ void ILogAndActions::SetString(const char *str, bool immortal)
     {
         throw std::runtime_error("Allocate memory error");
     }
-    strcpy_s(newDescr->str, len, str);
+    strcpy(newDescr->str, str);
     // set the maximum visibility
     if (immortal)
         newDescr->alpha = 10000.f;
@@ -498,7 +498,7 @@ void ILogAndActions::SetAction(const char *actionName)
         pA = pA->GetAttributeClass(actionName);
     if (pA == nullptr)
         return;
-    strcpy_s(m_sActionName, actionName);
+    strcpy(m_sActionName, actionName);
     // set texture coordinates for this action icon
     FRECT texRect;
     const long curIconNum = pA->GetAttributeAsDword("IconNum", 0);

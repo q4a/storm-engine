@@ -66,8 +66,10 @@ void SailorsEditor::Execute(uint32_t dltTime)
     SetCamera(dltTime);
     menu.OnKeyPress(menu.sailrs->shipWalk[0].sailorsPoints);
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(VK_ESCAPE) < 0)
         ExitProcess(0);
+#endif
 };
 
 void SailorsEditor::Realize(uint32_t dltTime)
@@ -103,14 +105,17 @@ void SailorsEditor::SetCamera(uint32_t &dltTime)
     pos = mtx * cameraPos;
 
     float speed = 0;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(VK_LBUTTON) < 0)
         speed = -0.1f;
     if (GetAsyncKeyState(VK_RBUTTON) < 0)
         speed = 0.1f;
+#endif
 
     cameraPos.y += speed * (dltTime / 10.0f);
     rs->SetCamera(cameraTo + pos, cameraTo, CVECTOR(0.0f, 1.0f, 0.0f));
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(0x57) < 0)
     {
         cameraTo.x -= sin(cameraAng.y) * dltTime / 50.0f;
@@ -134,6 +139,7 @@ void SailorsEditor::SetCamera(uint32_t &dltTime)
         cameraTo.x -= sin(cameraAng.y + PI / 2) * dltTime / 50.0f;
         cameraTo.z -= cos(cameraAng.y + PI / 2) * dltTime / 50.0f;
     }
+#endif
 
     menu.cameraAng = cameraAng;
     menu.cameraPos = cameraTo;

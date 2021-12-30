@@ -61,7 +61,7 @@ class STRING_CODEC : public VSTRING_CODEC
             return 0xffffffff;
 
         char cTemp[1024];
-        strncpy_s(cTemp, pString, iLen);
+        strncpy(cTemp, pString, iLen);
         cTemp[iLen] = 0;
 
         bool bNew;
@@ -94,7 +94,8 @@ class STRING_CODEC : public VSTRING_CODEC
 
         for (n = 0; n < pE->nStringsNum; n++)
         {
-            if (pE->pElements[n].dwHashCode == nHash && _stricmp(pString, pE->pElements[n].pStr) == 0)
+            if (pE->pElements[n].dwHashCode == nHash &&
+                storm::iEquals(std::string_view(pString), std::string_view(pE->pElements[n].pStr)))
             {
                 nStringCode = (nTableIndex << 16) | (n & 0xffff);
                 bNew = false;

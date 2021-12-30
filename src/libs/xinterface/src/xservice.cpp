@@ -54,12 +54,12 @@ long XSERVICE::GetTextureID(const char *sImageListName)
     if (sImageListName != nullptr)
     {
         for (auto i = 0; i < m_dwListQuantity; i++)
-            if (!_stricmp(m_pList[i].sImageListName, sImageListName))
+            if (storm::iEquals(std::string_view(m_pList[i].sImageListName), std::string_view(sImageListName)))
             {
                 if (m_pList[i].textureQuantity <= 0)
                 {
                     char sTexName[256];
-                    sprintf_s(sTexName, "INTERFACES\\%s", m_pList[i].sTextureName);
+                    sprintf(sTexName, "INTERFACES\\%s", m_pList[i].sTextureName);
                     m_pList[i].textureID = m_pRS->TextureCreate(sTexName);
                     m_pList[i].textureQuantity = 1;
                 }
@@ -77,7 +77,7 @@ long XSERVICE::FindGroup(const char *sImageListName) const
     if (!sImageListName)
         return -1;
     for (auto n = 0; n < m_dwListQuantity; n++)
-        if (!_stricmp(m_pList[n].sImageListName, sImageListName))
+        if (storm::iEquals(std::string_view(m_pList[n].sImageListName), std::string_view(sImageListName)))
             return n;
     return -1;
 }
@@ -88,7 +88,7 @@ bool XSERVICE::ReleaseTextureID(const char *sImageListName)
         return false;
 
     for (auto i = 0; i < m_dwListQuantity; i++)
-        if (!_stricmp(m_pList[i].sImageListName, sImageListName))
+        if (storm::iEquals(std::string_view(m_pList[i].sImageListName), std::string_view(sImageListName)))
             if (--m_pList[i].textureQuantity == 0)
             {
                 m_pRS->TextureRelease(m_pList[i].textureID);
@@ -265,11 +265,11 @@ void XSERVICE::LoadAllPicturesInfo()
 
             // get list name
             m_pList[i].sImageListName = new char[sizeof section];
-            strcpy_s(m_pList[i].sImageListName, sizeof section, section);
+            strcpy(m_pList[i].sImageListName, section);
             // get texture name
             ini->ReadString(section, "sTextureName", param, sizeof(param) - 1, "");
             m_pList[i].sTextureName = new char[sizeof param];
-            strcpy_s(m_pList[i].sTextureName, sizeof param, param);
+            strcpy(m_pList[i].sTextureName, param);
 
             // get texture width & height
             m_pList[i].textureWidth = ini->GetLong(section, "wTextureWidth", 1024);
@@ -362,10 +362,10 @@ long XSERVICE::GetImageNum(const char *sImageListName, const char *sImageName)
         if (sImageListName != nullptr)
         {
             for (int i = 0; i < m_dwListQuantity; i++)
-                if (!_stricmp(m_pList[i].sImageListName, sImageListName))
+                if (storm::iEquals(std::string_view(m_pList[i].sImageListName), std::string_view(sImageListName)))
                 {
                     for (int j = m_pList[i].pictureStart; j < m_pList[i].pictureStart + m_pList[i].pictureQuantity; j++)
-                        if (!_stricmp(m_pImage[j].sPictureName, sImageName))
+                        if (storm::iEquals(std::string_view(m_pImage[j].sPictureName), std::string_view(sImageName)))
                         {
                             retVal = j;
                             break;
@@ -376,7 +376,7 @@ long XSERVICE::GetImageNum(const char *sImageListName, const char *sImageName)
         else
         {
             for (int i = 0; i < m_dwImageQuantity; i++)
-                if (!_stricmp(m_pImage[i].sPictureName, sImageName))
+                if (storm::iEquals(std::string_view(m_pImage[i].sPictureName), std::string_view(sImageName)))
                 {
                     retVal = i;
                     break;

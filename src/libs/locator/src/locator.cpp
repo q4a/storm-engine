@@ -1,6 +1,6 @@
 #include "locator.h"
 #include "core.h"
-#include "entity.h"
+#include "Entity.h"
 #include "shared/messages.h"
 
 CREATE_CLASS(LOCATOR)
@@ -59,7 +59,7 @@ void LOCATOR::LocateForI_L2(ATTRIBUTES *pA, GEOS *g, GEOS::LABEL &label)
     for (long stringIndex = 0; (stringIndex = g->FindLabelG(stringIndex, groupID)) >= 0; stringIndex++)
     {
         g->GetLabel(stringIndex, label2);
-        sprintf_s(name, "l%d", n);
+        sprintf(name, "l%d", n);
         auto *pAA = pA->CreateSubAClass(pA, name);
         pAA->SetAttributeUseFloat("x", label2.m[3][0]);
         pAA->SetAttributeUseFloat("y", label2.m[3][1]);
@@ -95,7 +95,7 @@ void LOCATOR::LocateForI(VDATA *pData)
     }
     char sFileLocators[256];
     auto *const pAFilesPath = pA->FindAClass(pA, "filespath.models");
-    sprintf_s(sFileLocators, "%s\\%s", (pAFilesPath) ? pAFilesPath->GetThisAttr() : "", pA->GetAttribute("locators"));
+    sprintf(sFileLocators, "%s\\%s", (pAFilesPath) ? pAFilesPath->GetThisAttr() : "", pA->GetAttribute("locators"));
     rs->SetLoadTextureEnable(false);
     g = gs->CreateGeometry(sFileLocators, "", 0);
     rs->SetLoadTextureEnable(true);
@@ -122,7 +122,8 @@ void LOCATOR::LocateForI(VDATA *pData)
                             core.Trace("LOCATOR: no name");
                             continue;
                         }
-                        if (_stricmp(pAA->GetAttributeClass(n)->GetAttribute("name"), label.name) == 0)
+                        if (storm::iEquals(std::string_view(pAA->GetAttributeClass(n)->GetAttribute("name")),
+                                           std::string_view(label.name)))
                         {
                             pAA->GetAttributeClass(n)->SetAttributeUseFloat("x", label.m[3][0]);
                             pAA->GetAttributeClass(n)->SetAttributeUseFloat("y", label.m[3][1]);

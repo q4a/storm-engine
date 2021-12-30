@@ -450,7 +450,7 @@ void CXI_FORMATEDTEXT::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -477,9 +477,9 @@ void CXI_FORMATEDTEXT::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     }
 
     ReadIniString(ini1, name1, ini2, name2, "alignment", param, sizeof(param), "left");
-    if (_stricmp(param, "center") == 0)
+    if (storm::iEquals(param, "center"))
         m_nAlignment = PR_ALIGN_CENTER;
-    else if (_stricmp(param, "right") == 0)
+    else if (storm::iEquals(param, "right"))
         m_nAlignment = PR_ALIGN_RIGHT;
     else
         m_nAlignment = PR_ALIGN_LEFT;
@@ -679,13 +679,13 @@ bool CXI_FORMATEDTEXT::GetLineNext(int fontNum, const char *&pInStr, char *buf, 
         {
             if (pStart[i] == '<')
             {
-                if (_strnicmp(&pStart[i], "<color", 6) == 0)
+                if (storm::iEquals(std::string_view(&pStart[i]), "<color", 6))
                 {
                     while (i < lineSize && i < bufSize - 1 && pStart[i] != '>')
                         i++;
                     continue;
                 }
-                if (_strnicmp(&pStart[i], "</color>", 8) == 0)
+                if (storm::iEquals(std::string_view(&pStart[i]), "</color>", 8))
                 {
                     i += 7;
                     continue;
@@ -710,13 +710,13 @@ bool CXI_FORMATEDTEXT::GetLineNext(int fontNum, const char *&pInStr, char *buf, 
         {
             if (pStart[i] == '<')
             {
-                if (_strnicmp(&pStart[i], "<color", 6) == 0)
+                if (storm::iEquals(std::string_view(&pStart[i]), "<color", 6))
                 {
                     while (i < lineSize && i < bufSize - 1 && pStart[i] != '>')
                         i++;
                     continue;
                 }
-                if (_strnicmp(&pStart[i], "</color>", 8) == 0)
+                if (storm::iEquals(std::string_view(&pStart[i]), "</color>", 8))
                 {
                     i += 7;
                     continue;
@@ -724,7 +724,7 @@ bool CXI_FORMATEDTEXT::GetLineNext(int fontNum, const char *&pInStr, char *buf, 
             }
             j++;
         }
-        strncpy_s(buf, bufSize, pStart, i);
+        strncpy(buf, pStart, i);
         buf[i] = 0;
         pInStr = &pStart[i];
     }
@@ -775,7 +775,7 @@ void CXI_FORMATEDTEXT::GetOneLine(int fontNum, const char *pStr, char *buf, int 
     if (lineSize > bufSize - 1)
         lineSize = bufSize - 1;
 
-    strncpy_s(buf, bufSize, pStart, lineSize);
+    strncpy(buf, pStart, lineSize);
     buf[lineSize] = 0;
     long strWidth = m_rs->StringWidth(buf, fontNum);
 
@@ -962,7 +962,7 @@ void CXI_FORMATEDTEXT::MakeTagChecking(bool &tagState, uint32_t &tagColor, uint3
         {
             if (tagState)
             {
-                if (_strnicmp(str, "</color>", 8) == 0)
+                if (storm::iEquals(std::string_view(str), "</color>", 8))
                 {
                     tagState = false;
                     q = str - tagBegin;
@@ -971,7 +971,7 @@ void CXI_FORMATEDTEXT::MakeTagChecking(bool &tagState, uint32_t &tagColor, uint3
             }
             else
             {
-                if (_strnicmp(str, "<color=", 7) == 0)
+                if (storm::iEquals(std::string_view(str), "<color=", 7))
                 {
                     tagState = true;
                     long a = 255, r = 255, g = 255, b = 255;
@@ -1071,7 +1071,7 @@ uint32_t CXI_FORMATEDTEXT::MessageProc(long msgcode, MESSAGE &message)
             {
                 oldgroup = sd->strGroup;
                 char atrName[128];
-                sprintf_s(atrName, "line%d", idx);
+                sprintf(atrName, "line%d", idx);
                 pAttr->SetAttributeUseDword(atrName, i);
                 idx++;
             }
@@ -1102,7 +1102,7 @@ uint32_t CXI_FORMATEDTEXT::MessageProc(long msgcode, MESSAGE &message)
             {
                 oldgroup = sd->strGroup;
                 char atrName[128];
-                sprintf_s(atrName, "line%d", idx);
+                sprintf(atrName, "line%d", idx);
                 pAttr->SetAttributeUseDword(atrName, m_rect.top + m_vertOffset * i - m_hostRect.top);
                 idx++;
             }

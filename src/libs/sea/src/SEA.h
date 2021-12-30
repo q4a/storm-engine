@@ -3,8 +3,8 @@
 // ************************************************************************
 #pragma once
 
-#include "Sea_Base.h"
-#include "cvector4.h"
+#include "sea_base.h"
+#include "CVector4.h"
 #include "dx9render.h"
 #include "defines.h"
 
@@ -38,6 +38,25 @@ class SEA : public SEA_BASE
         long iIFirst, iILast;
 
         bool bInProgress, bDone;
+
+        SeaBlock(long iX1, long iX2, long iY1, long iY2, long iSize0, long iTX, long iTY, long iSize, long iLOD,
+                 long iIStart, long iIFirst, long iILast, bool bInProgress, bool bDone)
+        {
+            this->iX1 = iX1;
+            this->iX2 = iX2;
+            this->iY1 = iY1;
+            this->iY2 = iY2;
+            this->iSize0 = iSize0;
+            this->iTX = iTX;
+            this->iTY = iTY;
+            this->iSize = iSize;
+            this->iLOD = iLOD;
+            this->iIStart = iIStart;
+            this->iIFirst = iIFirst;
+            this->iILast = iILast;
+            this->bInProgress = bInProgress;
+            this->bDone = bDone;
+        }
 
         static bool QSort(const SeaBlock &b1, const SeaBlock &b2)
         {

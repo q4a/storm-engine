@@ -124,8 +124,10 @@ bool CORE::Run()
     stopFrameProcessing_ = false;
 
     const auto bDebugWindow = true;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (bDebugWindow && core.Controls && core.Controls->GetDebugAsyncKeyState(VK_F7) < 0)
         DumpEntitiesInfo();
+#endif
     dwNumberScriptCommandsExecuted = 0;
 
     if (Exit_flag)
@@ -137,19 +139,19 @@ bool CORE::Run()
     if (pVCTime)
         pVCTime->Set(static_cast<long>(GetRDeltaTime()));
 
-    SYSTEMTIME st;
-    GetLocalTime(&st);
+    auto tt = std::time(nullptr);
+    auto local_tm = *std::localtime(&tt);
 
     auto *pVYear = static_cast<VDATA *>(core.GetScriptVariable("iRealYear"));
     auto *pVMonth = static_cast<VDATA *>(core.GetScriptVariable("iRealMonth"));
     auto *pVDay = static_cast<VDATA *>(core.GetScriptVariable("iRealDay"));
 
     if (pVYear)
-        pVYear->Set(static_cast<long>(st.wYear));
+        pVYear->Set(static_cast<long>(local_tm.tm_year + 1900));
     if (pVMonth)
-        pVMonth->Set(static_cast<long>(st.wMonth));
+        pVMonth->Set(static_cast<long>(local_tm.tm_mon + 1)); // tm_mon belongs [0, 11]
     if (pVDay)
-        pVDay->Set(static_cast<long>(st.wDay));
+        pVDay->Set(static_cast<long>(local_tm.tm_mday));
 
     if (Controls && Controls->GetDebugAsyncKeyState('R') < 0)
         Timer.Delta_Time *= 10;
@@ -238,7 +240,7 @@ bool CORE::Initialize()
 
 void CORE::ProcessEngineIniFile()
 {
-    char String[_MAX_PATH];
+    char String[MAX_PATH];
 
     bEngineIniProcessed = true;
 
@@ -287,8 +289,10 @@ void CORE::ProcessEngineIniFile()
 
             if (iScriptVersion != ENGINE_SCRIPT_VERSION)
             {
+#ifdef _WIN32 // FIX_LINUX
                 ShowCursor(true);
                 MessageBoxA(nullptr, "Wrong script version", "Error", MB_OK);
+#endif
                 Compiler->ExitProgram();
             }
         }
@@ -324,10 +328,12 @@ HWND CORE::GetAppHWND()
     return App_Hwnd;
 }
 
+#ifdef _WIN32
 HINSTANCE CORE::GetAppInstance()
 {
     return hInstance;
 }
+#endif
 
 void CORE::SetTimeScale(float _scale)
 {
@@ -443,7 +449,7 @@ void *CORE::MakeClass(const char *class_name)
 {
     const long hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
-        if (c->GetHash() == hash && _stricmp(class_name, c->GetName()) == 0)
+        if (c->GetHash() == hash && storm::iEquals(std::string_view(class_name), std::string_view(c->GetName())))
             return c->CreateClass();
 
     return nullptr;
@@ -462,7 +468,7 @@ VMA *CORE::FindVMA(const char *class_name)
 {
     const long hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
-        if (c->GetHash() == hash && _stricmp(class_name, c->GetName()) == 0)
+        if (c->GetHash() == hash && storm::iEquals(std::string_view(class_name), std::string_view(c->GetName())))
             return c;
 
     return nullptr;
@@ -514,7 +520,7 @@ void CORE::Trace(const char *format, ...)
 
     va_list args;
     va_start(args, format);
-    _vsnprintf_s(buffer_4k, sizeof(buffer_4k) - 4, format, args);
+    vsnprintf(buffer_4k, sizeof(buffer_4k) - 4, format, args);
     va_end(args);
     spdlog::info(buffer_4k);
 }
@@ -593,7 +599,7 @@ bool CORE::InitiateStateLoading(const char *file_name)
 
     const auto len = strlen(file_name) + 1;
     State_file_name = static_cast<char *>(new char[len]);
-    strcpy_s(State_file_name, len, file_name);
+    strcpy(State_file_name, file_name);
     return true;
 }
 
@@ -935,7 +941,7 @@ void CORE::stopFrameProcessing()
     stopFrameProcessing_ = true;
 }
 
-void CORE:: collectCrashInfo()
+void CORE::collectCrashInfo()
 {
     Compiler->collectCallStack();
 }

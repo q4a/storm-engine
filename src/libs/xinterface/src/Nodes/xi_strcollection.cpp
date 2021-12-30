@@ -161,7 +161,7 @@ bool CXI_STRCOLLECTION::GetInternalNameList(std::vector<std::string> &aStr)
         // aStr.Add();
         aStr.push_back(std::string{});
         char param[512];
-        sprintf_s(param, sizeof(param), "%d - %s", n + 1, pStringService->GetStringName(m_pStrDescr[n].strNum));
+        sprintf(param, "%d - %s", n + 1, pStringService->GetStringName(m_pStrDescr[n].strNum));
         aStr[n + 1] = param;
     }
     return aStr.size() > 1;
@@ -240,23 +240,21 @@ void CXI_STRCOLLECTION::SaveParametersToIni()
             pcState[1] = 0;
 
         if (m_pStrDescr[n].strStr)
-            sprintf_s(param, sizeof(param),
-                      "#%s,font:%s,pos:{%d,%d},fc:{%d,%d,%d,%d},bc:{%d,%d,%d,%d},scale:%.2f,state:{%s}",
-                      m_pStrDescr[n].strStr,                            // strID
-                      m_pStrDescr[n].sFontName,                         // font name
-                      m_pStrDescr[n].scrPos.x, m_pStrDescr[n].scrPos.y, // pos
-                      ALPHA(m_pStrDescr[n].foreColor), RED(m_pStrDescr[n].foreColor), GREEN(m_pStrDescr[n].foreColor),
-                      BLUE(m_pStrDescr[n].foreColor), ALPHA(m_pStrDescr[n].backColor), RED(m_pStrDescr[n].backColor),
-                      GREEN(m_pStrDescr[n].backColor), BLUE(m_pStrDescr[n].backColor), m_pStrDescr[n].fScale, pcState);
+            sprintf(param, "#%s,font:%s,pos:{%d,%d},fc:{%d,%d,%d,%d},bc:{%d,%d,%d,%d},scale:%.2f,state:{%s}",
+                    m_pStrDescr[n].strStr,                            // strID
+                    m_pStrDescr[n].sFontName,                         // font name
+                    m_pStrDescr[n].scrPos.x, m_pStrDescr[n].scrPos.y, // pos
+                    ALPHA(m_pStrDescr[n].foreColor), RED(m_pStrDescr[n].foreColor), GREEN(m_pStrDescr[n].foreColor),
+                    BLUE(m_pStrDescr[n].foreColor), ALPHA(m_pStrDescr[n].backColor), RED(m_pStrDescr[n].backColor),
+                    GREEN(m_pStrDescr[n].backColor), BLUE(m_pStrDescr[n].backColor), m_pStrDescr[n].fScale, pcState);
         else
-            sprintf_s(param, sizeof(param),
-                      "%s,font:%s,pos:{%d,%d},fc:{%d,%d,%d,%d},bc:{%d,%d,%d,%d},scale:%.2f,state:{%s}",
-                      pStringService->GetStringName(m_pStrDescr[n].strNum), // strID
-                      m_pStrDescr[n].sFontName,                             // font name
-                      m_pStrDescr[n].scrPos.x, m_pStrDescr[n].scrPos.y,     // pos
-                      ALPHA(m_pStrDescr[n].foreColor), RED(m_pStrDescr[n].foreColor), GREEN(m_pStrDescr[n].foreColor),
-                      BLUE(m_pStrDescr[n].foreColor), ALPHA(m_pStrDescr[n].backColor), RED(m_pStrDescr[n].backColor),
-                      GREEN(m_pStrDescr[n].backColor), BLUE(m_pStrDescr[n].backColor), m_pStrDescr[n].fScale, pcState);
+            sprintf(param, "%s,font:%s,pos:{%d,%d},fc:{%d,%d,%d,%d},bc:{%d,%d,%d,%d},scale:%.2f,state:{%s}",
+                    pStringService->GetStringName(m_pStrDescr[n].strNum), // strID
+                    m_pStrDescr[n].sFontName,                             // font name
+                    m_pStrDescr[n].scrPos.x, m_pStrDescr[n].scrPos.y,     // pos
+                    ALPHA(m_pStrDescr[n].foreColor), RED(m_pStrDescr[n].foreColor), GREEN(m_pStrDescr[n].foreColor),
+                    BLUE(m_pStrDescr[n].foreColor), ALPHA(m_pStrDescr[n].backColor), RED(m_pStrDescr[n].backColor),
+                    GREEN(m_pStrDescr[n].backColor), BLUE(m_pStrDescr[n].backColor), m_pStrDescr[n].fScale, pcState);
         pIni->AddString(m_nodeName, "string", param);
     }
 }
@@ -373,7 +371,8 @@ CXI_STRCOLLECTION::STRINGDESCR *CXI_STRCOLLECTION::CreateNewDinamicString(const 
     int i;
     for (i = 0; i < m_nStr; i++)
     {
-        if (m_pStrDescr[i].strID != nullptr && _stricmp(m_pStrDescr[i].strID, strID) == 0)
+        if (m_pStrDescr[i].strID != nullptr &&
+            storm::iEquals(std::string_view(m_pStrDescr[i].strID), std::string_view(strID)))
             break;
     }
     if (i < m_nStr)

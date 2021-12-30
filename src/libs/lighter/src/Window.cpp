@@ -63,7 +63,7 @@ Window::Window()
     lastPreset = -1;
     prsComment[0] = 0;
     slidDltX = 0.0f;
-    strcpy_s(ver, "Location lighter v1.03");
+    strcpy(ver, "Location lighter v1.03");
 }
 
 Window::~Window()
@@ -140,29 +140,29 @@ void Window::InitList(LighterLights &ls)
     list = new ListElement[numElements + maxSize];
     memset(list, 0, (numElements + maxSize) * sizeof(ListElement));
     list[0].name = new char[sizeof "Quick process"];
-    strcpy_s(list[0].name, sizeof "Quick process", "Quick process");
+    strcpy(list[0].name, "Quick process");
     list[0].type = ListElement::t_quick;
     list[0].h = 200.0f;
     list[1].name = new char[sizeof "Trace shadows"];
-    strcpy_s(list[1].name, sizeof "Trace shadows", "Trace shadows");
+    strcpy(list[1].name, "Trace shadows");
     list[1].type = ListElement::t_trace;
     list[2].name = new char[sizeof "Smooth shadows"];
-    strcpy_s(list[2].name, sizeof "Smooth shadows", "Smooth shadows");
+    strcpy(list[2].name, "Smooth shadows");
     list[2].type = ListElement::t_smooth;
     list[3].name = new char[sizeof "Blur light"];
-    strcpy_s(list[3].name, sizeof "Blur light", "Blur light");
+    strcpy(list[3].name, "Blur light");
     list[3].type = ListElement::t_blur;
     list[3].h = 100.0f;
     list[4].name = new char[sizeof "Save presets"];
-    strcpy_s(list[4].name, sizeof "Save presets", "Save presets");
+    strcpy(list[4].name, "Save presets");
     list[4].type = ListElement::t_save;
     list[4].h = 180.0f;
     list[5].name = new char[sizeof "Load presets"];
-    strcpy_s(list[5].name, sizeof "Load presets", "Load presets");
+    strcpy(list[5].name, "Load presets");
     list[5].type = ListElement::t_load;
     list[5].h = 180.0f;
     list[6].name = new char[sizeof "Save lights"];
-    strcpy_s(list[6].name, sizeof "Save lights", "Save lights");
+    strcpy(list[6].name, "Save lights");
     list[6].type = ListElement::t_savelight;
     for (long i = 0; i < maxSize; i++)
         ls[i].isMark = false;
@@ -176,7 +176,7 @@ void Window::InitList(LighterLights &ls)
             break;
         case Light::t_amb: {
             list[numElements].name = new char[sizeof "Ambient light"];
-            strcpy_s(list[numElements].name, sizeof "Ambient light", "Ambient light");
+            strcpy(list[numElements].name, "Ambient light");
             list[numElements].type = ListElement::t_amb;
             list[numElements].c = ls[i].color;
             list[numElements].st = 0.0f;
@@ -195,7 +195,7 @@ void Window::InitList(LighterLights &ls)
         break;
         case Light::t_sun: {
             list[numElements].name = new char[sizeof "Sun light"];
-            strcpy_s(list[numElements].name, sizeof "Sun light", "Sun light");
+            strcpy(list[numElements].name, "Sun light");
             list[numElements].type = ListElement::t_light;
             list[numElements].c = ls[i].color;
             list[numElements].st = 0.0f;
@@ -214,7 +214,7 @@ void Window::InitList(LighterLights &ls)
         break;
         case Light::t_sky: {
             list[numElements].name = new char[sizeof "Sky light"];
-            strcpy_s(list[numElements].name, sizeof "Sky light", "Sky light");
+            strcpy(list[numElements].name, "Sky light");
             list[numElements].type = ListElement::t_light;
             list[numElements].c = ls[i].color;
             list[numElements].st = 0.0f;
@@ -235,8 +235,8 @@ void Window::InitList(LighterLights &ls)
             const auto len = strlen(ls[i].group) + sizeof "Group ";
             list[numElements].name = new char[len];
             list[numElements].name[0] = 0;
-            strcat_s(list[numElements].name, len, "Group ");
-            strcat_s(list[numElements].name, len, ls[i].group);
+            strcat(list[numElements].name, "Group ");
+            strcat(list[numElements].name, ls[i].group);
             list[numElements].type = ListElement::t_glight;
             list[numElements].c = ls[i].color;
             list[numElements].st = 0.0f;
@@ -308,8 +308,10 @@ void Window::Draw(float dltTime)
         {
             if (cursy >= y - 50.0f && cursy <= y + 50.0f)
             {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
                 if (GetAsyncKeyState(VK_LBUTTON) < 0)
                     isSuccessful = 0.0f;
+#endif
             }
         }
     }
@@ -324,14 +326,17 @@ void Window::Draw(float dltTime)
         {
             if (cursy >= y - 50.0f && cursy <= y + 50.0f)
             {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
                 if (GetAsyncKeyState(VK_LBUTTON) < 0)
                     isFailed = 0.0f;
+#endif
             }
         }
     }
     // Drawing the interface
     if (!isVisible)
         return;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(VK_CONTROL) < 0)
     {
         if (GetAsyncKeyState(VK_SUBTRACT) < 0)
@@ -383,6 +388,7 @@ void Window::Draw(float dltTime)
         }
     }
     isMouseDown = !isLockCtrl && isSuccessful <= 0.0f && isFailed <= 0.0f && (GetAsyncKeyState(VK_LBUTTON) < 0);
+#endif
     if (!isMouseDown)
         slidID = -1;
     if (!isActiveMouseState)
@@ -597,9 +603,11 @@ void Window::Draw(float dltTime)
             cl = 0xff000000;
             if (isMouseDown)
             {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
                 if (GetAsyncKeyState(VK_SHIFT) < 0)
                     listPos -= 3.0f;
                 else
+#endif
                     listPos -= 1.0f;
             }
         }
@@ -615,9 +623,11 @@ void Window::Draw(float dltTime)
             cl = 0xff000000;
             if (isMouseDown)
             {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
                 if (GetAsyncKeyState(VK_SHIFT) < 0)
                     listPos += 3.0f;
                 else
+#endif
                     listPos += 1.0f;
             }
         }
@@ -734,7 +744,10 @@ void Window::DrawLRect(float x1, float y1, float x2, float y2, uint32_t bkgColor
 
 void Window::Print(long color, float xleft, float xright, float y, float scale, bool isAlign, const char *format, ...)
 {
-    _vsnprintf_s(stringBuffer, sizeof(stringBuffer), format, ((char *)&format + sizeof(char *)));
+    va_list args;
+    va_start(args, format);
+    vsnprintf(stringBuffer, sizeof(stringBuffer), format, args);
+    va_end(args);
     auto x = xleft;
     if (isAlign)
     {
@@ -1139,7 +1152,7 @@ long Window::SelPreset()
             if (ini)
             {
                 char sect[32];
-                sprintf_s(sect, "prs%i", ins);
+                sprintf(sect, "prs%i", ins);
                 prsComment[0] = 0;
                 if (!ini->ReadString(sect, "comment", prsComment, 64, ""))
                     prsComment[0] = 0;
@@ -1166,7 +1179,7 @@ void Window::SavePreset(long prs)
     if (!ini)
         return;
     char sect[32];
-    sprintf_s(sect, "prs%i", prs);
+    sprintf(sect, "prs%i", prs);
     for (long i = 0; i < numElements; i++)
     {
         switch (list[i].type)
@@ -1229,7 +1242,7 @@ void Window::LoadPreset(long prs)
     if (!ini)
         return;
     char sect[32];
-    sprintf_s(sect, "prs%i", prs);
+    sprintf(sect, "prs%i", prs);
     for (long i = 0; i < numElements; i++)
     {
         switch (list[i].type)
@@ -1303,8 +1316,8 @@ void Window::LoadPreset(long prs)
 
 char *Window::GenerateName(const char *f, const char *n)
 {
-    strcpy_s(stringBuffer, f);
-    strcat_s(stringBuffer, n);
+    strcpy(stringBuffer, f);
+    strcat(stringBuffer, n);
     for (long i = 0; stringBuffer[i]; i++)
         if (stringBuffer[i] == ' ')
             stringBuffer[i] = '_';

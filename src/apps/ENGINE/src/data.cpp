@@ -1,5 +1,6 @@
 #include "data.h"
 #include "core.h"
+#include "defines.h"
 
 #include "storm/string_compare.hpp"
 
@@ -314,7 +315,7 @@ void DATA::Set(float value)
     }
     Data_type = VAR_FLOAT;
     fValue = value;
-    if (_isnan(fValue))
+    if (isnan(fValue))
         Error("NAN ERROR");
 }
 
@@ -1051,7 +1052,7 @@ bool DATA::Convert(S_TOKEN_TYPE type)
             return true;
         case VAR_STRING:
             Data_type = type;
-            _ltoa_s(lValue, buffer, 10);
+            sprintf(buffer, "%ld", lValue);
             Set(buffer);
             return true;
         default:
@@ -1070,7 +1071,7 @@ bool DATA::Convert(S_TOKEN_TYPE type)
             return true;
         case VAR_STRING:
             Data_type = type;
-            _gcvt(fValue, 10, buffer);
+            gcvt(fValue, 10, buffer);
             Set(buffer);
             return true;
         default:
@@ -2793,7 +2794,7 @@ bool DATA::RefConvert()
 void DATA::BadIndex(uint32_t index, uint32_t array_size)
 {
     char buffer[MAX_PATH];
-    sprintf_s(buffer, "invalid index %d [size:%d]", index, array_size);
+    sprintf(buffer, "invalid index %d [size:%d]", index, array_size);
     Error(buffer);
 }
 

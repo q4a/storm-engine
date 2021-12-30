@@ -12,7 +12,7 @@
 
 #include "ModelArray.h"
 #include "core.h"
-#include "entity.h"
+#include "Entity.h"
 #include "shared/messages.h"
 
 // ============================================================================================
@@ -95,7 +95,7 @@ long ModelArray::CreateModel(const char *modelName, const char *technique, long 
     // Save the model name
     if (strlen(modelName) < MA_MAX_NAME_LENGTH)
     {
-        strcpy_s(model[numModels].name, modelName);
+        strcpy(model[numModels].name, modelName);
     }
     else
     {
@@ -163,7 +163,7 @@ long ModelArray::FindModel(const char *modelName)
     char buf[MA_MAX_NAME_LENGTH];
     if (strlen(modelName) < MA_MAX_NAME_LENGTH)
     {
-        strcpy_s(buf, modelName);
+        strcpy(buf, modelName);
     }
     else
     {
@@ -177,7 +177,7 @@ long ModelArray::FindModel(const char *modelName)
     {
         if (model[i].hash == hash)
         {
-            if (_stricmp(model[i].name, buf) == 0)
+            if (storm::iEquals(std::string_view(model[i].name), std::string_view(buf)))
             {
                 return i;
             }

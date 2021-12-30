@@ -4,6 +4,7 @@
 #include "defines.h"
 
 #include "utf8.h"
+#include <storm/string_compare.hpp>
 
 #define DISCARD_DATABUFFER                                                                                             \
     {                                                                                                                  \
@@ -365,7 +366,7 @@ void TOKEN::LowCase()
 {
     if (pTokenData[0] == 0)
         return;
-    _strlwr(pTokenData);
+    strlwr(pTokenData);
 }
 
 const char *TOKEN::GetData()
@@ -502,7 +503,9 @@ S_TOKEN_TYPE TOKEN::Get(bool bKeepData)
     const auto stt = ProcessToken(Program, bKeepData);
     if (stt == HOLD_COMPILATION)
     {
+#ifdef _WIN32 // FIX_LINUX
         __debugbreak();
+#endif
         // stt == HOLD_COMPILATION;
     }
     return stt;
@@ -1216,7 +1219,7 @@ S_TOKEN_TYPE TOKEN::Keyword2TokenType(const char *pString)
     for (uint32_t n = 0; n < KeywordsHash[hash].dwNum; n++)
     {
         const uint32_t index = KeywordsHash[hash].pIndex[n];
-        if (_stricmp(pString, Keywords[index].name) == 0)
+        if (storm::iEquals(std::string_view(pString), std::string_view(Keywords[index].name)))
         {
             return Keywords[index].type;
         }

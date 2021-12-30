@@ -4,7 +4,11 @@
 
 #include <zlib.h>
 
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
+#else
+#include "core.h"
+#endif
 #include "logging.hpp"
 #include "storm_assert.h"
 
@@ -40,7 +44,7 @@ COMPILER::COMPILER()
     InitInternalFunctions();
     bWriteCodeFile = false;
     bDebugInfo = false;
-    strcpy_s(DebugSourceFileName, "<no debug information>");
+    strcpy(DebugSourceFileName, "<no debug information>");
     DebugSourceLine = 0;
     InstructionPointer = 0;
     pCompileTokenTempBuffer = nullptr;
@@ -48,7 +52,7 @@ COMPILER::COMPILER()
     pRunCodeBase = nullptr;
     SStack.SetVCompiler(this);
     VarTab.SetVCompiler(this);
-    srand(GetTickCount());
+    srand(time(nullptr));
     bEntityUpdate = true;
     pDebExpBuffer = nullptr;
     nDebExpBufferSize = 0;
@@ -192,10 +196,12 @@ void COMPILER::SetProgramDirectory(const char *dir_name)
     {
         const auto len = strlen(dir_name) + strlen("\\") + 1;
         ProgramDirectory = new char[len];
-        strcpy_s(ProgramDirectory, len, dir_name);
-        strcat_s(ProgramDirectory, len, "\\");
+        strcpy(ProgramDirectory, dir_name);
+        strcat(ProgramDirectory, "\\");
     }
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     CDebug->SetProgramDirectory(dir_name);
+#endif
 }
 
 // load file into memory
@@ -210,17 +216,17 @@ char *COMPILER::LoadFile(const char *file_name, uint32_t &file_size, bool bFullP
         if (strncmp(file_name, EngineDir.c_str(), EngineDir.length()) == 0)
         {
             std::string ExePath = fio->_GetExecutableDirectory() + "resource\\shared\\";
-            strcpy_s(buffer, ExePath.c_str());
-            strcat_s(buffer, file_name + EngineDir.length());
+            strcpy(buffer, ExePath.c_str());
+            strcat(buffer, file_name + EngineDir.length());
         }
         else if (ProgramDirectory)
         {
-            strcpy_s(buffer, ProgramDirectory);
-            strcat_s(buffer, file_name);
+            strcpy(buffer, ProgramDirectory);
+            strcat(buffer, file_name);
         }
         else
         {
-            strcpy_s(buffer, file_name);
+            strcpy(buffer, file_name);
         }
     }
 
@@ -280,7 +286,7 @@ void COMPILER::Trace(const char *data_PTR, ...)
     char LogBuffer[4096];
     va_list args;
     va_start(args, data_PTR);
-    _vsnprintf_s(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
+    vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
     va_end(args);
     logTrace_->trace(LogBuffer);
 }
@@ -296,7 +302,7 @@ void COMPILER::DTrace(const char *data_PTR, ...)
     char LogBuffer[4096];
     va_list args;
     va_start(args, data_PTR);
-    _vsnprintf_s(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
+    vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
     va_end(args);
     logTrace_->trace(LogBuffer);
 }
@@ -369,28 +375,30 @@ void COMPILER::SetError(const char *data_PTR, ...)
     char ErrorBuffer[MAX_PATH + BUFSIZ];
     va_list args;
     va_start(args, data_PTR);
-    _vsnprintf_s(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
+    vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
     uint32_t bytes;
     FindErrorSource();
 
     switch (CompilerStage)
     {
     case CS_SYSTEM:
-        sprintf_s(ErrorBuffer, "ERROR in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
+        sprintf(ErrorBuffer, "ERROR in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
         break;
     case CS_COMPILATION:
-        sprintf_s(ErrorBuffer, "COMPILE ERROR in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
+        sprintf(ErrorBuffer, "COMPILE ERROR in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
         break;
     case CS_RUNTIME:
-        sprintf_s(ErrorBuffer, "RUNTIME ERROR in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
+        sprintf(ErrorBuffer, "RUNTIME ERROR in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
         break;
     }
     va_end(args);
 
     logError_->error(ErrorBuffer);
 
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     if (bBreakOnError)
         CDebug->SetTraceMode(TMODE_MAKESTEP);
+#endif
 }
 
 void COMPILER::SetWarning(const char *data_PTR, ...)
@@ -406,11 +414,11 @@ void COMPILER::SetWarning(const char *data_PTR, ...)
         return;
     va_list args;
     va_start(args, data_PTR);
-    _vsnprintf_s(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
+    vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
     uint32_t bytes;
     FindErrorSource();
 
-    sprintf_s(ErrorBuffer, "WARNING in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
+    sprintf(ErrorBuffer, "WARNING in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
     va_end(args);
 
     logTrace_->warn(ErrorBuffer);
@@ -451,11 +459,13 @@ void COMPILER::LoadPreprocess()
         // else bScriptTrace = true;
     }
 
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     auto ini = fio->OpenIniFile(PROJECT_NAME);
     if (ini)
     {
         bBreakOnError = (ini->GetLong("options", "break_on_error", 0) == 1);
     }
+#endif
 }
 
 bool COMPILER::CreateProgram(const char *file_name)
@@ -646,7 +656,7 @@ void COMPILER::DelEventHandler(const char *event_name, const char *func_name)
             continue;
         if (pM->ProcessTime(0))
             continue; // skip events, possible executed on this frame
-        if (_stricmp(pM->pEventName, event_name) == 0)
+        if (storm::iEquals(std::string_view(pM->pEventName), std::string_view(event_name)))
         {
             EventMsg.Del(n);
             n--;
@@ -675,8 +685,10 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
 
     bEventsBreak = false;
 
-    uint32_t nTimeOnEvent = GetTickCount();
+    auto nStartEventTime = std::chrono::system_clock::now();
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     current_debug_mode = CDebug->GetTraceMode();
+#endif
 
     pVD = nullptr;
     if (event_name == nullptr)
@@ -743,23 +755,27 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
             break;
     }
 
-    nTimeOnEvent = GetTickCount() - nTimeOnEvent;
+    std::chrono::duration<double, std::milli> nTimeOnEvent = std::chrono::system_clock::now() - nStartEventTime;
 
-    nRuntimeTicks += nTimeOnEvent;
+    nRuntimeTicks += static_cast<uint32_t>(nTimeOnEvent.count());
 
     pRun_fi = nullptr;
 
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     if (current_debug_mode == TMODE_CONTINUE)
         CDebug->SetTraceMode(TMODE_CONTINUE);
+#endif
     // SetFocus(core.App_Hwnd);        // VANO CHANGES
 
     RDTSC_E(dwRDTSC);
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     // VANO CHANGES - remove in release
     if (core.Controls->GetDebugAsyncKeyState('5') < 0 && core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
     {
         core.Trace("evnt: %d, %s", dwRDTSC, event_name);
     }
+#endif
 
     return pVD;
 }
@@ -882,7 +898,7 @@ bool COMPILER::BC_LoadSegment(const char *file_name)
     // const auto len = strlen(file_name) + 1;
     // SegmentTable[index].name = new char[len];
     // memcpy(SegmentTable[index].name, file_name, len);
-    SegmentTable[index].name = _strdup(file_name);
+    SegmentTable[index].name = strdup(file_name);
     SegmentTable[index].id = id;
     SegmentTable[index].bUnload = false;
     SegmentTable[index].pData = nullptr;
@@ -923,7 +939,7 @@ bool COMPILER::ProcessDebugExpression(const char *pExpression, DATA &Result)
         pDebExpBuffer = newPtr;
         nDebExpBufferSize = nDataSize;
     }
-    sprintf_s(pDebExpBuffer, nDebExpBufferSize, "return %s;", pExpression);
+    sprintf(pDebExpBuffer, "return %s;", pExpression);
     return ProcessDebugExpression0(pDebExpBuffer, Result);
 }
 
@@ -942,7 +958,7 @@ bool COMPILER::SetOnDebugExpression(const char *pLValue, const char *pRValue, DA
         pDebExpBuffer = newPtr;
         nDebExpBufferSize = nDataSize;
     }
-    sprintf_s(pDebExpBuffer, nDataSize, "%s = %s;", pLValue, pRValue);
+    sprintf(pDebExpBuffer, "%s = %s;", pLValue, pRValue);
     return ProcessDebugExpression0(pDebExpBuffer, Result);
 }
 
@@ -1255,7 +1271,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
     float fvalue;
 
     Control_offset = 0;
-    strcpy_s(file_name, Segment.name);
+    strcpy(file_name, Segment.name);
 
     if (pInternalCode == nullptr)
     {
@@ -1283,7 +1299,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
     // CurrentFuncCode = INVALID_FUNC_CODE;
 
     // register functions and variables ---------
-    strcpy_s(func_name, "null");
+    strcpy(func_name, "null");
     inout = 0;
     bracket_inout = 0;
     bFunctionBlock = false;
@@ -1291,7 +1307,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
     Token.SetProgram(pProgram, pProgram);
     if (bDebugInfo)
     {
-        strcpy_s(DebugSourceFileName, Segment.name);
+        strcpy(DebugSourceFileName, Segment.name);
     }
     DebugSourceLine = DSL_INI_VALUE;
     bool bExtern;
@@ -1348,7 +1364,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
             break;
         case DEBUG_FILE_NAME:
             DebugSourceLine = DSL_INI_VALUE;
-            strcpy_s(DebugSourceFileName, Token.GetData());
+            strcpy(DebugSourceFileName, Token.GetData());
             break;
         case INCLUDE_LIBRIARY: {
             SCRIPT_LIBRIARY *pLib;
@@ -1397,13 +1413,13 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
                 if (bDebugInfo)
                 {
                     uint32_t aps;
-                    strcpy_s(dbg_file_name, "#file \"");
-                    strcat_s(dbg_file_name, Token.GetData());
-                    strcat_s(dbg_file_name, "\";");
+                    strcpy(dbg_file_name, "#file \"");
+                    strcat(dbg_file_name, Token.GetData());
+                    strcat(dbg_file_name, "\";");
                     aps = strlen(dbg_file_name);
                     char *pTempS;
                     pTempS = new char[aps + 1];
-                    strcpy_s(pTempS, aps + 1, dbg_file_name);
+                    strcpy(pTempS, dbg_file_name);
                     AppendProgram(pProgram, Program_size, pTempS, aps, false);
                 }
                 AppendProgram(pProgram, Program_size, pApend_file, Append_file_size, true);
@@ -1415,7 +1431,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
             // DefineTable
             if (inout == 0)
             {
-                strcpy_s(var_name, Token.GetData());
+                strcpy(var_name, Token.GetData());
                 di.name = var_name;
                 di.segment_id = Segment.id;
                 Token.Get();
@@ -1514,7 +1530,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
                         Token.Get();           // function name
                         bFunctionBlock = true; // we are stepped into func area
 
-                        strcpy_s(func_name, Token.GetData());
+                        strcpy(func_name, Token.GetData());
 
                         fi.segment_id = Segment.id;
                         if (bExtern)
@@ -1867,7 +1883,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
 
     if (bDebugInfo)
     {
-        strcpy_s(DebugSourceFileName, Segment.name);
+        strcpy(DebugSourceFileName, Segment.name);
         fnsize = strlen(Segment.name);
         CompileToken(Segment, DEBUG_FILE_NAME, 3, (char *)&DebugSourceLine, sizeof(uint32_t), (char *)&fnsize,
                      sizeof(uint32_t), Segment.name, strlen(Segment.name));
@@ -1904,15 +1920,14 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
     uint32_t dwR;
     if (bWriteCodeFile)
     {
-        _splitpath(Segment.name, nullptr, nullptr, file_name, nullptr);
-        strcat_s(file_name, ".b");
-        std::wstring FileNameW = utf8::ConvertUtf8ToWide(file_name);
-        fh = CreateFile(FileNameW.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS,
-                        FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (fh != INVALID_HANDLE_VALUE)
+        auto fName = std::filesystem::path(Segment.name).filename().string();
+        strcpy(file_name, fName.c_str());
+        strcat(file_name, ".b");
+        auto fileS = fio->_CreateFile(file_name, std::ios::binary | std::ios::out);
+        if (fileS.is_open())
         {
-            WriteFile(fh, Segment.pCode, Segment.BCode_Program_size, (LPDWORD)&dwR, nullptr);
-            CloseHandle(fh);
+            fio->_WriteFile(fileS, Segment.pCode, Segment.BCode_Program_size);
+            fio->_CloseFile(fileS);
         }
     }
     return true;
@@ -1964,7 +1979,7 @@ S_TOKEN_TYPE COMPILER::CompileAuxiliaryTokens(SEGMENT_DESC &Segment) //, bool & 
                 SetError("Invalid DBG_FILE_NAME");
                 return DEBUG_FILE_NAME;
             }
-            strcpy_s(DebugSourceFileName, Token.GetData());
+            strcpy(DebugSourceFileName, Token.GetData());
             fnsize = strlen(Token.GetData());
 
             CompileToken(Segment, DEBUG_FILE_NAME, 3, (char *)&DebugSourceLine, sizeof(uint32_t), (char *)&fnsize,
@@ -2103,7 +2118,7 @@ bool COMPILER::CompileBlock(SEGMENT_DESC &Segment, bool &bFunctionBlock, uint32_
                     SetError("Invalid event handler");
                     return false;
                 }
-                strcpy_s(gs, Token.GetData());
+                strcpy(gs, Token.GetData());
             }
             else
             {
@@ -2126,7 +2141,7 @@ bool COMPILER::CompileBlock(SEGMENT_DESC &Segment, bool &bFunctionBlock, uint32_
                         SetError("Invalid define");
                         return false;
                     }
-                    strcpy_s(gs, (char *)di.data4b);
+                    strcpy(gs, (char *)di.data4b);
                 }
                 else
                 {
@@ -3611,7 +3626,9 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
     mem_pfi = pRun_fi;
     mem_codebase = pRunCodeBase;
 
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     nDebugEnterMode = CDebug->GetTraceMode();
+#endif
     uint64_t nTicks;
     if (call_fi.segment_id == INTERNAL_SEGMENT_ID)
     {
@@ -3662,10 +3679,12 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
             core.Trace("Invalid func_code = %u for AddTime", func_code);
         }
     }
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     if (nDebugEnterMode == TMODE_MAKESTEP)
     {
         CDebug->SetTraceMode(TMODE_MAKESTEP);
     }
+#endif
 
     if (pVResult)
     {
@@ -3873,7 +3892,9 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
         switch (Token_type)
         {
         case ARGS_NUM:
+#ifdef _WIN32 // FIX_LINUX
             __debugbreak();
+#endif
             break;
         case STACK_COMPARE:
             pV = SStack.Read();
@@ -4223,6 +4244,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
             if (bDebugExpressionRun)
                 break;
             memcpy(&nDebugTraceLineCode, &pCodeBase[ip], sizeof(uint32_t));
+#ifdef _WIN32 // FIX_LINUX s_debug.h
             if (bTraceMode)
             {
                 if (CDebug->GetTraceMode() == TMODE_MAKESTEP || CDebug->GetTraceMode() == TMODE_MAKESTEP_OVER)
@@ -4230,8 +4252,10 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                     if (CDebug->GetTraceMode() == TMODE_MAKESTEP_OVER && bDebugWaitForThisFunc == false)
                         break;
 
+#ifdef _WIN32
                     if (!CDebug->IsDebug())
                         CDebug->OpenDebugWindow(core.GetAppInstance());
+#endif
                     // else
                     ShowWindow(CDebug->GetWindowHandle(), SW_NORMAL);
 
@@ -4252,8 +4276,10 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                     // check for breakpoint
                     if (CDebug->Breaks.Find(fi.decl_file_name.c_str(), nDebugTraceLineCode))
                     {
+#ifdef _WIN32
                         if (!CDebug->IsDebug())
                             CDebug->OpenDebugWindow(core.GetAppInstance());
+#endif
 
                         ShowWindow(CDebug->GetWindowHandle(), SW_NORMAL);
                         // CDebug->OpenDebugWindow(core.hInstance);
@@ -4271,6 +4297,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                     }
                 }
             }
+#endif
             break;
         case DEBUG_FILE_NAME:
 
@@ -5167,7 +5194,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                 {
                     float fV1;
                     ExpressionResult.Get(fV1);
-                    sprintf_s(gs, "%.7f", fV1);
+                    sprintf(gs, "%.7f", fV1);
                     ExpressionResult.Set(gs);
                 }
                 // 2 signs precision --------------------------------
@@ -5863,8 +5890,8 @@ void COMPILER::SaveDataDebug(char *data_PTR, ...)
     }
     va_list args;
     va_start(args, data_PTR);
-    _vsnprintf_s(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
-    strcat_s(LogBuffer, "\x0d\x0a");
+    vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
+    strcat(LogBuffer, "\x0d\x0a");
     va_end(args);
 }
 
@@ -6040,8 +6067,8 @@ ATTRIBUTES *COMPILER::TraceARoot(ATTRIBUTES *pA, const char *&pAccess)
         memcpy(newPtr, pAS, slen);
         delete[] pAS;
         pAS = newPtr;
-        strcat_s(pAS, len, ".");
-        strcat_s(pAS, len, pAccess);
+        strcat(pAS, ".");
+        strcat(pAS, pAccess);
         delete[] pAccess;
         pAccess = pAS;
     }
@@ -6437,11 +6464,11 @@ void COMPILER::SaveVariable(DATA *pV, bool bdim)
         break;
     case VAR_AREFERENCE:
         pString = nullptr;
-        __try
+        try
         {
             pA = TraceARoot(pV->AttributesClass, pString);
         }
-        __except (EXCEPTION_EXECUTE_HANDLER)
+        catch (...)
         {
             SetError("Save - ARef to non existing attributes branch");
             WriteVDword(0xffffffff);
@@ -6493,9 +6520,9 @@ bool COMPILER::SaveState(std::fstream &fileS)
     EXTDATA_HEADER edh;
     auto *pVDat = static_cast<VDATA *>(core.GetScriptVariable("savefile_info"));
     if (pVDat && pVDat->GetString())
-        sprintf_s(edh.sFileInfo, sizeof(edh.sFileInfo), "%s", pVDat->GetString());
+        sprintf(edh.sFileInfo, "%s", pVDat->GetString());
     else
-        sprintf_s(edh.sFileInfo, sizeof(edh.sFileInfo), "save");
+        sprintf(edh.sFileInfo, "save");
     edh.dwExtDataOffset = 0;
     edh.dwExtDataSize = 0;
 
@@ -6746,9 +6773,9 @@ bool COMPILER::SetSaveData(const char *file_name, void *save_data, long data_siz
     const uint32_t dwFileSize = fio->_GetFileSize(file_name);
     auto *pVDat = static_cast<VDATA *>(core.GetScriptVariable("savefile_info"));
     if (pVDat && pVDat->GetString())
-        sprintf_s(exdh.sFileInfo, sizeof(exdh.sFileInfo), "%s", pVDat->GetString());
+        sprintf(exdh.sFileInfo, "%s", pVDat->GetString());
     else
-        sprintf_s(exdh.sFileInfo, sizeof(exdh.sFileInfo), "save");
+        sprintf(exdh.sFileInfo, "save");
     exdh.dwExtDataOffset = dwFileSize;
     exdh.dwExtDataSize = data_size;
 
@@ -7163,7 +7190,7 @@ void COMPILER::FormatDialog(char *file_name)
     uint32_t nLnk = 0;
 
     // sprintf_s(sFileName,"PROGRAM\\%sc",file_name);
-    strcpy_s(sFileName, file_name);
+    strcpy(sFileName, file_name);
 
     char *pFileData = LoadFile(file_name, FileSize, true);
     if (pFileData == nullptr)
@@ -7178,9 +7205,9 @@ void COMPILER::FormatDialog(char *file_name)
     }
 
     // sprintf_s(sFileName,"PROGRAM\\%s",file_name);
-    strcpy_s(sFileName, file_name);
+    strcpy(sFileName, file_name);
     sFileName[strlen(sFileName) - 1] = 0;
-    strcat_s(sFileName, "h");
+    strcat(sFileName, "h");
     auto fileS2 = fio->_CreateFile(sFileName, std::ios::binary | std::ios_base::out);
     if (!fileS2.is_open())
     {
@@ -7199,14 +7226,14 @@ void COMPILER::FormatDialog(char *file_name)
         if (file_name[n] == '\\')
             break;
     }
-    sprintf_s(sFileName, "DIALOGS%s", static_cast<char *>(file_name + n));
+    sprintf(sFileName, "DIALOGS%s", static_cast<char *>(file_name + n));
     sFileName[strlen(sFileName) - 1] = 0;
-    strcat_s(sFileName, "h");
+    strcat(sFileName, "h");
 
     fio->_WriteFile(fileS, buffer, strlen(buffer));
     fio->_WriteFile(fileS, sNewLine, strlen(sNewLine));
 
-    sprintf_s(buffer, "string DLG_TEXT[0] = {        ");
+    sprintf(buffer, "string DLG_TEXT[0] = {        ");
     fio->_WriteFile(fileS2, buffer, strlen(buffer));
     fio->_WriteFile(fileS2, sNewLine, strlen(sNewLine));
 
@@ -7225,7 +7252,7 @@ void COMPILER::FormatDialog(char *file_name)
                 if (Token.GetData())
                 {
                     // node text --------------------------------------------
-                    if (_stricmp(Token.GetData(), "text") == 0)
+                    if (storm::iEquals(std::string_view(Token.GetData()), "text"))
                     {
                         fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
 
@@ -7234,7 +7261,7 @@ void COMPILER::FormatDialog(char *file_name)
                         // fio->_WriteFile(fhH,sFileName,strlen(sFileName),&dwR);
                         // fio->_WriteFile(fhH,sNewLine,strlen(sNewLine),&dwR);
 
-                        constexpr size_t newline_len = _countof(sNewLine) - 1;
+                        constexpr size_t newline_len = sizeof(sNewLine) - 1;
                         do
                         {
                             Token_type = Token.FormatGet();
@@ -7267,9 +7294,9 @@ void COMPILER::FormatDialog(char *file_name)
                                 else
                                 {
                                     fio->_WriteFile(fileS2, Token.GetData(), strlen(Token.GetData()));
-                                    fio->_WriteFile(fileS2, ",", _countof(",") - 1);
+                                    fio->_WriteFile(fileS2, ",", sizeof(",") - 1);
                                     fio->_WriteFile(fileS2, sNewLine, newline_len);
-                                    sprintf_s(sFileName, "DLG_TEXT[%d]", nTxt);
+                                    sprintf(sFileName, "DLG_TEXT[%d]", nTxt);
                                     fio->_WriteFile(fileS, sFileName, strlen(sFileName));
                                     nTxt++;
                                 }
@@ -7296,7 +7323,7 @@ void COMPILER::FormatDialog(char *file_name)
             if (Token.GetData())
             {
                 fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
-                if (_stricmp(Token.GetData(), "link") == 0)
+                if (storm::iEquals(std::string_view(Token.GetData()), "link"))
                 {
                     Token_type = Token.FormatGet();
                     fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
@@ -7316,7 +7343,7 @@ void COMPILER::FormatDialog(char *file_name)
                             }
                             if (Token_type != DOT)
                             {
-                                constexpr size_t newline_len = _countof(sNewLine) - 1;
+                                constexpr size_t newline_len = sizeof(sNewLine) - 1;
                                 do
                                 {
                                     Token_type = Token.FormatGet();
@@ -7349,9 +7376,9 @@ void COMPILER::FormatDialog(char *file_name)
                                         else
                                         {
                                             fio->_WriteFile(fileS2, Token.GetData(), strlen(Token.GetData()));
-                                            fio->_WriteFile(fileS2, ",", _countof(",") - 1);
+                                            fio->_WriteFile(fileS2, ",", sizeof(",") - 1);
                                             fio->_WriteFile(fileS2, sNewLine, newline_len);
-                                            sprintf_s(sFileName, "DLG_TEXT[%d]", nTxt);
+                                            sprintf(sFileName, "DLG_TEXT[%d]", nTxt);
                                             fio->_WriteFile(fileS, sFileName, strlen(sFileName));
                                             nTxt++;
                                         }
@@ -7383,11 +7410,11 @@ void COMPILER::FormatDialog(char *file_name)
 
     delete[] pFileData;
 
-    sprintf_s(buffer, "};");
+    sprintf(buffer, "};");
     fio->_WriteFile(fileS2, sNewLine, strlen(sNewLine));
     fio->_WriteFile(fileS2, buffer, strlen(buffer));
     fio->_SetFilePointer(fileS2, 0, std::ios::beg);
-    sprintf_s(buffer, "string DLG_TEXT[%d] = {", nTxt);
+    sprintf(buffer, "string DLG_TEXT[%d] = {", nTxt);
     fio->_WriteFile(fileS2, buffer, strlen(buffer));
 
     fio->_CloseFile(fileS2);
@@ -7396,5 +7423,7 @@ void COMPILER::FormatDialog(char *file_name)
 
 void STRING_CODEC::VariableChanged()
 {
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     CDebug->SetTraceMode(TMODE_MAKESTEP);
+#endif
 }

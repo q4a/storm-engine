@@ -42,7 +42,7 @@ bool GetStringLine(char *&pStr, char *bufer, long bufSize)
 
     if (bufSize > 0)
     {
-        strcpy_s(bufer, bufSize, pStart);
+        strcpy(bufer, pStart);
         bufer[bufSize] = 0;
     }
     return true;
@@ -121,7 +121,11 @@ void TMPTELEPORT::Execute(uint32_t Delta_Time)
         }
     }
     long csVal;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
+#else
+    if (false)
+#endif
         csVal = CST_ACTIVE;
     else
         csVal = CST_ACTIVATED;
@@ -361,13 +365,13 @@ bool FINDDIALOGNODES::Init()
             auto nodIdx = 0;
             while (GetStringLine(pStr, param, sizeof(param) - 1))
             {
-                if (strlen(param) < 5 || _strnicmp(param, "case", 4))
+                if (strlen(param) < 5 || !storm::iEquals(std::string_view(param), "case", 4))
                     continue;
                 char param2[512];
                 GetQuotedString(param, param2, sizeof(param2) - 1);
                 if (strlen(param2) > 0)
                 {
-                    sprintf_s(param, "id%d", nodIdx);
+                    sprintf(param, "id%d", nodIdx);
                     nodIdx++;
                     pA->SetAttribute(param, param2);
                 }

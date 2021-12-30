@@ -70,7 +70,7 @@ void CXI_ToolTip::SetByFormatString(XYRECT &rectOwner, INIFILE *pDefIni, const c
 
     m_rActiveZone = rectOwner;
 
-    sprintf_s(pcToolTipType, sizeof(pcToolTipType), "ToolTip");
+    sprintf(pcToolTipType, "ToolTip");
     // TODO: figure out why this was done:
     long m_nMaxStrWidth = -1; //~!~
 
@@ -91,7 +91,7 @@ void CXI_ToolTip::SetByFormatString(XYRECT &rectOwner, INIFILE *pDefIni, const c
                     m_sText = m_pStrService->GetString(m_pStrService->GetStringNum(tokenString));
                 break;
             case InterfaceToken_class:
-                sprintf_s(pcToolTipType, sizeof(pcToolTipType), "%s", tokenString);
+                sprintf(pcToolTipType, "%s", tokenString);
                 break;
             case InterfaceToken_width:
                 m_nMaxStrWidth = CXI_UTILS::StringGetLong(pStr);

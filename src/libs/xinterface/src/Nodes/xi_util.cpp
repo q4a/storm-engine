@@ -59,6 +59,7 @@ char CXI_UTILS::GetKeyInput()
         if (pThis->keys[n].nAsyncKeyCode < 0)
             continue;
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
         if (GetAsyncKeyState(pThis->keys[n].nAsyncKeyCode) < 0)
         {
             pThis->m_bIsKeyPressed = true;
@@ -119,6 +120,7 @@ char CXI_UTILS::GetKeyInput()
         {
             pThis->keys[n].nPressedState = -1;
         }
+#endif
     }
 
     return cRetVal;
@@ -218,27 +220,28 @@ const char *CXI_UTILS::StringGetTokenString(char *&pcString, char *pcBuffer, lon
 
 long CXI_UTILS::StringGetTokenCode(const char *pcTokenID)
 {
-    if (_stricmp(pcTokenID, "color") == 0)
+    auto pcTokenIDView = std::string_view(pcTokenID); 
+    if (storm::iEquals(pcTokenIDView, "color"))
         return InterfaceToken_color;
-    if (_stricmp(pcTokenID, "file") == 0)
+    if (storm::iEquals(pcTokenIDView, "file"))
         return InterfaceToken_file;
-    if (_stricmp(pcTokenID, "piclist") == 0)
+    if (storm::iEquals(pcTokenIDView, "piclist"))
         return InterfaceToken_picture_list;
-    if (_stricmp(pcTokenID, "picname") == 0)
+    if (storm::iEquals(pcTokenIDView, "picname"))
         return InterfaceToken_picture_name;
-    if (_stricmp(pcTokenID, "piccutuv") == 0)
+    if (storm::iEquals(pcTokenIDView, "piccutuv"))
         return InterfaceToken_picture_cut_uv;
-    if (_stricmp(pcTokenID, "size") == 0)
+    if (storm::iEquals(pcTokenIDView, "size"))
         return InterfaceToken_size;
-    if (_stricmp(pcTokenID, "rectUV") == 0)
+    if (storm::iEquals(pcTokenIDView, "rectUV"))
         return InterfaceToken_rectUV;
-    if (_stricmp(pcTokenID, "pos") == 0)
+    if (storm::iEquals(pcTokenIDView, "pos"))
         return InterfaceToken_pos;
-    if (_stricmp(pcTokenID, "text") == 0)
+    if (storm::iEquals(pcTokenIDView, "text"))
         return InterfaceToken_text;
-    if (_stricmp(pcTokenID, "width") == 0)
+    if (storm::iEquals(pcTokenIDView, "width"))
         return InterfaceToken_width;
-    if (_stricmp(pcTokenID, "class") == 0)
+    if (storm::iEquals(pcTokenIDView, "class"))
         return InterfaceToken_class;
 
     return InterfaceToken_unknown;
@@ -417,7 +420,7 @@ float CXI_UTILS::GetByStrNumFromAttribute_Float(ATTRIBUTES *pA, const char *pStr
     if (!pA)
         return fDefValue;
     char stmp[64];
-    sprintf_s(stmp, sizeof(stmp), "%s%d", pStr, num);
+    sprintf(stmp, "%s%d", pStr, num);
     return pA->GetAttributeAsFloat(stmp, fDefValue);
 }
 
@@ -510,7 +513,7 @@ void CXI_UTILS::PrintTextIntoWindow(VDX9RENDER *pRender, long nFont, uint32_t dw
     }
 
     char tmpstr[4096];
-    sprintf_s(tmpstr, sizeof(tmpstr), "%s", pcString);
+    sprintf(tmpstr, "%s", pcString);
     char *pc = tmpstr;
 
     // cut the left edge

@@ -192,8 +192,8 @@ void ShipLights::AddFlare(VAI_OBJBASE *pObject, bool bLight, MODEL *pModel, cons
     ZERO(str);
     if (!label.name)
         return;
-    strcpy_s(str, label.name);
-    _strlwr(str);
+    strcpy(str, label.name);
+    strlwr(str);
 
     aLights.push_back(ShipLight{});
     // ShipLight * pL = &aLights[aLights.Add()];
@@ -225,20 +225,20 @@ void ShipLights::AddFlare(VAI_OBJBASE *pObject, bool bLight, MODEL *pModel, cons
         }
         int iMastIndex = atoi(str2);
 
-        sprintf_s(str2, "mast%d", iMastIndex);
+        sprintf(str2, "mast%d", iMastIndex);
         // rey found
         if (str[1] == 'm')
         {
             if (str[3] >= 'a' && str[3] <= 'z')
             {
-                sprintf_s(str2, "rey_%c%d", str[3], iMastIndex);
+                sprintf(str2, "rey_%c%d", str[3], iMastIndex);
             }
         }
         else
         {
             if (str[5] >= 'a' && str[5] <= 'z')
             {
-                sprintf_s(str2, "rey_%c%d", str[5], iMastIndex);
+                sprintf(str2, "rey_%c%d", str[5], iMastIndex);
             }
         }
 

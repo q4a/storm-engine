@@ -103,7 +103,7 @@ bool GetNextIdFromList(char *&sptr, char *bufQuestID, size_t nSizeBufQuestID, ch
         return false;
     if (static_cast<size_t>(idSize) >= bufSize)
         idSize = bufSize - 1;
-    strncpy_s(buf, bufSize, sstart, idSize);
+    strncpy(buf, sstart, idSize);
     buf[idSize] = 0;
     return true;
 }
@@ -160,7 +160,7 @@ bool CXI_QUESTTEXTS::GetLineNext(int fontNum, char *&pInStr, char *buf, int bufS
         lineSize = bufSize - 1 - utf8::u8_dec(pStart + bufSize - 1);
     }
 
-    strncpy_s(buf, bufSize, pStart, lineSize);
+    strncpy(buf, pStart, lineSize);
     buf[lineSize] = 0;
     const auto strWidth = m_rs->StringWidth(buf, fontNum);
     if (strWidth <= m_rect.right - m_rect.left)
@@ -292,7 +292,7 @@ void CXI_QUESTTEXTS::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 

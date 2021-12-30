@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Cvector.h"
+#include "math3d/Matrix.h"
 #include <d3d9.h>
+#ifdef _WIN32
 #include <d3dx9.h>
+#endif
 
 //============================================================================================
 
@@ -95,6 +98,7 @@ class CMatrix
 
     // Equal
     void operator=(const CMatrix &matrix);
+    void operator=(const Matrix &matrix);
 
     // Multiply
     void operator*=(CMatrix &matrix);
@@ -157,7 +161,9 @@ class CMatrix
     void BuildMirrorMatrix(float Nx, float Ny, float Nz, float D);
 
     // D3D extends (return (D3DXMATRIX *)pointer)
+#ifdef _WIN32
     operator D3DXMATRIX *() const;
+#endif
     operator D3DMATRIX *() const;
     operator const float *() const;
 };
@@ -397,6 +403,26 @@ inline void CMatrix::operator=(const CMatrix &matrix)
       mov        ecx, 16
       rep        movsd
     }*/
+}
+
+inline void CMatrix::operator=(const Matrix &matrix)
+{
+    this->matrix[0] = matrix.matrix[0];
+    this->matrix[1] = matrix.matrix[1];
+    this->matrix[2] = matrix.matrix[2];
+    this->matrix[3] = matrix.matrix[3];
+    this->matrix[4] = matrix.matrix[4];
+    this->matrix[5] = matrix.matrix[5];
+    this->matrix[6] = matrix.matrix[6];
+    this->matrix[7] = matrix.matrix[7];
+    this->matrix[8] = matrix.matrix[8];
+    this->matrix[9] = matrix.matrix[9];
+    this->matrix[10] = matrix.matrix[10];
+    this->matrix[11] = matrix.matrix[11];
+    this->matrix[12] = matrix.matrix[12];
+    this->matrix[13] = matrix.matrix[13];
+    this->matrix[14] = matrix.matrix[14];
+    this->matrix[15] = matrix.matrix[15];
 }
 
 // Multiply
@@ -868,11 +894,13 @@ inline void CMatrix::BuildMirrorMatrix(float Nx, float Ny, float Nz, float D)
     m[3][3] = 1.0f;
 }
 
+#ifdef _WIN32
 // D3D extends (return (D3DXMATRIX *)pointer)
 inline CMatrix::operator D3DXMATRIX *() const
 {
     return ((D3DXMATRIX *)matrix);
 };
+#endif
 
 // D3D extends (return (D3DMATRIX *)pointer)
 inline CMatrix::operator D3DMATRIX *() const

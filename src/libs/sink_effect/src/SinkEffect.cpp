@@ -1,4 +1,4 @@
-#include "SinkEffect.H"
+#include "SinkEffect.h"
 #include "Entity.h"
 #include "core.h"
 #include "shared/messages.h"

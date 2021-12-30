@@ -1,4 +1,8 @@
-#include <io.h>
+#ifdef _WIN32
+#include <corecrt_io.h>
+#else
+#include <unistd.h>
+#endif
 
 #include "core.h"
 #include "sdevice.h"
@@ -6,6 +10,7 @@
 
 void DX9RENDER::PrepareCapture()
 {
+#ifdef _WIN32 // FIX_LINUX BITMAP_AND_OTHER
     hDesktopDC = GetDC(core.GetAppHWND());
     hCaptureDC = CreateCompatibleDC(hDesktopDC);
     hCaptureBitmap = CreateCompatibleBitmap(hDesktopDC, screen_size.x, screen_size.y);
@@ -18,6 +23,7 @@ void DX9RENDER::PrepareCapture()
     GetDIBits(hCaptureDC, hCaptureBitmap, 0, screen_size.y, nullptr, lpbi, DIB_RGB_COLORS);
 
     bPreparedCapture = true;
+#endif
 }
 
 void DX9RENDER::SaveCaptureBuffers()
@@ -28,8 +34,8 @@ void DX9RENDER::SaveCaptureBuffers()
     long fi;
     for (fi = iCaptureFrameIndex; fi < iCaptureFrameIndex + 10000; fi++)
     {
-        sprintf_s(cFileName, "k3cap_%04d.tga", fi);
-        if (_access(cFileName, 0) == -1)
+        sprintf(cFileName, "k3cap_%04d.tga", fi);
+        if (access(cFileName, 0) == -1)
             break;
     }
 
@@ -38,7 +44,7 @@ void DX9RENDER::SaveCaptureBuffers()
         TGA_H TgaHead = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32};
         TgaHead.width = static_cast<uint16_t>(screen_size.x);
         TgaHead.height = static_cast<uint16_t>(screen_size.y);
-        sprintf_s(cFileName, "k3cap_%04d.tga", fi + i);
+        sprintf(cFileName, "k3cap_%04d.tga", fi + i);
         auto fileS = fio->_CreateFile(cFileName, std::ios::binary | std::ios::out);
         fio->_WriteFile(fileS, &TgaHead, sizeof(TGA_H));
         fio->_WriteFile(fileS, aCaptureBuffers[i], screen_size.x * screen_size.y * sizeof(uint32_t));
@@ -47,7 +53,9 @@ void DX9RENDER::SaveCaptureBuffers()
 
     iCaptureFrameIndex = fi + dwCaptureBuffersReady + 1;
 
+#ifdef _WIN32 // FIX_LINUX
     _flushall();
+#endif
     dwCaptureBuffersReady = 0;
 }
 
@@ -59,6 +67,7 @@ bool DX9RENDER::MakeCapture()
     if (!bPreparedCapture)
         PrepareCapture();
 
+#ifdef _WIN32 // FIX_LINUX BITMAP_AND_OTHER
     if (dwCaptureBuffersReady >= aCaptureBuffers.size())
     {
         Beep(1000, 150);
@@ -73,4 +82,7 @@ bool DX9RENDER::MakeCapture()
               DIB_RGB_COLORS);
     dwCaptureBuffersReady++;
     return true;
+#else
+    return false;
+#endif
 }

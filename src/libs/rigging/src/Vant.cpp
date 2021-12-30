@@ -129,7 +129,7 @@ void VANT_BASE::Realize(uint32_t Delta_Time)
                 static_cast<SHIP_BASE *>(EntityManager::GetEntityPointer(gdata[gn].shipEI))->SetLightAndFog(true);
                 static_cast<SHIP_BASE *>(EntityManager::GetEntityPointer(gdata[gn].shipEI))->SetLights();
 
-                RenderService->SetTransform(D3DTS_WORLD, (D3DXMATRIX *)gdata[gn].pMatWorld);
+                RenderService->SetTransform(D3DTS_WORLD, *gdata[gn].pMatWorld);
                 RenderService->DrawBuffer(vBuf, sizeof(VANTVERTEX), iBuf, 0, nVert, gdata[gn].sIndx, gdata[gn].nIndx);
 
                 static_cast<SHIP_BASE *>(EntityManager::GetEntityPointer(gdata[gn].shipEI))->UnSetLights();
@@ -638,7 +638,7 @@ void VANT::LoadIni()
         throw std::runtime_error("rigging.ini file not found!");
     }
 
-    sprintf_s(section, "VANTS");
+    sprintf(section, "VANTS");
 
     // texture name
     ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");

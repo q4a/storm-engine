@@ -38,7 +38,7 @@ class ISPYGLASS : public Entity
     {
         VDX9RENDER *rs;
         long nFontID;
-        POINT pos;
+        LPOINT pos;
         float fScale;
         uint32_t dwColor;
         std::string sText;

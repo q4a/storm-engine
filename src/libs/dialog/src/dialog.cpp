@@ -98,7 +98,7 @@ void DIALOG::DlgTextDescribe::Init(VDX9RENDER *pRS, D3DVIEWPORT9 &vp, INIFILE *p
     if (pIni)
         pIni->ReadString("DIALOG", "mainfont", FName, MAX_PATH, "DIALOG2");
     else
-        strcpy_s(FName, "DIALOG2");
+        strcpy(FName, "DIALOG2");
     nFontID = rs->LoadFont(FName);
 
     dwColor = ARGB(255, 210, 227, 227);
@@ -226,7 +226,7 @@ void DIALOG::DlgLinkDescribe::Init(VDX9RENDER *pRS, D3DVIEWPORT9 &vp, INIFILE *p
     if (pIni)
         pIni->ReadString("DIALOG", "subfont", FName, MAX_PATH, "DIALOG3");
     else
-        strcpy_s(FName, "DIALOG3");
+        strcpy(FName, "DIALOG3");
     nFontID = rs->LoadFont(FName);
 
     dwColor = 0xFF808080;
@@ -302,6 +302,7 @@ void DIALOG::DlgLinkDescribe::ShowEditMode(long nX, long nY, long nTextIdx)
                 {
                     switch (pKeys[n].ucVKey.c)
                     {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
                     case VK_LEFT:
                         if (nEditCharIndex > 0)
                             nEditCharIndex--;
@@ -331,6 +332,7 @@ void DIALOG::DlgLinkDescribe::ShowEditMode(long nX, long nY, long nTextIdx)
                         }
                     }
                     break;
+#endif
                     }
                     continue;
                 }
@@ -404,7 +406,7 @@ DIALOG::DIALOG()
 
     m_bDlgChanged = true;
 
-    strcpy_s(charDefSnd, "\0");
+    strcpy(charDefSnd, "\0");
 
     bEditMode = false;
     m_DlgLinks.SetDlg(this);
@@ -1049,15 +1051,15 @@ void DIALOG::Realize(uint32_t Delta_Time)
             if (pA)
             {
                 char *goName = pA->GetAttribute("go");
-                if (!goName || _stricmp(goName, selectedLinkName) == 0)
+                if (!goName || storm::iEquals(std::string_view(goName), selectedLinkName))
                     EmergencyExit();
                 else
                 {
                     AttributesPointer->SetAttribute("CurrentNode", goName);
-                    strcpy_s(selectedLinkName, goName);
+                    strcpy(selectedLinkName, goName);
 
                     // set default
-                    strcpy_s(soundName, charDefSnd);
+                    strcpy(soundName, charDefSnd);
                     core.Event("DialogEvent");
                 }
             }
@@ -1101,16 +1103,16 @@ uint32_t DIALOG::AttributeChanged(ATTRIBUTES *pA)
     if (par != nullptr)
     {
         const char *parname = par->GetThisName();
-        if (parname != nullptr && _stricmp(parname, "Links") == 0)
+        if (parname != nullptr && storm::iEquals(std::string_view(parname), "Links"))
             parLinks = true;
     }
 
     const char *nm = pA->GetThisName();
 
     // play sound d.speech
-    if (!parLinks && nm && _stricmp(nm, "greeting") == 0) // was "snd"
+    if (!parLinks && nm && storm::iEquals(std::string_view(nm), "greeting")) // was "snd"
     {
-        strcpy_s(soundName, pA->GetThisAttr());
+        strcpy(soundName, pA->GetThisAttr());
         if (start)
             play = 0;
     }

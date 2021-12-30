@@ -12,7 +12,11 @@
 #include "Entity.h"
 #include "core.h"
 
+#ifdef _WIN32
 #include <corecrt_io.h>
+#else
+#include <unistd.h>
+#endif
 
 // ============================================================================================
 // Construction, destruction
@@ -50,13 +54,13 @@ LGeometry::~LGeometry()
 // Set path to models
 void LGeometry::SetModelsPath(const char *mPath)
 {
-    strcpy_s(modelsPath, mPath);
+    strcpy(modelsPath, mPath);
 }
 
 // Set path for current weather
 void LGeometry::SetLightPath(const char *lPath)
 {
-    strcpy_s(lightPath, lPath);
+    strcpy(lightPath, lPath);
 }
 
 // Add object
@@ -70,19 +74,18 @@ void LGeometry::AddObject(const char *name, entid_t model)
     auto len = strlen(name) + strlen(modelsPath) + 8;
     object[numObjects].nameReal = new char[len];
     object[numObjects].nameReal[0] = 0;
-    strcat_s(object[numObjects].nameReal, len, modelsPath);
-    strcat_s(object[numObjects].nameReal, len, name);
-    strcat_s(object[numObjects].nameReal, len, ".gm");
+    strcat(object[numObjects].nameReal, modelsPath);
+    strcat(object[numObjects].nameReal, name);
+    strcat(object[numObjects].nameReal, ".gm");
     object[numObjects].name = new char[strlen(name) + 2048];
-    len = strlen(name) + 2048;
     object[numObjects].name[0] = 0;
-    strcat_s(object[numObjects].name, len, "resource\\models\\");
-    strcat_s(object[numObjects].name, len, modelsPath);
-    strcat_s(object[numObjects].name, len, "\\");
-    strcat_s(object[numObjects].name, len, name);
-    strcat_s(object[numObjects].name, len, "_");
-    strcat_s(object[numObjects].name, len, lightPath);
-    strcat_s(object[numObjects].name, len, ".col");
+    strcat(object[numObjects].name, "resource\\models\\");
+    strcat(object[numObjects].name, modelsPath);
+    strcat(object[numObjects].name, "\\");
+    strcat(object[numObjects].name, name);
+    strcat(object[numObjects].name, "_");
+    strcat(object[numObjects].name, lightPath);
+    strcat(object[numObjects].name, ".col");
     auto *const str = object[numObjects].name;
     for (long s = 0, d = 0; str[d]; s++)
     {
@@ -466,7 +469,7 @@ bool LGeometry::Save()
             if (dir[p] == '\\')
             {
                 dir[p] = 0;
-                if (_access(dir, 0) == -1)
+                if (access(dir, 0) == -1)
                 {
                     if (!fio->_CreateDirectory(dir))
                     {

@@ -6,10 +6,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <format>
 
-#include <Windows.h>
+#include <windows.h>
 
 #include <fileapi.h>
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 #include <spdlog/common.h>

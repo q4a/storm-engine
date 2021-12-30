@@ -1,6 +1,7 @@
 #include "InfoHandler.h"
 
 #include "core.h"
+#include "defines.h"
 
 #include "vmodule_api.h"
 
@@ -339,7 +340,7 @@ char *InfoHandler::GetCutString(char *pstr, int nOutWidth, float fScale) const
             if (n >= 1023)
                 break;
 
-            strncpy_s(param, pstr, n);
+            strncpy(param, pstr, n);
             param[n] = 0;
             const int j = m_rs->StringWidth(param, 0, fScale);
             if (j < nOutWidth)
@@ -364,7 +365,7 @@ char *InfoHandler::GetCutString(char *pstr, int nOutWidth, float fScale) const
         ps = pstr + nt;
     }
 
-    strncpy_s(param, pstr, nt);
+    strncpy(param, pstr, nt);
     param[nt] = 0;
     const int jt = m_rs->StringWidth(param, 0, fScale);
     if (jt < nOutWidth)
@@ -394,7 +395,7 @@ void InfoHandler::StringToBufer(char *outStr, int sizeBuf, char *inStr, int copy
     if (n < 1)
         return;
 
-    strncpy_s(outStr, sizeBuf, inStr, n);
+    strncpy(outStr, inStr, n);
     outStr[n] = 0;
 }
 

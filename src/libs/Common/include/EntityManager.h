@@ -216,7 +216,7 @@ class EntityManager final
         VMA *pClass = nullptr;
         for (const auto &c : __STORM_CLASSES_REGISTRY)
         {
-            if (c->GetHash() == hash && _stricmp(name, c->GetName()) == 0)
+            if (c->GetHash() == hash && storm::iEquals(std::string_view(name), std::string_view(c->GetName())))
             {
                 pClass = c;
                 break;
@@ -347,7 +347,7 @@ class EntityManager final
     }
 
     /* this is (temporary) workaround solution */
-    static constexpr AllEntIterators GetEntityIdIterators()
+    static AllEntIterators GetEntityIdIterators()
     {
         return std::pair{std::begin(entities_.first), std::begin(entities_.first) + entities_.second};
     }

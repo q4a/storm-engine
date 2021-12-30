@@ -52,7 +52,7 @@ void DataString::Write(MemFile *File) const
 {
     static char WriteTempString[128];
     memset(WriteTempString, 0, 128);
-    strncpy_s(WriteTempString, GetValue(), 128);
+    strncpy(WriteTempString, GetValue(), 128);
     File->Write(WriteTempString, 128);
 
     // save name

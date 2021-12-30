@@ -5,7 +5,7 @@
 #include "../sea/ships_list.h"
 #include "controls.h"
 #include "core.h"
-#include "entity.h"
+#include "Entity.h"
 #include "math3d/Sphere.h"
 #include "message.h"
 #include "shared/battle_interface/msg_control.h"
@@ -575,7 +575,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     // distance to -->
     if (fSailTo >= 0.f)
     {
-        sprintf_s(param, sizeof(param), "%.1f", fSailTo);
+        sprintf(param, "%.1f", fSailTo);
         m_txtSailTo.sText = param;
     }
     else
@@ -585,7 +585,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     // boal <--
     if (fShipSpeed >= 0.f)
     {
-        sprintf_s(param, sizeof(param), "%.1f", fShipSpeed);
+        sprintf(param, "%.1f", fShipSpeed);
         m_txtShipSpeed.sText = param;
     }
     else
@@ -595,7 +595,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
 
     if (nCurCannons >= 0 && nMaxCannons >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d/%d", nCurCannons, nMaxCannons);
+        sprintf(param, "%d/%d", nCurCannons, nMaxCannons);
         m_txtCannons.sText = param;
         if (m_Cannon.pImage)
             m_Cannon.pImage->CutSide(0.f, 0.f, 0.f, 0.f); // show
@@ -645,7 +645,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
 
     if (nShipCrew >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d", nShipCrew);
+        sprintf(param, "%d", nShipCrew);
         m_txtShipCrew.sText = param;
     }
     else
@@ -699,9 +699,9 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     if (m_CaptainFace.pImage)
     {
         if (nFace >= 0)
-            sprintf_s(param, sizeof(param), "battle_interface\\portraits\\face_%d.tga", nFace);
+            sprintf(param, "battle_interface\\portraits\\face_%d.tga", nFace);
         else
-            sprintf_s(param, sizeof(param), "%s", pcFaceTexture);
+            sprintf(param, "%s", pcFaceTexture);
         FRECT frUV;
         frUV.left = 0.f;
         frUV.right = 1.f;
@@ -712,7 +712,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     // further edit the skill icons to hide / show
     if (nFencing >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d", nFencing);
+        sprintf(param, "%d", nFencing);
         m_TextCaptainFencing.sText = param;
         if (m_ImgCaptainFencing.pImage)
             m_ImgCaptainFencing.pImage->CutSide(0.f, 0.f, 0.f, 0.f);
@@ -725,7 +725,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
 
     if (nCannon >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d", nCannon);
+        sprintf(param, "%d", nCannon);
         m_TextCaptainCannon.sText = param;
         if (m_ImgCaptainCannon.pImage)
             m_ImgCaptainCannon.pImage->CutSide(0.f, 0.f, 0.f, 0.f);
@@ -737,7 +737,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     }
     if (nAccuracy >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d", nAccuracy);
+        sprintf(param, "%d", nAccuracy);
         m_TextCaptainAccuracy.sText = param;
         if (m_ImgCaptainAccuracy.pImage)
             m_ImgCaptainAccuracy.pImage->CutSide(0.f, 0.f, 0.f, 0.f);
@@ -749,7 +749,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     }
     if (nNavigation >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d", nNavigation);
+        sprintf(param, "%d", nNavigation);
         m_TextCaptainNavigation.sText = param;
         if (m_ImgCaptainNavigation.pImage)
             m_ImgCaptainNavigation.pImage->CutSide(0.f, 0.f, 0.f, 0.f);
@@ -761,7 +761,7 @@ void ISPYGLASS::ChangeTargetData(const char *pcShipName, const char *pcShipType,
     }
     if (nBoarding >= 0)
     {
-        sprintf_s(param, sizeof(param), "%d", nBoarding);
+        sprintf(param, "%d", nBoarding);
         m_TextCaptainBoarding.sText = param;
         if (m_ImgCaptainBoarding.pImage)
             m_ImgCaptainBoarding.pImage->CutSide(0.f, 0.f, 0.f, 0.f);

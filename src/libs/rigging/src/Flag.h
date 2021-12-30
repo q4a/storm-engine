@@ -2,7 +2,7 @@
 
 #include "dx9render.h"
 #include "geos.h"
-#include "matrix.h"
+#include "Matrix.h"
 #include "model.h"
 
 #include <filesystem>
@@ -158,7 +158,7 @@ class FLAG : public Entity
     FLAGLXVERTEX *vertBuf;
     uint16_t *indxBuf;
 
-    D3DXMATRIX rootMatrix;
+    CMatrix rootMatrix;
 
     long vBuf, iBuf;
     uint32_t nVert, nIndx;

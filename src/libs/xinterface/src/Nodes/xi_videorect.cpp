@@ -1,6 +1,6 @@
 #include "xi_videorect.h"
 #include "../base_video.h"
-#include "entity.h"
+#include "Entity.h"
 
 CXI_VIDEORECT::CXI_VIDEORECT()
     : m_dwColor(0), m_eiVideo(0)
@@ -95,7 +95,7 @@ void CXI_VIDEORECT::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 

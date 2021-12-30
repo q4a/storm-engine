@@ -108,7 +108,7 @@ void CXI_IMGCOLLECTION::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2,
     if (ini1->ReadString(name1, "picture", param, sizeof(param) - 1, ""))
         do
         {
-            if (_strnicmp(param, "editsection:", 12) != 0)
+            if (!storm::iEquals(std::string_view(param), "editsection:", 12))
                 imgQuantity++;
         } while (ini1->ReadStringNext(name1, "picture", param, sizeof(param) - 1));
 
@@ -136,7 +136,7 @@ void CXI_IMGCOLLECTION::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2,
             ini1->ReadString(name1, "picture", param, sizeof(param) - 1, "");
             for (auto i = 0; i < imgQuantity; i++)
             {
-                if (_strnicmp(param, "editsection:", 12) != 0)
+                if (!storm::iEquals(std::string_view(param), "editsection:", 12))
                 {
                     auto dwColor = ARGB(255, 128, 128, 128);
                     char param2[256];
@@ -174,7 +174,7 @@ void CXI_IMGCOLLECTION::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2,
                 }
                 else
                 {
-                    if (_stricmp(&param[12], "end") == 0)
+                    if (storm::iEquals(std::string_view(&param[12]), "end"))
                     {
                         n = m_aSections.size() - 1;
                         if (n >= 0)
@@ -338,7 +338,7 @@ void CXI_IMGCOLLECTION::SaveParametersToIni()
 
     pIni->DeleteSection(m_nodeName);
 
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d", m_xyCommonOffset.x, m_xyCommonOffset.y);
+    sprintf(pcWriteParam, "%d,%d", m_xyCommonOffset.x, m_xyCommonOffset.y);
     pIni->AddString(m_nodeName, "offset", pcWriteParam);
 
     long n;
@@ -359,7 +359,7 @@ void CXI_IMGCOLLECTION::SaveParametersToIni()
             {
                 if (n == m_aSections[nGrp].nStartNum)
                 {
-                    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "editsection:%s", m_aSections[nGrp].sName.c_str());
+                    sprintf(pcWriteParam, "editsection:%s", m_aSections[nGrp].sName.c_str());
                     pIni->AddString(m_nodeName, "picture", pcWriteParam);
                 }
                 /*else
@@ -368,7 +368,7 @@ void CXI_IMGCOLLECTION::SaveParametersToIni()
                     pIni->AddString( m_nodeName, "picture", "editsection:end" );
                   }*/
             }
-            sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%s,col:{%d,%d,%d,%d},pos:{%d,%d,%d,%d}",
+            sprintf(pcWriteParam, "%s,col:{%d,%d,%d,%d},pos:{%d,%d,%d,%d}",
                       m_aEditInfo[n].sName.c_str(), ALPHA(m_aEditInfo[n].dwColor), RED(m_aEditInfo[n].dwColor),
                       GREEN(m_aEditInfo[n].dwColor), BLUE(m_aEditInfo[n].dwColor), m_aEditInfo[n].nLeft,
                       m_aEditInfo[n].nTop, m_aEditInfo[n].nRight, m_aEditInfo[n].nBottom);
@@ -405,7 +405,7 @@ uint32_t CXI_IMGCOLLECTION::MessageProc(long msgcode, MESSAGE &message)
     {
         const std::string &param = message.String();
 
-        if (!sGroupName || _stricmp(sGroupName, param.c_str()) != 0)
+        if (!sGroupName || !storm::iEquals(std::string_view(sGroupName), param))
         {
             STORM_DELETE(sGroupName);
             PICTURE_TEXTURE_RELEASE(pPictureService, sGroupName, texl);

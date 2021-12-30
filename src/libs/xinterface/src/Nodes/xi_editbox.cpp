@@ -165,7 +165,7 @@ int CXI_EDITBOX::CommandExecute(int wActCode)
             {
             case '*':
                 if (tmpstr)
-                    sprintf_s(param, "%s", tmpstr);
+                    sprintf(param, "%s", tmpstr);
                 if (strlen(param) > 0)
                     param[strlen(param) - 1] = 0;
                 pA->SetAttribute("strdata", param);
@@ -173,9 +173,9 @@ int CXI_EDITBOX::CommandExecute(int wActCode)
                 break;
             case '^':
                 if (tmpstr)
-                    sprintf_s(param, "%s ", tmpstr);
+                    sprintf(param, "%s ", tmpstr);
                 else
-                    sprintf_s(param, " ");
+                    sprintf(param, " ");
                 break;
             case '~':
                 core.Event("NodeOk", "s", m_nodeName);
@@ -191,9 +191,9 @@ int CXI_EDITBOX::CommandExecute(int wActCode)
                 break;
             default:
                 if (tmpstr)
-                    sprintf_s(param, "%s%c", tmpstr, m_alpha[m_bUpChrRegistrOffset + m_nCurAlphaNum]);
+                    sprintf(param, "%s%c", tmpstr, m_alpha[m_bUpChrRegistrOffset + m_nCurAlphaNum]);
                 else
-                    sprintf_s(param, "%c", m_alpha[m_bUpChrRegistrOffset + m_nCurAlphaNum]);
+                    sprintf(param, "%c", m_alpha[m_bUpChrRegistrOffset + m_nCurAlphaNum]);
             }
             int nLimit = pA->GetAttributeAsDword("maxlen", 0);
             if (nLimit > 0 && static_cast<int>(strlen(param)) > nLimit)
@@ -353,7 +353,7 @@ void CXI_EDITBOX::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 
@@ -405,7 +405,7 @@ void CXI_EDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const
         int nLen = strlen(pTmpStr);
         if (nLen > sizeof(m_alpha) / 2 - 1)
             nLen = sizeof(m_alpha) / 2 - 1;
-        strncpy_s(m_alpha, pTmpStr, nLen);
+        strncpy(m_alpha, pTmpStr, nLen);
         // m_alpha[nLen] = 0;
         m_nAlphaQuantity = strlen(m_alpha);
     }
@@ -417,7 +417,7 @@ void CXI_EDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const
         auto len = strlen(pTmpStr) + 1;
         if (len > sizeof(m_alpha) / 2 - 1)
             len = sizeof(m_alpha) / 2 - 1;
-        strcpy_s(&m_alpha[sizeof(m_alpha) / 2], len, pTmpStr);
+        strcpy(&m_alpha[sizeof(m_alpha) / 2], pTmpStr);
         // m_alpha[len+sizeof(m_alpha)/2] = 0;
 
         if (static_cast<size_t>(m_nAlphaQuantity) != strlen(&m_alpha[sizeof(m_alpha) / 2]))

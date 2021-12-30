@@ -100,6 +100,7 @@ bool PCS_CONTROLS::GetSystemControlDesc(long code, SYSTEM_CONTROL_DESC &_control
         _control_desc_struct.ControlType = SYSTEM_CONTROL_DESC::CT_AXIS;
         _control_desc_struct.pControlName = "Mouse Y axis";
         break;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     case VK_LBUTTON:
         _control_desc_struct.ControlType = SYSTEM_CONTROL_DESC::CT_BUTTON;
         _control_desc_struct.pControlName = "Mouse left button";
@@ -112,6 +113,7 @@ bool PCS_CONTROLS::GetSystemControlDesc(long code, SYSTEM_CONTROL_DESC &_control
         _control_desc_struct.ControlType = SYSTEM_CONTROL_DESC::CT_BUTTON;
         _control_desc_struct.pControlName = "Mouse middle button";
         break;
+#endif
     default:
         _control_desc_struct.ControlType = SYSTEM_CONTROL_DESC::CT_BUTTON;
         _control_desc_struct.pControlName = "Keyboard button";
@@ -127,7 +129,7 @@ long PCS_CONTROLS::CreateControl(const char *control_name)
         return INVALID_CONTROL_CODE;
     for (n = 0; n < nControlsNum; n++)
     {
-        if (_stricmp(control_name, pUserControls[n].name) == 0)
+        if (storm::iEquals(std::string_view(control_name), std::string_view(pUserControls[n].name)))
             return n;
     }
     n = nControlsNum;
@@ -227,7 +229,7 @@ bool PCS_CONTROLS::GetControlState(const char *control_name, CONTROL_STATE &_sta
         return false;
     for (n = 0; n < nControlsNum; n++)
     {
-        if (_stricmp(control_name, pUserControls[n].name) == 0)
+        if (storm::iEquals(std::string_view(control_name), std::string_view(pUserControls[n].name)))
         {
             if (pUserControls[n].bLocked)
             {
@@ -507,7 +509,7 @@ bool PCS_CONTROLS::SetControlState(const char *control_name, CONTROL_STATE &_sta
         return false;
     for (n = 0; n < nControlsNum; n++)
     {
-        if (_stricmp(control_name, pUserControls[n].name) == 0)
+        if (storm::iEquals(std::string_view(control_name), std::string_view(pUserControls[n].name)))
             return SetControlState(n, _state_struct);
     }
     return false;
@@ -541,7 +543,7 @@ void PCS_CONTROLS::LockControl(const char *control_name, bool mode)
     }
     for (n = 0; n < nControlsNum; n++)
     {
-        if (_stricmp(control_name, pUserControls[n].name) == 0)
+        if (storm::iEquals(std::string_view(control_name), std::string_view(pUserControls[n].name)))
         {
             pUserControls[n].bLocked = mode;
             pUserControls[n].state = FORCE_DWORD;
@@ -594,6 +596,7 @@ short PCS_CONTROLS::GetDebugKeyState(int vk)
 bool PCS_CONTROLS::IsKeyPressed(int vk)
 {
     auto pressed = false;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (vk == VK_LBUTTON)
         pressed = input_->MouseKeyState(MouseKey::Left);
     else if (vk == VK_RBUTTON)
@@ -615,6 +618,7 @@ bool PCS_CONTROLS::IsKeyPressed(int vk)
                   input_->KeyboardSDLKeyState(SDL_SCANCODE_KP_ENTER);
     }
     else
+#endif
         pressed = input_->KeyboardKeyState(vk);
 
     return pressed;

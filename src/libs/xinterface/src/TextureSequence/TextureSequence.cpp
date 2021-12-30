@@ -86,7 +86,7 @@ IDirect3DTexture9 *TextureSequence::Initialize(VDX9RENDER *pRS, const char *cTSf
     // load sequence texture
     char fullName[256];
     if (!ini->ReadString((char *)cTSfileName, "TextureFile", fullName, sizeof(fullName) - 1, ""))
-        sprintf_s(fullName, FILE_PATH, cTSfileName);
+        sprintf(fullName, FILE_PATH, cTSfileName);
     m_AllTex = m_pRS->TextureCreate(fullName);
     if (m_AllTex == -1)
     {

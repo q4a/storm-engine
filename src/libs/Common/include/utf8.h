@@ -4,7 +4,7 @@
 #include <cstring>
 #include <string>
 
-#include <Windows.h>
+#include <windows.h>
 
 namespace utf8
 {
@@ -28,18 +28,30 @@ struct u8_char
 
 inline std::string ConvertWideToUtf8(const std::wstring &wstr)
 {
+#ifdef _WIN32
     int count = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.length()), NULL, 0, NULL, NULL);
     std::string str(count, 0);
     WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &str[0], count, NULL, NULL);
     return str;
+#else
+    auto ws = wstr.c_str();
+    int count = wcslen(ws);
+    return std::string(ws, ws + count);
+#endif
 }
 
 inline std::wstring ConvertUtf8ToWide(const std::string &str)
 {
+#ifdef _WIN32
     int count = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.length()), NULL, 0);
     std::wstring wstr(count, 0);
     MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.length()), &wstr[0], count);
     return wstr;
+#else
+    wchar_t *buf = new wchar_t[str.size()];
+    size_t num_chars = std::mbstowcs(buf, str.c_str(), str.size());
+    return std::wstring(buf, num_chars);
+#endif
 }
 
 /* is c the start of a utf8 sequence? */
@@ -110,7 +122,7 @@ inline int Utf8ToCodepoint(const char *utf8)
     if (u0 >= 0xC0 && u0 <= 0xDF)
         return (u0 - 192) * 64 + (u1 - 128);
 
-    if (utf8[0] == 0xed && (utf8[1] & 0xa0) == 0xa0)
+    if (u0 == 0xED && (u1 & 0xA0) == 0xA0)
         return -1; // code points, 0xd800 to 0xdfff
 
     if (l < 3)

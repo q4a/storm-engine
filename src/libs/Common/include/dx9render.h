@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <d3d9.h>
-#include <d3dx9.h>
 
 #include "Entity.h"
 #include "Matrix.h"
@@ -267,7 +266,9 @@ class VDX9RENDER : public SERVICE
     virtual HRESULT SetFVF(uint32_t handle) = 0;
     virtual HRESULT GetVertexShader(IDirect3DVertexShader9 **ppShader) = 0;
     virtual HRESULT GetPixelShader(IDirect3DPixelShader9 **ppShader) = 0;
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     virtual ID3DXEffect *GetEffectPointer(const char *techniqueName) = 0;
+#endif
 
     // D3D Render Target/Begin/End/Clear
     virtual HRESULT GetRenderTarget(IDirect3DSurface9 **ppRenderTarget) = 0;

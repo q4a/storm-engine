@@ -1,7 +1,7 @@
 #include "SKY.h"
 #include "SunGlow.h"
 #include "core.h"
-#include <attributes.h>
+#include <Attributes.h>
 
 namespace
 {
@@ -296,12 +296,12 @@ void SKY::LoadTextures()
 
     for (long i = 0; i < SKY_NUM_TEXTURES; i++)
     {
-        sprintf_s(str, "%s%s", static_cast<const char *>(sSkyDir.c_str()), names[i]);
+        sprintf(str, "%s%s", static_cast<const char *>(sSkyDir.c_str()), names[i]);
         TexturesID[i] = pRS->TextureCreate(str);
 
         if (aSkyDirArray.size() > 1)
         {
-            sprintf_s(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
+            sprintf(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
             TexturesNextID[i] = pRS->TextureCreate(str);
         }
     }
@@ -326,17 +326,15 @@ void SKY::Realize(uint32_t Delta_Time)
 
     float fFov;
     CVECTOR vPos, vAng;
-    D3DXMATRIX pMatWorld, pMatTranslate, pMatRotate;
+    CMatrix pMatWorld, pMatTranslate, pMatRotate;
 
     pRS->GetCamera(vPos, vAng, fFov);
 
-    D3DXMatrixIdentity(&pMatWorld);
-
-    D3DXMatrixTranslation(&pMatTranslate, vPos.x, vPos.y / 6.0f, vPos.z);
-    D3DXMatrixMultiply(&pMatWorld, &pMatWorld, &pMatTranslate);
-    D3DXMatrixRotationY(&pMatRotate, fAngleY + fSkyAngle);
-    D3DXMatrixMultiply(&pMatWorld, &pMatRotate, &pMatWorld);
-    pRS->SetTransform(D3DTS_WORLD, &pMatWorld);
+    pMatTranslate.BuildPosition(vPos.x, vPos.y / 6.0f, vPos.z);
+    pMatWorld = pMatWorld * pMatTranslate;
+    pMatRotate.BuildRotateY(fAngleY + fSkyAngle);
+    pMatWorld = pMatRotate * pMatWorld;
+    pRS->SetTransform(D3DTS_WORLD, pMatWorld);
 
     if (aSkyDirArray.size() > 1)
     {
@@ -381,7 +379,7 @@ void SKY::Realize(uint32_t Delta_Time)
                 if (pSunGlow)
                     static_cast<SUNGLOW *>(pSunGlow)->DrawSunMoon();
 
-                pRS->SetTransform(D3DTS_WORLD, &pMatWorld);
+                pRS->SetTransform(D3DTS_WORLD, pMatWorld);
                 if (pRS->TechniqueExecuteStart(sTechSkyBlendAlpha.c_str()))
                     do
                     {
@@ -419,10 +417,10 @@ void SKY::Realize(uint32_t Delta_Time)
             } while (pRS->TechniqueExecuteNext());
     }
 
-    D3DXMatrixIdentity(&pMatWorld);
-    D3DXMatrixTranslation(&pMatTranslate, vPos.x, vPos.y / 6.0f, vPos.z);
-    D3DXMatrixMultiply(&pMatWorld, &pMatWorld, &pMatTranslate);
-    pRS->SetTransform(D3DTS_WORLD, &pMatWorld);
+    pMatWorld.SetIdentity();
+    pMatTranslate.BuildPosition(vPos.x, vPos.y / 6.0f, vPos.z);
+    pMatWorld = pMatWorld * pMatTranslate;
+    pRS->SetTransform(D3DTS_WORLD, pMatWorld);
     pRS->DrawBuffer(iFogVertsID, sizeof(FOGVERTEX), iFogIndexID, 0, kFogVertsNum, 0, kFogTrgsNum / 3,
                     sTechSkyFog.c_str());
 }
@@ -587,7 +585,7 @@ void SKY::UpdateTimeFactor()
                 pRS->TextureRelease(TexturesID[i]);
             TexturesID[i] = TexturesNextID[i];
 
-            sprintf_s(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
+            sprintf(str, "%s%s", static_cast<const char *>(sSkyDirNext.c_str()), names[i]);
             TexturesNextID[i] = pRS->TextureCreate(str);
         }
     }

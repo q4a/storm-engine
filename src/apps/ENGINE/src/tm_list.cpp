@@ -1,9 +1,10 @@
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "tm_list.h"
 
 #include "defines.h"
 #include "s_debug.h"
 
-#include <Windows.h>
+#include <windows.h>
 
 #define MAX_STR_SIZE 1024
 extern S_DEBUG * CDebug;
@@ -214,7 +215,7 @@ void TM_LIST::SelectItem(const char *name)
     for (long n = 0; n < items; n++)
     {
         GetItemText(n, 0, SearchName, sizeof(SearchName));
-        if (_stricmp(SearchName, name) == 0)
+        if (storm::iEquals(SearchName, std::string_view(name)))
         {
             ListView_SetItemState(GetWindowHandle(), n, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
             return;
@@ -422,10 +423,11 @@ long TM_LIST::GetItemsCount()
 void TM_LIST::SetCharID(const char *text)
 {
     if (text)
-        strcpy_s(CharID, text);
+        strcpy(CharID, text);
 }
 
 char *TM_LIST::GetCharID()
 {
     return CharID;
 }
+#endif

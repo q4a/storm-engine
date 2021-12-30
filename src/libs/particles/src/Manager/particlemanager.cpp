@@ -104,7 +104,7 @@ bool ParticleManager::OpenProject(const char *FileName)
     // std::string LongFileName = "resource\\particles\\";
     auto path = std::filesystem::path() / "resource" / "particles" / FileName;
     auto pathStr = path.extension().string();
-    if (_stricmp(pathStr.c_str(), ".prj") != 0)
+    if (!storm::iEquals(pathStr, ".prj"))
         path += ".prj";
     pathStr = path.string();
     // MessageBoxA(NULL, (LPCSTR)path.c_str(), "", MB_OK); //~!~
@@ -144,7 +144,7 @@ bool ParticleManager::OpenProject(const char *FileName)
     for (auto n = 0; n < 9999; n++)
     {
         char buf[64];
-        snprintf(buf, _countof(buf), "System_%04d", n);
+        snprintf(buf, sizeof(buf), "System_%04d", n);
         // Section.Format("System_%04d", n);
         const auto ReadSuccess = IniFile->ReadString("Manager", buf, IniStringBuffer, 8192, "none");
         if (!ReadSuccess)
@@ -286,11 +286,13 @@ void ParticleManager::Execute(float DeltaTime)
         }
     }
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_F3) < 0 && core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
     {
         ShowStat = !ShowStat;
-        Sleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+#endif
 
     for (uint32_t n = 0; n < DeleteQuery.size(); n++)
     {
@@ -480,7 +482,7 @@ bool ParticleManager::FindInEnumUsedGeom(const char *GeomName)
     for (uint32_t n = 0; n < EnumUsedGeom.size(); n++)
     {
         const char *StoredGeomName = EnumUsedGeom[n].c_str();
-        if (_stricmp(StoredGeomName, GeomName) == 0)
+        if (storm::iEquals(std::string_view(StoredGeomName), std::string_view(GeomName)))
             return true;
     }
     return false;

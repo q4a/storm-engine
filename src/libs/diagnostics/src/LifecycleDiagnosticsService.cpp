@@ -3,6 +3,7 @@
 #include <condition_variable>
 #include <cstdio>
 #include <mutex>
+#include <thread>
 
 #include <spdlog/spdlog.h>
 
@@ -12,15 +13,17 @@
 #include "watermark.hpp"
 
 #ifdef _UNICODE
+#ifdef _WIN32
 #include <tchar.h>
 #define sentry_options_set_database_path sentry_options_set_database_pathw
 #define sentry_options_set_handler_path sentry_options_set_handler_pathw
 #define sentry_options_add_attachment sentry_options_add_attachmentw
+#endif // _WIN32
 #else
 #include <cstdlib>
 #define _T(x) x
 #define _tsystem std::system
-#endif
+#endif // _UNICODE
 
 #ifdef _WIN32
 #include "logging.hpp"
@@ -40,12 +43,14 @@ auto &getLogsArchive()
     return logsArchive;
 }
 
+#ifdef _WIN32
 auto assembleArchiveCmd()
 {
     constexpr auto archiverBin = "7za.exe";
     return _T("call \"") + (getExecutableDir() / archiverBin).native() + _T("\" a \"\\\\?\\") +
            getLogsArchive().native() + _T("\" \"\\\\?\\") + fs::GetLogsPath().native() + _T("\"");
 }
+#endif
 
 }
 
@@ -160,6 +165,7 @@ LifecycleDiagnosticsService::Guard LifecycleDiagnosticsService::initialize(const
 
     if (!initialized_)
     {
+#ifdef _WIN32
         // TODO: make this crossplatform
         auto *options = sentry_options_new();
         sentry_options_set_dsn(options, "https://1798a1bcfb654cbd8ce157b381964525@o572138.ingest.sentry.io/5721165");
@@ -171,6 +177,7 @@ LifecycleDiagnosticsService::Guard LifecycleDiagnosticsService::initialize(const
         sentry_options_set_system_crash_reporter_enabled(options, enableCrashReports);
 
         initialized_ = sentry_init(options) == 0;
+#endif
     }
 
     return Guard(*this);
@@ -182,7 +189,9 @@ void LifecycleDiagnosticsService::terminate() const
 
     if (initialized_)
     {
+#ifdef _WIN32
         sentry_close();
+#endif
     }
 }
 
@@ -229,8 +238,10 @@ sentry_value_t LifecycleDiagnosticsService::beforeCrash(const sentry_value_t eve
     // terminate logging
     self->loggingService_->terminate();
 
+#ifdef _WIN32
     // archive logs for sentry backend
     _tsystem(assembleArchiveCmd().c_str());
+#endif
 
     return event;
 }

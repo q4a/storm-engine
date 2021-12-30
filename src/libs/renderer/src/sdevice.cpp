@@ -2,14 +2,18 @@
 
 #include "core.h"
 
-#include "entity.h"
+#include "Entity.h"
 #include "inlines.h"
 #include "s_import_func.h"
 #include "texture.h"
 #include "v_s_stack.h"
 
-#include <DxErr.h>
+#ifdef _WIN32
+#include <DxErr.h> // FIX_LINUX
 #include <corecrt_io.h>
+#else
+#include <unistd.h>
+#endif
 
 CREATE_SERVICE(DX9RENDER)
 
@@ -329,7 +333,9 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
+#ifdef _WIN32 // FIX_LINUX
         core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
+#endif
         return true;
     }
 
@@ -408,7 +414,7 @@ DX9RENDER::DX9RENDER()
     back0Texture = -1;
     progressSafeCounter = 0;
     isInPViewProcess = false;
-    progressUpdateTime = 0;
+    progressUpdateTime = std::chrono::system_clock::now();
     progressFramesPosX = 0.85f;
     progressFramesPosY = 0.8f;
     progressFramesWidth = 64;
@@ -466,17 +472,17 @@ bool DX9RENDER::Init()
         ini->ReadString(nullptr, "screen_bpp", str, sizeof(str), "D3DFMT_R5G6B5");
         screen_bpp = D3DFMT_R5G6B5;
         stencil_format = D3DFMT_D16;
-        if (_stricmp(str, "D3DFMT_A8R8G8B8") == 0)
+        if (storm::iEquals(str, "D3DFMT_A8R8G8B8"))
         {
             screen_bpp = D3DFMT_A8R8G8B8;
             stencil_format = D3DFMT_D24S8;
         }
-        if (_stricmp(str, "D3DFMT_X8R8G8B8") == 0)
+        if (storm::iEquals(str, "D3DFMT_X8R8G8B8"))
         {
             screen_bpp = D3DFMT_X8R8G8B8;
             stencil_format = D3DFMT_D24S8;
         }
-        if (_stricmp(str, "D3DFMT_R5G6B5") == 0)
+        if (storm::iEquals(str, "D3DFMT_R5G6B5"))
         {
             screen_bpp = D3DFMT_R5G6B5;
             stencil_format = D3DFMT_D16;
@@ -506,17 +512,17 @@ bool DX9RENDER::Init()
         if (!ini->ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
         {
             core.Trace("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
-            sprintf_s(str, "resource\\ini\\fonts.ini");
+            sprintf(str, "resource\\ini\\fonts.ini");
         }
         const auto len = strlen(str) + 1;
         if ((fontIniFileName = new char[len]) == nullptr)
             throw std::runtime_error("allocate memory error");
-        strcpy_s(fontIniFileName, len, str);
+        strcpy(fontIniFileName, str);
         // get start font quantity
         if (!ini->ReadString(nullptr, "font", str, sizeof(str) - 1, ""))
         {
             core.Trace("Start font not defined");
-            sprintf_s(str, "normal");
+            sprintf(str, "normal");
         }
         if (LoadFont(str) == -1L)
             core.Trace("can not init start font: %s", str);
@@ -635,10 +641,12 @@ DX9RENDER::~DX9RENDER()
 
     if (bPreparedCapture)
     {
+#ifdef _WIN32 // FIX_LINUX BITMAP_AND_OTHER
         STORM_DELETE(lpbi);
         ReleaseDC(core.GetAppHWND(), hDesktopDC);
         DeleteDC(hCaptureDC);
         DeleteObject(hCaptureBitmap);
+#endif
     }
     for (const auto &buffer : aCaptureBuffers)
         delete buffer;
@@ -1224,8 +1232,10 @@ bool DX9RENDER::DX9EndScene()
         return false;
 
     // boal if (bMakeShoot || core.Controls->GetDebugAsyncKeyState(VK_F8) < 0)  MakeScreenShot();
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (bMakeShoot || GetAsyncKeyState(VK_F8) < 0)
         MakeScreenShot();
+#endif
 
     if (bVideoCapture)
         MakeCapture();
@@ -1239,9 +1249,11 @@ bool DX9RENDER::DX9EndScene()
 
     if (bSafeRendering)
     {
+#ifdef _WIN32 // FIX_LINUX BITMAP_AND_OTHER
         const HDC dc = GetDC(hwnd);
         SetPixel(dc, 0, 0, 0);
         ReleaseDC(hwnd, dc);
+#endif
     }
 
     return true;
@@ -1271,7 +1283,7 @@ long DX9RENDER::TextureCreate(const char *fname)
 
         TexPaths[dwSetupNumber].str[0] = 0;
         if (fname && fname[0])
-            strcpy_s(TexPaths[dwSetupNumber].str, fname);
+            strcpy(TexPaths[dwSetupNumber].str, fname);
         iSetupPath = 0;
         return -1;
     }
@@ -1292,7 +1304,7 @@ long DX9RENDER::TextureCreate(const char *fname)
 
     std::filesystem::path path = fname;
     std::string pathStr = path.extension().string();
-    if (_stricmp(pathStr.c_str(), ".tx") == 0)
+    if (storm::iEquals(pathStr, ".tx"))
         path.replace_extension();
     pathStr = path.string();
     fname = pathStr.c_str(); //~!~ msvc still doesn't have working c_str for path
@@ -1318,25 +1330,25 @@ long DX9RENDER::TextureCreate(const char *fname)
                     break;
 
             _fname[0] = 0;
-            strncpy_s(_fname, fname, j + 1);
+            strncpy(_fname, fname, j + 1);
             _fname[j + 1] = 0;
-            strcat_s(_fname, TexPaths[i].str);
-            strcat_s(_fname, &fname[j + 1]);
+            strcat(_fname, TexPaths[i].str);
+            strcat(_fname, &fname[j + 1]);
             bTrace = false;
         }
         else
         {
             bTrace = true;
-            strcpy_s(_fname, fname);
+            strcpy(_fname, fname);
         }
 
-        if (strlen(_fname) > _countof(".tx") - 1)
+        if (strlen(_fname) > sizeof(".tx") - 1)
         {
-            if (_stricmp(&_fname[strlen(_fname) - 3], ".tx") == 0)
+            if (storm::iEquals(std::string_view(&_fname[strlen(_fname) - 3]), ".tx"))
                 _fname[strlen(_fname) - 3] = 0;
         }
 
-        _strupr(_fname);
+        strupr(_fname);
 
         const unsigned long hf = hash_string(_fname);
 
@@ -1344,7 +1356,7 @@ long DX9RENDER::TextureCreate(const char *fname)
         for (t = 0; t < MAX_STEXTURES; t++)
             if (Textures[t].ref != 0)
                 if (Textures[t].name)
-                    if (Textures[t].hash == hf && _stricmp(Textures[t].name, _fname) == 0)
+                    if (Textures[t].hash == hf && storm::iEquals(std::string_view(Textures[t].name), _fname))
                     {
                         Textures[t].ref++;
                         return t;
@@ -1359,7 +1371,7 @@ long DX9RENDER::TextureCreate(const char *fname)
         const auto len = strlen(_fname) + 1;
         if ((Textures[t].name = new char[len]) == nullptr)
             throw std::runtime_error("allocate memory error");
-        strcpy_s(Textures[t].name, len, _fname);
+        strcpy(Textures[t].name, _fname);
         Textures[t].isCubeMap = false;
         Textures[t].loaded = false;
         Textures[t].ref++;
@@ -1418,7 +1430,7 @@ bool DX9RENDER::TextureLoad(long t)
     {
         return false;
     }
-    sprintf_s(fn, TEXTURESDIR, Textures[t].name);
+    sprintf(fn, TEXTURESDIR, Textures[t].name);
     for (long s = 0, d = 0; fn[d]; s++)
     {
         if (d > 0 && fn[d - 1] == '\\' && fn[s] == '\\')
@@ -1729,8 +1741,8 @@ bool DX9RENDER::TextureLoad(long t)
         }
         auto fileS2 = fio->_CreateFile("texLoad.txt", std::ios::binary | std::ios::out | std::ios::app);
         totSize += Textures[t].dwSize;
-        sprintf_s(s, "%.2f, size: %d, %d * %d, %s\n", totSize / 1024.0f / 1024.0f, Textures[t].dwSize, head.width,
-                  head.height, Textures[t].name);
+        sprintf(s, "%.2f, size: %d, %d * %d, %s\n", totSize / 1024.0f / 1024.0f, Textures[t].dwSize, head.width,
+                head.height, Textures[t].name);
         fio->_WriteFile(fileS2, s, strlen(s));
         fio->_FlushFileBuffers(fileS2);
         fio->_CloseFile(fileS2);
@@ -1746,12 +1758,15 @@ bool DX9RENDER::TextureLoad(long t)
 bool DX9RENDER::TextureLoadUsingD3DX(const char* path, long t)
 {
     // TODO: reimplement the whole thing in a tidy way
+#ifdef _WIN32 // FIX_LINUX
     IDirect3DTexture9 *pTex;
     if(CHECKD3DERR(D3DXCreateTextureFromFileA(d3d9, path, &pTex)))
     {
+#endif
         delete Textures[t].name;
         Textures[t].name = nullptr;
         return false;
+#ifdef _WIN32 // FIX_LINUX
     }
 
     D3DSURFACE_DESC desc;
@@ -1765,6 +1780,7 @@ bool DX9RENDER::TextureLoadUsingD3DX(const char* path, long t)
     Textures[t].loaded = true;
 
     return true;
+#endif
 }
 
 IDirect3DBaseTexture9 *DX9RENDER::GetBaseTexture(long iTexture)
@@ -2079,7 +2095,7 @@ bool DX9RENDER::SetPerspective(float perspective, float fAspectRatio)
     const float h = 1.0f / tanf(fov_vert * 0.5f);
     const float Q = far_plane / (far_plane - near_plane);
 
-    D3DXMATRIX mtx;
+    D3DMATRIX mtx;
     PZERO(&mtx, sizeof(mtx));
 
     mtx._11 = w;
@@ -2507,12 +2523,20 @@ void DX9RENDER::LostRender()
         if (VertexBuffers[b].buff)
         {
             if (VertexBuffers[b].buff->Release() > 0)
+#ifdef _WIN32 // FIX_LINUX
                 __debugbreak();
+#else
+                do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
         if (IndexBuffers[b].buff)
         {
             if (IndexBuffers[b].buff->Release() > 0)
+#ifdef _WIN32 // FIX_LINUX
                 __debugbreak();
+#else
+                do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
     }
 
@@ -2712,6 +2736,7 @@ void DX9RENDER::RunStart()
     // execute default technique for set default render/texture states
     // if (TechniqueExecuteStart("default")) do{} while (TechniqueExecuteNext());
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     // boal del_cheat
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
@@ -2719,6 +2744,7 @@ void DX9RENDER::RunStart()
         RecompileEffects();
         InvokeEntitiesRestoreRender();
     }
+#endif
 
     SetRenderState(D3DRS_FILLMODE, (core.Controls->GetDebugAsyncKeyState('F') < 0) ? D3DFILL_WIREFRAME : D3DFILL_SOLID);
     // SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID); eddy
@@ -2758,7 +2784,7 @@ long DX9RENDER::Print(long x, long y, const char *format, ...)
 
     va_list args;
     va_start(args, format);
-    vsnprintf_s(Buff_4k, sizeof(Buff_4k), format, args);
+    vsnprintf(Buff_4k, sizeof(Buff_4k), format, args);
     va_end(args);
 
     return FontList[idFontCurrent].font->Print(x, y, Buff_4k);
@@ -2775,7 +2801,7 @@ long DX9RENDER::Print(long nFontNum, uint32_t color, long x, long y, const char 
 
     va_list args;
     va_start(args, format);
-    vsnprintf_s(Buff_4k, sizeof(Buff_4k), format, args);
+    vsnprintf(Buff_4k, sizeof(Buff_4k), format, args);
     va_end(args);
 
     FontList[nFontNum].font->StoreFontParameters();
@@ -2837,7 +2863,7 @@ long DX9RENDER::ExtPrint(long nFontNum, uint32_t foreColor, uint32_t backColor, 
 
     va_list args;
     va_start(args, format);
-    vsnprintf_s(Buff_4k, sizeof(Buff_4k), format, args);
+    vsnprintf(Buff_4k, sizeof(Buff_4k), format, args);
     va_end(args);
 
     pFont->StoreFontParameters();
@@ -2888,18 +2914,19 @@ long DX9RENDER::LoadFont(const char *fontName)
         return -1L;
     char sDup[256];
     if (strlen(fontName) < sizeof(sDup) - 1)
-        strcpy_s(sDup, fontName);
+        strcpy(sDup, fontName);
     else
     {
-        strncpy_s(sDup, fontName, sizeof(sDup) - 1);
+        strncpy(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = _strupr(sDup);
+    fontName = strupr(sDup);
     const unsigned long hashVal = hash_string(fontName);
 
     long i;
     for (i = 0; i < nFontQuantity; i++)
-        if (FontList[i].hash == hashVal && _stricmp(FontList[i].name, fontName) == 0)
+        if (FontList[i].hash == hashVal &&
+            storm::iEquals(std::string_view(FontList[i].name), std::string_view(fontName)))
         {
             if (FontList[i].ref > 0)
                 FontList[i].ref++;
@@ -2925,7 +2952,7 @@ long DX9RENDER::LoadFont(const char *fontName)
         const auto len = strlen(fontName) + 1;
         if ((FontList[i].name = new char[len]) == nullptr)
             throw std::runtime_error("allocate memory error");
-        strcpy_s(FontList[i].name, len, fontName);
+        strcpy(FontList[i].name, fontName);
         nFontQuantity++;
     }
     else
@@ -2939,17 +2966,18 @@ bool DX9RENDER::UnloadFont(const char *fontName)
         return false;
     char sDup[256];
     if (strlen(fontName) < sizeof(sDup) - 1)
-        strcpy_s(sDup, fontName);
+        strcpy(sDup, fontName);
     else
     {
-        strncpy_s(sDup, fontName, sizeof(sDup) - 1);
+        strncpy(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = _strupr(sDup);
+    fontName = strupr(sDup);
     const unsigned long hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
-        if (FontList[i].hash == hashVal && _stricmp(FontList[i].name, fontName) == 0)
+        if (FontList[i].hash == hashVal &&
+            storm::iEquals(std::string_view(FontList[i].name), std::string_view(fontName)))
             return UnloadFont(i);
     core.Trace("Font name \"%s\" is not containing", fontName);
     return false;
@@ -2992,13 +3020,13 @@ bool DX9RENDER::SetCurFont(const char *fontName)
         return false;
     char sDup[256];
     if (strlen(fontName) < sizeof(sDup) - 1)
-        strcpy_s(sDup, fontName);
+        strcpy(sDup, fontName);
     else
     {
-        strncpy_s(sDup, fontName, sizeof(sDup) - 1);
+        strncpy(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = _strupr(sDup);
+    fontName = strupr(sDup);
     const unsigned long hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
@@ -3033,7 +3061,8 @@ char *DX9RENDER::GetFontIniFileName()
 
 bool DX9RENDER::SetFontIniFileName(const char *iniName)
 {
-    if (fontIniFileName != nullptr && iniName != nullptr && _stricmp(fontIniFileName, iniName) == 0)
+    if (fontIniFileName != nullptr && iniName != nullptr &&
+        storm::iEquals(std::string_view(fontIniFileName), std::string_view(iniName)))
         return true;
 
     delete fontIniFileName;
@@ -3045,7 +3074,7 @@ bool DX9RENDER::SetFontIniFileName(const char *iniName)
     const auto len = strlen(iniName) + 1;
     if ((fontIniFileName = new char[len]) == nullptr)
         throw std::runtime_error("allocate memory error");
-    strcpy_s(fontIniFileName, len, iniName);
+    strcpy(fontIniFileName, iniName);
 
     for (int n = 0; n < nFontQuantity; n++)
     {
@@ -3204,7 +3233,7 @@ void DX9RENDER::MakeScreenShot()
     // GUARD(DX9RENDER::MakeScreenShot)
     static long file_number = 0;
     static TGA_H Dhdr = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32};
-    char file_name[_MAX_PATH];
+    char file_name[MAX_PATH];
     long i;
     HANDLE fh;
     uint32_t *Surface;
@@ -3243,7 +3272,11 @@ void DX9RENDER::MakeScreenShot()
     }
 
     // if (FAILED(d3d9->UpdateSurface(renderTarget, null, surface, null)) ||
+#ifdef _WIN32 // FIX_LINUX
     if (FAILED(D3DXLoadSurfaceFromSurface(surface, NULL, NULL, renderTarget, NULL, NULL, D3DX_DEFAULT, 0)) ||
+#else
+    if (FAILED(d3d9->UpdateSurface(renderTarget, nullptr, surface, nullptr)) ||
+#endif
         FAILED(surface->LockRect(&lr, &r, 0)))
     {
         surface->Release();
@@ -3256,8 +3289,8 @@ void DX9RENDER::MakeScreenShot()
     // Get the file name
     for (i = 0; i < 10000; i++)
     {
-        sprintf_s(file_name, "CCS_%04d.tga", i);
-        if (_access(file_name, 0) == -1)
+        sprintf(file_name, "CCS_%04d.tga", i);
+        if (access(file_name, 0) == -1)
             break;
     }
     // Save the picture
@@ -3594,7 +3627,11 @@ HRESULT DX9RENDER::Release(IUnknown *pObject)
     {
         if (*(void **)pObject == nullptr)
         {
+#ifdef _WIN32 // FIX_LINUX
             __debugbreak();
+#else
+            do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
         else
         {
@@ -3722,10 +3759,12 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
 }
+#endif
 
 HRESULT DX9RENDER::SetTexture(uint32_t Stage, IDirect3DBaseTexture9 *pTexture)
 {
@@ -3772,10 +3811,12 @@ HRESULT DX9RENDER::GetSurfaceLevel(IDirect3DTexture9 *ppTexture, UINT Level, IDi
 HRESULT DX9RENDER::UpdateSurface(IDirect3DSurface9 *pSourceSurface, CONST RECT *pSourceRectsArray, UINT cRects,
                                  IDirect3DSurface9 *pDestinationSurface, CONST POINT *pDestPointsArray)
 {
+#ifdef _WIN32 // FIX_LINUX
     return CHECKD3DERR(D3DXLoadSurfaceFromSurface(pDestinationSurface, nullptr, nullptr, pSourceSurface, nullptr,
-                                                 nullptr,
-                                      D3DX_DEFAULT, 0));
-    //return CHECKD3DERR(d3d9->UpdateSurface(pSourceSurface, pSourceRectsArray, pDestinationSurface, pDestPointsArray));
+                                                  nullptr, D3DX_DEFAULT, 0));
+#else
+    return CHECKD3DERR(d3d9->UpdateSurface(pSourceSurface, pSourceRectsArray, pDestinationSurface, pDestPointsArray));
+#endif
 }
 
 HRESULT DX9RENDER::StretchRect(IDirect3DSurface9 *pSourceSurface, const RECT *pSourceRect,
@@ -3842,7 +3883,7 @@ CVideoTexture *DX9RENDER::GetVideoTexture(const char *sVideoName)
     const unsigned long newHash = hash_string(sVideoName);
     while (pVTLcur != nullptr)
     {
-        if (pVTLcur->hash == newHash && _stricmp(pVTLcur->name, sVideoName) == 0)
+        if (pVTLcur->hash == newHash && storm::iEquals(std::string_view(pVTLcur->name), std::string_view(sVideoName)))
         {
             if (EntityManager::GetEntityPointer(pVTLcur->videoTexture_id))
             {
@@ -3869,7 +3910,7 @@ CVideoTexture *DX9RENDER::GetVideoTexture(const char *sVideoName)
     const auto len = strlen(sVideoName) + 1;
     if ((pVTLcur->name = new char[len]) == nullptr)
         throw std::runtime_error("memory allocate error");
-    strcpy_s(pVTLcur->name, len, sVideoName);
+    strcpy(pVTLcur->name, sVideoName);
     const entid_t ei = EntityManager::CreateEntity("TextureSequence");
     pVTLcur->VideoTexture = static_cast<CVideoTexture *>(EntityManager::GetEntityPointer(ei));
     if (pVTLcur->VideoTexture != nullptr)
@@ -4042,7 +4083,7 @@ void DX9RENDER::SetProgressImage(const char *image)
         delete progressImage;
         progressImage = new char[progressImageSize];
     }
-    strcpy_s(progressImage, s, image);
+    strcpy(progressImage, image);
 }
 
 void DX9RENDER::SetProgressBackImage(const char *image)
@@ -4060,7 +4101,7 @@ void DX9RENDER::SetProgressBackImage(const char *image)
         delete progressBackImage;
         progressBackImage = new char[progressBackImageSize];
     }
-    strcpy_s(progressBackImage, s, image);
+    strcpy(progressBackImage, image);
 }
 
 void DX9RENDER::SetTipsImage(const char *image)
@@ -4143,7 +4184,7 @@ void DX9RENDER::StartProgressView()
         progressTipsTexture = TextureCreate(progressTipsImage);
         isInPViewProcess = false;
     }
-    progressUpdateTime = GetTickCount() - 1000;
+    progressUpdateTime = std::chrono::system_clock::now() - std::chrono::milliseconds(1000);
 }
 
 void DX9RENDER::ProgressView()
@@ -4154,8 +4195,9 @@ void DX9RENDER::ProgressView()
     if (isInPViewProcess)
         return;
     // Analyzing time
-    const uint32_t time = GetTickCount();
-    if (abs(static_cast<long>(progressUpdateTime - time)) < 50)
+    const auto time = std::chrono::system_clock::now();
+    std::chrono::duration<double, std::milli> elapsedTime = progressUpdateTime - time;
+    if (abs(elapsedTime.count()) < 50)
         return;
     progressUpdateTime = time;
     isInPViewProcess = true;
@@ -4429,9 +4471,11 @@ IDirect3DBaseTexture9 *DX9RENDER::CreateTextureFromFileInMemory(const char *pFil
     IDirect3DTexture9 *pTexture = nullptr;
     auto *pTga = (TGA_H *)pFile;
     const D3DFORMAT d3dFormat = (pTga->bpp == 16) ? D3DFMT_DXT1 : D3DFMT_DXT3;
+#ifdef _WIN32 // FIX_LINUX
     D3DXCreateTextureFromFileInMemoryEx(static_cast<LPDIRECT3DDEVICE9>(GetD3DDevice()), pFile, dwSize, D3DX_DEFAULT,
                                         D3DX_DEFAULT, 1, 0, d3dFormat, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0,
                                         nullptr, nullptr, &pTexture);
+#endif
 
     return pTexture;
 }

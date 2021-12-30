@@ -722,9 +722,9 @@ bool ISLAND::CreateHeightMap(const std::string_view &pDir, const std::string_vie
     }
     char str[512];
     pI->WriteString("Main", "DepthFile", (char *)fileName.c_str());
-    sprintf_s(str, "%f,%f,%f", vBoxCenter.x, vBoxCenter.y, vBoxCenter.z);
+    sprintf(str, "%f,%f,%f", vBoxCenter.x, vBoxCenter.y, vBoxCenter.z);
     pI->WriteString("Main", "vBoxCenter", str);
-    sprintf_s(str, "%f,%f,%f", vBoxSize.x, vBoxSize.y, vBoxSize.z);
+    sprintf(str, "%f,%f,%f", vBoxSize.x, vBoxSize.y, vBoxSize.z);
     pI->WriteString("Main", "vBoxSize", str);
 
     return true;

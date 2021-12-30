@@ -3,6 +3,8 @@
 #include <functional>
 #include <SDL_scancode.h>
 #include <variant>
+#include <string>
+#include <memory>
 
 namespace storm
 {

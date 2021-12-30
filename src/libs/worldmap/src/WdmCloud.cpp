@@ -63,10 +63,12 @@ void WdmCloud::Update(float dltTime)
     if (dltTime > 1.0f)
         dltTime = 1.0f;
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetKeyState(VK_NUMLOCK) != 0)
     {
         dltTime = 0.0f;
     }
+#endif
 
     // Moving the cloud
     Move(dltTime);

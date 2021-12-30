@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "core.h"
 #include "shared/messages.h"
+#include "defines.h"
 
 #define ANGLESPEED_MUL 0.2f
 

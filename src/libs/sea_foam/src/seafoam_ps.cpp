@@ -4,6 +4,7 @@
 
 #include "Entity.h"
 #include "object.h"
+#include "defines.h"
 
 SEAFOAM_PS::SEAFOAM_PS() : enableEmit(true)
 {

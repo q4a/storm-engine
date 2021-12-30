@@ -128,12 +128,12 @@ WdmSea::WdmSea()
     baseTexture = wdmObjects->rs->TextureCreate("\\WorldMap\\Sea\\sea.tga");
     for (long i = 0; i < sizeof(aniTextures) / sizeof(long); i++)
     {
-        sprintf_s(buf, "\\WorldMap\\Sea\\Ani\\wave_%.4i.tga", i);
+        sprintf(buf, "\\WorldMap\\Sea\\Ani\\wave_%.4i.tga", i);
         aniTextures[i] = wdmObjects->rs->TextureCreate(buf);
     }
     for (long i = 0; i < sizeof(whiteHorses) / sizeof(long); i++)
     {
-        sprintf_s(buf, "\\WorldMap\\Sea\\WhiteHorses\\wh%.3i.tga", i);
+        sprintf(buf, "\\WorldMap\\Sea\\WhiteHorses\\wh%.3i.tga", i);
         whiteHorses[i] = -1; // wdmObjects->rs->TextureCreate(buf);
     }
     for (long i = 0; i < sizeof(flare) / sizeof(flare[0]); i++)

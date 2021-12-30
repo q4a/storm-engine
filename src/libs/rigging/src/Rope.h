@@ -2,7 +2,7 @@
 
 #include "dx9render.h"
 #include "geos.h"
-#include "matrix.h"
+#include "Matrix.h"
 #include "sail_base.h"
 
 class NODE;

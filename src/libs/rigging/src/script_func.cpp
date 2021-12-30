@@ -73,14 +73,14 @@ uint32_t _GetAssembledString(VS_STACK *pS)
                             switch (accessString[0])
                             {
                             case 's':
-                                strcat_s(retString, writeStr);
+                                strcat(retString, writeStr);
                                 break;
                             case 'f': {
                                 char tmpp[256];
                                 float ftmp = 0.f;
                                 sscanf(writeStr, "%f", &ftmp);
                                 if (nAttrNameStart == 1)
-                                    sprintf_s(tmpp, "%f", ftmp);
+                                    sprintf(tmpp, "%f", ftmp);
                                 else
                                 {
                                     char tmpFmtStr[5];
@@ -89,24 +89,24 @@ uint32_t _GetAssembledString(VS_STACK *pS)
                                     tmpFmtStr[2] = accessString[2];
                                     tmpFmtStr[3] = 'f';
                                     tmpFmtStr[4] = 0;
-                                    sprintf_s(tmpp, tmpFmtStr, ftmp);
+                                    sprintf(tmpp, tmpFmtStr, ftmp);
                                 }
-                                strcat_s(retString, tmpp);
+                                strcat(retString, tmpp);
                             }
                             break;
                             case 'd': {
                                 char tmpp[256];
                                 int ntmp = 0;
                                 sscanf(writeStr, "%d", &ntmp);
-                                sprintf_s(tmpp, "%d", ntmp);
-                                strcat_s(retString, tmpp);
+                                sprintf(tmpp, "%d", ntmp);
+                                strcat(retString, tmpp);
                             }
                             break;
                             }
                     }
                 }
                 else
-                    strcat_s(retString, accessString);
+                    strcat(retString, accessString);
                 bBuildAccessString = !bBuildAccessString;
                 accessStrSize = 0;
             }

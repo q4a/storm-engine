@@ -93,8 +93,6 @@ bool ROPE::LoadState(ENTITY_STATE *state)
     return true;
 }
 
-FILETIME ft_old;
-
 void ROPE::Execute(uint32_t Delta_Time)
 {
     uint64_t rtm;
@@ -162,7 +160,7 @@ void ROPE::Realize(uint32_t Delta_Time)
                         {
                             static_cast<SHIP_BASE *>(EntityManager::GetEntityPointer(gdata[i].shipEI))
                                 ->SetLightAndFog(true);
-                            RenderService->SetTransform(D3DTS_WORLD, (D3DXMATRIX *)gdata[i].pMatWorld);
+                            RenderService->SetTransform(D3DTS_WORLD, *gdata[i].pMatWorld);
 
                             RenderService->TextureSet(0, texl);
                             RenderService->SetMaterial(mat);
@@ -798,7 +796,7 @@ void ROPE::LoadIni()
     if (!ini)
         throw std::runtime_error("rigging.ini file not found!");
 
-    sprintf_s(section, "ROPES");
+    sprintf(section, "ROPES");
 
     // texture name
     ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "sail_rope.tga");

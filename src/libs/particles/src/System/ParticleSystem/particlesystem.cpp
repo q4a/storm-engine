@@ -189,7 +189,7 @@ IEmitter *ParticleSystem::FindEmitter(const char *name)
 {
     for (uint32_t n = 0; n < Emitters.size(); n++)
     {
-        if (_stricmp(Emitters[n].pEmitter->GetName(), name) == 0)
+        if (storm::iEquals(std::string_view(Emitters[n].pEmitter->GetName()), std::string_view(name)))
             return Emitters[n].pEmitter;
     }
 

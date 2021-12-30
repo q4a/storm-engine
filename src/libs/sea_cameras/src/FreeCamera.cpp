@@ -87,8 +87,10 @@ void FREE_CAMERA::Move(uint32_t DeltaTime)
 {
     if (!isActive())
         return;
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (LOWORD(GetKeyState(VK_NUMLOCK)) != 0)
         return;
+#endif
 
     // POINT pnt;
     // GetCursorPos(&pnt);
@@ -115,10 +117,12 @@ void FREE_CAMERA::Move(uint32_t DeltaTime)
     float s2 = sinf(vAng.z);
     float speed = 5.0f * 0.001f * static_cast<float>(DeltaTime);
 
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (GetAsyncKeyState(VK_SHIFT))
         speed *= 4.0f;
     if (GetAsyncKeyState(VK_CONTROL))
         speed *= 8.0f;
+#endif
 
     core.Controls->GetControlState("FreeCamera_Forward", cs);
     if (cs.state == CST_ACTIVE)

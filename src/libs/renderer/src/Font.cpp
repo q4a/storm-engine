@@ -112,14 +112,14 @@ bool FONT::Init(const char *font_name, const char *iniName, IDirect3DDevice9 *_d
         const auto len = strlen(buffer) + 1;
         if ((textureName = new char[len]) == nullptr)
             throw std::runtime_error("allocate memory error");
-        strcpy_s(textureName, len, buffer);
+        strcpy(textureName, buffer);
     }
     if (ini->ReadString(font_name, "Techniques", buffer, sizeof(buffer) - 1, ""))
     {
         const auto len = strlen(buffer) + 1;
         if ((techniqueName = new char[len]) == nullptr)
             throw std::runtime_error("allocate memory error");
-        strcpy_s(techniqueName, len, buffer);
+        strcpy(techniqueName, buffer);
     }
     Texture_XSize = ini->GetLong(font_name, "Texture_xsize", 1);
     Texture_YSize = ini->GetLong(font_name, "Texture_ysize", 1);
@@ -140,12 +140,12 @@ bool FONT::Init(const char *font_name, const char *iniName, IDirect3DDevice9 *_d
         utf8::CodepointToUtf8(utf8, codepoint);
         if (codepoint >= 'a' && codepoint <= 'z')
         {
-            sprintf_s(key_name, "char_%s_", utf8);
+            sprintf(key_name, "char_%s_", utf8);
         }
         else if (codepoint == '=')
-            sprintf_s(key_name, "char_equ");
+            sprintf(key_name, "char_equ");
         else
-            sprintf_s(key_name, "char_%s", utf8);
+            sprintf(key_name, "char_%s", utf8);
         if (!ini->ReadString(font_name, key_name, buffer, sizeof(buffer), ""))
             continue;
         pData = buffer;
@@ -213,7 +213,7 @@ long FONT::Printf(long x, long y, char *data_PTR, ...)
 {
     va_list args;
     va_start(args, data_PTR);
-    _vsnprintf_s(Buffer1024, sizeof(Buffer1024), data_PTR, args);
+    vsnprintf(Buffer1024, sizeof(Buffer1024), data_PTR, args);
     va_end(args);
     return Print(x, y, Buffer1024);
 }

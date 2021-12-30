@@ -34,7 +34,7 @@ bool CXI_QUESTTITLE::GetLineNext(int fontNum, char *&pInStr, char *buf, int bufS
     if (lineSize == 0)
         return false;
 
-    strncpy_s(buf, bufSize, pStart, lineSize);
+    strncpy(buf, pStart, lineSize);
     buf[lineSize] = 0;
     const auto strWidth = m_rs->StringWidth(buf, fontNum);
     const auto needWidth = m_rect.right - m_rect.left - m_iconWidth;
@@ -240,7 +240,7 @@ void CXI_QUESTTITLE::SaveParametersToIni()
     }
 
     // save position
-    sprintf_s(pcWriteParam, sizeof(pcWriteParam), "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+    sprintf(pcWriteParam, "%d,%d,%d,%d", m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
     pIni->WriteString(m_nodeName, "position", pcWriteParam);
 }
 

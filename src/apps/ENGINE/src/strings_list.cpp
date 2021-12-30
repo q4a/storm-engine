@@ -1,6 +1,7 @@
 #include "strings_list.h"
 #include <cstring>
 #include <stdexcept>
+#include <storm/string_compare.hpp>
 
 STRINGS_LIST::STRINGS_LIST()
 {
@@ -109,7 +110,8 @@ uint32_t STRINGS_LIST::GetStringCode(const char *_char_PTR)
     {
         if (hash == *((uint32_t *)String_Table_PTR[n]))
         {
-            if (_stricmp(String_Table_PTR[n] + used_data_size + sizeof(uint32_t), _char_PTR) == 0)
+            if (storm::iEquals(std::string_view(String_Table_PTR[n] + used_data_size + sizeof(uint32_t)),
+                               std::string_view(_char_PTR)))
             {
                 // CacheString(n);
                 return n;

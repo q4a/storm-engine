@@ -9,6 +9,7 @@
 // ============================================================================================
 
 #include "AnimationInfo.h"
+#include <storm/string_compare.hpp>
 
 // ============================================================================================
 // Construction, destruction
@@ -18,7 +19,7 @@ AnimationInfo::AnimationInfo(const char *animationName)
     : numFrames(0)
 {
     Assert(strlen(animationName) < 64);
-    strcpy_s(name, animationName);
+    strcpy(name, animationName);
     bone = nullptr;
     numBones = 0;
     refCounter = 0;
@@ -60,7 +61,7 @@ ActionInfo *AnimationInfo::AddAction(const char *anctionName, long startframe, l
 // Compare with current name
 bool AnimationInfo::operator==(const char *animationName)
 {
-    return _stricmp(animationName, name) == 0;
+    return storm::iEquals(std::string_view(animationName), std::string_view(name));
 }
 
 // Find action by name

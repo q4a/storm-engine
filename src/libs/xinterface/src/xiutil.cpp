@@ -23,7 +23,7 @@ int FindCommand(const char *comName)
 {
     int i;
     for (i = 0; i < COMMAND_QUANTITY; i++)
-        if (!_stricmp(comName, pCommandsList[i].sName))
+        if (storm::iEquals(std::string_view(comName), std::string_view(pCommandsList[i].sName)))
             break;
     if (i == COMMAND_QUANTITY)
         return -1;

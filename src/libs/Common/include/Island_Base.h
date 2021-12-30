@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.h"
-#include "sd2_h/CannonTrace.h"
+#include "Sd2_h/CannonTrace.h"
 
 class ISLAND_BASE : public CANNON_TRACE_BASE
 {

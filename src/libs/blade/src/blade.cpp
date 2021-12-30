@@ -175,8 +175,8 @@ bool BLADE::BLADE_INFO::LoadBladeModel(MESSAGE &message)
     {
         // path of the model
         char path[256];
-        strcpy_s(path, "Ammo\\");
-        strcat_s(path, mdlName.c_str());
+        strcpy(path, "Ammo\\");
+        strcat(path, mdlName.c_str());
         // path of the textures
         auto *gs = static_cast<VGEOMETRY *>(core.CreateService("geometry"));
         if (gs)
@@ -345,8 +345,8 @@ bool BLADE::LoadGunModel(MESSAGE &message)
     {
         // path of the model
         char path[256];
-        strcpy_s(path, "Ammo\\");
-        strcat_s(path, mdlName.c_str());
+        strcpy(path, "Ammo\\");
+        strcat(path, mdlName.c_str());
         // path of the textures
         auto *gs = static_cast<VGEOMETRY *>(core.CreateService("geometry"));
         if (gs)
@@ -649,8 +649,8 @@ bool BLADE::TIEITEM_INFO::LoadItemModel(const char *mdlName, const char *locName
 
     // path of the model
     char path[256];
-    strcpy_s(path, "Ammo\\");
-    strcat_s(path, mdlName);
+    strcpy(path, "Ammo\\");
+    strcat(path, mdlName);
     // path of the textures
     auto *gs = static_cast<VGEOMETRY *>(core.CreateService("geometry"));
     if (gs)

@@ -14,7 +14,7 @@
 
 #include "Character.h"
 #include "Location.h"
-#include "entity.h"
+#include "Entity.h"
 #include "sea_base.h"
 #include "shared/messages.h"
 
@@ -558,8 +558,10 @@ void LocationCamera::ExecuteTopos(float dltTime)
 // Free flying camera execution
 void LocationCamera::ExecuteFree(float dltTime)
 {
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (LOWORD(GetKeyState(VK_NUMLOCK)) != 0)
         return;
+#endif
 
     const auto pi = 3.14159265359f;
     freeAx -= dAx * 0.1f;
@@ -575,6 +577,7 @@ void LocationCamera::ExecuteFree(float dltTime)
     lookTo.x = cosf(freeAx) * sinf(freeAy);
     lookTo.y = sinf(freeAx);
     lookTo.z = cosf(freeAx) * cosf(freeAy);
+#ifdef _WIN32 // FIX_LINUX VirtualKey
     if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
         dltTime *= 10.0f;
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
@@ -583,6 +586,7 @@ void LocationCamera::ExecuteFree(float dltTime)
         camPos += 5.0f * lookTo * dltTime;
     if (core.Controls->GetDebugAsyncKeyState(VK_RBUTTON) < 0)
         camPos -= 5.0f * lookTo * dltTime;
+#endif
     lookTo += camPos;
 }
 

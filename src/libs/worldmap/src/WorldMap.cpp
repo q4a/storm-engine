@@ -25,7 +25,7 @@
 #include "WdmWarringShip.h"
 #include "WdmWindUI.h"
 #include "defines.h"
-#include "entity.h"
+#include "Entity.h"
 
 CREATE_CLASS(WorldMap)
 
@@ -56,7 +56,7 @@ WorldMap::WorldMap() : rs{}, aDate{}
     object[WDMAP_MAXOBJECTS - 1].next = -1;
     wdmObjects->wm = this;
     camera = nullptr;
-    srand(GetTickCount());
+    srand(time(nullptr));
     encTime = 0.0f;
     aStorm = nullptr;
     aEncounter = nullptr;
@@ -216,7 +216,7 @@ bool WorldMap::Init()
             AttributesPointer->GetAttributeAsFloat("stormBrnDistMax", wdmObjects->stormBrnDistMax);
         wdmObjects->stormZone = AttributesPointer->GetAttributeAsFloat("stormZone", wdmObjects->stormZone);
         auto *const s = AttributesPointer->GetAttribute("debug");
-        wdmObjects->isDebug = s && (_stricmp(s, "true") == 0);
+        wdmObjects->isDebug = s && (storm::iEquals(std::string_view(s), "true"));
         saveData = AttributesPointer->CreateSubAClass(AttributesPointer, "encounters");
         wdmObjects->resizeRatio = AttributesPointer->GetAttributeAsFloat("resizeRatio", wdmObjects->resizeRatio);
     }
@@ -307,7 +307,7 @@ bool WorldMap::Init()
                 saveData->DeleteAttributeClassX(a);
                 continue;
             }
-            if (_stricmp(type, "Merchant") == 0 && modelName && modelName[0])
+            if (storm::iEquals(std::string_view(type), "Merchant") && modelName && modelName[0])
             {
                 if (!CreateMerchantShip(modelName, nullptr, nullptr, 1.0f, -1.0f, a))
                 {
@@ -315,7 +315,7 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (_stricmp(type, "Follow") == 0 && modelName && modelName[0])
+            if (storm::iEquals(std::string_view(type), "Follow") && modelName && modelName[0])
             {
                 if (!CreateFollowShip(modelName, 1.0f, -1.0f, a))
                 {
@@ -323,7 +323,7 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (_stricmp(type, "Warring") == 0 && modelName && modelName[0])
+            if (storm::iEquals(std::string_view(type), "Warring") && modelName && modelName[0])
             {
                 auto *const attacked = a->GetAttribute("attacked");
                 if (attacked)
@@ -349,11 +349,11 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (_stricmp(type, "Attacked") == 0)
+            if (storm::iEquals(std::string_view(type), "Attacked"))
             {
                 continue;
             }
-            if (_stricmp(type, "Storm") == 0)
+            if (storm::iEquals(std::string_view(type), "Storm"))
             {
                 const auto isTornado = (a->GetAttributeAsDword("isTornado", 0) != 0);
                 if (!CreateStorm(isTornado, -1.0f, a))
@@ -466,22 +466,22 @@ void WorldMap::Realize(uint32_t delta_time)
     //
     auto *tmp = aDate->GetAttribute("sec");
     if (tmp)
-        strcpy_s(wdmObjects->attrSec, tmp);
+        strcpy(wdmObjects->attrSec, tmp);
     tmp = aDate->GetAttribute("min");
     if (tmp)
-        strcpy_s(wdmObjects->attrMin, tmp);
+        strcpy(wdmObjects->attrMin, tmp);
     tmp = aDate->GetAttribute("hour");
     if (tmp)
-        strcpy_s(wdmObjects->attrHour, tmp);
+        strcpy(wdmObjects->attrHour, tmp);
     tmp = aDate->GetAttribute("day");
     if (tmp)
-        strcpy_s(wdmObjects->attrDay, tmp);
+        strcpy(wdmObjects->attrDay, tmp);
     tmp = aDate->GetAttribute("month");
     if (tmp)
-        strcpy_s(wdmObjects->attrMonth, tmp);
+        strcpy(wdmObjects->attrMonth, tmp);
     tmp = aDate->GetAttribute("year");
     if (tmp)
-        strcpy_s(wdmObjects->attrYear, tmp);
+        strcpy(wdmObjects->attrYear, tmp);
     //---------------------------------------------------------
     if (camera && !wdmObjects->isPause)
         camera->Move(dltTime, rs);
@@ -635,7 +635,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
     float x, z, ay;
     if (!apnt || !AttributesPointer)
         return 0;
-    if (_stricmp(apnt->GetThisName(), "deleteUpdate") == 0)
+    if (storm::iEquals(std::string_view(apnt->GetThisName()), "deleteUpdate"))
     {
         for (long i = 0; i < wdmObjects->ships.size(); i++)
         {
@@ -648,7 +648,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             wdmObjects->storms[i]->DeleteUpdate();
         }
     }
-    else if (_stricmp(apnt->GetThisName(), "playerShipUpdate") == 0)
+    else if (storm::iEquals(std::string_view(apnt->GetThisName()), "playerShipUpdate"))
     {
         if (wdmObjects->playerShip)
         {
@@ -659,7 +659,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             AttributesPointer->SetAttributeUseFloat("playerShipAY", ay);
         }
     }
-    else if (_stricmp(apnt->GetThisName(), "cur") == 0)
+    else if (storm::iEquals(std::string_view(apnt->GetThisName()), "cur"))
     {
         auto *pa = apnt->GetParent();
         if (pa == aStorm)
@@ -701,7 +701,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
                 auto *const es = static_cast<WdmEnemyShip *>(wdmObjects->ships[i]);
                 pa->SetAttributeUseFloat("time", es->GetLiveTime());
                 char buf[32];
-                sprintf_s(buf, "%i", es->type);
+                sprintf(buf, "%i", es->type);
                 pa->SetAttribute("type", buf);
                 pa->SetAttributeUseDword("select", es->isSelect);
                 pa->SetAttribute("id", (char *)static_cast<WdmEnemyShip *>(wdmObjects->ships[i])->GetAttributeName());
@@ -733,7 +733,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             }
         }
     }
-    else if (_stricmp(apnt->GetThisName(), "updateinfo") == 0)
+    else if (storm::iEquals(std::string_view(apnt->GetThisName()), "updateinfo"))
     {
         auto *pa = apnt->GetParent();
         if (pa == aInfo)
@@ -745,7 +745,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
     {
         for (auto *pa = apnt; pa; pa = pa->GetParent())
         {
-            if (_stricmp(pa->GetThisName(), "labels") == 0)
+            if (storm::iEquals(std::string_view(pa->GetThisName()), "labels"))
             {
                 wdmObjects->islands->SetIslandsData(AttributesPointer, true);
                 return 0;
@@ -1233,7 +1233,7 @@ ATTRIBUTES *WorldMap::GetEncSaveData(const char *type, const char *retName)
     long i;
     for (i = 0; i < 1000000; i++, encCounter++)
     {
-        sprintf_s(atrName, "enc_%u", encCounter);
+        sprintf(atrName, "enc_%u", encCounter);
         ATTRIBUTES *a = saveData->FindAClass(saveData, atrName);
         if (!a)
             break;

@@ -8,6 +8,7 @@ Comments:
 Import library main file
 ******************************************************************************/
 #include "geom.h"
+#include <storm/string_compare.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -429,7 +430,7 @@ auto unbelievable_workaround(void *ptr)
 long GEOM::FindName(const char *name) const
 {
     for (long n = 0; n < rhead.names; n++)
-        if (_strcmpi(&globname[names[n]], name) == 0)
+        if (storm::iEquals(std::string_view(&globname[names[n]]), std::string_view(name)))
             return unbelievable_workaround(&globname[names[n]]);
     return -1;
 }

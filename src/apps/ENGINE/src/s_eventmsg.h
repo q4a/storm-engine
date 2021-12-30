@@ -34,7 +34,7 @@ class S_EVENTMSG
 
         const auto len = strlen(_name) + 1;
         pEventName = new char[len];
-        strcpy_s(pEventName, len, _name);
+        strcpy(pEventName, _name);
     };
 
     ~S_EVENTMSG()

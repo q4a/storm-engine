@@ -65,13 +65,14 @@ class CORE
     bool Initialized; // initialized flag (false at startup or after Reset())
     bool bEngineIniProcessed;
     HWND App_Hwnd;             // application handle
-    char gstring[_MAX_PATH]{}; // general purpose string
     bool State_loading;
     bool bEnableTimeScale{};
 
     SERVICES_LIST Services_List; // list for subsequent calls RunStart/RunEnd service functions
 
+#ifdef _WIN32
     HINSTANCE hInstance{};
+#endif
 
     char *State_file_name;
 
@@ -100,7 +101,9 @@ class CORE
     void Exit();
     // return application handle
     HWND GetAppHWND();
+#ifdef _WIN32
     HINSTANCE GetAppInstance();
+#endif
     // set time scale; affect on std entity functions DeltaTime parameter
     void SetTimeScale(float _scale);
     // write message to system log file

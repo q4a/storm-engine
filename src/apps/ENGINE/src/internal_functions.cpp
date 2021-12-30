@@ -1158,7 +1158,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         n = TempLong1;
         while (n + static_cast<uint32_t>(slen2) <= static_cast<uint32_t>(slen))
         {
-            if (_strnicmp(pChar + n, pChar2, slen2) == 0)
+            if (storm::iEquals(std::string_view(pChar + n), std::string_view(pChar2), slen2))
             {
                 pV = SStack.Push();
                 pV->Set(static_cast<long>(n));
@@ -1260,29 +1260,29 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             break;
         }
         if (pV->IsReference())
-            strcpy_s(sVarName, "ref:");
+            strcpy(sVarName, "ref:");
         else
             sVarName[0] = 0;
         pV = pV->GetVarPointer();
         switch (pV->GetType())
         {
         case VAR_INTEGER:
-            strcat_s(sVarName, "int");
+            strcat(sVarName, "int");
             break;
         case VAR_FLOAT:
-            strcat_s(sVarName, "float");
+            strcat(sVarName, "float");
             break;
         case VAR_STRING:
-            strcat_s(sVarName, "string");
+            strcat(sVarName, "string");
             break;
         case VAR_OBJECT:
-            strcat_s(sVarName, "object");
+            strcat(sVarName, "object");
             break;
         case VAR_REFERENCE:
-            strcat_s(sVarName, "ref");
+            strcat(sVarName, "ref");
             break;
         case VAR_AREFERENCE:
-            strcat_s(sVarName, "aref");
+            strcat(sVarName, "aref");
             break;
         }
         pV = SStack.Push();
@@ -1920,7 +1920,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         pV->Get(TempFloat1);
         pV2->Get(TempLong1);
         pV = SStack.Push();
-        _gcvt(TempFloat1, TempLong1, gs);
+        gcvt(TempFloat1, TempLong1, gs);
         pV->Set(gs);
         pVResult = pV;
         return pV;
