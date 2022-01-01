@@ -98,22 +98,15 @@ void *SDLWindow::OSHandle()
     if (!window_)
         return nullptr;
 
+#ifdef _WIN32
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
     SDL_GetWindowWMInfo(window_.get(), &info);
-#ifdef SDL_VIDEO_DRIVER_WINDOWS
+
     return info.info.win.window;
-// FIX_LINUX
-/*
-#elif SDL_VIDEO_DRIVER_X11
-    return info.info.x11.window;
-#elif SDL_VIDEO_DRIVER_WAYLAND
-    return info.info.win.egl_window;
-#elif SDL_VIDEO_DRIVER_COCOA
-    return info.info.cocoa.window;
 #else
-*/
-    return nullptr;
+    // dxvk-native uses HWND as SDL2 window handle, so this is allowed
+    return window_.get();
 #endif
 }
 
