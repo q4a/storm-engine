@@ -1,5 +1,7 @@
 #include "storm/xinterface/options_parser.hpp"
 
+#include <SDL.h>
+
 #include "xinterface.h"
 #include "BackScene/backscene.h"
 #include "HelpChooser/HelpChooser.h"
@@ -1071,15 +1073,22 @@ void XINTERFACE::LoadIni()
     if (!ini)
         throw std::runtime_error("ini file not found!");
 
-    RECT Screen_Rect;
 #ifdef _WIN32 // FIX_LINUX
+    RECT Screen_Rect;
     GetWindowRect(core.GetAppHWND(), &Screen_Rect);
+#else
+    int sdlScreenWidth, sdlScreenHeight;
+    SDL_GetWindowSize(reinterpret_cast<SDL_Window *>(core.GetAppHWND()), &sdlScreenWidth, &sdlScreenHeight);
 #endif
 
     fScale = 1.0f;
     const auto screenSize = core.GetScreenSize();
     dwScreenHeight = screenSize.height;
+#ifdef _WIN32 // FIX_LINUX
     dwScreenWidth = (Screen_Rect.right - Screen_Rect.left) * dwScreenHeight / (Screen_Rect.bottom - Screen_Rect.top);
+#else
+    dwScreenWidth = sdlScreenWidth * dwScreenHeight / sdlScreenHeight;
+#endif
     if (dwScreenWidth < screenSize.width)
         dwScreenWidth = screenSize.width;
     GlobalScreenRect.top = 0;
@@ -1138,9 +1147,9 @@ void XINTERFACE::LoadIni()
     m_idTex = pRenderService->TextureCreate(param2);
     //  RECT Screen_Rect;
     //  GetWindowRect(core.GetAppHWND(), &Screen_Rect);
+#ifdef _WIN32 // FIX_LINUX Cursor
     lock_x = Screen_Rect.left + (Screen_Rect.right - Screen_Rect.left) / 2;
     lock_y = Screen_Rect.top + (Screen_Rect.bottom - Screen_Rect.top) / 2;
-#ifdef _WIN32 // FIX_LINUX Cursor
     SetCursorPos(lock_x, lock_y);
 #endif
     fXMousePos = static_cast<float>(dwScreenWidth / 2);
