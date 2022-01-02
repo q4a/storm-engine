@@ -223,7 +223,7 @@ macro(STORM_SETUP)
 
     if(${_SETUP_TYPE} STREQUAL "executable")
       if(NOT WIN32)
-        list(APPEND target_link_flags "-v -Wl,--whole-archive")
+        list(APPEND target_link_flags "-Wl,--whole-archive")
       endif()
       foreach(dep ${_SETUP_DEPENDENCIES})
         if(TARGET ${dep})
