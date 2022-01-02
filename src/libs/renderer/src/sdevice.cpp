@@ -654,6 +654,28 @@ DX9RENDER::~DX9RENDER()
     // aCaptureBuffers.DelAllWithPointers();
 }
 
+#ifndef _WIN32 // DXVK_TEST2
+enum eModeRenderDevice
+{
+    RENDERDEVICE_MODE_WINDOW	=	1<<0,	// вывод в окно
+
+    //d3d only
+    RENDERDEVICE_MODE_RGB16		=	1<<8,	// 16 битный цвет
+    RENDERDEVICE_MODE_RGB32		=	1<<9,	// 32 битный цвет
+    RENDERDEVICE_MODE_COMPRESS	=	1<<10,	// компресованные текстуры
+    RENDERDEVICE_MODE_VSYNC		=	1<<11,	// использовать вертикальную синхронизацию
+    RENDERDEVICE_MODE_STRENCIL	=	1<<12,
+    RENDERDEVICE_MODE_Z24		=	1<<13,	// 24 битный
+    RENDERDEVICE_MODE_REF		=	1<<14,
+    RENDERDEVICE_MODE_MULTITHREAD = 1<<15,
+    RENDERDEVICE_MODE_ALPHA		=   1<<16,  //При создании rendertarget использовать alpha
+
+    //Internal
+    RENDERDEVICE_MODE_RETURNERROR=	1<<17, //Только для ChangeSize
+    RENDERDEVICE_MODE_ONEBACKBUFFER=1<<18,
+};
+#endif
+
 bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, long width, long height)
 {
     // GUARD(DX9RENDER::InitDevice)
@@ -667,6 +689,91 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, long width, long height)
 
     hwnd = _hwnd;
     core.Trace("Initializing DirectX 9");
+#ifndef _WIN32 // DXVK_TEST2
+    int xscr = width;
+    int yscr = height;
+    int Mode = 33281;
+    int RefreshRateInHz = 0;
+    D3DCAPS9 DeviceCaps;
+    int RenderMode = Mode;
+    bool bSupportVertexShaderHardware = true;
+
+    //RenderMode = Mode;
+    d3d = Direct3DCreate9(D3D_SDK_VERSION);
+
+    D3DDISPLAYMODE d3ddm;
+    DWORD Adapter=0/*D3DADAPTER_DEFAULT*/;
+    d3d->GetAdapterDisplayMode(Adapter,&d3ddm);
+    if(Mode&RENDERDEVICE_MODE_WINDOW) {
+        if(d3ddm.Format==D3DFMT_X8R8G8B8||d3ddm.Format==D3DFMT_R8G8B8||d3ddm.Format==D3DFMT_A8R8G8B8)
+            RenderMode&=~RENDERDEVICE_MODE_RGB16,RenderMode|=RENDERDEVICE_MODE_RGB32;
+        else
+            RenderMode&=~RENDERDEVICE_MODE_RGB32,RenderMode|=RENDERDEVICE_MODE_RGB16;
+    }
+
+    if(!(RenderMode&RENDERDEVICE_MODE_RGB32))
+        RenderMode|=RENDERDEVICE_MODE_RGB16;
+
+//	if(TexFmtData[SURFMT_RENDERMAP].TexFmtD3D==D3DFMT_UNKNOWN||TexFmtData[SURFMT_COLORALPHA].TexFmtD3D==D3DFMT_UNKNOWN||TexFmtData[SURFMT_COLOR].TexFmtD3D==D3DFMT_UNKNOWN)
+//		return 5; // don't support render to texture
+    d3d->GetDeviceCaps(Adapter,D3DDEVTYPE_HAL,&DeviceCaps);
+    memset(&d3dpp, 0, sizeof(d3dpp));
+    d3dpp.BackBufferWidth			= xscr;
+    d3dpp.BackBufferHeight			= yscr;
+    d3dpp.MultiSampleType			= D3DMULTISAMPLE_NONE;
+    d3dpp.MultiSampleQuality		= 0;
+    d3dpp.SwapEffect				= D3DSWAPEFFECT_DISCARD;
+    d3dpp.hDeviceWindow				= hwnd;
+
+    d3dpp.EnableAutoDepthStencil	= TRUE;
+    d3dpp.Flags						= D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
+    d3dpp.FullScreen_RefreshRateInHz= (Mode&RENDERDEVICE_MODE_WINDOW)?0:RefreshRateInHz;
+    d3dpp.PresentationInterval		= D3DPRESENT_INTERVAL_IMMEDIATE;
+    //UpdateRenderMode();
+
+    if(!(RenderMode&RENDERDEVICE_MODE_RGB32))
+        RenderMode|=RENDERDEVICE_MODE_RGB16;
+
+    bool is32zbuffer=false;
+    if(RenderMode&(RENDERDEVICE_MODE_STRENCIL|RENDERDEVICE_MODE_Z24))
+    {
+        is32zbuffer=true;
+    }else
+    {
+        is32zbuffer=(RenderMode&RENDERDEVICE_MODE_RGB32)?true:false;
+    }
+
+    d3dpp.AutoDepthStencilFormat= is32zbuffer?D3DFMT_D24S8:D3DFMT_D16;
+    d3dpp.BackBufferFormat=D3DFMT_X8R8G8B8;
+
+    d3dpp.BackBufferCount			= (RenderMode&RENDERDEVICE_MODE_WINDOW)?1:2;
+    d3dpp.Windowed					= (RenderMode&(RENDERDEVICE_MODE_WINDOW|RENDERDEVICE_MODE_ONEBACKBUFFER))?TRUE:FALSE;
+
+    D3DDISPLAYMODE d3ddm1;
+    DWORD Adapter1=0;
+    d3d->GetAdapterDisplayMode(Adapter1,&d3ddm1);
+
+    //bSupportVertexShaderHardware=bSupportVertexShader=(D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion)>=1);
+
+    DWORD mt=D3DCREATE_FPU_PRESERVE;
+
+    if(RenderMode&RENDERDEVICE_MODE_MULTITHREAD)
+        mt|=D3DCREATE_MULTITHREADED;
+
+    if(bSupportVertexShaderHardware)
+    {
+        if(CHECKD3DERR(d3d->CreateDevice(Adapter,D3DDEVTYPE_HAL,hwnd,D3DCREATE_HARDWARE_VERTEXPROCESSING|mt,&d3dpp,&d3d9)))
+        {
+            return false;
+        }
+    }
+
+    if(d3d9==0)
+    {
+        return false;
+    }
+
+#else
     d3d = Direct3DCreate9(D3D_SDK_VERSION);
     if (d3d == nullptr)
     {
@@ -707,6 +814,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, long width, long height)
     }
 
     d3dpp.MultiSampleType = D3DMULTISAMPLE_NONE;
+#ifdef _WIN32 // DXVK_TEST
     for (auto samples = msaa; msaa > D3DMULTISAMPLE_2_SAMPLES; samples--)
     {
         if (SUCCEEDED(d3d->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.BackBufferFormat, false,
@@ -721,6 +829,9 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, long width, long height)
         d3dpp.Flags = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
     else
         d3dpp.Flags = 0;
+#else
+    d3dpp.Flags = D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
+#endif
     // d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
     // d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
@@ -889,6 +1000,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, long width, long height)
 
     // UNGUARD
     return true;
+#endif // DXVK_TEST2
 }
 
 //################################################################################
