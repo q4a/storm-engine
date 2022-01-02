@@ -57,8 +57,6 @@ if (NOT CMAKE_HOST_WIN32 AND STORM_ENABLE_DXVK)
             "${SOURCE_DIR}/include/native/windows"
     )
     set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
-
-    #set(perimeter_LINK_LIBS ${perimeter_LINK_LIBS} ${DXVK_NATIVE_D3D9_LIB})
     include_directories("${DXVK_NATIVE_INCLUDE_DIRS}")
 endif()
 
