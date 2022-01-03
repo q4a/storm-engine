@@ -1348,7 +1348,7 @@ long DX9RENDER::TextureCreate(const char *fname)
                 _fname[strlen(_fname) - 3] = 0;
         }
 
-        strupr(_fname);
+        toupr(_fname);
 
         const unsigned long hf = hash_string(_fname);
 
@@ -2920,7 +2920,8 @@ long DX9RENDER::LoadFont(const char *fontName)
         strncpy(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = strupr(sDup);
+    toupr(sDup);
+    fontName = sDup;
     const unsigned long hashVal = hash_string(fontName);
 
     long i;
@@ -2972,7 +2973,8 @@ bool DX9RENDER::UnloadFont(const char *fontName)
         strncpy(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = strupr(sDup);
+    toupr(sDup);
+    fontName = sDup;
     const unsigned long hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
@@ -3026,7 +3028,8 @@ bool DX9RENDER::SetCurFont(const char *fontName)
         strncpy(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = strupr(sDup);
+    toupr(sDup);
+    fontName = sDup;
     const unsigned long hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
