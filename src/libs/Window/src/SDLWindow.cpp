@@ -7,9 +7,12 @@ namespace storm
 {
 SDLWindow::SDLWindow(int width, int height, bool fullscreen) : fullscreen_(fullscreen)
 {
+    uint32_t flags = (fullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_HIDDEN;
+#ifndef _WIN32 // DXVK-Native
+    flags |= SDL_WINDOW_VULKAN;
+#endif
     window_ = std::unique_ptr<SDL_Window, std::function<void(SDL_Window *)>>(
-        SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
-                         (fullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_HIDDEN),
+        SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags),
         [](SDL_Window *w) { SDL_DestroyWindow(w); });
 
     sdlID_ = SDL_GetWindowID(window_.get());
