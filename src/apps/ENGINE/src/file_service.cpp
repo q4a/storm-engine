@@ -2,6 +2,7 @@
 #include "core.h"
 #include "storm_assert.h"
 #include "utf8.h"
+#include "defines.h"
 
 #include <SDL.h>
 #include <exception>
@@ -16,25 +17,6 @@
 #define INI_SIGNATURE ";[SE2IF]"
 const char INI_LINEFEED[3] = {0xd, 0xa, 0};
 const char INI_VOIDSYMS[VOIDSYMS_NUM] = {0x20, 0x9};
-
-#ifdef _WIN32
-inline const char *convert_path_sep(const char *cPath)
-{
-    return cPath;
-}
-#else
-inline char *convert_path_sep(const char *cPath)
-{
-    const auto len = strlen(cPath) + 1;
-    auto newPath = new char[len];
-    strcpy(newPath, cPath);
-
-    while (char *sep = strchr(newPath, '\\'))
-        *sep = '/';
-
-    return newPath;
-}
-#endif
 
 void FILE_SERVICE::FlushIniFiles()
 {

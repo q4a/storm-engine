@@ -1302,7 +1302,7 @@ long DX9RENDER::TextureCreate(const char *fname)
         return -1L;
     }
 
-    std::filesystem::path path = fname;
+    std::filesystem::path path = convert_path_sep(fname);
     std::string pathStr = path.extension().string();
     if (storm::iEquals(pathStr, ".tx"))
         path.replace_extension();

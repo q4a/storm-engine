@@ -107,9 +107,26 @@ inline void tolwr(char *str)
         QueryPerformanceCounter(&li);                                                                                  \
         x = li.QuadPart - x;                                                                                           \
     }
+
+inline const char *convert_path_sep(const char *cPath)
+{
+    return cPath;
+}
 #else
 #define RDTSC_B(x)    { x = __rdtsc(); }
 #define RDTSC_E(x)    { x = __rdtsc() - x; }
+
+inline char *convert_path_sep(const char *cPath)
+{
+    const auto len = strlen(cPath) + 1;
+    auto newPath = new char[len];
+    strcpy(newPath, cPath);
+
+    while (char *sep = strchr(newPath, '\\'))
+        *sep = '/';
+
+    return newPath;
+}
 
 #include <limits.h>
 
