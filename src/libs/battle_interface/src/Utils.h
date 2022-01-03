@@ -85,7 +85,7 @@ class BIUtils
 {
     //---------------------------------------
   public: // functions
-    static long GetLongFromAttr(ATTRIBUTES *pA, const char *name, long defVal);
+    static long GetIntFromAttr(ATTRIBUTES *pA, const char *name, long defVal);
     static float GetFloatFromAttr(ATTRIBUTES *pA, const char *name, float defVal);
     static bool ReadStringFromAttr(ATTRIBUTES *pA, const char *name, char *buf, long bufSize, const char *defVal);
     static char *GetStringFromAttr(ATTRIBUTES *pA, const char *name, const char *defVal);

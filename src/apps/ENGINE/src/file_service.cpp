@@ -413,15 +413,15 @@ bool INIFILE_T::ReadStringNext(const char *section_name, const char *key_name, c
 }
 
 // return long value of key in pointed section if section and key exist, throw EXS object otherwise
-long INIFILE_T::GetLong(const char *section_name, const char *key_name)
+long INIFILE_T::GetInt(const char *section_name, const char *key_name)
 {
-    return ifs_PTR->GetLong(&Search, section_name, key_name);
+    return ifs_PTR->GetInt(&Search, section_name, key_name);
 }
 
 // return long value of key in pointed section if section and key exist, if not - return def_value
-long INIFILE_T::GetLong(const char *section_name, const char *key_name, long def_val)
+long INIFILE_T::GetInt(const char *section_name, const char *key_name, long def_val)
 {
-    return ifs_PTR->GetLong(&Search, section_name, key_name, def_val);
+    return ifs_PTR->GetInt(&Search, section_name, key_name, def_val);
 }
 
 // return double value of key in pointed section if section and key exist, throw EXS object otherwise
@@ -436,9 +436,9 @@ double INIFILE_T::GetDouble(const char *section_name, const char *key_name, doub
     return ifs_PTR->GetDouble(&Search, section_name, key_name, def_val);
 }
 
-bool INIFILE_T::GetLongNext(const char *section_name, const char *key_name, long *val)
+bool INIFILE_T::GetIntNext(const char *section_name, const char *key_name, long *val)
 {
-    return ifs_PTR->GetLongNext(&Search, section_name, key_name, val);
+    return ifs_PTR->GetIntNext(&Search, section_name, key_name, val);
 }
 
 bool INIFILE_T::GetDoubleNext(const char *section_name, const char *key_name, double *val)

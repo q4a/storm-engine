@@ -9,7 +9,7 @@
 entid_t BIUtils::idBattleInterface;
 uint32_t BIUtils::g_dwBlinkColor;
 
-long BIUtils::GetLongFromAttr(ATTRIBUTES *pA, const char *name, long defVal)
+long BIUtils::GetIntFromAttr(ATTRIBUTES *pA, const char *name, long defVal)
 {
     if (pA == nullptr || name == nullptr)
         return defVal;

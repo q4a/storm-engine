@@ -784,5 +784,5 @@ long BIShipIcon::GetShipClass(long nCharIdx)
     VDATA *pVDat = core.Event("evntGetCharacterShipClass", "l", nCharIdx);
     if (!pVDat)
         return 1;
-    return pVDat->GetLong();
+    return pVDat->GetInt();
 }

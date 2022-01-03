@@ -115,9 +115,9 @@ class IFS : public INIFILE
                                         size_t buffer_size, const char *def_string))
     IFS_NOT_IMPLEMENTED(bool ReadStringNext(const char *section_name, const char *key_name, char *buffer,
                                             size_t buffer_size))
-    IFS_NOT_IMPLEMENTED(long GetLong(const char *section_name, const char *key_name))
-    IFS_NOT_IMPLEMENTED(long GetLong(const char *section_name, const char *key_name, long def_val))
-    IFS_NOT_IMPLEMENTED(bool GetLongNext(const char *section_name, const char *key_name, long *val))
+    IFS_NOT_IMPLEMENTED(long GetInt(const char *section_name, const char *key_name))
+    IFS_NOT_IMPLEMENTED(long GetInt(const char *section_name, const char *key_name, long def_val))
+    IFS_NOT_IMPLEMENTED(bool GetIntNext(const char *section_name, const char *key_name, long *val))
     IFS_NOT_IMPLEMENTED(double GetDouble(const char *section_name, const char *key_name))
     IFS_NOT_IMPLEMENTED(double GetDouble(const char *section_name, const char *key_name, double def_val))
     IFS_NOT_IMPLEMENTED(bool GetDoubleNext(const char *section_name, const char *key_name, double *val))
@@ -158,9 +158,9 @@ class IFS : public INIFILE
     bool ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer,
                         uint32_t buffer_size);
 
-    long GetLong(SEARCH_DATA *sd, const char *section_name, const char *key_name);
-    long GetLong(SEARCH_DATA *sd, const char *section_name, const char *key_name, long def_val);
-    bool GetLongNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, long *val);
+    long GetInt(SEARCH_DATA *sd, const char *section_name, const char *key_name);
+    long GetInt(SEARCH_DATA *sd, const char *section_name, const char *key_name, long def_val);
+    bool GetIntNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, long *val);
 
     double GetDouble(SEARCH_DATA *sd, const char *section_name, const char *key_name);
     double GetDouble(SEARCH_DATA *sd, const char *section_name, const char *key_name, double def_val);

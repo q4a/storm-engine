@@ -77,7 +77,7 @@ class CXI_UTILS
     static uint32_t StringGetColor(const char *pcARGBString);
     static void StringDoublicate(const char *pcSrc, char *&pcDst);
     static void StringTwoLong(const char *pcString, long &nLong1, long &nLong2);
-    static long StringGetLong(const char *&pcString);
+    static long StringGetInt(const char *&pcString);
     static float StringGetFloat(const char *&pcString);
     static void StringFourFloat(const char *pcString, float &f1, float &f2, float &f3, float &f4);
     static void StringFillStringArray(const char *pcString, std::vector<std::string> &asStringsArray);

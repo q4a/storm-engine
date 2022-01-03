@@ -923,14 +923,14 @@ bool IFS::ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *
     return false;
 }
 
-long IFS::GetLong(SEARCH_DATA *sd, const char *section_name, const char *key_name)
+long IFS::GetInt(SEARCH_DATA *sd, const char *section_name, const char *key_name)
 {
     char buffer[256];
     ReadString(sd, section_name, key_name, buffer, sizeof(buffer));
     return static_cast<long>(atoll(buffer));
 }
 
-long IFS::GetLong(SEARCH_DATA *sd, const char *section_name, const char *key_name, long def_val)
+long IFS::GetInt(SEARCH_DATA *sd, const char *section_name, const char *key_name, long def_val)
 {
     char buffer[256];
     if (ReadString(sd, section_name, key_name, buffer, sizeof(buffer), ""))
@@ -938,7 +938,7 @@ long IFS::GetLong(SEARCH_DATA *sd, const char *section_name, const char *key_nam
     return def_val;
 }
 
-bool IFS::GetLongNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, long *val)
+bool IFS::GetIntNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, long *val)
 {
     char buffer[256];
     if (ReadStringNext(sd, section_name, key_name, buffer, sizeof(buffer)))

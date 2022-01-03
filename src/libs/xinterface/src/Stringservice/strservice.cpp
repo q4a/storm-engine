@@ -1174,7 +1174,7 @@ uint32_t _InterfaceMakeNode(VS_STACK *pS)
     VDATA* pDat = (VDATA *)pS->Pop();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    const long nPriority = pDat->GetLong();
+    const long nPriority = pDat->GetInt();
 
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
@@ -1213,7 +1213,7 @@ uint32_t _InterfaceWindowShow(VS_STACK *pS)
     VDATA *pDat = (VDATA *)pS->Pop();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    long nShow = pDat->GetLong();
+    long nShow = pDat->GetInt();
 
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
@@ -1231,7 +1231,7 @@ uint32_t _InterfaceWindowDisable(VS_STACK *pS)
     VDATA * pDat = (VDATA *)pS->Pop();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    long nShow = pDat->GetLong();
+    long nShow = pDat->GetInt();
 
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
@@ -1462,7 +1462,7 @@ uint32_t _RestoreNodeLocks(VS_STACK *pS)
     auto pDat = (VDATA *)pS->Pop();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    const long nStoreIndex = pDat->GetLong();
+    const long nStoreIndex = pDat->GetInt();
     if (XINTERFACE::pThis != nullptr)
         XINTERFACE::pThis->RestoreNodeLocks(nStoreIndex);
     return IFUNCRESULT_OK;
@@ -1511,7 +1511,7 @@ uint32_t IsVirtualKeyPressed(VS_STACK *stack)
         return IFUNCRESULT_FAILED;
     }
 
-    const auto key_code = data->GetLong();
+    const auto key_code = data->GetInt();
 
     data = stack->Push();
     if (!data)
@@ -1558,7 +1558,7 @@ uint32_t _AddControlTreeNode(VS_STACK *pS)
     pDat = (VDATA *)pS->Pop();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    const long nParent = pDat->GetLong();
+    const long nParent = pDat->GetInt();
 
     const long nNodIdx = core.Controls->AddControlTreeNode(nParent, pcBaseControl, pcOutControl, fTimeOut);
 

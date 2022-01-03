@@ -783,7 +783,7 @@ bool AIShipCannonController::isHaveEnoughtBallsForBort(uint32_t dwBortIdx)
     Assert(dwBortIdx != INVALID_BORT_INDEX && dwBortIdx < aShipBorts.size());
     VDATA *pvData = core.Event(SHIP_GET_CURRENT_BALLS_NUM, "a", GetAIShip()->GetACharacter());
     Assert(pvData);
-    if (static_cast<long>(GetBortIntactCannonsNum(dwBortIdx)) > pvData->GetLong())
+    if (static_cast<long>(GetBortIntactCannonsNum(dwBortIdx)) > pvData->GetInt())
         return false;
     return true;
 }

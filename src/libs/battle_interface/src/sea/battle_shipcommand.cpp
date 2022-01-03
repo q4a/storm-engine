@@ -161,7 +161,7 @@ long BIShipCommandList::ShipAdding(bool allLabel, bool bMyShip, bool bEnemy, boo
                 {
                     auto *pvdat =
                         core.Event("evntCheckEnableShip", "sl", m_sCurrentCommandName.c_str(), sd->characterIndex);
-                    if (pvdat != nullptr && pvdat->GetLong() == 0)
+                    if (pvdat != nullptr && pvdat->GetInt() == 0)
                         continue;
                 }
                 n = AddToIconList(sd->textureNum, sd->pictureNum, sd->selectPictureNum, -1, sd->characterIndex, nullptr,
@@ -218,7 +218,7 @@ long BIShipCommandList::FortAdding(bool allLabel, bool bFriend, bool bNeutral, b
                 if (SQR(pL->x - selX) + SQR(pL->z - selZ) > sqrRadius)
                     continue;
             auto *pvdat = core.Event("evntCheckEnableLocator", "sa", m_sCurrentCommandName.c_str(), pL->pA);
-            if (pvdat != nullptr && pvdat->GetLong() == 0)
+            if (pvdat != nullptr && pvdat->GetInt() == 0)
                 continue;
             char *pLocName = nullptr;
             if (pL->pA != nullptr)
@@ -270,7 +270,7 @@ long BIShipCommandList::LandAdding(bool allLabel)
             if (SQR(pL->x - selX) + SQR(pL->z - selZ) > sqrRadius)
                 continue;
         auto *pvdat = core.Event("evntCheckEnableLocator", "sa", m_sCurrentCommandName.c_str(), pL->pA);
-        if (pvdat != nullptr && pvdat->GetLong() == 0)
+        if (pvdat != nullptr && pvdat->GetInt() == 0)
             continue;
         char *pLocName = nullptr;
         if (pL->pA != nullptr)
@@ -460,7 +460,7 @@ long BIShipCommandList::TownAdding(bool allLabel, bool bDiseased, bool bNotDisea
             if (SQR(pL->x - selX) + SQR(pL->z - selZ) > sqrRadius)
                 continue;
         auto *pvdat = core.Event("evntCheckEnableLocator", "sa", m_sCurrentCommandName.c_str(), pL->pA);
-        if (pvdat != nullptr && pvdat->GetLong() == 0)
+        if (pvdat != nullptr && pvdat->GetInt() == 0)
             continue;
         char *pLocName = nullptr;
         if (pL->pA != nullptr)
