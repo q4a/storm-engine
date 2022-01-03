@@ -132,7 +132,7 @@ inline char *convert_path_sep(const char *cPath)
 
 #define MAX_PATH PATH_MAX
 #define _MAX_FNAME NAME_MAX
-#define MAKELONG(low, hi) ((long)(((unsigned short)(low)) | (((unsigned long)((unsigned short)(hi))) << 16)))
+#define MAKELONG(low, high) ((int32_t)(((uint16_t)(low)) | (((uint32_t)((uint16_t)(high))) << 16)))
 #endif
 
 // Defines
