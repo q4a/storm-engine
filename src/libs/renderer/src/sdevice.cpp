@@ -99,7 +99,7 @@ uint32_t DX9SetTexturePath(VS_STACK *pS)
     auto *pVR = (VDATA *)pS->Push();
     if (!pVR || iNumber < 0 || iNumber >= 4)
     {
-        pVR->Set(static_cast<long>(0));
+        pVR->Set(0);
         return IFUNCRESULT_OK;
     }
 
@@ -107,7 +107,7 @@ uint32_t DX9SetTexturePath(VS_STACK *pS)
     DX9RENDER::pRS->TextureCreate((const char *)iNumber);
     DX9RENDER::pRS->TextureCreate(static_cast<const char *>(pStr));
 
-    pVR->Set(static_cast<long>(1));
+    pVR->Set(1);
 
     return IFUNCRESULT_OK;
 }
@@ -121,7 +121,7 @@ uint32_t RPrint(VS_STACK *pS)
     if (pString->GetString())
         DX9RENDER::pRS->Print(x, y, pString->GetString());
     auto *pVR = (VDATA *)pS->Push();
-    pVR->Set(static_cast<long>(0));
+    pVR->Set(0);
     return IFUNCRESULT_OK;
 }
 
@@ -134,14 +134,14 @@ uint32_t SetGlowParams(VS_STACK *pS)
     DX9RENDER::pRS->SetGLOWParams(fBlurBrushSize, Intensivity, BlurPasses);
 
     auto *pVR = (VDATA *)pS->Push();
-    pVR->Set(static_cast<long>(0));
+    pVR->Set(0);
     return IFUNCRESULT_OK;
 }
 
 uint32_t slGetTexture(VS_STACK *pS)
 {
     auto filename = ((VDATA *)pS->Pop())->GetString();
-    long texNum = DX9RENDER::pRS->TextureCreate(filename);
+    int32_t texNum = static_cast<int32_t>(DX9RENDER::pRS->TextureCreate(filename));
 
     auto *pVR = (VDATA *)pS->Push();
     pVR->Set(texNum);

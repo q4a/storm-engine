@@ -1221,12 +1221,12 @@ uint64_t SHIP::ProcessMessage(MESSAGE &message)
     break;
     case MSG_SHIP_GET_CHARACTER_INDEX: {
         auto *pVData = message.ScriptVariablePointer();
-        pVData->Set(static_cast<long>(GetIndex(GetACharacter())));
+        pVData->Set(static_cast<int32_t>(GetIndex(GetACharacter())));
     }
     break;
     case MSG_SHIP_GET_NUM_FIRE_PLACES: {
         auto *pVData = message.ScriptVariablePointer();
-        pVData->Set(static_cast<long>(aFirePlaces.size()));
+        pVData->Set(static_cast<int32_t>(aFirePlaces.size()));
     }
     break;
     case MSG_SHIP_RESET_TRACK: {

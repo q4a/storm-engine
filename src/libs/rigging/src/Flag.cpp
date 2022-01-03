@@ -833,8 +833,8 @@ void FLAG::SetAdd(int flagNum)
         }
         else
         {
-            long curTexNumC = 0;
-            long curTexNumR = 0;
+            int32_t curTexNumC = 0;
+            int32_t curTexNumR = 0;
 
             // set texture number
             if (core.GetTargetEngineVersion() <= storm::ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS)

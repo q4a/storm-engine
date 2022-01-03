@@ -273,7 +273,7 @@ void Grass::Execute(uint32_t delta_time)
     }
 
     VDATA *param = core.Event("GOpt_GetGrassQuality", nullptr);
-    long res = rq_full;
+    int32_t res = rq_full;
     if (param && param->Get(res))
     {
         if (res < rq_full)

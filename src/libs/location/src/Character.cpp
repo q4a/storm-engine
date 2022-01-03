@@ -1362,7 +1362,7 @@ bool Character::IsFightEnable() const
 {
     // Ask the script about the possibility of shooting
     VDATA *vd = core.Event("Location_CharacterIsFight", "i", GetId());
-    long res = 0;
+    int32_t res = 0;
     if (vd && vd->Get(res))
     {
         if (!res)
@@ -1497,7 +1497,7 @@ void Character::Attack(Character *enemy, FightAction type)
         res = core.Event("ChrAttackAction", "is", GetId(), aname);
         if (res)
         {
-            long isEnable = 1;
+            int32_t isEnable = 1;
             if (res->Get(isEnable))
             {
                 if (!isEnable)
@@ -1770,7 +1770,7 @@ bool Character::IsGunLoad() const
         return false;
     // Ask the script about the possibility of shooting
     VDATA *vd = core.Event("Location_CharacterIsFire", "i", GetId());
-    long res = 0;
+    int32_t res = 0;
     if (vd && vd->Get(res))
     {
         if (!res)
@@ -4959,7 +4959,7 @@ void Character::FindNearCharacters(MESSAGE &message)
     auto n = fndCharacter.size();
     if (fndCharacter.empty())
     {
-        num->Set(0L);
+        num->Set(0);
         return;
     }
     num->Set(n);
@@ -4968,7 +4968,7 @@ void Character::FindNearCharacters(MESSAGE &message)
     if (n > static_cast<long>(array->GetElementsNum()))
         array->SetElementsNum(n);
     char buf[64];
-    long nn = 0;
+    int32_t nn = 0;
     for (long i = 0; i < n; i++)
     {
         // Information

@@ -1462,11 +1462,11 @@ void BATTLE_NAVIGATOR::UpdateCurrentCharge()
     VDATA *pVD = core.Event("GetCurrentCharge");
     if (pVD == nullptr)
         return;
-    long curCharge = m_curCharge;
-    long curSailState = m_curSailState;
-    long curWindPic = m_curWindPic;
-    long curPowder = m_curPowder;
-    long isPowderRunOut = 0;
+    int32_t curCharge = m_curCharge;
+    int32_t curSailState = m_curSailState;
+    int32_t curWindPic = m_curWindPic;
+    int32_t curPowder = m_curPowder;
+    int32_t isPowderRunOut = 0;
     pVD->Get(curCharge, 0);
     pVD->Get(curSailState, 1);
     pVD->Get(curWindPic, 2);

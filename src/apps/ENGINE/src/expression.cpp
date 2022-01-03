@@ -68,7 +68,7 @@ bool COMPILER::BC_ProcessExpression(DATA *value)
         if (Token_type == SQUARE_OPEN_BRACKET)
         {
             DATA array_index;
-            long index;
+            int32_t index;
             array_index.SetVCompiler(this);
 
             if (!pV->IsArray())
@@ -139,7 +139,7 @@ bool COMPILER::BC_ProcessExpression(DATA *value)
 // logical
 void COMPILER::BC_ProcessExpression_L0(DATA *value)
 {
-    long lRes;
+    int32_t lRes;
     DATA value2;
     value2.SetVCompiler(this);
 
@@ -330,7 +330,7 @@ void COMPILER::BC_ProcessExpression_L4(DATA *value, bool bSkip)
 {
     DATA TempVal;
     TempVal.SetVCompiler(this);
-    long Deg;
+    int32_t Deg;
 
     BC_ProcessExpression_L5(value, bSkip);
     if (TokenIs(OP_POWER))
@@ -368,7 +368,7 @@ void COMPILER::BC_ProcessExpression_L5(DATA *value, bool bSkip)
             value->Inverse();
         else if (op == OP_BOOL_NEG)
         {
-            long iVal;
+            int32_t iVal;
             const char *sVal;
 
             switch (value->GetType())
@@ -425,7 +425,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
 {
     const VarInfo *real_var;
     uint32_t var_code;
-    long index;
+    int32_t index;
     DATA array_index;
     DATA TempData;
     TempData.SetVCompiler(this);
@@ -450,7 +450,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
             }
             return;
         }
-        value->Set(*((long *)&pRunCodeBase[TLR_DataOffset]));
+        value->Set(*((int32_t *)&pRunCodeBase[TLR_DataOffset]));
         while (BC_TokenGet() == DEBUG_LINE_CODE)
         {
         }

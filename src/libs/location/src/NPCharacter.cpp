@@ -91,7 +91,7 @@ bool NPCharacter::PostInit()
 {
     charactersGroups = EntityManager::GetEntityId("CharactersGroups");
     float tmp;
-    long tmpBool;
+    int32_t tmpBool;
     VDATA *vd;
     // Attack parameters
     vd = core.Event("NPC_Event_GetAttackActive", "i", GetId());
@@ -147,9 +147,9 @@ bool NPCharacter::PostInit()
     vd = core.Event("NPC_Event_StunChance", "i", GetId());
     if (core.GetTargetEngineVersion() >= storm::ENGINE_VERSION::TO_EACH_HIS_OWN)
     {
-        auto tmpLong = stunChance;
+        auto tmpLong = static_cast<int32_t>(stunChance);
         if (vd && vd->Get(tmpLong))
-            stunChance = tmpLong;
+            stunChance = static_cast<long>(tmpLong);
     }
     // Parameter normalization
     if (attackCur < 0.0f)
@@ -845,7 +845,7 @@ void NPCharacter::DoFightActionAnalysisNone(float dltTime, NPCharacter *enemy)
     if (!(wishAttact | wishDefence))
         return;
     // get the target selection mode for the attack
-    long isAdaptive = true;
+    int32_t isAdaptive = true;
     VDATA *vd = core.Event("NPC_Event_AdaptiveTargetSelect", "i", GetId());
     if (vd)
         vd->Get(isAdaptive);

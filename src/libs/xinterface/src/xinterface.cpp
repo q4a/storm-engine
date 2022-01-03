@@ -318,7 +318,7 @@ void XINTERFACE::Execute(uint32_t)
     }
 
     if (m_pMouseWeel)
-        m_pMouseWeel->Set(0L);
+        m_pMouseWeel->Set(0);
 }
 
 void XINTERFACE::Realize(uint32_t)
@@ -859,7 +859,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         if (sSaveName != nullptr)
         {
             message.ScriptVariablePointer()->Set(sSaveName);
-            message.ScriptVariablePointer()->Set(nSaveFileSize);
+            message.ScriptVariablePointer()->Set(static_cast<int32_t>(nSaveFileSize));
             return 1;
         }
     }
@@ -2161,7 +2161,7 @@ void XINTERFACE::DoControl()
         if (cs.state == CST_ACTIVATED)
             bFirstPress = true;
 
-        long nWeel = 0;
+        int32_t nWeel = 0;
         if (m_pMouseWeel)
             m_pMouseWeel->Get(nWeel);
         if (nWeel != 0 && m_pCurNode && m_pCurNode->IsWeelActive())

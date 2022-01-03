@@ -619,11 +619,11 @@ bool CharactersGroups::MsgGetOptimalTarget(MESSAGE &message) const
     // if(!c->IsSetBlade()) return false;
     if (c->AttributesPointer)
     {
-        vd->Set(static_cast<long>(c->AttributesPointer->GetAttributeAsDword("index", -1)));
+        vd->Set(static_cast<int32_t>(c->AttributesPointer->GetAttributeAsDword("index", -1)));
     }
     else
     {
-        vd->Set(static_cast<long>(-1));
+        vd->Set(-1);
     }
     return true;
 }

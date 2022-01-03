@@ -206,20 +206,20 @@ class BATTLE_NAVIGATOR
     POINT m_ChargeGreed;
     POINT m_ChargePos;
     POINT m_ChargeSize;
-    long m_curCharge;
+    int32_t m_curCharge;
     // gunpowder icon
     POINT m_PowderGreed;
     POINT m_PowderPos;
     POINT m_PowderSize;
-    long m_curPowder;
+    int32_t m_curPowder;
     bool m_bPowderRunOut; // for blinking
     // wind icon
-    long m_curWindPic;
+    int32_t m_curWindPic;
     POINT m_WindGreed;
     POINT m_WindPos;
     POINT m_WindSize;
     // sail position icon
-    long m_curSailState;
+    int32_t m_curSailState;
     POINT m_SailGreed;
     POINT m_SailPos;
     POINT m_SailSize;

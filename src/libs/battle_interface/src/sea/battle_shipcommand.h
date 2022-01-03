@@ -29,5 +29,5 @@ class BIShipCommandList : public BICommandList
     long m_nChargeTextureNum;
     long m_nCommandTextureNum;
 
-    std::vector<long> m_aChargeQuantity;
+    std::vector<int32_t> m_aChargeQuantity;
 };

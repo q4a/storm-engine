@@ -123,7 +123,7 @@ uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, long ca
         return IFUNCRESULT_FAILED;
     if (!charactersFindBuf.name[0])
     {
-        pReturn->Set(-1L);
+        pReturn->Set(-1);
         return IFUNCRESULT_OK;
     }
     // Lowering the cache usage values
@@ -157,13 +157,13 @@ uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, long ca
         {
             // Found in cache, return
             cache[i].use++;
-            pReturn->Set(cache[i].index);
+            pReturn->Set(static_cast<int32_t>(cache[i].index));
             return IFUNCRESULT_OK;
         }
     }
     // Have to search through the array
-    const long num = pArray->GetElementsNum();
-    for (long i = 0; i < num; i++)
+    const int32_t num = pArray->GetElementsNum();
+    for (int32_t i = 0; i < num; i++)
     {
         auto *const vd = (VDATA *)pArray->GetArrayElement(i);
         if (CheckID(vd, charactersFindBuf.name, res))
@@ -177,7 +177,7 @@ uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, long ca
         }
     }
     //
-    pReturn->Set(-1L);
+    pReturn->Set(-1);
     return IFUNCRESULT_OK;
 }
 
@@ -201,16 +201,16 @@ uint32_t slNativeFindLaodLocation(VS_STACK *pS)
     const auto loc = EntityManager::GetEntityId("location");
     if (!loc)
     {
-        pReturn->Set(-1L);
+        pReturn->Set(-1);
         return IFUNCRESULT_OK;
     }
     Entity *l = EntityManager::GetEntityPointer(loc);
     if (!l || !l->AttributesPointer)
     {
-        pReturn->Set(-1L);
+        pReturn->Set(-1);
         return IFUNCRESULT_OK;
     }
-    const long index = l->AttributesPointer->GetAttributeAsDword("index", -1L);
+    const int32_t index = l->AttributesPointer->GetAttributeAsDword("index", -1L);
     pReturn->Set(index);
     return IFUNCRESULT_OK;
 }
@@ -259,7 +259,7 @@ uint32_t slNativeSleep(VS_STACK *pS)
 {
     // Get strings
     auto *pInt = (VDATA *)pS->Pop();
-    long delay = 1;
+    int32_t delay = 1;
     if (!pInt || !pInt->Get(delay))
         return IFUNCRESULT_FAILED;
     if (delay < 1)

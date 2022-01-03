@@ -224,5 +224,5 @@ class Grass : public Entity
     float m_fMinGrassLod;
 
     // boal grass parameters
-    long isGrassLightsOn;
+    int32_t isGrassLightsOn;
 };

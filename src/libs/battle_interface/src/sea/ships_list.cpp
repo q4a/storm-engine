@@ -119,10 +119,10 @@ void SetNLongData(VDATA *pvd, int n, ...)
 
     for (auto i = 0; i < n; i++)
     {
-        auto *const pIVal = va_arg(args, long *);
+        auto *const pIVal = va_arg(args, int32_t *);
         if (!pIVal)
             break;
-        const auto nDefVal = va_arg(args, long);
+        const auto nDefVal = va_arg(args, int32_t);
         if (pvd)
             pvd->Get(*pIVal, i);
         else

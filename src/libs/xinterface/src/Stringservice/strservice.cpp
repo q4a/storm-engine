@@ -942,7 +942,7 @@ uint32_t _Language_OpenFile(VS_STACK *pS)
     pLngFileName->Get(strLngFileName);
 
     // get the ID for the given file
-    const long nLngFileID = g_StringServicePointer->OpenUsersStringFile(strLngFileName);
+    const int32_t nLngFileID = static_cast<int32_t>(g_StringServicePointer->OpenUsersStringFile(strLngFileName));
 
     auto *pVR = (VDATA *)pS->Push();
     if (!pVR)
@@ -958,10 +958,10 @@ uint32_t _Language_CloseFile(VS_STACK *pS)
     auto pLngFileID = (VDATA *)pS->Pop();
     if (!pLngFileID)
         return IFUNCRESULT_FAILED;
-    long nLngFileID = -1;
+    int32_t nLngFileID = -1;
     pLngFileID->Get(nLngFileID);
 
-    g_StringServicePointer->CloseUsersStringFile(nLngFileID);
+    g_StringServicePointer->CloseUsersStringFile(static_cast<long>(nLngFileID));
 
     return IFUNCRESULT_OK;
 }
@@ -978,7 +978,7 @@ uint32_t _Language_ConvertString(VS_STACK *pS)
     auto *pLngFileID = (VDATA *)pS->Pop();
     if (!pLngFileID)
         return IFUNCRESULT_FAILED;
-    long nLngFileID = -1;
+    int32_t nLngFileID = -1;
     pLngFileID->Get(nLngFileID);
 
     char *strOutStr = g_StringServicePointer->TranslateFromUsers(nLngFileID, strInStr);
@@ -1036,7 +1036,7 @@ uint32_t _GlobalLngFileID(VS_STACK *pS)
     auto *pVR = (VDATA *)pS->Push();
     if (!pVR)
         return IFUNCRESULT_FAILED;
-    pVR->Set(g_idGlobLanguageFileID);
+    pVR->Set(static_cast<int32_t>(g_idGlobLanguageFileID));
 
     return IFUNCRESULT_OK;
 }
@@ -1146,7 +1146,7 @@ uint32_t _ControlMakeInvert(VS_STACK *pS)
     auto *pControlFlag = (VDATA *)pS->Pop();
     if (!pControlFlag)
         return IFUNCRESULT_FAILED;
-    long nControlFlag = 0;
+    int32_t nControlFlag = 0;
     pControlFlag->Get(nControlFlag);
 
     auto pControlName = (VDATA *)pS->Pop();
@@ -1260,7 +1260,7 @@ uint32_t _InterfaceIsWindowEnable(VS_STACK *pS)
     pDat = (VDATA *)pS->Push();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    pDat->Set(static_cast<long>(bActive ? 1 : 0));
+    pDat->Set(bActive);
 
     return IFUNCRESULT_OK;
 }
@@ -1292,7 +1292,7 @@ uint32_t _InterfaceCreateFolder(VS_STACK *pS)
     if (!pDat)
         return IFUNCRESULT_FAILED;
     const char *sFolderName = pDat->GetString();
-    const long nSuccess = fio->_CreateDirectory(sFolderName);
+    const int32_t nSuccess = fio->_CreateDirectory(sFolderName);
 
     pDat = (VDATA *)pS->Push();
     if (!pDat)
@@ -1310,7 +1310,7 @@ uint32_t _InterfaceCheckFolder(VS_STACK *pS)
         return IFUNCRESULT_FAILED;
     }
     const char *sFolderName = pDat->GetString();
-    long nSuccess = fio->_FileOrDirectoryExists(sFolderName);
+    const int32_t nSuccess = fio->_FileOrDirectoryExists(sFolderName);
     pDat = (VDATA *)pS->Push();
     if (!pDat)
     {
@@ -1333,7 +1333,7 @@ uint32_t _InterfaceDeleteFolder(VS_STACK *pS)
         return IFUNCRESULT_FAILED;
     const char *sFolderName = pDat->GetString();
     // long nSuccess = fio->_RemoveDirectory(sFolderName);
-    const long nSuccess = DeleteFolderWithCantainment(sFolderName);
+    const int32_t nSuccess = DeleteFolderWithCantainment(sFolderName);
     pDat = (VDATA *)pS->Push();
     if (!pDat)
         return IFUNCRESULT_FAILED;
@@ -1372,7 +1372,7 @@ uint32_t _InterfaceFindFolders(VS_STACK *pS)
     {
         return IFUNCRESULT_FAILED;
     }
-    const long nSuccess = (pA->GetAttributesNum() > 0);
+    const int32_t nSuccess = (pA->GetAttributesNum() > 0);
     pDat->Set(nSuccess);
     return IFUNCRESULT_OK;
 }
@@ -1453,7 +1453,7 @@ uint32_t _StoreNodeLocksWithOff(VS_STACK *pS)
     auto pDat = (VDATA *)pS->Push();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    pDat->Set(nStoreIndex);
+    pDat->Set(static_cast<int32_t>(nStoreIndex));
     return IFUNCRESULT_OK;
 }
 
@@ -1499,7 +1499,7 @@ uint32_t _IsKeyPressed(VS_STACK *pS)
     pDat = (VDATA *)pS->Push();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    pDat->Set(static_cast<long>(bIsPressed));
+    pDat->Set(bIsPressed);
     return IFUNCRESULT_OK;
 }
 
@@ -1519,7 +1519,7 @@ uint32_t IsVirtualKeyPressed(VS_STACK *stack)
         return IFUNCRESULT_FAILED;
     }
 
-    data->Set(static_cast<long>(core.Controls->IsKeyPressed(key_code)));
+    data->Set(core.Controls->IsKeyPressed(key_code));
     return IFUNCRESULT_OK;
 }
 
@@ -1566,7 +1566,7 @@ uint32_t _AddControlTreeNode(VS_STACK *pS)
     pDat = (VDATA *)pS->Push();
     if (!pDat)
         return IFUNCRESULT_FAILED;
-    pDat->Set(nNodIdx);
+    pDat->Set(static_cast<int32_t>(nNodIdx));
 
     return IFUNCRESULT_OK;
 }

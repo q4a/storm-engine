@@ -1660,7 +1660,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
                                             SetError("Invalid array '%s' initialization parameter", vi.name.c_str());
                                             return false;
                                         }
-                                        real_var->value->Set(static_cast<long>(1));
+                                        real_var->value->Set(1);
                                         break;
                                     case FALSE_CONST:
                                         if (vi.type != VAR_INTEGER)
@@ -1668,7 +1668,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
                                             SetError("Invalid array '%s' initialization parameter", vi.name.c_str());
                                             return false;
                                         }
-                                        real_var->value->Set(static_cast<long>(0));
+                                        real_var->value->Set(0);
                                         break;
 
                                     case NUMBER:
@@ -1678,9 +1678,9 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
                                             return false;
                                         }
                                         if (bNeg)
-                                            real_var->value->Set(-atol(Token.GetData()), aindex);
+                                            real_var->value->Set(static_cast<int32_t>(-atol(Token.GetData())), aindex);
                                         else
-                                            real_var->value->Set(static_cast<long>(atoll(Token.GetData())), aindex);
+                                            real_var->value->Set(static_cast<int32_t>(atoll(Token.GetData())), aindex);
                                         aindex++;
                                         break;
                                     case FLOAT_NUMBER:
@@ -1738,20 +1738,20 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
                                 case TRUE_CONST:
                                     if (vi.type != VAR_INTEGER)
                                         break;
-                                    real_var->value->Set(static_cast<long>(1));
+                                    real_var->value->Set(1);
                                     break;
                                 case FALSE_CONST:
                                     if (vi.type != VAR_INTEGER)
                                         break;
-                                    real_var->value->Set(static_cast<long>(0));
+                                    real_var->value->Set(0);
                                     break;
                                 case NUMBER:
                                     if (vi.type != VAR_INTEGER)
                                         break;
                                     if (bNeg)
-                                        real_var->value->Set(-atol(Token.GetData()));
+                                        real_var->value->Set(static_cast<int32_t>(-atol(Token.GetData())));
                                     else
-                                        real_var->value->Set(static_cast<long>(atoll(Token.GetData())));
+                                        real_var->value->Set(static_cast<int32_t>(atoll(Token.GetData())));
                                     break;
                                 case FLOAT_NUMBER:
                                     if (vi.type != VAR_FLOAT)
@@ -3741,7 +3741,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
     uint32_t func_code;
     uint32_t nLeftOperandCode;
     uint32_t bLeftOperandType;
-    long nLeftOperandIndex;
+    int32_t nLeftOperandIndex;
     S_TOKEN_TYPE Token_type;
     FuncInfo fi;
     const VarInfo *real_var;
@@ -3750,7 +3750,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
     //    DATA   ExpressionResult;    // while compile expression not ready, each function have its own register
     const char *pCodeBase;
     bool bExit;
-    long lvalue;
+    int32_t lvalue;
     S_TOKEN_TYPE vtype;
     DATA *pVV;
     uint32_t var_code;
@@ -3765,7 +3765,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
     DATA *pVDst;
     DATA *pVSrc;
     bool bUseIndex;
-    long dwBXIndex;
+    int32_t dwBXIndex;
 
     CompilerStage = CS_RUNTIME;
 
@@ -4364,11 +4364,11 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                 return false;
             if (pVResult)
             {
-                ExpressionResult.Set(static_cast<long>(1));
+                ExpressionResult.Set(1);
                 // SStack.Pop();
             }
             else
-                ExpressionResult.Set(static_cast<long>(0));
+                ExpressionResult.Set(0);
             break;
         case CALL_FUNCTION:
             memcpy(&func_code, &pCodeBase[ip], sizeof(uint32_t));
@@ -5289,7 +5289,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
             switch (Token_type)
             {
             case NUMBER:
-                pV->Set(*((long *)&pRunCodeBase[TLR_DataOffset]));
+                pV->Set(*((int32_t *)&pRunCodeBase[TLR_DataOffset]));
                 break;
             case FLOAT_NUMBER:
                 pV->Set(*((float *)&pRunCodeBase[TLR_DataOffset]));
@@ -6156,7 +6156,7 @@ char *COMPILER::ReadString()
 
 bool COMPILER::ReadVariable(char *name, /* DWORD code,*/ bool bDim, uint32_t a_index)
 {
-    long nLongValue;
+    int32_t nIntValue;
     uintptr_t ptrValue;
     float fFloatValue;
     char *pString;
@@ -6264,10 +6264,10 @@ bool COMPILER::ReadVariable(char *name, /* DWORD code,*/ bool bDim, uint32_t a_i
     switch (eType)
     {
     case VAR_INTEGER:
-        ReadData(&nLongValue, sizeof(nLongValue));
+        ReadData(&nIntValue, sizeof(nIntValue));
         if (bSkipVariable)
             break;
-        pV->Set(nLongValue);
+        pV->Set(nIntValue);
         break;
     case VAR_PTR:
         ReadData(&ptrValue, sizeof(ptrValue));
@@ -6374,7 +6374,7 @@ bool COMPILER::ReadVariable(char *name, /* DWORD code,*/ bool bDim, uint32_t a_i
 
 void COMPILER::SaveVariable(DATA *pV, bool bdim)
 {
-    long nLongValue;
+    int32_t nLongValue;
     uintptr_t ptrValue;
     float fFloatValue;
     const char *pString;

@@ -82,7 +82,7 @@ void Player::Move(float dltTime)
     auto *vd = core.Event("EventSGMode", nullptr);
     if (vd)
     {
-        long data = 0;
+        int32_t data = 0;
         if (vd->Get(data))
             shootgunMode = (data != 0);
     }

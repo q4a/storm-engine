@@ -1084,7 +1084,7 @@ bool WorldMap::CreateFollowShip(const char *modelName, float kSpeed, float time,
     VDATA *isSkipEnable = core.Event("WorldMap_IsSkipEnable");
     if (isSkipEnable)
     {
-        long skipEnable = 0;
+        int32_t skipEnable = 0;
         if (isSkipEnable->Get(skipEnable))
         {
             static_cast<WdmEnemyShip *>(ship)->canSkip = skipEnable != 0;

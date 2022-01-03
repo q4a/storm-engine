@@ -137,7 +137,7 @@ bool CORE::Run()
 
     auto *pVCTime = static_cast<VDATA *>(core.GetScriptVariable("iRealDeltaTime"));
     if (pVCTime)
-        pVCTime->Set(static_cast<long>(GetRDeltaTime()));
+        pVCTime->Set(static_cast<int32_t>(GetRDeltaTime()));
 
     auto tt = std::time(nullptr);
     auto local_tm = *std::localtime(&tt);
@@ -147,11 +147,11 @@ bool CORE::Run()
     auto *pVDay = static_cast<VDATA *>(core.GetScriptVariable("iRealDay"));
 
     if (pVYear)
-        pVYear->Set(static_cast<long>(local_tm.tm_year + 1900));
+        pVYear->Set(local_tm.tm_year + 1900);
     if (pVMonth)
-        pVMonth->Set(static_cast<long>(local_tm.tm_mon + 1)); // tm_mon belongs [0, 11]
+        pVMonth->Set(local_tm.tm_mon + 1); // tm_mon belongs [0, 11]
     if (pVDay)
-        pVDay->Set(static_cast<long>(local_tm.tm_mday));
+        pVDay->Set(local_tm.tm_mday);
 
     if (Controls && Controls->GetDebugAsyncKeyState('R') < 0)
         Timer.Delta_Time *= 10;
@@ -282,7 +282,7 @@ void CORE::ProcessEngineIniFile()
         // Script version test
         if (targetVersion_ >= storm::ENGINE_VERSION::LATEST)
         {
-            long iScriptVersion = 0xFFFFFFFF;
+            int32_t iScriptVersion = 0xFFFFFFFF;
             auto *pVScriptVersion = static_cast<VDATA *>(core.GetScriptVariable("iScriptVersion"));
             if (pVScriptVersion)
                 pVScriptVersion->Get(iScriptVersion);

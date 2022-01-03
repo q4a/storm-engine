@@ -406,9 +406,9 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
     Access.SetVCompiler(this);
     float TempFloat1;
     float TempFloat2;
-    long TempLong1;
-    long TempLong2;
-    long TempLong;
+    int32_t TempLong1;
+    int32_t TempLong2;
+    int32_t TempLong;
     bool TempBool;
     const char *pChar;
     const char *pChar2;
@@ -438,7 +438,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
     {
     case FUNC_GETENGINEVERSION:
         pV = SStack.Push();
-        pV->Set(static_cast<long>(ENGINE_SCRIPT_VERSION));
+        pV->Set(ENGINE_SCRIPT_VERSION);
         pVResult = pV;
         return pV;
         break;
@@ -455,12 +455,12 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             if (FuncTab.FindFunc(pChar) == INVALID_FUNC_CODE)
             {
                 pV = SStack.Push();
-                pV->Set(static_cast<long>(0));
+                pV->Set(0);
             }
             else
             {
                 pV = SStack.Push();
-                pV->Set(static_cast<long>(1));
+                pV->Set(1);
             }
             pVResult = pV;
         }
@@ -636,15 +636,15 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         if (static_cast<uint32_t>(TempLong1) >= strlen(pChar))
         {
             pV = SStack.Push();
-            pV->Set(static_cast<long>(0));
+            pV->Set(0);
             pVResult = pV;
             return pV;
         }
         pV = SStack.Push();
         if (pChar[TempLong1] >= 0x30 && pChar[TempLong1] <= 0x39)
-            pV->Set(static_cast<long>(1));
+            pV->Set(1);
         else
-            pV->Set(static_cast<long>(0));
+            pV->Set(0);
         pVResult = pV;
         return pV;
 
@@ -994,7 +994,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         break;
     case FUNC_GETDELTATIME:
         pV = SStack.Push();
-        pV->Set(static_cast<long>(core.GetDeltaTime()));
+        pV->Set(static_cast<int32_t>(core.GetDeltaTime()));
         pVResult = pV;
         return pV;
 
@@ -1150,7 +1150,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         if (slen < slen2)
         {
             pV = SStack.Push();
-            pV->Set(static_cast<long>(-1));
+            pV->Set(-1);
             pVResult = pV;
             return pV;
         }
@@ -1161,14 +1161,14 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             if (storm::iEquals(std::string_view(pChar + n), std::string_view(pChar2), slen2))
             {
                 pV = SStack.Push();
-                pV->Set(static_cast<long>(n));
+                pV->Set(static_cast<int32_t>(n));
                 pVResult = pV;
                 return pV;
             }
             n++;
         }
         pV = SStack.Push();
-        pV->Set(static_cast<long>(-1));
+        pV->Set(-1);
         pVResult = pV;
         return pV;
 
@@ -1562,13 +1562,13 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             pV->Set(ent);
             SStack.Pop();
             pV = SStack.Push();
-            pV->Set(static_cast<long>(1));
+            pV->Set(1);
             pVResult = pV;
             return pV;
         }
         SStack.Pop();
         pV = SStack.Push();
-        pV->Set(static_cast<long>(0));
+        pV->Set(0);
         pVResult = pV;
         SetError("Cant create class: %s", pChar);
         return pV;
@@ -1673,7 +1673,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             return pResult;
         case 'l':
             pResult = SStack.Push();
-            pResult->Set(pEventMessage->Long());
+            pResult->Set(static_cast<int32_t>(pEventMessage->Long()));
             pVResult = pResult;
             return pResult;
         case 'f':
@@ -1725,9 +1725,9 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         Access.Get(pChar);
         pV = SStack.Push();
         if (BC_LoadSegment(pChar))
-            pV->Set(static_cast<long>(1));
+            pV->Set(1);
         else
-            pV->Set(static_cast<long>(0));
+            pV->Set(0);
         pVResult = pV;
         return pV;
         //
@@ -1751,9 +1751,9 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         pV->Get(pChar);
         pV = SStack.Push();
         if (BC_SegmentIsLoaded(pChar))
-            pV->Set(static_cast<long>(1));
+            pV->Set(1);
         else
-            pV->Set(static_cast<long>(0));
+            pV->Set(0);
         pVResult = pV;
         break;
         //
@@ -2555,7 +2555,7 @@ void COMPILER::DumpAttributes(ATTRIBUTES *pA, long level)
 bool COMPILER::CreateMessage(MESSAGE *pMs, uint32_t s_off, uint32_t var_offset, bool s2s)
 {
     uintptr_t TempPtr;
-    long TempLong1;
+    int32_t TempLong1;
     float TempFloat1;
     entid_t TempEid;
     ATTRIBUTES *pA;
@@ -2605,7 +2605,7 @@ bool COMPILER::CreateMessage(MESSAGE *pMs, uint32_t s_off, uint32_t var_offset, 
                 return false;
             }
             pV->Get(TempLong1);
-            pMs->Set(TempLong1);
+            pMs->Set(static_cast<long>(TempLong1));
             break;
         case 'p':
             pV = pV->GetVarPointer();

@@ -315,7 +315,7 @@ long BIShipCommandList::ChargeAdding()
     auto *tmpDat = core.Event("BI_GetChargeQuantity", "l", m_nCurrentCommandCharacterIndex);
     if (tmpDat == nullptr)
         return 0;
-    long lIdx = 0; // number of charge types
+    int32_t lIdx = 0; // number of charge types
     tmpDat->Get(lIdx, 0);
     if (lIdx <= 0)
         return 0;
@@ -476,7 +476,7 @@ void BIShipCommandList::AddFlagPictureToIcon(long nCharIdx)
     auto *pvdat = core.Event("evntGetSmallFlagData", "l", nCharIdx);
     if (!pvdat)
         return;
-    long nTex, nPic, nBackPic;
+    int32_t nTex, nPic, nBackPic;
     pvdat->Get(nTex, 0);
     pvdat->Get(nPic, 1);
     pvdat->Get(nBackPic, 2);
