@@ -5,7 +5,7 @@
     #define EX_OFF
 #endif
 
-inline void __Storm_Assert__(bool expression, const char *file, long line, const char *str)
+inline void __Storm_Assert__(bool expression, const char *file, int32_t line, const char *str)
 {
     if (!expression)
     {

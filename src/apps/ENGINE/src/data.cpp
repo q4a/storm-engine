@@ -237,7 +237,7 @@ void DATA::SetAReference(ATTRIBUTES *pARef)
     AttributesClass = pARef;
 }
 
-/*void  DATA::SetReference(DATA * pRef, long reference_index)
+/*void  DATA::SetReference(DATA * pRef, int32_t reference_index)
 {
     if(!bRef)
     {
@@ -617,8 +617,8 @@ bool DATA::Get(int32_t &value, uint32_t index)
     }
     return ArrayPTR[index].Get(value);
     /*
-      long * pL;
-      pL = (long *)ArrayPointer;
+      int32_t * pL;
+      pL = (int32_t *)ArrayPointer;
       value = pL[index];
       return true;    */
 }
@@ -727,8 +727,8 @@ bool DATA::Set(int32_t value, uint32_t index)
     }
     ArrayPTR[index].Set(value);
     return true;
-    /*long * pL;
-    pL = (long *)ArrayPointer;
+    /*int32_t * pL;
+    pL = (int32_t *)ArrayPointer;
     pL[index] = value;
     return true;    */
 }
@@ -1065,7 +1065,7 @@ bool DATA::Convert(S_TOKEN_TYPE type)
         {
         case VAR_INTEGER:
             Data_type = type;
-            lValue = static_cast<long>(fValue);
+            lValue = static_cast<int32_t>(fValue);
             return true;
         case VAR_FLOAT:
             return true;
@@ -1153,7 +1153,7 @@ bool DATA::Convert(S_TOKEN_TYPE type)
             return true;
         case VAR_INTEGER:
             Data_type = type;
-            lValue = static_cast<long>(pValue);
+            lValue = static_cast<int32_t>(pValue);
             return true;
         default:
             Error(INVALID_CONVERSATION);
@@ -1571,7 +1571,7 @@ bool DATA::Modul(DATA *pV)
                 Error("Divide by zero");
                 return false;
             }
-            lValue = lValue % static_cast<long>(floor(pV->fValue));
+            lValue = lValue % static_cast<int32_t>(floor(pV->fValue));
             break;
         default:
             return false;
@@ -2153,7 +2153,7 @@ bool DATA::Copy(DATA *pV, uint32_t index)
     }
 
     //    char * * ppChar;
-    //    long *   pLong;
+    //    int32_t *   pLong;
     //    float *  pFloat;
     //    OBJECT_DESC * pOD;
 
@@ -2199,7 +2199,7 @@ bool DATA::Copy(DATA *pV, uint32_t index)
     /*switch(pV->GetType())
     {
       case VAR_INTEGER:
-        pLong = (long *)pV->ArrayPointer;
+        pLong = (int32_t *)pV->ArrayPointer;
         Set(pLong[index]);
       break;
       case VAR_FLOAT:

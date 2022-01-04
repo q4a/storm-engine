@@ -311,7 +311,7 @@ bool ParticleManager::IsSystemAvailable(const char *FileName)
 }
 
 // Get the global texture of the project
-long ParticleManager::GetProjectTexture()
+int32_t ParticleManager::GetProjectTexture()
 {
     return pProjectTexture;
 }

@@ -91,7 +91,7 @@ class CORE
     void AppState(bool state);
     uint32_t MakeHashValue(const char *string);
     VMA *FindVMA(const char *class_name);
-    VMA *FindVMA(long hash);
+    VMA *FindVMA(int32_t hash);
     //------------------------------------------------------------------------------------------------
     // API functions : (virtual API)
 
@@ -136,16 +136,16 @@ class CORE
     // return current fps
     uint32_t EngineFps();
     // set fixed delta time mode, (-1) - off
-    void SetDeltaTime(long delta_time);
+    void SetDeltaTime(int32_t delta_time);
     uint32_t GetDeltaTime();
     uint32_t GetRDeltaTime();
     //
     VDATA *Event(const char *Event_name, const char *Format = nullptr, ...);
     uint32_t PostEvent(const char *Event_name, uint32_t post_time, const char *Format, ...);
 
-    void *GetSaveData(const char *file_name, long &data_size);
+    void *GetSaveData(const char *file_name, int32_t &data_size);
 
-    bool SetSaveData(const char *file_name, void *data_ptr, long data_size);
+    bool SetSaveData(const char *file_name, void *data_ptr, int32_t data_size);
 
     uint32_t SetScriptFunction(IFUNCINFO *pFuncInfo);
 

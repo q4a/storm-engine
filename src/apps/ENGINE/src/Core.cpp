@@ -210,7 +210,7 @@ void CORE::ProcessControls()
     if (!Controls)
         return;
 
-    for (long n = 0; n < Controls->GetControlsNum(); n++)
+    for (int32_t n = 0; n < Controls->GetControlsNum(); n++)
     {
         Controls->GetControlState(n, cs);
         if (cs.state == CST_ACTIVATED)
@@ -380,7 +380,7 @@ uint32_t CORE::PostEvent(const char *Event_name, uint32_t post_time, const char 
             {
                 //-------------------------------------
             case 'l':
-                long v;
+                int32_t v;
                 v = message.Long();
                 pMS->Set(v);
                 break;
@@ -447,7 +447,7 @@ VDATA *CORE::Event(const char *Event_name, const char *Format, ...)
 
 void *CORE::MakeClass(const char *class_name)
 {
-    const long hash = MakeHashValue(class_name);
+    const int32_t hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash && storm::iEquals(std::string_view(class_name), std::string_view(c->GetName())))
             return c->CreateClass();
@@ -466,7 +466,7 @@ void CORE::ReleaseServices()
 
 VMA *CORE::FindVMA(const char *class_name)
 {
-    const long hash = MakeHashValue(class_name);
+    const int32_t hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash && storm::iEquals(std::string_view(class_name), std::string_view(c->GetName())))
             return c;
@@ -474,7 +474,7 @@ VMA *CORE::FindVMA(const char *class_name)
     return nullptr;
 }
 
-VMA *CORE::FindVMA(long hash)
+VMA *CORE::FindVMA(int32_t hash)
 {
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash)
@@ -661,7 +661,7 @@ uint32_t CORE::EngineFps()
     return Timer.fps;
 }
 
-void CORE::SetDeltaTime(long delta_time)
+void CORE::SetDeltaTime(int32_t delta_time)
 {
     Timer.SetDelta(delta_time);
 }
@@ -796,8 +796,8 @@ uint32_t CORE::MakeHashValue(const char *string)
         if ('A' <= v && v <= 'Z')
             v += 'a' - 'A';
 
-        hval = (hval << 4) + static_cast<unsigned long>(v);
-        const uint32_t g = hval & (static_cast<unsigned long>(0xf) << (32 - 4));
+        hval = (hval << 4) + static_cast<uint32_t>(v);
+        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
         if (g != 0)
         {
             hval ^= g >> (32 - 8);
@@ -876,12 +876,12 @@ void CORE::DumpEntitiesInfo()
     Sleep(200);*/
 }
 
-void *CORE::GetSaveData(const char *file_name, long &data_size)
+void *CORE::GetSaveData(const char *file_name, int32_t &data_size)
 {
     return Compiler->GetSaveData(file_name, data_size);
 }
 
-bool CORE::SetSaveData(const char *file_name, void *data_ptr, long data_size)
+bool CORE::SetSaveData(const char *file_name, void *data_ptr, int32_t data_size)
 {
     return Compiler->SetSaveData(file_name, data_ptr, data_size);
 }

@@ -143,7 +143,7 @@ class CMatrix
     CVECTOR &Pos() const; // Position (reference)
 
     // Access to matrix element
-    float &operator()(long i, long j);
+    float &operator()(int32_t i, int32_t j);
 
     // Create only rotate matrix
     void Get3X3(CMatrix &mtr);
@@ -151,8 +151,8 @@ class CMatrix
 
     // Projection
     CMatrix &BuildProjectionMatrix(float viewAngle, float vpWidth, float vpHeight, float zNear, float zFar);
-    void Projection(CVECTOR *srcArray, MTX_PRJ_VECTOR *dstArray, long num, float vphWidth05, float vphHeight05,
-                    long srcStrcSize, long dstStrcSize);
+    void Projection(CVECTOR *srcArray, MTX_PRJ_VECTOR *dstArray, int32_t num, float vphWidth05, float vphHeight05,
+                    int32_t srcStrcSize, int32_t dstStrcSize);
 
     // View
     bool BuildViewMatrix(CVECTOR lookFrom, CVECTOR lookTo, CVECTOR upVector);
@@ -708,7 +708,7 @@ inline CVECTOR &CMatrix::Pos() const
 }
 
 // Access to matrix element
-inline float &CMatrix::operator()(long i, long j)
+inline float &CMatrix::operator()(int32_t i, int32_t j)
 {
     return m[i][j];
 }
@@ -797,8 +797,8 @@ inline CMatrix &CMatrix::BuildProjectionMatrix(float viewAngle, float vpWidth, f
     return (*this);
 }
 
-inline void CMatrix::Projection(CVECTOR *srcArray, MTX_PRJ_VECTOR *dstArray, long num, float vphWidth05,
-                                float vphHeight05, long srcStrcSize, long dstStrcSize)
+inline void CMatrix::Projection(CVECTOR *srcArray, MTX_PRJ_VECTOR *dstArray, int32_t num, float vphWidth05,
+                                float vphHeight05, int32_t srcStrcSize, int32_t dstStrcSize)
 {
     float k;
     for (; num > 0; num--)

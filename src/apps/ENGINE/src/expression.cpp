@@ -484,7 +484,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
     case CALL:
         if (bSkip)
         {
-            long local_in;
+            int32_t local_in;
             BC_TokenGet(); // string var
             if (BC_TokenGet() != OPEN_BRACKET)
             {
@@ -508,7 +508,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
             return;
         }
         vtype = BC_TokenGet();                               // read variable
-        var_code = *((long *)&pRunCodeBase[TLR_DataOffset]); // var code
+        var_code = *((int32_t *)&pRunCodeBase[TLR_DataOffset]); // var code
         if (vtype == VARIABLE)
         {
             real_var = VarTab.GetVar(var_code);
@@ -561,7 +561,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
     case CALL_FUNCTION:
         if (bSkip)
         {
-            long local_in;
+            int32_t local_in;
             if (BC_TokenGet() != OPEN_BRACKET)
             {
                 SetError("missing '('");
@@ -602,7 +602,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
         break;
     case LOCAL_VARIABLE:
     case VARIABLE:
-        var_code = *((long *)&pRunCodeBase[TLR_DataOffset]);
+        var_code = *((int32_t *)&pRunCodeBase[TLR_DataOffset]);
         if (TokenType() == VARIABLE)
         {
             real_var = VarTab.GetVar(var_code);
@@ -757,18 +757,18 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
                 if (pRoot == nullptr)
                 {
                     value->Set("");
-                    SetError("missed attribute: %s", SCodec.Convert(*((long *)&pRunCodeBase[TLR_DataOffset])));
+                    SetError("missed attribute: %s", SCodec.Convert(*((int32_t *)&pRunCodeBase[TLR_DataOffset])));
                     while (TokenType() == ACCESS_WORD_CODE || TokenType() == ACCESS_WORD || TokenType() == ACCESS_VAR)
                     {
                         BC_TokenGet();
                     }
                     return;
                 }
-                pRoot = pRoot->GetAttributeClassByCode(*((long *)&pRunCodeBase[TLR_DataOffset]));
+                pRoot = pRoot->GetAttributeClassByCode(*((int32_t *)&pRunCodeBase[TLR_DataOffset]));
                 if (pRoot == nullptr)
                 {
                     value->Set("");
-                    SetError("missed attribute: %s", SCodec.Convert(*((long *)&pRunCodeBase[TLR_DataOffset])));
+                    SetError("missed attribute: %s", SCodec.Convert(*((int32_t *)&pRunCodeBase[TLR_DataOffset])));
                     while (TokenType() == ACCESS_WORD_CODE || TokenType() == ACCESS_WORD || TokenType() == ACCESS_VAR)
                     {
                         BC_TokenGet();
@@ -806,7 +806,7 @@ void COMPILER::BC_ProcessExpression_L7(DATA *value, bool bSkip)
                 while (BC_TokenGet() == DEBUG_LINE_CODE)
                 {
                 }
-                var_code = *((long *)&pRunCodeBase[TLR_DataOffset]);
+                var_code = *((int32_t *)&pRunCodeBase[TLR_DataOffset]);
                 if (TokenType() == VARIABLE)
                 {
                     real_var = VarTab.GetVar(var_code);

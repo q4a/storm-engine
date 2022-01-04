@@ -430,7 +430,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
 
     pVResult = nullptr; // default - no return value
 
-    long slen, slen2;
+    int32_t slen, slen2;
     char sVarName[64];
     std::string utf8_character;
 
@@ -554,7 +554,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             if(fh == INVALID_HANDLE_VALUE)
             {
                 pV = SStack.Push();
-                pV->Set((long)0);
+                pV->Set((int32_t)0);
                 pVResult = pV;
                 return pV;
             }
@@ -567,7 +567,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             {
                 fio->_CloseHandle(fh);
                 pV = SStack.Push();
-                pV->Set((long)0);
+                pV->Set((int32_t)0);
                 pVResult = pV;
                 return pV;
             }
@@ -585,7 +585,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             nIOFullSize = 0;
 
             pV = SStack.Push();
-            pV->Set((long)1);
+            pV->Set((int32_t)1);
             pVResult = pV;
         return pV;
 
@@ -602,7 +602,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             if(fh == INVALID_HANDLE_VALUE)
             {
                 pV = SStack.Push();
-                pV->Set((long)0);
+                pV->Set((int32_t)0);
                 pVResult = pV;
                 return pV;
             }
@@ -613,7 +613,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
 
             fio->_CloseHandle(fh);
             pV = SStack.Push();
-            pV->Set((long)1);
+            pV->Set((int32_t)1);
             pVResult = pV;
         return pV;*/
 
@@ -1006,7 +1006,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             pV2->Get(pChar2);
             SetSaveData(pChar2,pChar);
 
-            pV = SStack.Push();    pV->Set((long)1);    pVResult = pV;
+            pV = SStack.Push();    pV->Set((int32_t)1);    pVResult = pV;
         return pV;
 
         case FUNC_GETSAVEDATA:
@@ -1970,7 +1970,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
                 SetError("Negative func 'sqrt' argument");
                 return nullptr;
             }
-            TempLong1 = static_cast<long>(sqrtf(static_cast<float>(TempLong1)));
+            TempLong1 = static_cast<int32_t>(sqrtf(static_cast<float>(TempLong1)));
             pV = SStack.Push();
             pV->Set(TempLong1);
             pVResult = pV;
@@ -2532,7 +2532,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
     return nullptr;
 }
 
-void COMPILER::DumpAttributes(ATTRIBUTES *pA, long level)
+void COMPILER::DumpAttributes(ATTRIBUTES *pA, int32_t level)
 {
     char buffer[128];
     if (pA == nullptr)
@@ -2605,7 +2605,7 @@ bool COMPILER::CreateMessage(MESSAGE *pMs, uint32_t s_off, uint32_t var_offset, 
                 return false;
             }
             pV->Get(TempLong1);
-            pMs->Set(static_cast<long>(TempLong1));
+            pMs->Set(static_cast<int32_t>(TempLong1));
             break;
         case 'p':
             pV = pV->GetVarPointer();

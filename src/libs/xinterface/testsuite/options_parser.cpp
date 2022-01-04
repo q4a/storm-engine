@@ -22,7 +22,7 @@ class TestStringCodec : public VSTRING_CODEC
         return hash;
     }
 
-    uint32_t Convert(const char *pString, long iLen) override
+    uint32_t Convert(const char *pString, int32_t iLen) override
     {
         std::string str(pString, iLen);
         const uint32_t hash = std::hash<std::string>{}(str);

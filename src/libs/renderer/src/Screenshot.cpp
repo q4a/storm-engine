@@ -31,7 +31,7 @@ void DX9RENDER::SaveCaptureBuffers()
     uint32_t Written;
     char cFileName[256];
 
-    long fi;
+    int32_t fi;
     for (fi = iCaptureFrameIndex; fi < iCaptureFrameIndex + 10000; fi++)
     {
         sprintf(cFileName, "k3cap_%04d.tga", fi);

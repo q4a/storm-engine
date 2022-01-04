@@ -645,7 +645,7 @@ S_TOKEN_TYPE TOKEN::FormatGet()
 }
 
 // copy argument data to buffer and close the termination 0
-long TOKEN::SetTokenData(const char *pointer, bool bKeepControlSymbols)
+int32_t TOKEN::SetTokenData(const char *pointer, bool bKeepControlSymbols)
 {
     // if(!IsOperator(pointer,Data_size))
     const auto Data_size = StopArgument(pointer, bKeepControlSymbols);
@@ -690,9 +690,9 @@ ptrdiff_t TOKEN::SetNTokenData(const char *pointer, ptrdiff_t Data_size)
 // search throw the program code until find non significant argument character:
 // SPACE,TAB,0,'\r','\n'
 // return number of significant symbols
-long TOKEN::StopArgument(const char *pointer, bool bKeepControlSymbols)
+int32_t TOKEN::StopArgument(const char *pointer, bool bKeepControlSymbols)
 {
-    long size = 0;
+    int32_t size = 0;
     auto bDot = false;
     auto bOnlyDigit = true;
     do
@@ -989,7 +989,7 @@ bool TOKEN::IsOperator(char * pointer)
 }
 */
 /*
-bool TOKEN::IsOperator(char * pointer, long & syms)
+bool TOKEN::IsOperator(char * pointer, int32_t & syms)
 {
     DWORD operators_num,n,i;
     bool found;
@@ -1049,8 +1049,8 @@ bool TOKEN::StepBack()
 S_TOKEN_TYPE TOKEN::ProcessToken(char *&pointer, bool bKeepData)
 {
     char sym;
-    // long keywords_num;
-    // long n;
+    // int32_t keywords_num;
+    // int32_t n;
     char *pBase;
 
     pointer += SetTokenData(pointer, bKeepData);
@@ -1198,7 +1198,7 @@ S_TOKEN_TYPE TOKEN::ProcessToken(char *&pointer, bool bKeepData)
     return eTokenType;
 }
 
-long TOKEN::TokenLines()
+int32_t TOKEN::TokenLines()
 {
     return Lines_in_token;
 }
@@ -1238,8 +1238,8 @@ uint32_t TOKEN::MakeHashValue(const char *string, uint32_t max_syms)
         auto v = *string++;
         if ('A' <= v && v <= 'Z')
             v += 'a' - 'A'; // case independent
-        hval = (hval << 4) + static_cast<unsigned long>(v);
-        const uint32_t g = hval & (static_cast<unsigned long>(0xf) << (32 - 4));
+        hval = (hval << 4) + static_cast<uint32_t>(v);
+        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
         if (g != 0)
         {
             hval ^= g >> (32 - 8);

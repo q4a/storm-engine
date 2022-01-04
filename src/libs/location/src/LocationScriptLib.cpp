@@ -25,7 +25,7 @@ struct LocationFindCacheElement
         delete name;
     };
 
-    long Cmp(const LocationFindCacheElement &v) const
+    int32_t Cmp(const LocationFindCacheElement &v) const
     {
         if (v.size != size)
             return false;
@@ -47,10 +47,10 @@ struct LocationFindCacheElement
     };
 
     char *name;
-    long size;
-    long max;
-    long index;
-    long use;
+    int32_t size;
+    int32_t max;
+    int32_t index;
+    int32_t use;
 };
 
 LocationFindCacheElement charactersFindCache[16];
@@ -75,13 +75,13 @@ inline bool CheckID(VDATA *vd, const char *id, bool &res)
     return true;
 }
 
-void slAddToCache(LocationFindCacheElement *element, long size, const char *name, long index)
+void slAddToCache(LocationFindCacheElement *element, int32_t size, const char *name, int32_t index)
 {
     Assert(name);
     Assert(name[0]);
     // looking for a cell for recording
-    long j = 0;
-    for (long i = 0, min = element[i].use; i < size; i++)
+    int32_t j = 0;
+    for (int32_t i = 0, min = element[i].use; i < size; i++)
     {
         if (element[i].index < 0)
         {
@@ -99,7 +99,7 @@ void slAddToCache(LocationFindCacheElement *element, long size, const char *name
     element[j].Set(name);
 }
 
-uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, long cacheSize)
+uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, int32_t cacheSize)
 {
     // Get strings
     auto *pStr = (VDATA *)pS->Pop();
@@ -127,7 +127,7 @@ uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, long ca
         return IFUNCRESULT_OK;
     }
     // Lowering the cache usage values
-    for (long i = 0; i < cacheSize; i++)
+    for (int32_t i = 0; i < cacheSize; i++)
     {
         cache[i].use--;
         if (cache[i].use < 0)
@@ -135,7 +135,7 @@ uint32_t slNativeFastFind(VS_STACK *pS, LocationFindCacheElement *cache, long ca
     }
     // look in the cache
     bool res;
-    for (long i = 0; i < cacheSize; i++)
+    for (int32_t i = 0; i < cacheSize; i++)
     {
         if (cache[i].index < 0)
             continue;

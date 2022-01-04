@@ -26,7 +26,7 @@ bool g_bExternMapCenter = false;
 bool g_bMapScaling = false;
 CVECTOR g_externPos;
 
-void BATTLE_NAVIGATOR::CalculateTextureRect(FRECT &texRect, long num, long hq, long vq)
+void BATTLE_NAVIGATOR::CalculateTextureRect(FRECT &texRect, int32_t num, int32_t hq, int32_t vq)
 {
     const auto yNum = num / hq;
     const auto xNum = num - yNum * hq;
@@ -839,7 +839,7 @@ void BATTLE_NAVIGATOR::Init(VDX9RENDER *RenderService, Entity *pOwnerEI)
     }
 }
 
-long BATTLE_NAVIGATOR::SetRectangleVertexPos(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
+int32_t BATTLE_NAVIGATOR::SetRectangleVertexPos(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
                                              float angle) const
 {
     if (v == nullptr)
@@ -871,7 +871,7 @@ long BATTLE_NAVIGATOR::SetRectangleVertexPos(BI_ONETEXTURE_VERTEX *v, float x, f
     return 4;
 }
 
-long BATTLE_NAVIGATOR::SetRectangleVertexTex(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
+int32_t BATTLE_NAVIGATOR::SetRectangleVertexTex(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
                                              float angle)
 {
     if (v == nullptr)
@@ -903,7 +903,7 @@ long BATTLE_NAVIGATOR::SetRectangleVertexTex(BI_ONETEXTURE_VERTEX *v, float x, f
     return 4;
 }
 
-long BATTLE_NAVIGATOR::SetCircleVertexPos(BI_ONETEXTURE_VERTEX *v, float x, float y, float rad, float angle) const
+int32_t BATTLE_NAVIGATOR::SetCircleVertexPos(BI_ONETEXTURE_VERTEX *v, float x, float y, float rad, float angle) const
 {
     if (v == nullptr)
         return 0;
@@ -927,7 +927,7 @@ long BATTLE_NAVIGATOR::SetCircleVertexPos(BI_ONETEXTURE_VERTEX *v, float x, floa
     return RADIAL_QUANTITY + 2;
 }
 
-long BATTLE_NAVIGATOR::SetCircleVertexTex(BI_ONETEXTURE_VERTEX *v, float x, float y, float rad, float angle)
+int32_t BATTLE_NAVIGATOR::SetCircleVertexTex(BI_ONETEXTURE_VERTEX *v, float x, float y, float rad, float angle)
 {
     if (v == nullptr)
         return 0;
@@ -1180,7 +1180,7 @@ float BATTLE_NAVIGATOR::CalculateCrossY(int side, float w, float h, float angl)
     return 0.f;
 }
 
-long BATTLE_NAVIGATOR::SetRectangleSegVertexPos(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
+int32_t BATTLE_NAVIGATOR::SetRectangleSegVertexPos(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
                                                 float begAngle, float endAngle)
 {
     if (v == nullptr)
@@ -1260,7 +1260,7 @@ long BATTLE_NAVIGATOR::SetRectangleSegVertexPos(BI_ONETEXTURE_VERTEX *v, float x
     return idx;
 }
 
-long BATTLE_NAVIGATOR::SetRectangleSegVertexTex(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
+int32_t BATTLE_NAVIGATOR::SetRectangleSegVertexTex(BI_ONETEXTURE_VERTEX *v, float x, float y, float width, float height,
                                                 float begAngle, float endAngle)
 {
     if (v == nullptr)

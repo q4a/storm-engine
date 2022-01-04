@@ -132,10 +132,10 @@ uint32_t _funcGetSailSpeed(VS_STACK *pS)
     const float fSailPow = pSailPow->GetFloat();
 
     auto *pHoleMax = (VDATA *)pS->Pop();
-    const long nHoleMax = pHoleMax->GetInt();
+    const int32_t nHoleMax = pHoleMax->GetInt();
 
     auto *pHoleQ = (VDATA *)pS->Pop();
-    const long nHoleQ = pHoleQ->GetInt();
+    const int32_t nHoleQ = pHoleQ->GetInt();
 
     auto *pVR = (VDATA *)pS->Push();
     if (!pVR)

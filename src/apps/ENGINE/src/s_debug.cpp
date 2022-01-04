@@ -388,8 +388,8 @@ bool S_DEBUG::OpenDebugWindow_NT(HINSTANCE hInstance)
     wndclass.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
     RegisterClassEx(&wndclass);
 
-    const long xs = GetSystemMetrics(SM_CXSCREEN);
-    const long ys = GetSystemMetrics(SM_CYSCREEN);
+    const int32_t xs = GetSystemMetrics(SM_CXSCREEN);
+    const int32_t ys = GetSystemMetrics(SM_CYSCREEN);
     // MoveWindow(hMain,(xs - DBGWIN_WIDTH)/2,(ys - DBGWIN_HEIGHT)/2,DBGWIN_WIDTH,DBGWIN_HEIGHT,false);
 
     hMain = CreateWindow(DClass, DClass,
@@ -874,7 +874,7 @@ bool S_DEBUG::ProcessRegistry_Open()
     return true;
 }
 
-long S_DEBUG::GetRecentFileALine(const char *pFileName)
+int32_t S_DEBUG::GetRecentFileALine(const char *pFileName)
 {
     HKEY hKey;
     char buffer[MAX_PATH];
@@ -917,7 +917,7 @@ long S_DEBUG::GetRecentFileALine(const char *pFileName)
     return 0;
 }
 
-void S_DEBUG::SaveRecentFileALine(const char *pFileName, long nLine)
+void S_DEBUG::SaveRecentFileALine(const char *pFileName, int32_t nLine)
 {
     HKEY hKey;
     char buffer[MAX_PATH];

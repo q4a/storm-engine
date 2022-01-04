@@ -33,7 +33,7 @@ class MousePointer : public BI_MousePointerBase
     };
 
     MouseCursorInfo m_aCursors[BI_CURSORS_QUANTITY];
-    long m_nCurrentCursor;
+    int32_t m_nCurrentCursor;
     LPOINT m_cursorsize;
 
     void InitMouseCursors();

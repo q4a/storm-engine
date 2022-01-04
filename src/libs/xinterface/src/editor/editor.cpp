@@ -116,7 +116,7 @@ bool GIEditor::ProcessControl()
                     m_bShowMode = true;
                     m_bSubNameOn = false;
                     m_pSubNameList->RemoveAllStrings();
-                    for (long n = 0; n < aStr.size(); n++)
+                    for (int32_t n = 0; n < aStr.size(); n++)
                         m_pSubNameList->AddString(aStr[n]);
                     m_bSubNameOn = true;
                     m_pSubNameList->SetSelectIndex(0);
@@ -164,7 +164,7 @@ bool GIEditor::ProcessControl()
 
     if (bMove || bSize)
     {
-        long nHorz = 0;
+        int32_t nHorz = 0;
 #ifdef _WIN32 // FIX_LINUX VirtualKey
         if (core.Controls->GetDebugAsyncKeyState(VK_LEFT) < 0)
             if (core.Controls->GetDebugAsyncKeyState(VK_MENU) < 0)
@@ -177,7 +177,7 @@ bool GIEditor::ProcessControl()
             else
                 nHorz++;
 #endif
-        long nVert = 0;
+        int32_t nVert = 0;
 #ifdef _WIN32 // FIX_LINUX VirtualKey
         if (core.Controls->GetDebugAsyncKeyState(VK_UP) < 0)
             if (core.Controls->GetDebugAsyncKeyState(VK_MENU) < 0)
@@ -216,7 +216,7 @@ bool GIEditor::ProcessControl()
                 /*
                         if( rectNew.right < 0 ) rectNew.right = 0;
                         if(
-                 * rectNew.left > (long)m_pGIOwner->GetScreenWidth() ) rectNew.left =
+                 * rectNew.left > (int32_t)m_pGIOwner->GetScreenWidth() ) rectNew.left =
  m_pGIOwner->GetScreenWidth();
                  * if( rectNew.right < rectNew.left ) rectNew.right = rectNew.left;*/
             }
@@ -228,7 +228,7 @@ bool GIEditor::ProcessControl()
 
                 /*                if( rectNew.bottom < 0 ) rectNew.bottom = 0;
                         if( rectNew.top >
-                 * (long)m_pGIOwner->GetScreenHeight() ) rectNew.top =
+                 * (int32_t)m_pGIOwner->GetScreenHeight() ) rectNew.top =
                    m_pGIOwner->GetScreenHeight();
                  * if( rectNew.bottom < rectNew.top ) rectNew.bottom = rectNew.top;*/
             }
@@ -290,7 +290,7 @@ void GIEditor::DrawSizeBox() const
 #endif
     {
         RS_LINE rsl[8];
-        for (long n = 0; n < 8; n++)
+        for (int32_t n = 0; n < 8; n++)
         {
             rsl[n].dwColor = 0xFFFFFFFF;
             rsl[n].vPos.z = 1.f;

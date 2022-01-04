@@ -33,8 +33,8 @@ struct STEXTURE
 {
     IDirect3DBaseTexture9 *d3dtex;
     char *name;
-    unsigned long hash;
-    long ref;
+    uint32_t hash;
+    int32_t ref;
     uint32_t dwSize;
     bool isCubeMap;
     bool loaded;
@@ -45,8 +45,8 @@ struct VERTEX_BUFFER
 {
     uint32_t dwNumLocks;
     uint32_t dwUsage;
-    long type;
-    long size;
+    int32_t type;
+    int32_t size;
     IDirect3DVertexBuffer9 *buff;
 };
 
@@ -54,23 +54,23 @@ struct INDEX_BUFFER
 {
     uint32_t dwNumLocks;
     uint32_t dwUsage;
-    long size;
+    int32_t size;
     IDirect3DIndexBuffer9 *buff;
 };
 
 struct FONTEntity
 {
     char *name;
-    unsigned long hash;
+    uint32_t hash;
     FONT *font;
-    long ref;
+    int32_t ref;
 };
 
 struct VideoTextureEntity
 {
     char *name;
-    unsigned long hash;
-    long ref;
+    uint32_t hash;
+    int32_t ref;
     entid_t videoTexture_id;
     CVideoTexture *VideoTexture;
     VideoTextureEntity *next;
@@ -119,13 +119,13 @@ class DX9RENDER : public VDX9RENDER
     Effects effects_;
 
     char *fontIniFileName;
-    long nFontQuantity;
+    int32_t nFontQuantity;
     FONTEntity FontList[MAX_FONTS];
-    long idFontCurrent;
+    int32_t idFontCurrent;
 
     VideoTextureEntity *pVTL;
 
-    long nTextureDegradation;
+    int32_t nTextureDegradation;
     float aspectRatio;
     float m_fHeightDeformator;
 
@@ -148,7 +148,7 @@ class DX9RENDER : public VDX9RENDER
     HBITMAP hCaptureBitmap;
     LPBITMAPINFO lpbi;
 #endif
-    long iCaptureFrameIndex;
+    int32_t iCaptureFrameIndex;
     bool bPreparedCapture;
     bool bVideoCapture;
     float fFixedFPS;
@@ -231,7 +231,7 @@ class DX9RENDER : public VDX9RENDER
     bool bBackBufferCanLock;
 
     IDirect3DVertexBuffer9 *aniVBuffer;
-    long numAniVerteces;
+    int32_t numAniVerteces;
 
     IDirect3DVertexBuffer9 *pDropConveyorVBuffer;
 
@@ -244,7 +244,7 @@ class DX9RENDER : public VDX9RENDER
     bool bLoadTextureEnabled;
 
     bool bTrace;
-    long iSetupPath;
+    int32_t iSetupPath;
     uint64_t dwSetupNumber;
     texpaths_t TexPaths[4];
 
@@ -252,8 +252,8 @@ class DX9RENDER : public VDX9RENDER
 
     std::stack<RenderTarget> stRenderTarget;
 
-    bool TextureLoad(long texid);
-    bool TextureLoadUsingD3DX(const char* path, long texid);
+    bool TextureLoad(int32_t texid);
+    bool TextureLoadUsingD3DX(const char* path, int32_t texid);
 
     bool MakeCapture();
     void SaveCaptureBuffers();
@@ -266,11 +266,11 @@ class DX9RENDER : public VDX9RENDER
     ~DX9RENDER() override;
 
     // DX9Render: Init/Release
-    bool InitDevice(bool windowed, HWND hwnd, long width, long height) override;
+    bool InitDevice(bool windowed, HWND hwnd, int32_t width, int32_t height) override;
     bool ReleaseDevice() override;
 
     // DX9Render: Animation
-    void RenderAnimation(long ib, void *src, long numVrts, long minv, long numv, long startidx, long numtrg,
+    void RenderAnimation(int32_t ib, void *src, int32_t numVrts, int32_t minv, int32_t numv, int32_t startidx, int32_t numtrg,
                          bool isUpdateVB) override;
 
     // DX9Render: Return d3d9 device
@@ -285,7 +285,7 @@ class DX9RENDER : public VDX9RENDER
     };
 
     // DX9Render: Render Target/Begin/End/Clear
-    bool DX9Clear(long type) override; // D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
+    bool DX9Clear(int32_t type) override; // D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
     bool DX9BeginScene() override;
     bool DX9EndScene() override;
 
@@ -304,8 +304,8 @@ class DX9RENDER : public VDX9RENDER
     PLANE *GetPlanes() override;
 
     // DX9Render: Camera Section
-    void SetTransform(long type, D3DMATRIX *mtx) override;
-    void GetTransform(long type, D3DMATRIX *mtx) override;
+    void SetTransform(int32_t type, D3DMATRIX *mtx) override;
+    void GetTransform(int32_t type, D3DMATRIX *mtx) override;
 
     bool SetCamera(const CVECTOR &pos, const CVECTOR &ang, float perspective) override;
     bool SetCamera(const CVECTOR &pos, const CVECTOR &ang) override;
@@ -316,27 +316,27 @@ class DX9RENDER : public VDX9RENDER
     bool SetCurrentMatrix(D3DMATRIX *mtx) override;
 
     // DX9Render: Textures Section
-    long TextureCreate(const char *fname) override;
-    long TextureCreate(UINT width, UINT height, UINT levels, uint32_t usage, D3DFORMAT format, D3DPOOL pool) override;
-    bool TextureSet(long stage, long texid) override;
-    bool TextureRelease(long texid) override;
-    bool TextureIncReference(long texid) override;
+    int32_t TextureCreate(const char *fname) override;
+    int32_t TextureCreate(UINT width, UINT height, UINT levels, uint32_t usage, D3DFORMAT format, D3DPOOL pool) override;
+    bool TextureSet(int32_t stage, int32_t texid) override;
+    bool TextureRelease(int32_t texid) override;
+    bool TextureIncReference(int32_t texid) override;
 
     // DX9Render: Fonts Section
-    long Print(long x, long y, const char *format, ...) override;
-    long Print(long nFontNum, uint32_t color, long x, long y, const char *format, ...) override;
-    long ExtPrint(long nFontNum, uint32_t foreColor, uint32_t backColor, int wAlignment, bool bShadow, float fScale,
-                  long scrWidth, long scrHeight, long x, long y, const char *format, ...) override;
-    long StringWidth(const char *string, long nFontNum = 0, float fScale = 1.f, long scrWidth = 0) override;
-    long CharWidth(utf8::u8_char, long nFontNum = 0, float fScale = 1.f, long scrWidth = 0) override;
-    long CharHeight(long fontID) override;
-    long LoadFont(const char *fontName) override;   // returns the number \ font id, or -1 on error
+    int32_t Print(int32_t x, int32_t y, const char *format, ...) override;
+    int32_t Print(int32_t nFontNum, uint32_t color, int32_t x, int32_t y, const char *format, ...) override;
+    int32_t ExtPrint(int32_t nFontNum, uint32_t foreColor, uint32_t backColor, int wAlignment, bool bShadow, float fScale,
+                  int32_t scrWidth, int32_t scrHeight, int32_t x, int32_t y, const char *format, ...) override;
+    int32_t StringWidth(const char *string, int32_t nFontNum = 0, float fScale = 1.f, int32_t scrWidth = 0) override;
+    int32_t CharWidth(utf8::u8_char, int32_t nFontNum = 0, float fScale = 1.f, int32_t scrWidth = 0) override;
+    int32_t CharHeight(int32_t fontID) override;
+    int32_t LoadFont(const char *fontName) override;   // returns the number \ font id, or -1 on error
     bool UnloadFont(const char *fontName) override; // returns true if the font is still in use
-    bool UnloadFont(long fontID) override;          // returns true if the font is still in use
-    bool IncRefCounter(long fontID) override;       // increase reference counter if object is being copied
+    bool UnloadFont(int32_t fontID) override;          // returns true if the font is still in use
+    bool IncRefCounter(int32_t fontID) override;       // increase reference counter if object is being copied
     bool SetCurFont(const char *fontName) override; // returns true if the given font is installed
-    bool SetCurFont(long fontID) override;          // returns true if the given font is installed
-    long GetCurFont() override;
+    bool SetCurFont(int32_t fontID) override;          // returns true if the given font is installed
+    int32_t GetCurFont() override;
     char *GetFontIniFileName() override;
     bool SetFontIniFileName(const char *iniName) override;
 
@@ -351,12 +351,12 @@ class DX9RENDER : public VDX9RENDER
     void DrawLines(RS_LINE *pRSL, uint32_t dwLinesNum, const char *cBlockName = nullptr) override;
     void DrawLines2D(RS_LINE2D *pRSL2D, size_t dwLinesNum, const char *cBlockName = nullptr) override;
 
-    void DrawBuffer(long vbuff, long stride, long ibuff, long minv, size_t numv, size_t startidx, size_t numtrg,
+    void DrawBuffer(int32_t vbuff, int32_t stride, int32_t ibuff, int32_t minv, size_t numv, size_t startidx, size_t numtrg,
                     const char *cBlockName = nullptr) override;
-    void DrawIndexedPrimitiveNoVShader(D3DPRIMITIVETYPE dwPrimitiveType, long iVBuff, long iStride, long iIBuff,
-                                       long iMinV, long iNumV, long iStartIdx, long iNumTrg,
+    void DrawIndexedPrimitiveNoVShader(D3DPRIMITIVETYPE dwPrimitiveType, int32_t iVBuff, int32_t iStride, int32_t iIBuff,
+                                       int32_t iMinV, int32_t iNumV, int32_t iStartIdx, int32_t iNumTrg,
                                        const char *cBlockName = nullptr) override;
-    void DrawPrimitive(D3DPRIMITIVETYPE dwPrimitiveType, long iVBuff, long iStride, long iStartV, long iNumPT,
+    void DrawPrimitive(D3DPRIMITIVETYPE dwPrimitiveType, int32_t iVBuff, int32_t iStride, int32_t iStartV, int32_t iNumPT,
                        const char *cBlockName = nullptr) override;
     void DrawPrimitiveUP(D3DPRIMITIVETYPE dwPrimitiveType, uint32_t dwVertexBufferFormat, uint32_t dwNumPT,
                          void *pVerts, uint32_t dwStride, const char *cBlockName = nullptr) override;
@@ -371,18 +371,18 @@ class DX9RENDER : public VDX9RENDER
     void ReleaseVideoTexture(CVideoTexture *pVTexture) override;
 
     // DX9Render: Vertex/Index Buffers Section
-    long CreateVertexBuffer(long type, size_t nverts, uint32_t usage) override;
-    long CreateIndexBuffer(size_t ntrgs, uint32_t dwUsage = D3DUSAGE_WRITEONLY) override;
+    int32_t CreateVertexBuffer(int32_t type, size_t nverts, uint32_t usage) override;
+    int32_t CreateIndexBuffer(size_t ntrgs, uint32_t dwUsage = D3DUSAGE_WRITEONLY) override;
 
-    IDirect3DVertexBuffer9 *GetVertexBuffer(long id) override;
-    long GetVertexBufferFVF(long id) override;
-    void *LockVertexBuffer(long id, uint32_t dwFlags = 0) override;
-    void UnLockVertexBuffer(long id) override;
-    long GetVertexBufferSize(long id) override;
-    void *LockIndexBuffer(long id, uint32_t dwFlags = 0) override;
-    void UnLockIndexBuffer(long id) override;
-    void ReleaseVertexBuffer(long id) override;
-    void ReleaseIndexBuffer(long id) override;
+    IDirect3DVertexBuffer9 *GetVertexBuffer(int32_t id) override;
+    int32_t GetVertexBufferFVF(int32_t id) override;
+    void *LockVertexBuffer(int32_t id, uint32_t dwFlags = 0) override;
+    void UnLockVertexBuffer(int32_t id) override;
+    int32_t GetVertexBufferSize(int32_t id) override;
+    void *LockIndexBuffer(int32_t id, uint32_t dwFlags = 0) override;
+    void UnLockIndexBuffer(int32_t id) override;
+    void ReleaseVertexBuffer(int32_t id) override;
+    void ReleaseIndexBuffer(int32_t id) override;
 
     // DX9Render: Render/Texture States Section
     uint32_t SetRenderState(uint32_t State, uint32_t Value) override;
@@ -482,7 +482,7 @@ class DX9RENDER : public VDX9RENDER
     HRESULT EndScene() override;
 
     HRESULT ImageBlt(const char *pName, RECT *pDstRect, RECT *pSrcRect) override;
-    HRESULT ImageBlt(long nTextureId, RECT *pDstRect, RECT *pSrcRect) override;
+    HRESULT ImageBlt(int32_t nTextureId, RECT *pDstRect, RECT *pSrcRect) override;
 
     void MakeScreenShot();
     bool LoadTextureSurface(std::fstream &fileS, IDirect3DSurface9 *suface, uint32_t mipSize, uint32_t width,
@@ -507,16 +507,16 @@ class DX9RENDER : public VDX9RENDER
 
     void SetCommonStates();
 
-    /*bool InitDevice(bool windowed, HWND hwnd, long width, long height);
+    /*bool InitDevice(bool windowed, HWND hwnd, int32_t width, int32_t height);
     bool ReleaseDevice();
 
-    bool DX9Clear(long type);    //D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
+    bool DX9Clear(int32_t type);    //D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER
     bool DX9BeginScene();
     bool DX9EndScene();
 
-    long TextureCreate(const char *fname);
-    bool TextureSet(long stage, long texid);
-    bool TextureRelease(long texid);
+    int32_t TextureCreate(const char *fname);
+    bool TextureSet(int32_t stage, int32_t texid);
+    bool TextureRelease(int32_t texid);
     //-----------------------------
     bool SetCamera(CVECTOR *pos, CVECTOR *ang, float perspective);
     bool SetCamera(CVECTOR *pos, CVECTOR *ang);
@@ -527,55 +527,55 @@ class DX9RENDER : public VDX9RENDER
 
     bool SetCurrentMatrix(D3DMATRIX *mtx);
     //-----------------------------
-    bool SetLight(long l, D3DLIGHT9 &lt);
-    bool LightEnable(long l, bool onf);
+    bool SetLight(int32_t l, D3DLIGHT9 &lt);
+    bool LightEnable(int32_t l, bool onf);
     bool SetMaterial(D3DMATERIAL9 &m);
 
     //-----------------------------
-    long CreateVertexBuffer(long type, long nverts,uint32_t usage);
-    long CreateIndexBuffer(long ntrgs, uint32_t dwUsage = D3DUSAGE_WRITEONLY);
-    void DrawBuffer(long vbuff, long stride, long ibuff, long minv, long numv, long startidx, long numtrg, char
-    *cBlockName = 0); void DrawIndexedPrimitiveNoVShader(D3DPRIMITIVETYPE dwPrimitiveType, long iVBuff, long iStride,
-    long iIBuff, long iMinV, long iNumV, long iStartIdx, long iNumTrg, char *cBlockName = 0); void
-    DrawPrimitive(D3DPRIMITIVETYPE dwPrimitiveType, long iVBuff, long iStride, long iStartV, long iNumPT, char
+    int32_t CreateVertexBuffer(int32_t type, int32_t nverts,uint32_t usage);
+    int32_t CreateIndexBuffer(int32_t ntrgs, uint32_t dwUsage = D3DUSAGE_WRITEONLY);
+    void DrawBuffer(int32_t vbuff, int32_t stride, int32_t ibuff, int32_t minv, int32_t numv, int32_t startidx, int32_t numtrg, char
+    *cBlockName = 0); void DrawIndexedPrimitiveNoVShader(D3DPRIMITIVETYPE dwPrimitiveType, int32_t iVBuff, int32_t iStride,
+    int32_t iIBuff, int32_t iMinV, int32_t iNumV, int32_t iStartIdx, int32_t iNumTrg, char *cBlockName = 0); void
+    DrawPrimitive(D3DPRIMITIVETYPE dwPrimitiveType, int32_t iVBuff, int32_t iStride, int32_t iStartV, int32_t iNumPT, char
     *cBlockName = 0); void DrawPrimitiveUP(D3DPRIMITIVETYPE dwPrimitiveType, uint32_t dwVertexBufferFormat, uint32_t
     dwNumPT, void *pVerts, uint32_t dwStride, char *cBlockName = 0); void DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE
     dwPrimitiveType, uint32_t dwMinIndex, uint32_t dwNumVertices, uint32_t dwPrimitiveCount, const void *pIndexData,
     D3DFORMAT IndexDataFormat, const void *pVertexData, uint32_t dwVertexStride, char *cBlockName = 0);
 
-    void RenderAnimation(long ib, void * src, long numVrts, long minv, long numv,  long startidx, long numtrg, bool
+    void RenderAnimation(int32_t ib, void * src, int32_t numVrts, int32_t minv, int32_t numv,  int32_t startidx, int32_t numtrg, bool
     isUpdateVB);
 
     bool TechniqueSetParamsAndStart(char *cBlockName = 0, uint32_t dwNumParams = 0, void *pParams = 0);
     bool TechniqueExecuteStart(char *cBlockName = 0, uint32_t dwNumParams = 0, ...);
     bool TechniqueExecuteNext();
 
-    void* LockVertexBuffer(long id, uint32_t dwFlags = 0);
-    void UnLockVertexBuffer(long id);
-    long GetVertexBufferSize(long id);
-    void* LockIndexBuffer(long id, uint32_t dwFlags = 0);
-    void UnLockIndexBuffer(long id);
-    void ReleaseVertexBuffer(long id);
-    void ReleaseIndexBuffer(long id);
-    void SetTransform(long type, D3DMATRIX *mtx);
-    void GetTransform(long type, D3DMATRIX *mtx);
+    void* LockVertexBuffer(int32_t id, uint32_t dwFlags = 0);
+    void UnLockVertexBuffer(int32_t id);
+    int32_t GetVertexBufferSize(int32_t id);
+    void* LockIndexBuffer(int32_t id, uint32_t dwFlags = 0);
+    void UnLockIndexBuffer(int32_t id);
+    void ReleaseVertexBuffer(int32_t id);
+    void ReleaseIndexBuffer(int32_t id);
+    void SetTransform(int32_t type, D3DMATRIX *mtx);
+    void GetTransform(int32_t type, D3DMATRIX *mtx);
 
     // fonts
     //DX9FONTS Fonts;
-    long Print(long x, long y,char * format,...);
-    long Print(long nFontNum, DWORD color, long x, long y,char * format,...);
-    long ExtPrint(long nFontNum, DWORD foreColor, DWORD backColor, int wAlignment,
-                         bool bShadow, float fScale, long scrWidth, long scrHeight,
-                         long x, long y,char * format,...);
-    long StringWidth(char * string, long nFontNum=0, float fScale=1.f, long scrWidth=0);
-    long CharWidth(char ch, long nFontNum=0, float fScale=1.f, long scrWidth=0);
-long CharHeight (long fontID); // returns the font height
-long LoadFont (char * fontName); // returns number \ font identifier or -1 in case of error
+    int32_t Print(int32_t x, int32_t y,char * format,...);
+    int32_t Print(int32_t nFontNum, DWORD color, int32_t x, int32_t y,char * format,...);
+    int32_t ExtPrint(int32_t nFontNum, DWORD foreColor, DWORD backColor, int wAlignment,
+                         bool bShadow, float fScale, int32_t scrWidth, int32_t scrHeight,
+                         int32_t x, int32_t y,char * format,...);
+    int32_t StringWidth(char * string, int32_t nFontNum=0, float fScale=1.f, int32_t scrWidth=0);
+    int32_t CharWidth(char ch, int32_t nFontNum=0, float fScale=1.f, int32_t scrWidth=0);
+int32_t CharHeight (int32_t fontID); // returns the font height
+int32_t LoadFont (char * fontName); // returns number \ font identifier or -1 in case of error
 bool UnloadFont (char * fontName); // returns true if the font is still in use
-bool UnloadFont (long fontID); // returns true if the font is still in use
+bool UnloadFont (int32_t fontID); // returns true if the font is still in use
 bool SetCurFont (char * fontName); // returns true if the given font is installed
-bool SetCurFont (long fontID); // returns true if the given font is installed
-    long GetCurFont();
+bool SetCurFont (int32_t fontID); // returns true if the given font is installed
+    int32_t GetCurFont();
     char *GetFontIniFileName();
     bool SetFontIniFileName(char * iniName);
 
@@ -656,8 +656,8 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
     void ReleaseVideoTexture(IDirect3DTexture9* pTexture);
 
 
-    virtual IDirect3DVertexBuffer9 * GetVertexBuffer(long id);
-    virtual long GetVertexBufferFVF(long id);
+    virtual IDirect3DVertexBuffer9 * GetVertexBuffer(int32_t id);
+    virtual int32_t GetVertexBufferFVF(int32_t id);
 
     bool LoadTextureSurface(HANDLE file, IDirect3DSurface9 * suface, uint32_t mipSize, uint32_t width, uint32_t height,
     bool isSwizzled);
@@ -675,26 +675,26 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
     IDirect3DVertexBuffer9 *rectsVBuffer;
 
     char *progressImage;
-    long progressImageSize;
-    long backTexture;
+    int32_t progressImageSize;
+    int32_t backTexture;
     char *progressBackImage;
-    long progressBackImageSize;
-    long back0Texture;
-    long progressTexture;
+    int32_t progressBackImageSize;
+    int32_t back0Texture;
+    int32_t progressTexture;
     char *progressTipsImage;
-    long progressTipsImageSize;
-    long progressTipsTexture;
+    int32_t progressTipsImageSize;
+    int32_t progressTipsTexture;
 
-    long loadFrame;
-    long progressSafeCounter;
+    int32_t loadFrame;
+    int32_t progressSafeCounter;
     bool isInPViewProcess;
     std::chrono::time_point<std::chrono::system_clock> progressUpdateTime;
     float progressFramesPosX;
     float progressFramesPosY;
     float progressFramesWidth;
     float progressFramesHeight;
-    long progressFramesCountX;
-    long progressFramesCountY;
+    int32_t progressFramesCountX;
+    int32_t progressFramesCountY;
 
     // new renderer settings
     bool vSyncEnabled;
@@ -732,7 +732,7 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
                         CVECTOR v2, float fScale, uint32_t dwColor);
     void DrawVector(const CVECTOR &v1, const CVECTOR &v2, uint32_t dwColor,
                     const char *pTechniqueName = "DXVector") override;
-    IDirect3DBaseTexture9 *GetBaseTexture(long iTexture) override;
+    IDirect3DBaseTexture9 *GetBaseTexture(int32_t iTexture) override;
 
     IDirect3DBaseTexture9 *CreateTextureFromFileInMemory(const char *pFile, uint32_t dwSize) override;
 
@@ -751,9 +751,9 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
                                                  uint32_t Usage, D3DFORMAT Format, D3DPOOL Pool) override;
 
     void MakePostProcess() override;
-    void SetGLOWParams(float _fBlurBrushSize, long _GlowIntensity, long _GlowPasses) override;
+    void SetGLOWParams(float _fBlurBrushSize, int32_t _GlowIntensity, int32_t _GlowPasses) override;
 
-    IDirect3DBaseTexture9 *GetTextureFromID(long nTextureID) override;
+    IDirect3DBaseTexture9 *GetTextureFromID(int32_t nTextureID) override;
 
     void LostRender();
     void RestoreRender();

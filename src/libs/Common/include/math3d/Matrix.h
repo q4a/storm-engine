@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "Plane.h"
 #include "Vector4.h"
 #include <d3d9.h>
@@ -225,8 +227,8 @@ class Matrix
     // Project Vertex (for projection matrix)
     Vector4 Projection(Vector vertex, float vphWidth05 = 1.0f, float vphHeight05 = 1.0f) const;
     // Project vertex array (for projection matrix)
-    void Projection(Vector4 *dstArray, Vector *srcArray, long num, float vphWidth05 = 1.0f, float vphHeight05 = 1.0f,
-                    long srcSize = sizeof(Vector), long dstSize = sizeof(Vector4)) const;
+    void Projection(Vector4 *dstArray, Vector *srcArray, int32_t num, float vphWidth05 = 1.0f, float vphHeight05 = 1.0f,
+                    int32_t srcSize = sizeof(Vector), int32_t dstSize = sizeof(Vector4)) const;
 
     // Get angles from unscaled rotation matrix
     void GetAngles(float &ax, float &ay, float &az) const;
@@ -234,7 +236,7 @@ class Matrix
     void GetAngles(Vector &ang) const;
 
     // Access matrix elements with brackets
-    float &operator()(long i, long j);
+    float &operator()(int32_t i, int32_t j);
 
     // Get a pointer to a D3D matrix
     operator D3DMATRIX *() const;
@@ -1129,7 +1131,7 @@ inline Matrix &Matrix::InverseWhithScale()
     }
     else
     {
-        for (long i = 0; i < 16; i++)
+        for (int32_t i = 0; i < 16; i++)
             matrix[i] = 0.0f;
     }
     // Position
@@ -1418,8 +1420,8 @@ inline Vector4 Matrix::Projection(Vector vertex, float vphWidth05, float vphHeig
 }
 
 // Project vertex array (for projection matrix)
-inline void Matrix::Projection(Vector4 *dstArray, Vector *srcArray, long num, float vphWidth05, float vphHeight05,
-                               long srcSize, long dstSize) const
+inline void Matrix::Projection(Vector4 *dstArray, Vector *srcArray, int32_t num, float vphWidth05, float vphHeight05,
+                               int32_t srcSize, int32_t dstSize) const
 {
     for (; num > 0; num--)
     {
@@ -1472,7 +1474,7 @@ inline void Matrix::GetAngles(Vector &ang) const
 }
 
 // Access matrix elements with brackets
-inline float &Matrix::operator()(long i, long j)
+inline float &Matrix::operator()(int32_t i, int32_t j)
 {
     return m[i][j];
 }

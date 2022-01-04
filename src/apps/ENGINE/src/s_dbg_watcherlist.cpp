@@ -12,12 +12,12 @@ WATCHER_LIST::WATCHER_LIST(HWND hwnd, HINSTANCE hinst)
     Initialize(hwnd, hinst, 0, 0, 0);
     SetBindMask(BM_BIND_RIGHT | BM_BIND_BOTTOM);
 
-    const long xs = GetSystemMetrics(SM_CXSCREEN);
+    const int32_t xs = GetSystemMetrics(SM_CXSCREEN);
 
     AddColumn("Name", (3 * xs) / 5 - 20);
     AddColumn("Value", xs - (3 * xs) / 5 - 20);
 
-    for (long n = 0; n < 11; n++)
+    for (int32_t n = 0; n < 11; n++)
     {
         AddItem("");
     }
@@ -27,7 +27,7 @@ WATCHER_LIST::WATCHER_LIST(HWND hwnd, HINSTANCE hinst)
     ini = fio->OpenIniFile("project.df");
     if (ini)
     {
-        long n = 0;
+        int32_t n = 0;
         sprintf(buffer, "E%d", n);
         if (ini->ReadString(nullptr, buffer, buffer, sizeof(buffer), ""))
         {
@@ -76,7 +76,7 @@ WATCHER_LIST::~WATCHER_LIST()
     hMenu = nullptr;
 }
 
-void WATCHER_LIST::ItemChanged(long Item_index, long Subitem_index)
+void WATCHER_LIST::ItemChanged(int32_t Item_index, int32_t Subitem_index)
 {
     char buffer[MAX_PATH]{};
     char buffer2[MAX_PATH]{};
@@ -104,7 +104,7 @@ void WATCHER_LIST::ItemChanged(long Item_index, long Subitem_index)
 void WATCHER_LIST::Refresh()
 {
     char String[MAX_PATH]{};
-    for (long n = 0; n < GetItemsCount(); n++)
+    for (int32_t n = 0; n < GetItemsCount(); n++)
     {
         GetItemText(n, 0, String, sizeof(String));
         SetItemText(n, 1, CDebug->ProcessExpression(String));
@@ -143,8 +143,8 @@ void WATCHER_LIST::ProcessMessage(uint64_t iMsg, uint64_t wParam, uint64_t lPara
             {
                 if (lpnmlv->iItem >= 0)
                 {
-                    long item = lpnmlv->iItem;
-                    long subitem = lpnmlv->iSubItem;
+                    int32_t item = lpnmlv->iItem;
+                    int32_t subitem = lpnmlv->iSubItem;
                 }
                 else
                 {
@@ -161,7 +161,7 @@ void WATCHER_LIST::ProcessMessage(uint64_t iMsg, uint64_t wParam, uint64_t lPara
     POINT point;
     HMENU hSubMenu;
     LPNMLISTVIEW lpnmlv;
-    long item,subitem;
+    int32_t item,subitem;
 
     switch(iMsg)
     {

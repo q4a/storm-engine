@@ -44,7 +44,7 @@ class DATA : public VDATA
     uint32_t Segment_id;
 
     DATA *pReference;
-    // long   ReferenceIndex;
+    // int32_t   ReferenceIndex;
 
     std::vector<DATA> ArrayPTR;
     uint32_t nGlobalVarTableIndex;
