@@ -1529,7 +1529,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             break;
         }
         pV->Get(TempLong1);
-        TempLong2 = ((TempLong1 + 1) * rand()) / RAND_MAX;
+        TempLong2 = ((int64_t)(TempLong1 + 1) * rand()) / RAND_MAX;
         if (TempLong2 > TempLong1)
             TempLong2 = TempLong1;
         pV = SStack.Push();
