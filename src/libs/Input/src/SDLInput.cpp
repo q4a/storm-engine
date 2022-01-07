@@ -1,8 +1,8 @@
 #include "SDLInput.hpp"
 
-#include <SDL.h>
-#include <SDL_system.h>
-#include <SDL_video.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_system.h>
+#include <SDL2/SDL_video.h>
 #include <windows.h>
 #include <map>
 

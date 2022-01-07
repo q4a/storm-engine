@@ -54,7 +54,7 @@ STORM_SETUP(
 	
     # external
     sentry-native
-    sdl2
+    sdl
     zlib
 
     # system
@@ -118,7 +118,7 @@ STORM_SETUP(
 	
     # external
     sentry-native
-    sdl2
+    sdl
     zlib
 )
 endif()

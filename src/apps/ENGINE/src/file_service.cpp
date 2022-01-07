@@ -1,10 +1,9 @@
 #include "file_service.h"
 #include "core.h"
 #include "storm_assert.h"
-#include "utf8.h"
 #include "defines.h"
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <exception>
 #include <storm/string_compare.hpp>
 #include <string>

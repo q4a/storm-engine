@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #ifdef _WIN32
 #include <ShlObj.h>
 #endif
