@@ -16,7 +16,7 @@ class StormEngine(ConanFile):
 
     # dependencies used in deploy binaries
     # conan-center
-    requires = ["zlib/1.2.11", "spdlog/1.9.2", "sentry-native/0.4.12@storm/patched",
+    requires = ["zlib/1.2.11", "spdlog/1.9.2", "sentry-native/0.4.13@storm/patched", "fast_float/3.4.0",
     # bincrafters
     "sdl2/2.0.16@bincrafters/stable",
     # storm.jfrog.io
