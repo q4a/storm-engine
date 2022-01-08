@@ -58,6 +58,7 @@ if (NOT CMAKE_HOST_WIN32 AND STORM_ENABLE_DXVK)
     )
     set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
     include_directories("${DXVK_NATIVE_INCLUDE_DIRS}")
+    ADD_CUSTOM_TARGET(dependencies ALL DEPENDS dxvk-native)
 endif()
 
 ### Define library ALIASes for use without CONAN_PKG:: prefix
