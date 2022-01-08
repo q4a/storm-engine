@@ -12,7 +12,7 @@
 
 //#define inline __forceinline
 
-#include "math3d/vector.h"
+#include "math3d/Vector.h"
 
 // Fast conversion of a floating point number to an integer with discarding of the fractional part
 inline int32_t fftol(float f)
@@ -167,4 +167,4 @@ inline float safeASin(float ang)
 
 #define ARRSIZE(ar) (sizeof(ar) / sizeof(ar[0]))
 
-#include "math3d/vector4.h"
+#include "math3d/Vector4.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sailone.h"
+#include "SAILONE.h"
 #include "dx9render.h"
 #include "geos.h"
 #include "model.h"
