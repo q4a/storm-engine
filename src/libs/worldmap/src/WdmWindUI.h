@@ -12,6 +12,8 @@
 
 #include "WdmInterfaceObject.h"
 
+#include <optional>
+
 class WdmWindUI : public WdmInterfaceObject
 {
     // --------------------------------------------------------------------------------------------
