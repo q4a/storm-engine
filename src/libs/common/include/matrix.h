@@ -4,7 +4,9 @@
 
 #include "c_vector.h"
 #include <d3d9.h>
+#ifdef _WIN32
 #include <d3dx9.h>
+#endif
 
 //============================================================================================
 
@@ -159,7 +161,9 @@ class CMatrix
     void BuildMirrorMatrix(float Nx, float Ny, float Nz, float D);
 
     // D3D extends (return (D3DXMATRIX *)pointer)
+#ifdef _WIN32
     operator D3DXMATRIX *() const;
+#endif
     operator D3DMATRIX *() const;
     operator const float *() const;
 };
@@ -870,11 +874,13 @@ inline void CMatrix::BuildMirrorMatrix(float Nx, float Ny, float Nz, float D)
     m[3][3] = 1.0f;
 }
 
+#ifdef _WIN32
 // D3D extends (return (D3DXMATRIX *)pointer)
 inline CMatrix::operator D3DXMATRIX *() const
 {
     return ((D3DXMATRIX *)matrix);
 };
+#endif
 
 // D3D extends (return (D3DMATRIX *)pointer)
 inline CMatrix::operator D3DMATRIX *() const
