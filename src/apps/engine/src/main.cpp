@@ -12,7 +12,11 @@
 #include "os_window.hpp"
 #include "steam_api_impl.hpp"
 #include "file_service.h"
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
+#else
+#include "core.h"
+#endif
 #include "v_sound_service.h"
 #include "storm/fs.h"
 #include "watermark.hpp"
@@ -178,9 +182,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core_internal.Init();
 
     // Init script debugger
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     S_DEBUG debug;
     debug.Init();
     CDebug = &debug;
+#endif
 
     // Read config
     auto ini = fio->OpenIniFile(fs::ENGINE_INI_FILE_NAME);
