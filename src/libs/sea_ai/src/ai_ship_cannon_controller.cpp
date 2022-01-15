@@ -398,7 +398,9 @@ CVECTOR AIShipCannonController::GetFirePos(const CVECTOR &vFireDir)
     {
         return CVECTOR(1e5f, 0.0f, 1e5f);
 
+#ifdef _WIN32 // FIX_LINUX __debugbreak
         __debugbreak();
+#endif
         bTempFlag = true;
         dwBort = GetFirstFireBort(vTempFirePos);
         Assert(dwBort != INVALID_BORT_INDEX);
