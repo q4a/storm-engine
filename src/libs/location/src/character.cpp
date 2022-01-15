@@ -3467,6 +3467,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
         if (storm::iEquals(msg, "CheckID"))
         {
 #ifdef _DEBUG
+#ifdef _WIN32 // FIX_LINUX __debugbreak
             const std::string &msg = message.String();
             if (AttributesPointer)
             {
@@ -3481,6 +3482,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
             }
             if (strcmp(msg.c_str(), characterID) != 0)
                 __debugbreak();
+#endif
 #endif
             return 1;
         }

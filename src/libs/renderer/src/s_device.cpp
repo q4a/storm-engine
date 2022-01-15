@@ -2546,12 +2546,20 @@ void DX9RENDER::LostRender()
         if (VertexBuffers[b].buff)
         {
             if (VertexBuffers[b].buff->Release() > 0)
+#ifdef _WIN32 // FIX_LINUX __debugbreak
                 __debugbreak();
+#else
+                do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
         if (IndexBuffers[b].buff)
         {
             if (IndexBuffers[b].buff->Release() > 0)
+#ifdef _WIN32 // FIX_LINUX __debugbreak
                 __debugbreak();
+#else
+                do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
     }
 
@@ -3593,7 +3601,9 @@ HRESULT DX9RENDER::Release(IUnknown *pObject)
     {
         if (*(void **)pObject == nullptr)
         {
+#ifdef _WIN32 // FIX_LINUX __debugbreak
             __debugbreak();
+#endif
         }
         else
         {
