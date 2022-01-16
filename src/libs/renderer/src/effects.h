@@ -7,6 +7,7 @@
 #endif
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 class Effects final
 {
