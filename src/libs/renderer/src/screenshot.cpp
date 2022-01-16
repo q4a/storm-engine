@@ -47,7 +47,9 @@ void DX9RENDER::SaveCaptureBuffers()
 
     iCaptureFrameIndex = fi + dwCaptureBuffersReady + 1;
 
+#ifdef _WIN32 // FIX_LINUX _flushall
     _flushall();
+#endif
     dwCaptureBuffersReady = 0;
 }
 
