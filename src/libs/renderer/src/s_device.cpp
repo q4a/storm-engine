@@ -35,6 +35,7 @@ namespace
 {
     constexpr auto kKeyTakeScreenshot = "TakeScreenshot";
 
+#ifdef _WIN32 // FIX_LINUX Screenshot
     D3DXIMAGE_FILEFORMAT GetScreenshotFormat(const std::string &fmt)
     {
         if (fmt == "bmp")
@@ -76,6 +77,7 @@ namespace
 
         return D3DXIFF_FORCE_DWORD;
     }
+#endif
 
     void InvokeEntitiesLostRender()
     {
@@ -506,12 +508,14 @@ bool DX9RENDER::Init()
         screenshotExt = str;
         std::ranges::transform(screenshotExt, screenshotExt.begin(),
                                [](const unsigned char c) { return std::tolower(c); });
+#ifdef _WIN32 // FIX_LINUX Screenshot
         screenshotFormat = GetScreenshotFormat(str);
         if (screenshotFormat == D3DXIFF_FORCE_DWORD)
         {
             screenshotExt = "jpg";
             screenshotFormat = D3DXIFF_JPG;
         }
+#endif
 
         bShowFps = ini->GetInt(nullptr, "show_fps", 0) == 1;
         bShowExInfo = ini->GetInt(nullptr, "show_exinfo", 0) == 1;
@@ -1284,9 +1288,11 @@ bool DX9RENDER::DX9EndScene()
 
     if (bSafeRendering)
     {
+#ifdef _WIN32 // FIX_LINUX ReleaseDC
         const HDC dc = GetDC(hwnd);
         SetPixel(dc, 0, 0, 0);
         ReleaseDC(hwnd, dc);
+#endif
     }
 
     return true;
@@ -1790,6 +1796,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
 
 bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
 {
+#ifdef _WIN32 // FIX_LINUX D3DXCreateTextureFromFileA
     // TODO: reimplement the whole thing in a tidy way
     IDirect3DTexture9 *pTex;
     if(CHECKD3DERR(D3DXCreateTextureFromFileA(d3d9, path, &pTex)))
@@ -1810,6 +1817,9 @@ bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
     Textures[t].loaded = true;
 
     return true;
+#else
+    return false;
+#endif
 }
 
 IDirect3DBaseTexture9 *DX9RENDER::GetBaseTexture(int32_t iTexture)
@@ -3280,7 +3290,11 @@ void DX9RENDER::MakeScreenShot()
         return;
     }
 
+#ifdef _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
     if (CHECKD3DERR(D3DXLoadSurfaceFromSurface(surface, NULL, NULL, renderTarget, NULL, NULL, D3DX_DEFAULT, 0)))
+#else
+    if (FAILED(d3d9->UpdateSurface(renderTarget, nullptr, surface, nullptr)))
+#endif
     {
         surface->Release();
         renderTarget->Release();
@@ -3296,7 +3310,9 @@ void DX9RENDER::MakeScreenShot()
         screenshot_path.replace_filename(screenshot_base_filename + "_" + std::to_string(i));
         screenshot_path.replace_extension(screenshotExt);
     }
+#ifdef _WIN32 // FIX_LINUX Screenshot
     D3DXSaveSurfaceToFile(screenshot_path.c_str(), screenshotFormat, surface, nullptr, nullptr);
+#endif
 
     surface->Release();
     renderTarget->Release();
@@ -3791,10 +3807,12 @@ HRESULT DX9RENDER::GetSurfaceLevel(IDirect3DTexture9 *ppTexture, UINT Level, IDi
 HRESULT DX9RENDER::UpdateSurface(IDirect3DSurface9 *pSourceSurface, CONST RECT *pSourceRectsArray, UINT cRects,
                                  IDirect3DSurface9 *pDestinationSurface, CONST POINT *pDestPointsArray)
 {
+#ifdef _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
     return CHECKD3DERR(D3DXLoadSurfaceFromSurface(pDestinationSurface, nullptr, nullptr, pSourceSurface, nullptr,
-                                                 nullptr,
-                                      D3DX_DEFAULT, 0));
-    //return CHECKD3DERR(d3d9->UpdateSurface(pSourceSurface, pSourceRectsArray, pDestinationSurface, pDestPointsArray));
+                                                  nullptr, D3DX_DEFAULT, 0));
+#else
+    return CHECKD3DERR(d3d9->UpdateSurface(pSourceSurface, pSourceRectsArray, pDestinationSurface, pDestPointsArray));
+#endif
 }
 
 HRESULT DX9RENDER::StretchRect(IDirect3DSurface9 *pSourceSurface, const RECT *pSourceRect,
