@@ -89,8 +89,8 @@ void Effects::release()
 #ifdef _WIN32 // FIX_LINUX ID3DXEffect
     for (auto *fx : effects_)
         fx->Release();
-#endif
     effects_.clear();
+#endif
     techniques_.clear();
     currentTechnique_ = nullptr;
 }
