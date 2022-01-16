@@ -185,7 +185,7 @@ class MESSAGE final
     }
 
   private:
-    static storm::MessageParam GetParamValue(const char c, va_list &args)
+    static storm::MessageParam GetParamValue(const char c, va_list args)
     {
         switch (c)
         {
