@@ -269,7 +269,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core_internal.Event("ExitApplication", nullptr);
     core_internal.CleanUp();
     core_internal.ReleaseBase();
+#ifdef _WIN32 // FIX_LINUX Cursor
     ClipCursor(nullptr);
+#endif
     SDL_Quit();
 
     return EXIT_SUCCESS;
