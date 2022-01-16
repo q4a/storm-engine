@@ -15,8 +15,12 @@
 
 #include <fmt/chrono.h>
 
+#ifdef _WIN32
 #include <DxErr.h>
 #include <corecrt_io.h>
+#else
+#include <unistd.h>
+#endif
 
 CREATE_SERVICE(DX9RENDER)
 
@@ -379,7 +383,11 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
+#ifdef _WIN32
         core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
+#else
+        core.Trace("[%s:%s:%d] (%s)", file, func, line, expr);
+#endif
         return true;
     }
 
