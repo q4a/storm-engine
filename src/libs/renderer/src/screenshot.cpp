@@ -65,9 +65,13 @@ bool DX9RENDER::MakeCapture()
 
     if (dwCaptureBuffersReady >= aCaptureBuffers.size())
     {
+#ifdef _WIN32 // FIX_LINUX Beep
         Beep(1000, 150);
         SaveCaptureBuffers();
         Beep(5000, 150);
+#else
+        SaveCaptureBuffers();
+#endif
     }
 
 #ifdef _WIN32 // FIX_LINUX HBITMAP
