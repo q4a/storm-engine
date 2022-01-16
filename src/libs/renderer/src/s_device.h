@@ -489,8 +489,10 @@ private:
 
     // VideoCapture section
     HDC hDesktopDC, hCaptureDC;
+#ifdef _WIN32 // FIX_LINUX HBITMAP
     HBITMAP hCaptureBitmap;
     LPBITMAPINFO lpbi;
+#endif
     int32_t iCaptureFrameIndex;
     bool bPreparedCapture;
     bool bVideoCapture;
