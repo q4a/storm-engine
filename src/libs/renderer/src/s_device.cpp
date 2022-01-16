@@ -710,10 +710,14 @@ DX9RENDER::~DX9RENDER()
 
     if (bPreparedCapture)
     {
+#ifndef _WIN32 // FIX_LINUX HBITMAP
         STORM_DELETE(lpbi);
+#endif
         ReleaseDC(static_cast<HWND>(core.GetAppHWND()), hDesktopDC);
         DeleteDC(hCaptureDC);
+#ifndef _WIN32 // FIX_LINUX HBITMAP
         DeleteObject(hCaptureBitmap);
+#endif
     }
     for (const auto &buffer : aCaptureBuffers)
         delete buffer;
