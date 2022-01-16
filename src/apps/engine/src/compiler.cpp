@@ -1856,7 +1856,8 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
     uint32_t dwR;
     if (bWriteCodeFile)
     {
-        _splitpath(Segment.name, nullptr, nullptr, file_name, nullptr);
+        auto fName = std::filesystem::path(Segment.name).filename().string();
+        strcpy_s(file_name, fName.c_str());
         strcat_s(file_name, ".b");
         std::wstring FileNameW = utf8::ConvertUtf8ToWide(file_name);
         fh = CreateFile(FileNameW.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS,
