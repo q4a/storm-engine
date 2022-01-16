@@ -9,7 +9,7 @@
 #ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
 #else
-#include "core.h"
+#include "core_impl.h"
 #endif
 #include "v_sound_service.h"
 #include "storm/fs.h"
