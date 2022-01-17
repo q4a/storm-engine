@@ -202,7 +202,11 @@ int main(int argc, char *argv[])
     core_internal.InitBase();
 
     // Message loop
+#ifdef _WIN32 // FIX_LINUX GetTickCount
     auto dwOldTime = GetTickCount();
+#else
+    auto dwOldTime = std::chrono::system_clock::now();
+#endif
 
     isRunning = true;
     while (isRunning)
@@ -215,9 +219,16 @@ int main(int argc, char *argv[])
             if (dwMaxFPS)
             {
                 const auto dwMS = 1000u / dwMaxFPS;
+#ifdef _WIN32 // FIX_LINUX GetTickCount
                 const auto dwNewTime = GetTickCount();
                 if (dwNewTime - dwOldTime < dwMS)
                     continue;
+#else
+                const auto dwNewTime = std::chrono::system_clock::now();
+                const std::chrono::duration<double, std::milli> passedTime = dwNewTime - dwOldTime;
+                if (static_cast<uint32_t>(passedTime.count()) < dwMS)
+                    continue;
+#endif
                 dwOldTime = dwNewTime;
             }
 
