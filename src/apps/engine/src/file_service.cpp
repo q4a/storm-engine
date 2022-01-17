@@ -41,7 +41,7 @@ FILE_SERVICE::~FILE_SERVICE()
 
 std::fstream FILE_SERVICE::_CreateFile(const char *filename, std::ios::openmode mode)
 {
-    const auto path = filename ? std::filesystem::u8path(filename) : std::filesystem::path();
+    const auto path = filename ? std::filesystem::u8path(convert_path_sep(filename)) : std::filesystem::path();
     std::fstream fileS(path, mode);
     return fileS;
 }
@@ -58,7 +58,7 @@ void FILE_SERVICE::_SetFilePointer(std::fstream &fileS, std::streamoff off, std:
 
 bool FILE_SERVICE::_DeleteFile(const char *filename)
 {
-    std::filesystem::path path = std::filesystem::u8path(filename);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(filename));
     return std::filesystem::remove(path);
 }
 
@@ -94,7 +94,7 @@ bool FILE_SERVICE::_ReadFile(std::fstream &fileS, void *s, std::streamsize count
 
 bool FILE_SERVICE::_FileOrDirectoryExists(const char *p)
 {
-    std::filesystem::path path = std::filesystem::u8path(p);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(p));
     return std::filesystem::exists(path);
 }
 
@@ -125,7 +125,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
     }
     else
     {
-        srcPath = std::filesystem::u8path(sourcePath);
+        srcPath = std::filesystem::u8path(convert_path_sep(sourcePath));
     }
 
     std::filesystem::path curPath;
@@ -171,7 +171,7 @@ std::time_t FILE_SERVICE::_ToTimeT(std::filesystem::file_time_type tp)
 
 std::filesystem::file_time_type FILE_SERVICE::_GetLastWriteTime(const char *filename)
 {
-    std::filesystem::path path = std::filesystem::u8path(filename);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(filename));
     return std::filesystem::last_write_time(path);
 }
 
@@ -195,25 +195,25 @@ std::string FILE_SERVICE::_GetExecutableDirectory()
 
 std::uintmax_t FILE_SERVICE::_GetFileSize(const char *filename)
 {
-    std::filesystem::path path = std::filesystem::u8path(filename);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(filename));
     return std::filesystem::file_size(path);
 }
 
 void FILE_SERVICE::_SetCurrentDirectory(const char *pathName)
 {
-    std::filesystem::path path = std::filesystem::u8path(pathName);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(pathName));
     std::filesystem::current_path(path);
 }
 
 bool FILE_SERVICE::_CreateDirectory(const char *pathName)
 {
-    std::filesystem::path path = std::filesystem::u8path(pathName);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(pathName));
     return std::filesystem::create_directories(path);
 }
 
 std::uintmax_t FILE_SERVICE::_RemoveDirectory(const char *pathName)
 {
-    std::filesystem::path path = std::filesystem::u8path(pathName);
+    std::filesystem::path path = std::filesystem::u8path(convert_path_sep(pathName));
     return std::filesystem::remove_all(path);
 }
 
