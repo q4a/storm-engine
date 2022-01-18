@@ -44,7 +44,6 @@ class CoreImpl : public Core
 
     void ProcessControls();
 
-
     void DumpEntitiesInfo();
     void EraseEntities();
     void ClearEvents();
