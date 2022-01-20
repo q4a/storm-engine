@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        configuration: [msvc-debug, msvc-release]
+        configuration: [msvc-debug, msvc-release, clang-debug]
         enable_steam: [false]
         include:
           - enable_steam: true
