@@ -62,7 +62,7 @@ class CoreImpl : public Core
     void Exit();
     // return application handle
     void* GetAppHWND() override;
-#ifdef _WIN32 // FIX_LINUX HINSTANCE
+#ifdef false // _WIN32 // FIX_LINUX HINSTANCE
     HINSTANCE GetAppInstance();
 #endif
     // set time scale; affect on std entity functions DeltaTime parameter
@@ -152,7 +152,7 @@ class CoreImpl : public Core
 
     SERVICES_LIST Services_List; // list for subsequent calls RunStart/RunEnd service functions
 
-#ifdef _WIN32 // FIX_LINUX HINSTANCE
+#ifdef false // _WIN32 // FIX_LINUX HINSTANCE
     HINSTANCE hInstance{};
 #endif
 

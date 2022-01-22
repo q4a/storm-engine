@@ -194,7 +194,7 @@ class CONTROLS
 
     virtual short GetDebugAsyncKeyState(int vk)
     {
-#ifdef _WIN32 // FIX_LINUX VirtualKey
+#ifdef false // _WIN32 // FIX_LINUX VirtualKey
         return GetAsyncKeyState(vk);
 #else
         return 0;
@@ -203,7 +203,7 @@ class CONTROLS
 
     virtual short GetDebugKeyState(int vk)
     {
-#ifdef _WIN32 // FIX_LINUX VirtualKey
+#ifdef false // _WIN32 // FIX_LINUX VirtualKey
         return GetKeyState(vk);
 #else
         return 0;
@@ -212,7 +212,7 @@ class CONTROLS
 
     virtual bool IsKeyPressed(int vk)
     {
-#ifdef _WIN32 // FIX_LINUX VirtualKey
+#ifdef false // _WIN32 // FIX_LINUX VirtualKey
         return GetKeyState(vk) < 0;
 #else
         return false;

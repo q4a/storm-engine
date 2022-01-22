@@ -5,7 +5,7 @@
 
 #include <zlib.h>
 
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
 #else
 #include "core_impl.h"
@@ -137,7 +137,7 @@ void COMPILER::SetProgramDirectory(const char *dir_name)
         strcpy_s(ProgramDirectory, len, dir_name);
         strcat_s(ProgramDirectory, len, "\\");
     }
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     CDebug->SetProgramDirectory(dir_name);
 #endif
 }
@@ -333,7 +333,7 @@ void COMPILER::SetError(const char *data_PTR, ...)
 
     logError_->error(ErrorBuffer);
 
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     if (bBreakOnError)
         CDebug->SetTraceMode(TMODE_MAKESTEP);
 #endif
@@ -399,7 +399,7 @@ void COMPILER::LoadPreprocess()
         // else bScriptTrace = true;
     }
 
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     auto ini = fio->OpenIniFile(PROJECT_NAME);
     if (ini)
     {
@@ -625,12 +625,12 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
 
     bEventsBreak = false;
 
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     uint32_t nTimeOnEvent = GetTickCount();
 #else
     auto nStartEventTime = std::chrono::system_clock::now();
 #endif
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     current_debug_mode = CDebug->GetTraceMode();
 #endif
 
@@ -699,7 +699,7 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
             break;
     }
 
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     nTimeOnEvent = GetTickCount() - nTimeOnEvent;
 
     nRuntimeTicks += nTimeOnEvent;
@@ -711,7 +711,7 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
 
     pRun_fi = nullptr;
 
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     if (current_debug_mode == TMODE_CONTINUE)
         CDebug->SetTraceMode(TMODE_CONTINUE);
 #endif
@@ -3644,7 +3644,7 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
     mem_pfi = pRun_fi;
     mem_codebase = pRunCodeBase;
 
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     nDebugEnterMode = CDebug->GetTraceMode();
 #endif
     uint64_t nTicks;
@@ -3697,7 +3697,7 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
             core_internal.Trace("Invalid func_code = %u for AddTime", func_code);
         }
     }
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     if (nDebugEnterMode == TMODE_MAKESTEP)
     {
         CDebug->SetTraceMode(TMODE_MAKESTEP);
@@ -3910,7 +3910,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
         switch (Token_type)
         {
         case ARGS_NUM:
-#ifdef _WIN32 // FIX_LINUX __debugbreak
+#ifdef false // _WIN32 // FIX_LINUX __debugbreak
             __debugbreak();
 #endif
             break;
@@ -4261,7 +4261,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                 break;
             if (bDebugExpressionRun)
                 break;
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
             memcpy(&nDebugTraceLineCode, &pCodeBase[ip], sizeof(uint32_t));
             if (bTraceMode)
             {
@@ -7992,7 +7992,7 @@ void COMPILER::FormatDialog(char *file_name)
 
 void STRING_CODEC::VariableChanged()
 {
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     CDebug->SetTraceMode(TMODE_MAKESTEP);
 #endif
 }

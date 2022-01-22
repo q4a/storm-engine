@@ -33,7 +33,7 @@ void InterfaceBackScene::LightParam::UpdateParams(float fTime)
         if (jjj > 10000)
         {
             core.Trace("jjj: %f, %f", fColorTimer, fColorPeriod);
-#ifdef _WIN32 // FIX_LINUX __debugbreak
+#ifdef false // _WIN32 // FIX_LINUX __debugbreak
             __debugbreak();
 #endif
         }

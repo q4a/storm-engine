@@ -35,7 +35,7 @@ namespace
 {
     constexpr auto kKeyTakeScreenshot = "TakeScreenshot";
 
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
     D3DXIMAGE_FILEFORMAT GetScreenshotFormat(const std::string &fmt)
     {
         if (fmt == "bmp")
@@ -382,7 +382,7 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
-#ifdef _WIN32 // FIX_LINUX DxErr.h
+#ifdef false // _WIN32 // FIX_LINUX DxErr.h
         core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
 #else
         core.Trace("[%s:%s:%d] (%s)", file, func, line, expr);
@@ -465,7 +465,7 @@ DX9RENDER::DX9RENDER()
     back0Texture = -1;
     progressSafeCounter = 0;
     isInPViewProcess = false;
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     progressUpdateTime = 0;
 #else
     progressUpdateTime = std::chrono::system_clock::now();
@@ -516,7 +516,7 @@ bool DX9RENDER::Init()
         screenshotExt = str;
         std::ranges::transform(screenshotExt, screenshotExt.begin(),
                                [](const unsigned char c) { return std::tolower(c); });
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
         screenshotFormat = GetScreenshotFormat(str);
         if (screenshotFormat == D3DXIFF_FORCE_DWORD)
         {
@@ -718,7 +718,7 @@ DX9RENDER::~DX9RENDER()
 
     if (bPreparedCapture)
     {
-#ifdef _WIN32 // FIX_LINUX HBITMAP // FIX_LINUX ReleaseDC
+#ifdef false // _WIN32 // FIX_LINUX HBITMAP // FIX_LINUX ReleaseDC
         STORM_DELETE(lpbi);
         ReleaseDC(static_cast<HWND>(core.GetAppHWND()), hDesktopDC);
         DeleteDC(hCaptureDC);
@@ -1323,7 +1323,7 @@ bool DX9RENDER::DX9EndScene()
 
     if (bSafeRendering)
     {
-#ifdef _WIN32 // FIX_LINUX ReleaseDC
+#ifdef false // _WIN32 // FIX_LINUX ReleaseDC
         const HDC dc = GetDC(hwnd);
         SetPixel(dc, 0, 0, 0);
         ReleaseDC(hwnd, dc);
@@ -1831,7 +1831,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
 
 bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
 {
-#ifdef _WIN32 // FIX_LINUX D3DXCreateTextureFromFileA
+#ifdef false // _WIN32 // FIX_LINUX D3DXCreateTextureFromFileA
     // TODO: reimplement the whole thing in a tidy way
     IDirect3DTexture9 *pTex;
     if(CHECKD3DERR(D3DXCreateTextureFromFileA(d3d9, path, &pTex)))
@@ -3328,7 +3328,7 @@ void DX9RENDER::MakeScreenShot()
         return;
     }
 
-#ifdef _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
+#ifdef false // _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
     if (CHECKD3DERR(D3DXLoadSurfaceFromSurface(surface, NULL, NULL, renderTarget, NULL, NULL, D3DX_DEFAULT, 0)))
 #else
     if (FAILED(d3d9->UpdateSurface(renderTarget, nullptr, surface, nullptr)))
@@ -3348,7 +3348,7 @@ void DX9RENDER::MakeScreenShot()
         screenshot_path.replace_filename(screenshot_base_filename + "_" + std::to_string(i));
         screenshot_path.replace_extension(screenshotExt);
     }
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
     D3DXSaveSurfaceToFile(screenshot_path.c_str(), screenshotFormat, surface, nullptr, nullptr);
 #endif
 
@@ -3663,7 +3663,7 @@ HRESULT DX9RENDER::Release(IUnknown *pObject)
     {
         if (*(void **)pObject == nullptr)
         {
-#ifdef _WIN32 // FIX_LINUX __debugbreak
+#ifdef false // _WIN32 // FIX_LINUX __debugbreak
             __debugbreak();
 #endif
         }
@@ -3793,7 +3793,7 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
@@ -3845,7 +3845,7 @@ HRESULT DX9RENDER::GetSurfaceLevel(IDirect3DTexture9 *ppTexture, UINT Level, IDi
 HRESULT DX9RENDER::UpdateSurface(IDirect3DSurface9 *pSourceSurface, CONST RECT *pSourceRectsArray, UINT cRects,
                                  IDirect3DSurface9 *pDestinationSurface, CONST POINT *pDestPointsArray)
 {
-#ifdef _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
+#ifdef false // _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
     return CHECKD3DERR(D3DXLoadSurfaceFromSurface(pDestinationSurface, nullptr, nullptr, pSourceSurface, nullptr,
                                                   nullptr, D3DX_DEFAULT, 0));
 #else
@@ -4239,7 +4239,7 @@ void DX9RENDER::StartProgressView()
         progressTipsTexture = TextureCreate(progressTipsImage);
         isInPViewProcess = false;
     }
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     progressUpdateTime = GetTickCount() - 1000;
 #else
     progressUpdateTime = std::chrono::system_clock::now() - std::chrono::milliseconds(1000);
@@ -4254,7 +4254,7 @@ void DX9RENDER::ProgressView()
     if (isInPViewProcess)
         return;
     // Analyzing time
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     const uint32_t time = GetTickCount();
     if (abs(static_cast<int32_t>(progressUpdateTime - time)) < 50)
         return;
@@ -4536,7 +4536,7 @@ IDirect3DBaseTexture9 *DX9RENDER::CreateTextureFromFileInMemory(const char *pFil
     IDirect3DTexture9 *pTexture = nullptr;
     auto *pTga = (TGA_H *)pFile;
     const D3DFORMAT d3dFormat = (pTga->bpp == 16) ? D3DFMT_DXT1 : D3DFMT_DXT3;
-#ifdef _WIN32 // FIX_LINUX D3DXCreateTextureFromFileInMemoryEx
+#ifdef false // _WIN32 // FIX_LINUX D3DXCreateTextureFromFileInMemoryEx
     D3DXCreateTextureFromFileInMemoryEx(static_cast<LPDIRECT3DDEVICE9>(GetD3DDevice()), pFile, dwSize, D3DX_DEFAULT,
                                         D3DX_DEFAULT, 1, 0, d3dFormat, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0,
                                         nullptr, nullptr, &pTexture);

@@ -67,7 +67,7 @@ void SailorsEditor::Execute(uint32_t dltTime)
     menu.OnKeyPress(menu.sailrs->shipWalk[0].sailorsPoints);
 
     if (core.Controls->GetDebugAsyncKeyState(VK_ESCAPE) < 0)
-#ifdef _WIN32 // FIX_LINUX ExitProcess
+#ifdef false // _WIN32 // FIX_LINUX ExitProcess
         ExitProcess(0);
 #else
         exit(0);

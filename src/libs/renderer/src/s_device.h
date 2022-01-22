@@ -305,7 +305,7 @@ class DX9RENDER : public VDX9RENDER
     HRESULT SetFVF(uint32_t handle) override;
     HRESULT GetVertexShader(IDirect3DVertexShader9 **ppShader) override;
     HRESULT GetPixelShader(IDirect3DPixelShader9 **ppShader) override;
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     ID3DXEffect *GetEffectPointer(const char *techniqueName) override;
 #endif
 
@@ -366,7 +366,7 @@ class DX9RENDER : public VDX9RENDER
     int32_t loadFrame;
     int32_t progressSafeCounter;
     bool isInPViewProcess;
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     uint32_t progressUpdateTime;
 #else
     std::chrono::time_point<std::chrono::system_clock> progressUpdateTime;
@@ -494,7 +494,7 @@ private:
 
     // VideoCapture section
     HDC hDesktopDC, hCaptureDC;
-#ifdef _WIN32 // FIX_LINUX HBITMAP
+#ifdef false // _WIN32 // FIX_LINUX HBITMAP
     HBITMAP hCaptureBitmap;
     LPBITMAPINFO lpbi;
 #endif
@@ -602,7 +602,7 @@ private:
 
     std::stack<RenderTarget> stRenderTarget;
 
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
     D3DXIMAGE_FILEFORMAT screenshotFormat;
 #endif
     std::string screenshotExt;

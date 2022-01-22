@@ -511,7 +511,7 @@ Sharks::Sharks() : sea(0), island(0), indeces{}, vrt{}
 {
     rs = nullptr;
     camPos = 0.0f;
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     numShakes = 3 + (GetTickCount() & 3);
 #else
     numShakes = 3 + (std::time(nullptr) & 3);
@@ -574,7 +574,7 @@ bool Sharks::Init()
                             const auto day = root->GetAttributeAsDword("day");
                             if (day == 7)
                             {
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
                                 if ((GetTickCount() & 7) == 5)
 #else
                                 if ((std::time(nullptr) & 7) == 5)

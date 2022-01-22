@@ -139,7 +139,7 @@ bool Grass::Init()
     }
     rs->UnLockIndexBuffer(ib);
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     // Constants
     static const auto pi2 = 2.0f * 3.141592653f;
     for (size_t i = 0; i < 16; i++)
@@ -379,7 +379,7 @@ void Grass::Execute(uint32_t delta_time)
 
 void Grass::Realize(uint32_t delta_time)
 {
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     if (quality == rq_off || fx_ == nullptr)
         return;
 #else
@@ -523,7 +523,7 @@ void Grass::Realize(uint32_t delta_time)
         lColor = 0.3f;
     }
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     // recalculate the parameters of the angles
     for (int32_t i = 0; i < 16; i++)
     {
@@ -566,7 +566,7 @@ void Grass::Realize(uint32_t delta_time)
     rs->TextureSet(0, texture);
     rs->TextureSet(1, texture);
     // set constants
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     fx_->SetMatrix(hgVP_, cmtx);
     fx_->SetValue(haAngles_, &aAngles[0], sizeof(D3DXVECTOR3) * 16);
     fx_->SetValue(haUV_, &aUV[0], sizeof(D3DXVECTOR2) * 16);
@@ -997,7 +997,7 @@ void Grass::CreateVertexDeclaration() const
         rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
     }
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     fx_ = rs->GetEffectPointer("Grass");
     if (fx_ != nullptr)
     {

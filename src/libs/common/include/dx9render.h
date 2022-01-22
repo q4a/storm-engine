@@ -273,7 +273,7 @@ class VDX9RENDER : public SERVICE
     virtual HRESULT SetFVF(uint32_t handle) = 0;
     virtual HRESULT GetVertexShader(IDirect3DVertexShader9 **ppShader) = 0;
     virtual HRESULT GetPixelShader(IDirect3DPixelShader9 **ppShader) = 0;
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     virtual ID3DXEffect *GetEffectPointer(const char *techniqueName) = 0;
 #endif
 

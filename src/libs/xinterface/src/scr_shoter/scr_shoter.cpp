@@ -222,7 +222,7 @@ bool SCRSHOTER::MakeScreenShot()
             IDirect3DSurface9 *pSurf1 = nullptr, *pSurf2 = nullptr;
             rs->GetSurfaceLevel(texture_, 0, &pSurf1);
             rs->GetSurfaceLevel(pScrShotTex, 0, &pSurf2);
-#ifdef _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
+#ifdef false // _WIN32 // FIX_LINUX D3DXLoadSurfaceFromSurface
             hr = D3DXLoadSurfaceFromSurface(pSurf1, nullptr, nullptr, pSurf2, nullptr, nullptr, D3DX_DEFAULT, 0);
 #else
             hr = rs->UpdateSurface(pSurf2, nullptr, 0, pSurf1, nullptr);
