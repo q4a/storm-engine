@@ -11,9 +11,6 @@
 cmake_minimum_required( VERSION 3.0 )
 project(bgfx)
 
-# sets project version from api ver / git rev
-include( ${STORM_EXTERN_RENDERING_DIR}/cmake/version.cmake )
-
 set_property( GLOBAL PROPERTY USE_FOLDERS ON )
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -45,6 +42,9 @@ set_property( CACHE BGFX_LIBRARY_TYPE PROPERTY STRINGS STATIC SHARED )
 set( BX_DIR "${STORM_EXTERN_RENDERING_DIR}/bx" CACHE STRING "Location of bx." FORCE )
 set( BIMG_DIR "${STORM_EXTERN_RENDERING_DIR}/bimg" CACHE STRING "Location of bimg." FORCE )
 set( BGFX_DIR "${STORM_EXTERN_RENDERING_DIR}/bgfx" CACHE STRING "Location of bgfx." FORCE )
+
+# sets project version from api ver / git rev
+include( ${STORM_EXTERN_RENDERING_DIR}/cmake/version.cmake )
 
 if( BGFX_USE_OVR )
 	include( ${STORM_EXTERN_RENDERING_DIR}/cmake/ovr.cmake )
