@@ -45,16 +45,16 @@ target_include_directories( bx
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
 # Build system specific configurations
-if( MSVC OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
-	target_include_directories( bx
-		PUBLIC
-			$<BUILD_INTERFACE:${BX_DIR}/include/compat/msvc>
-			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/msvc> )
-elseif( MINGW )
+if( MINGW )
 	target_include_directories( bx
 		PUBLIC
 		    $<BUILD_INTERFACE:${BX_DIR}/include/compat/mingw>
 		    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/mingw> )
+elseif( WIN32 )
+	target_include_directories( bx
+		PUBLIC
+			$<BUILD_INTERFACE:${BX_DIR}/include/compat/msvc>
+			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/msvc> )
 elseif( APPLE )
 	target_include_directories( bx
 		PUBLIC
@@ -67,9 +67,10 @@ target_compile_definitions( bx PUBLIC "__STDC_LIMIT_MACROS" )
 target_compile_definitions( bx PUBLIC "__STDC_FORMAT_MACROS" )
 target_compile_definitions( bx PUBLIC "__STDC_CONSTANT_MACROS" )
 
-target_compile_definitions( bx PRIVATE "$<$<CONFIG:Debug>:BX_CONFIG_DEBUG=1>" )
-if(BGFX_CONFIG_DEBUG)
-	target_compile_definitions( bx PRIVATE BX_CONFIG_DEBUG=1)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	target_compile_definitions( bx PUBLIC "BX_CONFIG_DEBUG=1" )
+else()
+	target_compile_definitions( bx PUBLIC "BX_CONFIG_DEBUG=0" )
 endif()
 
 # Additional dependencies on Unix
