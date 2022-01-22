@@ -10,6 +10,15 @@
 #include "xservice.h"
 #include <stdio.h>
 
+#include "bgfx_utils.h"
+#include "glm.hpp"
+#include "gtx/matrix_transform_2d.hpp"
+
+#include "gtc/matrix_transform.hpp"
+#include "gtc/type_ptr.hpp"
+#include "matrix.hpp"
+
+
 #include <direct.h>
 
 #include "aviplayer/aviplayer.h"
@@ -343,10 +352,16 @@ void XINTERFACE::Realize(uint32_t Delta_Time)
     // Get old transformation
     pRenderService->GetTransform(D3DTS_VIEW, moldv);
     pRenderService->GetTransform(D3DTS_PROJECTION, moldp);
+
+
     // Set new transformation
     pRenderService->SetTransform(D3DTS_WORLD, matw);
     pRenderService->SetTransform(D3DTS_VIEW, matv);
     pRenderService->SetTransform(D3DTS_PROJECTION, matp);
+
+    pRenderService->BGFXSetTransformUpdateViews(D3DTS_WORLD, matw);
+    pRenderService->BGFXSetTransformUpdateViews(D3DTS_VIEW, matv);
+    pRenderService->BGFXSetTransformUpdateViews(D3DTS_PROJECTION, bgfxProj);
 
     DrawNode(m_pNodes, Delta_Time, 0, 80);
 
@@ -449,6 +464,9 @@ void XINTERFACE::Realize(uint32_t Delta_Time)
     // Restore old transformation
     pRenderService->SetTransform(D3DTS_VIEW, moldv);
     pRenderService->SetTransform(D3DTS_PROJECTION, moldp);
+
+    pRenderService->BGFXSetTransform(D3DTS_VIEW, moldv);
+    pRenderService->BGFXSetTransform(D3DTS_PROJECTION, moldp);
 }
 
 long oldCurNum = -1L;
@@ -1164,6 +1182,20 @@ void XINTERFACE::LoadIni()
     matp.m[3][2] = 0.f;
     matp.m[3][3] = 0.f;
     matp.m[3][2] = -1.f;
+
+    
+    glm::mat4 proj(1);
+    bx::mtxOrtho(glm::value_ptr(proj), 0.0f, float(dwScreenWidth), float(dwScreenHeight), 0.0f, 1.0f, 100.0f, 0.0f,
+                 bgfx::getCaps()->homogeneousDepth);
+
+    proj = glm::transpose(proj);
+
+    float *glmprojection = glm::value_ptr(proj);
+
+    for (int i = 0; i < 16; ++i)
+        bgfxProj.matrix[i] = glmprojection[i];
+
+    bgfxProj.m[2][2] = 1.0003f;
 
     matv.m[3][0] = -(GlobalScreenRect.left + GlobalScreenRect.right) / 2.f;
     matv.m[3][1] = -(GlobalScreenRect.top + GlobalScreenRect.bottom) / 2.f;
