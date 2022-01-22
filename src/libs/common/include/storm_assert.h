@@ -1,7 +1,7 @@
 #pragma once
 #include <spdlog/spdlog.h>
 
-#ifdef _WIN32 // FIX_LINUX __debugbreak
+#ifdef false // _WIN32 // FIX_LINUX __debugbreak
 #define EX_OFF
 #endif
 

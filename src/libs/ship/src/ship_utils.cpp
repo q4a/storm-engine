@@ -43,7 +43,7 @@ BOOL SHIP::BuildContour(CVECTOR *vContour, int32_t &iNumVContour)
     {
         core.Trace("SHIP: Up trace error, ship %s", GetAShip()->GetAttribute("Name"));
         bDefaultContour = true;
-#ifdef _WIN32 // FIX_LINUX Beep
+#ifdef false // _WIN32 // FIX_LINUX Beep
         Beep(1000, 200);
 #endif
     }
@@ -59,7 +59,7 @@ BOOL SHIP::BuildContour(CVECTOR *vContour, int32_t &iNumVContour)
     {
         core.Trace("SHIP: Down trace error, ship %s", GetAShip()->GetAttribute("Name"));
         bDefaultContour = true;
-#ifdef _WIN32 // FIX_LINUX Beep
+#ifdef false // _WIN32 // FIX_LINUX Beep
         Beep(1000, 200);
 #endif
     }

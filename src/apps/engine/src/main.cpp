@@ -12,7 +12,7 @@
 #include "os_window.hpp"
 #include "steam_api_impl.hpp"
 #include "file_service.h"
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
 #else
 #include "core_impl.h"
@@ -125,14 +125,14 @@ void HandleWindowEvent(const storm::OSWindow::Event &event)
     }
 }
 
-#ifdef _WIN32 // FIX_LINUX HINSTANCE
+#ifdef false // _WIN32 // FIX_LINUX HINSTANCE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 #else
 int main(int argc, char *argv[])
 #endif
 {
     // Prevent multiple instances
-#ifdef _WIN32 // FIX_LINUX CreateEventA
+#ifdef false // _WIN32 // FIX_LINUX CreateEventA
     if (!CreateEventA(nullptr, false, false, "Global\\FBBD2286-A9F1-4303-B60C-743C3D7AA7BE") ||
         GetLastError() == ERROR_ALREADY_EXISTS)
 #else
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     core_internal.Init();
 
     // Init script debugger
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
     S_DEBUG debug;
     debug.Init();
     CDebug = &debug;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
     core_internal.InitBase();
 
     // Message loop
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     auto dwOldTime = GetTickCount();
 #else
     auto dwOldTime = std::chrono::system_clock::now();
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
             if (dwMaxFPS)
             {
                 const auto dwMS = 1000u / dwMaxFPS;
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
                 const auto dwNewTime = GetTickCount();
                 if (dwNewTime - dwOldTime < dwMS)
                     continue;
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
     core_internal.Event("ExitApplication");
     core_internal.CleanUp();
     core_internal.ReleaseBase();
-#ifdef _WIN32 // FIX_LINUX Cursor
+#ifdef false // _WIN32 // FIX_LINUX Cursor
     ClipCursor(nullptr);
 #endif
     SDL_Quit();

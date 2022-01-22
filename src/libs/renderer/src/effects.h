@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <d3d9.h>
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
 #include <d3dx9.h>
 #endif
 #include <unordered_map>
@@ -14,7 +14,7 @@ class Effects final
   private:
     struct Technique
     {
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
         Technique(ID3DXEffect *fx, D3DXHANDLE handle, D3DXTECHNIQUE_DESC desc) : fx(fx), handle(handle), desc(desc)
         {
         }
@@ -27,7 +27,7 @@ class Effects final
 
     IDirect3DDevice9 *device_;
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     std::vector<ID3DXEffect *> effects_;
 #endif
     std::unordered_map<std::string, Technique> techniques_;
@@ -57,7 +57,7 @@ class Effects final
     bool begin(const std::string &techniqueName);
     // Execute next technique
     bool next();
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     // Get effect pointer by technique name
     ID3DXEffect *getEffectPointer(const std::string &techniqueName);
 #endif

@@ -10,7 +10,7 @@
 
 void DX9RENDER::PrepareCapture()
 {
-#ifdef _WIN32 // FIX_LINUX HBITMAP
+#ifdef false // _WIN32 // FIX_LINUX HBITMAP
     hDesktopDC = GetDC(static_cast<HWND>(core.GetAppHWND()));
     hCaptureDC = CreateCompatibleDC(hDesktopDC);
     hCaptureBitmap = CreateCompatibleBitmap(hDesktopDC, screen_size.x, screen_size.y);
@@ -53,7 +53,7 @@ void DX9RENDER::SaveCaptureBuffers()
 
     iCaptureFrameIndex = fi + dwCaptureBuffersReady + 1;
 
-#ifdef _WIN32 // FIX_LINUX _flushall
+#ifdef false // _WIN32 // FIX_LINUX _flushall
     _flushall();
 #endif
     dwCaptureBuffersReady = 0;
@@ -69,7 +69,7 @@ bool DX9RENDER::MakeCapture()
 
     if (dwCaptureBuffersReady >= aCaptureBuffers.size())
     {
-#ifdef _WIN32 // FIX_LINUX Beep
+#ifdef false // _WIN32 // FIX_LINUX Beep
         Beep(1000, 150);
         SaveCaptureBuffers();
         Beep(5000, 150);
@@ -78,7 +78,7 @@ bool DX9RENDER::MakeCapture()
 #endif
     }
 
-#ifdef _WIN32 // FIX_LINUX HBITMAP
+#ifdef false // _WIN32 // FIX_LINUX HBITMAP
     auto *const OldBmp = static_cast<HBITMAP>(SelectObject(hCaptureDC, hCaptureBitmap));
     BitBlt(hCaptureDC, 0, 0, screen_size.x, screen_size.y, hDesktopDC, 0, 0, SRCCOPY);
     SelectObject(hCaptureDC, OldBmp);

@@ -1,4 +1,4 @@
-#ifdef _WIN32 // FIX_LINUX s_debug.h
+#ifdef false // _WIN32 // FIX_LINUX s_debug.h
 #include "tm_list.h"
 
 #include "defines.h"

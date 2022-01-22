@@ -29,7 +29,7 @@ CAviPlayer::CAviPlayer()
     m_bContinue = true;
     m_bShowVideo = true;
 
-#ifdef _WIN32 // FIX_LINUX ddraw.h and amstream.h
+#ifdef false // _WIN32 // FIX_LINUX ddraw.h and amstream.h
     pDD = nullptr;
     pPrimarySurface = nullptr;
     pVideoSurface = nullptr;
@@ -78,7 +78,7 @@ void CAviPlayer::Execute(uint32_t delta_time)
 {
     if (m_bContinue == false)
     {
-#ifdef _WIN32 // FIX_LINUX ddraw.h and amstream.h
+#ifdef false // _WIN32 // FIX_LINUX ddraw.h and amstream.h
         if (pAMStream != nullptr)
             pAMStream->SetState(STREAMSTATE_STOP);
 #endif
@@ -91,7 +91,7 @@ void CAviPlayer::Realize(uint32_t delta_time)
 {
     //~!~
     // rs->BeginScene();
-#ifdef _WIN32 // FIX_LINUX ddraw.h and amstream.h
+#ifdef false // _WIN32 // FIX_LINUX ddraw.h and amstream.h
     int i;
     HRESULT hr;
     DDSURFACEDESC ddsd;
@@ -184,7 +184,7 @@ uint64_t CAviPlayer::ProcessMessage(MESSAGE &message)
 
 bool CAviPlayer::PlayMedia(const char *fileName)
 {
-#ifdef _WIN32 // FIX_LINUX ddraw.h and amstream.h
+#ifdef false // _WIN32 // FIX_LINUX ddraw.h and amstream.h
     auto hr = S_OK;
     DDSURFACEDESC ddsd;
 
@@ -315,7 +315,7 @@ bool CAviPlayer::GetInterfaces()
 {
     HRESULT hr = S_OK;
 
-#ifdef _WIN32 // FIX_LINUX ddraw.h and amstream.h
+#ifdef false // _WIN32 // FIX_LINUX ddraw.h and amstream.h
     // Initialize COM
     if (FAILED(hr = CoInitialize(NULL)))
         return false;
@@ -368,7 +368,7 @@ bool CAviPlayer::GetInterfaces()
 
 void CAviPlayer::CleanupInterfaces()
 {
-#ifdef _WIN32 // FIX_LINUX ddraw.h and amstream.h
+#ifdef false // _WIN32 // FIX_LINUX ddraw.h and amstream.h
     IRELEASE(pSample);
     IRELEASE(pDDStream);
     IRELEASE(pPrimaryVidStream);

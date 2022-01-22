@@ -13,7 +13,7 @@
 #include "watermark.hpp"
 
 #ifdef _UNICODE
-#ifdef _WIN32 // FIX_LINUX sentry_options
+#ifdef false // _WIN32 // FIX_LINUX sentry_options
 #include <tchar.h>
 #define sentry_options_set_database_path sentry_options_set_database_pathw
 #define sentry_options_set_handler_path sentry_options_set_handler_pathw
@@ -43,7 +43,7 @@ auto &getLogsArchive()
     return logsArchive;
 }
 
-#ifdef _WIN32 // FIX_LINUX 7za.exe
+#ifdef false // _WIN32 // FIX_LINUX 7za.exe
 auto assembleArchiveCmd()
 {
     constexpr auto archiverBin = "7za.exe";
@@ -165,7 +165,7 @@ LifecycleDiagnosticsService::Guard LifecycleDiagnosticsService::initialize(const
 
     if (!initialized_)
     {
-#ifdef _WIN32 // FIX_LINUX sentry_options
+#ifdef false // _WIN32 // FIX_LINUX sentry_options
         // TODO: make this crossplatform
         auto *options = sentry_options_new();
         sentry_options_set_dsn(options, "https://1798a1bcfb654cbd8ce157b381964525@o572138.ingest.sentry.io/5721165");
@@ -189,7 +189,7 @@ void LifecycleDiagnosticsService::terminate() const
 
     if (initialized_)
     {
-#ifdef _WIN32 // FIX_LINUX sentry_options
+#ifdef false // _WIN32 // FIX_LINUX sentry_options
         sentry_close();
 #endif
     }
@@ -238,7 +238,7 @@ sentry_value_t LifecycleDiagnosticsService::beforeCrash(const sentry_value_t eve
     // terminate logging
     self->loggingService_->terminate();
 
-#ifdef _WIN32 // FIX_LINUX 7za.exe
+#ifdef false // _WIN32 // FIX_LINUX 7za.exe
     // archive logs for sentry backend
     _tsystem(assembleArchiveCmd().c_str());
 #endif
