@@ -56,15 +56,18 @@ include_directories(${STORM_EXTERN_RENDERING_DIR}/bgfx/examples/common
 						${WEBGPU_INCLUDES})
 
 # Build system specific configurations
-if( MSVC )
-	include_directories($<BUILD_INTERFACE:${BX_DIR}/include/compat/msvc>
-						$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/msvc>)
-elseif( MINGW )
-	include_directories($<BUILD_INTERFACE:${BX_DIR}/include/compat/mingw>
-		    			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/mingw> )
+if( MINGW )
+	include_directories(
+		    $<BUILD_INTERFACE:${STORM_EXTERN_RENDERING_DIR}/bx/include/compat/mingw>
+		    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/mingw> )
+elseif( WIN32 )
+	include_directories(
+			$<BUILD_INTERFACE:${STORM_EXTERN_RENDERING_DIR}/bx/include/compat/msvc>
+			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/msvc> )
 elseif( APPLE )
-	include_directories($<BUILD_INTERFACE:${BX_DIR}/include/compat/osx>
-		    			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/osx> )
+	include_directories(
+		    $<BUILD_INTERFACE:${STORM_EXTERN_RENDERING_DIR}/bx/include/compat/osx>
+		    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/compat/osx> )
 endif()
 
 include_directories()
