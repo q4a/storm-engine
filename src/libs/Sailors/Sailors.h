@@ -15,7 +15,7 @@ const float CLIMB_SPEED = 0.065f;
 const float JUMP_SPEED_X_MASTFALL = 3.0f;
 const float JUMP_SPEED_Y_EXPLOSION = 30.0f;
 
-#include "../../Shared/SEA_AI/seaPeople.h"
+#include "../../Shared/SEA_AI/sea_people.h"
 #include "SailorsWayPoints.h"
 
 #define CREW2VISIBLE(n) 5.0f * logf(n) //???
