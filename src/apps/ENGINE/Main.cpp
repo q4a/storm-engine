@@ -11,9 +11,29 @@
 #include <OSWindow.hpp>
 #include <SDL.h>
 
+#include "bx/bx.h"
+#include "bgfx/bgfx.h"
+#include "bgfx/platform.h"
+
+#include "sprite_renderer.h"
+
+#include "common.h"
+
+#include "dx9render.h"
+#include <SDL2/SDL_syswm.h>
+
+
 VFILE_SERVICE *fio = nullptr;
 CORE core;
 S_DEBUG CDebug;
+
+VDX9RENDER *renderService;
+
+std::shared_ptr<TextureResource> texture;
+std::shared_ptr<TextureResource> texture2;
+
+long PortraitID;
+
 
 using namespace storm;
 
@@ -45,7 +65,8 @@ void HandleWindowEvent(const OSWindow::Event &event)
     }
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+
+int main(int argc, char **argv)
 {
     // Prevent multiple instances
     if (!CreateEventA(nullptr, false, false, "Global\\FBBD2286-A9F1-4303-B60C-743C3D7AA7BE") ||
@@ -132,19 +153,74 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // evaluate SteamApi singleton
     steamapi::SteamApi::getInstance(!bSteam);
 
+    // Collect information about the window from SDL
     std::shared_ptr<storm::OSWindow> window = storm::OSWindow::Create(width, height, fullscreen);
     window->SetTitle("Sea Dogs");
     core.Set_Hwnd(static_cast<HWND>(window->OSHandle()));
     window->Subscribe(HandleWindowEvent);
     window->Show();
 
+    // and give the pointer to the window to pd
+    bgfx::PlatformData pd;
+    // TODO for platforms this goes inside OSWindow->OSHandle()
+#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+    pd.ndt = wmi.info.x11.display;
+    pd.nwh = (void *)(uintptr_t)wmi.info.x11.window;
+#elif BX_PLATFORM_OSX
+    pd.ndt = NULL;
+    pd.nwh = wmi.info.cocoa.window;
+#elif BX_PLATFORM_WINDOWS
+    pd.ndt = NULL;
+    pd.nwh = static_cast<HWND>(window->OSHandle());
+#elif BX_PLATFORM_STEAMLINK
+    pd.ndt = wmi.info.vivante.display;
+    pd.nwh = wmi.info.vivante.window;
+#endif // BX_PLATFORM_
+    pd.context = NULL;
+    pd.backBuffer = NULL;
+    pd.backBufferDS = NULL;
+
+    // Tell bgfx about the platform and window
+    bgfx::setPlatformData(pd);
+
+    // Render an empty frame
+    bgfx::renderFrame();
+
+    // Init bgfx
+    bgfx::Init init;
+    init.type = bgfx::RendererType::Direct3D11;
+    init.vendorId = BGFX_PCI_ID_NONE;
+    init.resolution.width = width;
+    init.resolution.height = height;
+    init.resolution.reset = BGFX_RESET_NONE;
+
+    bgfx::init(init);
+
+    const bgfx::Caps *caps = bgfx::getCaps();
+    // bool swapChainSupported = 0 != (caps->supported & BGFX_CAPS_SWAP_CHAIN);
+
+    // Enable m_debug text.
+    bgfx::setDebug(BGFX_DEBUG_TEXT);
+
+    // Set view 0 clear state.
+    // bgfx::setViewClear(0, BGFX_CLEAR_NONE, 0x303030ff, 1.0f, 0);
+
+    bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height));
+    bgfx::setViewRect(1, 0, 0, uint16_t(width), uint16_t(height));
+    //bgfx::setViewRect(2, 0, 0, uint16_t(width), uint16_t(height));
+
+    
     /* Init stuff */
     core.InitBase();
 
-    /* Message loop */
-    auto dwOldTime = GetTickCount();
+    core.Run(); // to allow service initialization, remove/comment after tests
 
-    isRunning = true;
+    renderService = static_cast<VDX9RENDER *>(core.CreateService("dx9render"));
+
+    /* Message loop */
+    auto dwOldTime = GetTickCount64();
+
+    isRunning = renderService != nullptr;
     while (isRunning)
     {
         SDL_PumpEvents();
@@ -155,12 +231,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             if (dwMaxFPS)
             {
                 const auto dwMS = 1000u / dwMaxFPS;
-                const auto dwNewTime = GetTickCount();
+                const auto dwNewTime = GetTickCount64();
                 if (dwNewTime - dwOldTime < dwMS)
                     continue;
                 dwOldTime = dwNewTime;
             }
+
             const auto runResult = core.Run();
+
             if (!isHold && !runResult)
             {
                 isHold = true;
@@ -180,6 +258,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     /* Release */
     core.ReleaseBase();
     ClipCursor(nullptr);
+
+    // Shutdown bgfx.
+    bgfx::shutdown();
+
 
     SDL_Quit();
 

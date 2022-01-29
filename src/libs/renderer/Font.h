@@ -1,5 +1,10 @@
 #pragma once
 
+#include "bgfx/bgfx.h"
+#include "bgfx_utils.h"
+
+#include "bx/timer.h"
+
 #include "dx9render.h"
 #include "matrix.h"
 #include "vmodule_api.h"
@@ -18,7 +23,9 @@ struct IMAGE_VERTEX
     uint32_t color;
     float tu, tv;
 };
+
 #endif
+
 
 #define IMAGE_FVF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEXTUREFORMAT2)
 
