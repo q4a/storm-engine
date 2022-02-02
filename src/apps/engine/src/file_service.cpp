@@ -4,9 +4,9 @@
 #include "storm_assert.h"
 
 #include <SDL2/SDL.h>
+#include <algorithm>
 #include <exception>
 #include <string>
-#include <algorithm>
 
 #define COMMENT ';'
 #define SECTION_A '['
@@ -364,7 +364,7 @@ void FILE_SERVICE::CachePaths()
     const auto current_path = std::filesystem::current_path();
     for (auto const &p : std::filesystem::recursive_directory_iterator(current_path))
     {
-	std::string key(p.path().string());
+        std::string key(p.path().string());
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         key.erase(0, 2);
         m_PathCache[key] = p.path().string();
