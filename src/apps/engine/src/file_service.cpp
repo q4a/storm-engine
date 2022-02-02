@@ -1,11 +1,12 @@
 #include "file_service.h"
 #include "core_impl.h"
-#include "storm_assert.h"
 #include "storm/string_compare.hpp"
+#include "storm_assert.h"
 
 #include <SDL2/SDL.h>
 #include <exception>
 #include <string>
+#include <algorithm>
 
 #define COMMENT ';'
 #define SECTION_A '['
@@ -127,7 +128,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
     std::vector<std::filesystem::path> result;
 
     std::filesystem::path srcPath;
-    if (sourcePath == nullptr || sourcePath[0] =='\0')
+    if (sourcePath == nullptr || sourcePath[0] == '\0')
     {
         srcPath = std::filesystem::current_path();
     }
@@ -356,6 +357,25 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
     _ReadFile(fileS, *ppBuffer, dwLowSize);
     _CloseFile(fileS);
     return true;
+}
+
+void FILE_SERVICE::CachePaths()
+{
+    const auto current_path = std::filesystem::current_path();
+    for (auto const &p : std::filesystem::recursive_directory_iterator(current_path))
+    {
+	std::string key(p.path().string());
+        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+        key.erase(0, 2);
+        m_PathCache[key] = p.path().string();
+    }
+}
+
+std::string FILE_SERVICE::PathLookup(const char *path)
+{
+    std::string key(path);
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    return m_PathCache[key];
 }
 
 //=================================================================================================

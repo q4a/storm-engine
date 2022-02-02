@@ -3,6 +3,7 @@
 #include "ifs.h"
 #include "v_file_service.h"
 #include <memory>
+#include <unordered_map>
 
 #define _MAX_OPEN_INI_FILES 1024
 
@@ -85,6 +86,7 @@ class FILE_SERVICE : public VFILE_SERVICE
     IFS *OpenFiles[_MAX_OPEN_INI_FILES];
     uint32_t Files_Num;
     uint32_t Max_File_Index;
+    std::unordered_map<std::string, std::string> m_PathCache;
 
   public:
     FILE_SERVICE();
@@ -116,4 +118,6 @@ class FILE_SERVICE : public VFILE_SERVICE
     std::unique_ptr<INIFILE> OpenIniFile(const char *file_name) override;
     void RefDec(INIFILE *ini_obj);
     void FlushIniFiles();
+    void CachePaths();
+    std::string PathLookup(const char *path);
 };
