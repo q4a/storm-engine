@@ -43,6 +43,8 @@ class VFILE_SERVICE
     // ini files section
     virtual std::unique_ptr<INIFILE> CreateIniFile(const char *file_name, bool fail_if_exist) = 0;
     virtual std::unique_ptr<INIFILE> OpenIniFile(const char *file_name) = 0;
+    virtual void ScanPaths() = 0;
+    virtual std::string PathLookup(const std::string &path) = 0;
 };
 
 //------------------------------------------------------------------------------------------------

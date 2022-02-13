@@ -42,7 +42,10 @@ FILE_SERVICE::~FILE_SERVICE()
 
 std::fstream FILE_SERVICE::_CreateFile(const char *filename, std::ios::openmode mode)
 {
+    spdlog::error("_CreateFile called. \t {}", filename);
     const auto path = filename ? std::filesystem::u8path(filename) : std::filesystem::path();
+    auto path_str = path.string();
+    spdlog::error("_CreateFile path: \t {}", PathLookup(path_str).c_str());
     std::fstream fileS(path, mode);
     return fileS;
 }
@@ -359,22 +362,28 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
     return true;
 }
 
-void FILE_SERVICE::CachePaths()
+void FILE_SERVICE::ScanPaths()
 {
     const auto current_path = std::filesystem::current_path();
+    // spdlog::error("current_path: \t {}", current_path.string().c_str());
     for (auto const &p : std::filesystem::recursive_directory_iterator(current_path))
     {
         std::string key(p.path().string());
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-        key.erase(0, 2);
+	// use std::fs::relative instead key.erase(0, 2);
+	// spdlog::error("adding path: \t {}", key.c_str());
         m_PathCache[key] = p.path().string();
     }
 }
 
-std::string FILE_SERVICE::PathLookup(const char *path)
+std::string FILE_SERVICE::PathLookup(const std::string &path)
 {
+	spdlog::error("looking up path: \t {}", path.c_str());
     std::string key(path);
+    const auto current_path = std::filesystem::current_path();
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    key = current_path.string() + key;
+    spdlog::error("getting path: \t {}", key.c_str());
     return m_PathCache[key];
 }
 

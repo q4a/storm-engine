@@ -118,6 +118,6 @@ class FILE_SERVICE : public VFILE_SERVICE
     std::unique_ptr<INIFILE> OpenIniFile(const char *file_name) override;
     void RefDec(INIFILE *ini_obj);
     void FlushIniFiles();
-    void CachePaths();
-    std::string PathLookup(const char *path);
+    void ScanPaths();
+    std::string PathLookup(const std::string &path);
 };

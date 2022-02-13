@@ -1,3 +1,4 @@
+
 #include <fstream>
 #include <thread>
 
@@ -149,6 +150,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // Init FS
     FILE_SERVICE File_Service;
     fio = &File_Service;
+    fio->ScanPaths();
 
     // Init diagnostics
     const auto lifecycleDiagnosticsGuard =
