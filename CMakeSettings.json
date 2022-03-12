@@ -8,19 +8,19 @@
       "buildRoot": "${projectDir}\\build\\${name}",
       "cmakeCommandArgs": "-DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl",
       "buildCommandArgs": "",
-      "enableClangTidyCodeAnalysis": true,
-      "variables": []
+      "addressSanitizerEnabled": true,
+      "addressSanitizerRuntimeFlags": "windows_hook_legacy_allocators=true:halt_on_error=0",
+      "enableClangTidyCodeAnalysis": true
     },
     {
       "name": "msvc-release",
       "generator": "Ninja",
-      "configurationType": "Release",
+      "configurationType": "RelWithDebInfo",
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}\\build\\${name}",
       "cmakeCommandArgs": "-DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl",
       "buildCommandArgs": "",
-      "enableClangTidyCodeAnalysis": true,
-      "variables": []
+      "enableClangTidyCodeAnalysis": true
     }
   ]
 }

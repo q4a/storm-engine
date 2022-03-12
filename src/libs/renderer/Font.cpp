@@ -3,7 +3,10 @@
 #include "defines.h"
 #include "utf8.h"
 
+#include "sprite_renderer.h"
+
 static char Buffer1024[1024];
+
 
 FONT::FONT()
 {
@@ -17,7 +20,7 @@ FONT::FONT()
     bInverse = bOldInverse = false;
     techniqueName = nullptr;
     textureName = nullptr;
-}
+} 
 
 FONT::~FONT()
 {
@@ -36,7 +39,7 @@ FONT::~FONT()
     if (RenderService)
     {
         if (TextureID >= 0)
-            RenderService->TextureRelease(TextureID);
+            RenderService->BGFXTextureRelease(TextureID);
         // core.FreeService("dx9render");
     }
 }
@@ -190,7 +193,8 @@ bool FONT::Init(const char *font_name, const char *iniName, IDirect3DDevice9 *_d
     fScale = fOldScale = 1.f;
     Color = oldColor = 0xFFFFFFFF;
 
-    TextureID = RenderService->TextureCreate(textureName);
+    //TextureID = RenderService->TextureCreate(textureName);
+    TextureID = RenderService->BGFXTextureCreate(textureName);
     if (TextureID < 0)
     {
         core.Trace("Not Found Texture: %s", textureName);
@@ -262,11 +266,14 @@ long FONT::UpdateVertexBuffer(long x, long y, char *data_PTR, int utf8length)
     long n;
     float xoffset;
     uint8_t sym;
+
     IMAGE_VERTEX *pVertex;
 
     s_num = strlen(data_PTR);
 
-    VBuffer->Lock(0, sizeof(IMAGE_VERTEX) * utf8length * SYM_VERTEXS, (VOID **)&pVertex, 0);
+
+
+    //VBuffer->Lock(0, sizeof(IMAGE_VERTEX) * utf8length * SYM_VERTEXS, (VOID **)&pVertex, 0);
 
     xoffset = 0;
 
@@ -277,7 +284,7 @@ long FONT::UpdateVertexBuffer(long x, long y, char *data_PTR, int utf8length)
         int Codepoint = utf8::Utf8ToCodepoint(data_PTR + i);
         Assert(Codepoint < USED_CODES);
 
-        n = curLetter * 6;
+        n = curLetter * 4;
         FLOAT_RECT pos = CharT[Codepoint].Pos;
         if (fScale != 1.f)
         {
@@ -295,7 +302,7 @@ long FONT::UpdateVertexBuffer(long x, long y, char *data_PTR, int utf8length)
             xoffset += Spacebar * fScale;
         }
 
-        pVertex[n + 0].pos.x = pos.x1;
+        /*pVertex[n + 0].pos.x = pos.x1;
         pVertex[n + 1].pos.x = pos.x1;
         pVertex[n + 2].pos.x = pos.x2;
 
@@ -309,52 +316,81 @@ long FONT::UpdateVertexBuffer(long x, long y, char *data_PTR, int utf8length)
 
         pVertex[n + 3].pos.y = pos.y2;
         pVertex[n + 4].pos.y = pos.y2;
-        pVertex[n + 5].pos.y = pos.y1;
+        pVertex[n + 5].pos.y = pos.y1;*/
 
         FLOAT_RECT tuv = CharT[Codepoint].Tuv;
 
-        pVertex[n + 0].tu = tuv.x1;
-        pVertex[n + 1].tu = tuv.x1;
-        pVertex[n + 2].tu = tuv.x2;
-
-        pVertex[n + 3].tu = tuv.x1;
-        pVertex[n + 4].tu = tuv.x2;
-        pVertex[n + 5].tu = tuv.x2;
-
+        /*pVertex[n + 0].tu = tuv.x1;
         pVertex[n + 0].tv = tuv.y1;
+
+        pVertex[n + 1].tu = tuv.x1;
         pVertex[n + 1].tv = tuv.y2;
+
+        pVertex[n + 2].tu = tuv.x2;
         pVertex[n + 2].tv = tuv.y1;
 
+        pVertex[n + 3].tu = tuv.x1;
         pVertex[n + 3].tv = tuv.y2;
+
+        pVertex[n + 4].tu = tuv.x2;
         pVertex[n + 4].tv = tuv.y2;
-        pVertex[n + 5].tv = tuv.y1;
 
-        pVertex[n + 0].color = pVertex[n + 1].color = pVertex[n + 2].color = pVertex[n + 3].color =
-            pVertex[n + 4].color = pVertex[n + 5].color = Color;
+        pVertex[n + 5].tu = tuv.x2;
+        pVertex[n + 5].tv = tuv.y1;*/
 
-        pVertex[n + 0].rhw = pVertex[n + 1].rhw = pVertex[n + 2].rhw = pVertex[n + 3].rhw = pVertex[n + 4].rhw =
-            pVertex[n + 5].rhw = fScale;
+        /*pVertex[n + 0].color = pVertex[n + 1].color = pVertex[n + 2].color = pVertex[n + 3].color =
+            pVertex[n + 4].color = pVertex[n + 5].color = Color;*/
+
+        std::vector<glm::vec3> vertices;
+        
+        vertices.resize(4);
+        
+        vertices[0] = glm::vec3(pos.x1, pos.y1, 1);
+        vertices[1] = glm::vec3(pos.x2, pos.y1, 1);
+        vertices[2] = glm::vec3(pos.x1, pos.y2, 1);
+        vertices[3] = glm::vec3(pos.x2, pos.y2, 1);
+
+        auto uCoordinates = glm::vec2(tuv.x1, tuv.x2);
+
+        auto vCoordinates = glm::vec2(tuv.y1, tuv.y2);
+
+        //RenderService->GetSpriteRenderer()->SetViewProjection();
+        //RenderService->GetSpriteRenderer()->UpdateVertexBuffer(vertices, uCoordinates, vCoordinates, Color);
+
+        /*pVertex[n + 0].rhw = pVertex[n + 1].rhw = pVertex[n + 2].rhw = pVertex[n + 3].rhw = pVertex[n + 4].rhw =
+            pVertex[n + 5].rhw = fScale;*/
     }
-    VBuffer->Unlock();
+
+    
+
+
+    //VBuffer->Unlock();
     return static_cast<long>(xoffset);
 }
 
 long FONT::Print(long x, long y, char *data_PTR)
 {
-    if (data_PTR == nullptr || techniqueName == nullptr)
+    //if (data_PTR == nullptr || techniqueName == nullptr)
+    if (data_PTR == nullptr)
         return 0;
+
     auto xoffset = 0L;
     long s_num = utf8::Utf8StringLength(data_PTR);
     if (s_num == 0)
         return 0;
 
-    const auto bDraw = RenderService->TechniqueExecuteStart(techniqueName);
+    /*const auto bDraw = RenderService->TechniqueExecuteStart(techniqueName);
     if (!bDraw)
-        return xoffset;
+        return xoffset;*/
 
-    RenderService->TextureSet(0, TextureID);
+    RenderService->GetSpriteRenderer()->Texture = RenderService->GetBGFXTextureFromID(TextureID);
+
+    //RenderService->GetSpriteRenderer()->SetViewProjection();
+
+/*    RenderService->TextureSet(0, TextureID);
     Device->SetFVF(IMAGE_FVF);
     Device->SetStreamSource(0, VBuffer, 0, sizeof(IMAGE_VERTEX));
+    */
     // Device->SetIndices(0);
 
     if (bInverse)
@@ -363,18 +399,18 @@ long FONT::Print(long x, long y, char *data_PTR)
         {
             UpdateVertexBuffer(x + Shadow_offsetx, y + Shadow_offsety, data_PTR, s_num);
 
-            Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-            Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            //Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+            //Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-            Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
+            //Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
         }
 
         xoffset = UpdateVertexBuffer(x, y, data_PTR, s_num);
 
-        Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-        Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+        //Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
+        //Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-        Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
+        //Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
     }
     else
     {
@@ -382,21 +418,21 @@ long FONT::Print(long x, long y, char *data_PTR)
         {
             UpdateVertexBuffer(x + Shadow_offsetx, y + Shadow_offsety, data_PTR, s_num);
 
-            Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-            Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            //Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
+            //Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-            Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
+            //Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
         }
 
         xoffset = UpdateVertexBuffer(x, y, data_PTR, s_num);
 
-        Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-        Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+        //Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+        //Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-        Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
+        //Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, s_num * 2);
     }
-    while (RenderService->TechniqueExecuteNext())
-        ;
+    /*while (RenderService->TechniqueExecuteNext())
+        ;*/
 
     return xoffset;
 }
@@ -428,7 +464,8 @@ void FONT::TempUnload()
     if (RenderService != nullptr)
     {
         if (TextureID != -1L)
-            RenderService->TextureRelease(TextureID);
+            // RenderService->TextureRelease(TextureID);
+            RenderService->BGFXTextureRelease(TextureID);
         TextureID = -1L;
     }
 }
@@ -436,5 +473,5 @@ void FONT::TempUnload()
 void FONT::RepeatInit()
 {
     if (TextureID == -1L)
-        TextureID = RenderService->TextureCreate(textureName);
+        TextureID = RenderService->BGFXTextureCreate(textureName);
 }

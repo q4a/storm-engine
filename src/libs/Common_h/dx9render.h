@@ -11,6 +11,8 @@
 #include "types3d.h"
 #include "utf8.h"
 
+#include "glm.hpp"
+
 #define FONT_DEFAULT 0
 
 // define print text alignments
@@ -66,6 +68,10 @@ struct RS_LINE2D
 
 class CVideoTexture;
 
+struct TextureResource;
+class SpriteRenderer;
+class PrimitiveRenderer;
+
 class VDX9RENDER : public SERVICE
 {
   public:
@@ -107,6 +113,11 @@ class VDX9RENDER : public SERVICE
     virtual void SetTransform(long type, D3DMATRIX *mtx) = 0;
     virtual void GetTransform(long type, D3DMATRIX *mtx) = 0;
 
+    virtual void BGFXSetTransform(long type, D3DMATRIX *mtx) = 0;
+    virtual void BGFXSetTransformUpdateViews(long type, D3DMATRIX *mtx) = 0;
+    virtual void BGFXGetTransform(long type, D3DMATRIX *mtx) = 0;
+
+
     virtual bool SetCamera(const CVECTOR &pos, const CVECTOR &ang, float perspective) = 0;
     virtual bool SetCamera(const CVECTOR &pos, const CVECTOR &ang) = 0;
     virtual bool SetCamera(CVECTOR lookFrom, CVECTOR lookTo, CVECTOR up) = 0;
@@ -117,8 +128,10 @@ class VDX9RENDER : public SERVICE
 
     // DX9Render: Textures Section
     virtual long TextureCreate(const char *fname) = 0;
+    virtual long BGFXTextureCreate(const char *fname) = 0;
     virtual bool TextureSet(long stage, long texid) = 0;
     virtual bool TextureRelease(long texid) = 0;
+    virtual bool BGFXTextureRelease(long texid) = 0;
 
     // DX9Render: Fonts Section
     virtual long Print(long x, long y, const char *format, ...) = 0;
@@ -141,6 +154,19 @@ class VDX9RENDER : public SERVICE
     // DX9Render: Techniques Section
     virtual bool TechniqueExecuteStart(const char *cBlockName) = 0;
     virtual bool TechniqueExecuteNext() = 0;
+
+    virtual std::shared_ptr<SpriteRenderer> GetSpriteRenderer() = 0;
+    virtual std::shared_ptr<PrimitiveRenderer> GetPrimitiveRenderer() = 0;
+
+    virtual void DrawSprite(std::shared_ptr<TextureResource> texture, uint32_t color,
+                    const glm::vec2 &position, float depth) = 0;
+
+    virtual void DrawSprite(std::shared_ptr<TextureResource> texture, const glm::vec4 &src, uint32_t color,
+                    const glm::vec2 &position, const glm::vec2 &origin, const glm::vec2 &scale, float angle,
+                    float depth, bool flip_x, bool flip_y) = 0;
+
+    virtual void DrawSprites(std::shared_ptr<TextureResource> texture, std::vector<glm::vec3> &vertices, glm::vec2 &u,
+                             glm::vec2 &v, uint32_t &color) = 0;
 
     // DX9Render: Draw Section
     virtual void DrawRects(RS_RECT *pRSR, uint32_t dwRectsNum, const char *cBlockName = nullptr,
@@ -318,4 +344,5 @@ class VDX9RENDER : public SERVICE
     virtual void SetGLOWParams(float _fBlurBrushSize, long _GlowIntensity, long _GlowPasses) = 0;
 
     virtual IDirect3DBaseTexture9 *GetTextureFromID(long nTextureID) = 0;
+    virtual std::shared_ptr<TextureResource> GetBGFXTextureFromID(long nTextureID) = 0;
 };

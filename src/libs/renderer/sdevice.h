@@ -1,5 +1,8 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+
+
 #include "Effects.h"
 #include "Font.h"
 #include "VideoTexture.h"
@@ -10,8 +13,12 @@
 #include "d3d9types.h"
 #include "script_libriary.h"
 
+#include "sprite_renderer.h"
+#include "primitive_renderer.h"
+
 #include <stack>
 #include <vector>
+#include <filesystem>
 
 #define MAX_STEXTURES 1024
 #define MAX_BUFFERS 1024
@@ -94,11 +101,22 @@ class DX9RENDER : public VDX9RENDER
 {
 
 #define RS_RECT_VERTEX_FORMAT (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-    struct RECT_VERTEX
+    struct PosColorTexVertex
     {
         CVECTOR pos;
         uint32_t color;
         float u, v;
+
+        static void init()
+        {
+            ms_layout.begin()
+                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+                .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+                .end();
+        };
+
+        static bgfx::VertexLayout ms_layout;
     };
 
     struct RenderTarget
@@ -107,6 +125,9 @@ class DX9RENDER : public VDX9RENDER
         IDirect3DSurface9 *pDepthSurface;
         D3DVIEWPORT9 ViewPort;
     };
+
+    std::shared_ptr<SpriteRenderer> m_spriteRenderer;
+    std::shared_ptr<PrimitiveRenderer> m_primitiveRenderer;
 
     IDirect3DDevice9 *d3d9;
     IDirect3D9 *d3d;
@@ -137,6 +158,8 @@ class DX9RENDER : public VDX9RENDER
     STEXTURE Textures[MAX_STEXTURES];
     INDEX_BUFFER IndexBuffers[MAX_BUFFERS];
     VERTEX_BUFFER VertexBuffers[MAX_BUFFERS];
+
+    std::vector<TextureResource> BGFXTextures;
 
     bool MakeAvi;
     IDirect3DSurface9 *ImageBuffer;
@@ -249,6 +272,7 @@ class DX9RENDER : public VDX9RENDER
 
     std::stack<RenderTarget> stRenderTarget;
 
+    bool BGFXTextureLoad(long texid);
     bool TextureLoad(long texid);
     bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char *func, const char *expr);
 
@@ -295,6 +319,8 @@ class DX9RENDER : public VDX9RENDER
     // DX9Render: Screenshot Section
     void SaveShoot() override;
 
+    void BGFXRenderToBackBuffer();
+
     // DX9Render: Clip Planes Section
     HRESULT SetClipPlane(uint32_t Index, CONST float *pPlane) override;
     PLANE *GetPlanes() override;
@@ -302,6 +328,11 @@ class DX9RENDER : public VDX9RENDER
     // DX9Render: Camera Section
     void SetTransform(long type, D3DMATRIX *mtx) override;
     void GetTransform(long type, D3DMATRIX *mtx) override;
+
+    void BGFXSetTransform(long type, D3DMATRIX *mtx) override;
+    void BGFXSetTransformUpdateViews(long type, D3DMATRIX *mtx) override;
+    void BGFXGetTransform(long type, D3DMATRIX *mtx) override;
+
 
     bool SetCamera(const CVECTOR &pos, const CVECTOR &ang, float perspective) override;
     bool SetCamera(const CVECTOR &pos, const CVECTOR &ang) override;
@@ -313,8 +344,12 @@ class DX9RENDER : public VDX9RENDER
 
     // DX9Render: Textures Section
     long TextureCreate(const char *fname) override;
+    long BGFXTextureCreate(const char *fname) override;
+
     bool TextureSet(long stage, long texid) override;
     bool TextureRelease(long texid) override;
+
+    bool BGFXTextureRelease(long texid) override;
 
     // DX9Render: Fonts Section
     long Print(long x, long y, const char *format, ...) override;
@@ -337,6 +372,23 @@ class DX9RENDER : public VDX9RENDER
     // DX9Render: Techniques Section
     bool TechniqueExecuteStart(const char *cBlockName) override;
     bool TechniqueExecuteNext() override;
+
+
+    std::shared_ptr<SpriteRenderer> GetSpriteRenderer() override;
+    std::shared_ptr<PrimitiveRenderer> GetPrimitiveRenderer() override;
+
+    void DrawSprite(std::shared_ptr<TextureResource> texture, uint32_t color,
+                               const glm::vec2 &position, float depth) override;
+
+    void DrawSprite(std::shared_ptr<TextureResource> texture, const glm::vec4 &src, uint32_t color,
+                    const glm::vec2 &position, const glm::vec2 &origin, const glm::vec2 &scale, float angle,
+                    float depth, bool flip_x, bool flip_y) override;
+
+    void DrawSprites(std::shared_ptr<TextureResource> texture,
+                    std::vector<glm::vec3> &vertices,
+                    glm::vec2 &u, glm::vec2 &v,
+                    uint32_t &color) override;
+
 
     // DX9Render: Draw Section
     void DrawRects(RS_RECT *pRSR, uint32_t dwRectsNum, const char *cBlockName = nullptr, uint32_t dwSubTexturesX = 1,
@@ -475,8 +527,14 @@ class DX9RENDER : public VDX9RENDER
     HRESULT ImageBlt(long nTextureId, RECT *pDstRect, RECT *pSrcRect) override;
 
     void MakeScreenShot();
+    bool BGFXLoadTextureSurface(std::filesystem::path file, IDirect3DSurface9 *suface, uint32_t mipSize, uint32_t width,
+                                uint32_t height, bool isSwizzled, uint32_t seek_to = 0);
     bool LoadTextureSurface(std::fstream &fileS, IDirect3DSurface9 *suface, uint32_t mipSize, uint32_t width,
                             uint32_t height, bool isSwizzled);
+
+    uint32_t BGFXLoadCubmapSide(std::wstring file, IDirect3DCubeTexture9 *tex, D3DCUBEMAP_FACES face, uint32_t numMips,
+                                uint32_t mipSize, uint32_t size, bool isSwizzled, uint32_t seek_to = 0);
+
     uint32_t LoadCubmapSide(std::fstream &fileS, IDirect3DCubeTexture9 *tex, D3DCUBEMAP_FACES face, uint32_t numMips,
                             uint32_t mipSize, uint32_t size, bool isSwizzled);
 
@@ -690,8 +748,12 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
 
     CMatrix mView, mWorld, mProjection;
 
+    CMatrix bgfxView, bgfxWorld, bgfxProjection;
+
     CVECTOR vWordRelationPos;
     CVECTOR vViewRelationPos;
+    CVECTOR bgfxvWordRelationPos;
+    CVECTOR bgfxvViewRelationPos;
 
     bool bUseLargeBackBuffer;
 
@@ -737,7 +799,7 @@ bool SetCurFont (long fontID); // returns true if the given font is installed
     void SetGLOWParams(float _fBlurBrushSize, long _GlowIntensity, long _GlowPasses) override;
 
     IDirect3DBaseTexture9 *GetTextureFromID(long nTextureID) override;
-
+    std::shared_ptr<TextureResource> GetBGFXTextureFromID(long nTextureID) override;
     void LostRender();
     void RestoreRender();
 
