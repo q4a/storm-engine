@@ -1596,7 +1596,7 @@ bool DX9RENDER::BGFXTextureLoad(long t)
         switch (textureFormats[textureFI].txFormat)
         {
             case TXF_A8R8G8B8:
-                bgfxFormat = bgfx::TextureFormat::Enum::BGRA8;
+                bgfxFormat = bgfx::TextureFormat::Enum::RGBA8;
                 break;
             case TXF_R5G6B5:
                 bgfxFormat = bgfx::TextureFormat::Enum::R5G6B5;
