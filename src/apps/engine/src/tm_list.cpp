@@ -1,3 +1,4 @@
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "tm_list.h"
 
 #include "defines.h"
@@ -320,7 +321,7 @@ void TM_LIST::ProcessMessageBase(uint64_t iMsg, uint64_t wParam, uint64_t lParam
             vKey = ((LPNMLVKEYDOWN)lParam)->wVKey;
             if (vKey == VK_F4)
                 StartEditSelectedItem();
-            if (vKey == 'O' && GetAsyncKeyState(VK_CONTROL) < 0)
+            if (vKey == 'O' && core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
                 CDebug->OpenNewFile();
             if (vKey == VK_F10)
             {
@@ -429,3 +430,4 @@ char *TM_LIST::GetCharID()
 {
     return CharID;
 }
+#endif

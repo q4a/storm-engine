@@ -1,3 +1,4 @@
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_dbg_sourceview.h"
 #include "core_impl.h"
 #include "data.h"
@@ -62,30 +63,31 @@ LRESULT CALLBACK SourceViewWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
             switch (static_cast<int>(wParam))
             {
             case VK_HOME:
-                if (GetAsyncKeyState(VK_CONTROL) < 0)
+                if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
                     CDebug->SourceView->SetActiveLine(0);
                 break;
             case VK_END:
-                if (GetAsyncKeyState(VK_CONTROL) < 0)
+                if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
                     CDebug->SourceView->SetActiveLine(CDebug->SourceView->nLinesNum - 1);
                 break;
             case 'G':
                 break;
             case 'F':
-                if (GetAsyncKeyState(VK_CONTROL) < 0)
+                if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
                     CDebug->SourceView->FindModal();
                 break;
             case 'O':
-                if (GetAsyncKeyState(VK_CONTROL) < 0)
+                if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
                     CDebug->OpenNewFile();
                 break;
             case VK_F2:
-                if (GetAsyncKeyState(VK_CONTROL) < 0 && GetAsyncKeyState(VK_SHIFT) < 0)
+                if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0 &&
+                    core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
                 {
                     CDebug->SourceView->ClearAllBookmarks();
                     break;
                 }
-                if (GetAsyncKeyState(VK_CONTROL) < 0)
+                if (core.Controls->GetDebugAsyncKeyState(VK_CONTROL) < 0)
                 {
                     CDebug->SourceView->ToogleBookmark();
                     break;
@@ -1346,3 +1348,4 @@ void SOURCE_VIEW::FindNext()
         }
     }
 }
+#endif

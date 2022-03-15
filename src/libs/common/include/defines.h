@@ -4,6 +4,7 @@
 #include "math3d.h"
 #include <cstdint>
 #include <cstring>
+#include <cctype>
 
 namespace TOREMOVE
 {
@@ -75,6 +76,25 @@ constexpr float PIm2 = (PI * 2.0f);
 constexpr float PId2 = (PI / 2.0f);
 constexpr float PId4 = (PI / 4.0f);
 
+inline void toupr(char *str)
+{
+    while (*str != '\0')
+    {
+        *str = toupper(*str);
+        str++;
+    }
+}
+
+inline void tolwr(char *str)
+{
+    while (*str != '\0')
+    {
+        *str = tolower(*str);
+        str++;
+    }
+}
+
+#ifdef _WIN32 // FIX_LINUX RDTSC_*
 #define RDTSC_B(x)                                                                                                     \
     {                                                                                                                  \
         LARGE_INTEGER li;                                                                                              \
@@ -87,9 +107,10 @@ constexpr float PId4 = (PI / 4.0f);
         QueryPerformanceCounter(&li);                                                                                  \
         x = li.QuadPart - x;                                                                                           \
     }
-
-//#define RDTSC_B(x)    { x = __rdtsc(); }
-//#define RDTSC_E(x)    { x = __rdtsc() - x; }
+#else
+#define RDTSC_B(x)    { x = __rdtsc(); }
+#define RDTSC_E(x)    { x = __rdtsc() - x; }
+#endif
 
 // Defines
 #ifdef RGB

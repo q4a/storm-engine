@@ -11,8 +11,12 @@
 
 #include <fmt/chrono.h>
 
-#include <DxErr.h>
+#ifdef _WIN32
+#include <DxErr.h> // FIX_LINUX DxErr.h
 #include <corecrt_io.h>
+#else
+#include <unistd.h>
+#endif
 
 CREATE_SERVICE(DX9RENDER)
 
@@ -31,6 +35,7 @@ namespace
 {
     constexpr auto kKeyTakeScreenshot = "TakeScreenshot";
 
+#ifdef _WIN32 // FIX_LINUX Screenshot
     D3DXIMAGE_FILEFORMAT GetScreenshotFormat(const std::string &fmt)
     {
         if (fmt == "bmp")
@@ -72,6 +77,7 @@ namespace
 
         return D3DXIFF_FORCE_DWORD;
     }
+#endif
 
     void InvokeEntitiesLostRender()
     {
@@ -376,7 +382,11 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
+#ifdef _WIN32 // FIX_LINUX DxErr.h
         core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
+#else
+        core.Trace("[%s:%s:%d] (%s)", file, func, line, expr);
+#endif
         return true;
     }
 
@@ -455,7 +465,11 @@ DX9RENDER::DX9RENDER()
     back0Texture = -1;
     progressSafeCounter = 0;
     isInPViewProcess = false;
+#ifdef _WIN32 // FIX_LINUX GetTickCount
     progressUpdateTime = 0;
+#else
+    progressUpdateTime = std::chrono::system_clock::now();
+#endif
     progressFramesPosX = 0.85f;
     progressFramesPosY = 0.8f;
     progressFramesWidth = 64;
@@ -502,12 +516,14 @@ bool DX9RENDER::Init()
         screenshotExt = str;
         std::ranges::transform(screenshotExt, screenshotExt.begin(),
                                [](const unsigned char c) { return std::tolower(c); });
+#ifdef _WIN32 // FIX_LINUX Screenshot
         screenshotFormat = GetScreenshotFormat(str);
         if (screenshotFormat == D3DXIFF_FORCE_DWORD)
         {
             screenshotExt = "jpg";
             screenshotFormat = D3DXIFF_JPG;
         }
+#endif
 
         bShowFps = ini->GetInt(nullptr, "show_fps", 0) == 1;
         bShowExInfo = ini->GetInt(nullptr, "show_exinfo", 0) == 1;
@@ -702,10 +718,12 @@ DX9RENDER::~DX9RENDER()
 
     if (bPreparedCapture)
     {
+#ifdef _WIN32 // FIX_LINUX HBITMAP // FIX_LINUX ReleaseDC
         STORM_DELETE(lpbi);
         ReleaseDC(static_cast<HWND>(core.GetAppHWND()), hDesktopDC);
         DeleteDC(hCaptureDC);
         DeleteObject(hCaptureBitmap);
+#endif
     }
     for (const auto &buffer : aCaptureBuffers)
         delete buffer;
@@ -1305,9 +1323,11 @@ bool DX9RENDER::DX9EndScene()
 
     if (bSafeRendering)
     {
+#ifdef _WIN32 // FIX_LINUX ReleaseDC
         const HDC dc = GetDC(hwnd);
         SetPixel(dc, 0, 0, 0);
         ReleaseDC(hwnd, dc);
+#endif
     }
 
     return true;
@@ -1356,7 +1376,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
         return -1L;
     }
 
-    std::filesystem::path path = fname;
+    std::filesystem::path path = fio->ConvertPathResource(fname);
     std::string pathStr = path.extension().string();
     if (storm::iEquals(pathStr, ".tx"))
         path.replace_extension();
@@ -1402,7 +1422,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
                 _fname[strlen(_fname) - 3] = 0;
         }
 
-        _strupr(_fname);
+        toupr(_fname);
 
         const uint32_t hf = hash_string(_fname);
 
@@ -1811,6 +1831,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
 
 bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
 {
+#ifdef _WIN32 // FIX_LINUX D3DXCreateTextureFromFileA
     // TODO: reimplement the whole thing in a tidy way
     IDirect3DTexture9 *pTex;
     if(CHECKD3DERR(D3DXCreateTextureFromFileA(d3d9, path, &pTex)))
@@ -1831,6 +1852,9 @@ bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
     Textures[t].loaded = true;
 
     return true;
+#else
+    return false;
+#endif
 }
 
 IDirect3DBaseTexture9 *DX9RENDER::GetBaseTexture(int32_t iTexture)
@@ -2575,12 +2599,20 @@ void DX9RENDER::LostRender()
         if (VertexBuffers[b].buff)
         {
             if (VertexBuffers[b].buff->Release() > 0)
+#ifdef _WIN32 // FIX_LINUX __debugbreak
                 __debugbreak();
+#else
+                do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
         if (IndexBuffers[b].buff)
         {
             if (IndexBuffers[b].buff->Release() > 0)
+#ifdef _WIN32 // FIX_LINUX __debugbreak
                 __debugbreak();
+#else
+                do { __asm__ volatile ("int $3"); } while(0);
+#endif
         }
     }
 
@@ -2969,7 +3001,8 @@ int32_t DX9RENDER::LoadFont(const char *fontName)
         strncpy_s(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = _strupr(sDup);
+    toupr(sDup);
+    fontName = sDup;
     const uint32_t hashVal = hash_string(fontName);
 
     int32_t i;
@@ -3020,7 +3053,8 @@ bool DX9RENDER::UnloadFont(const char *fontName)
         strncpy_s(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = _strupr(sDup);
+    toupr(sDup);
+    fontName = sDup;
     const uint32_t hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
@@ -3073,7 +3107,8 @@ bool DX9RENDER::SetCurFont(const char *fontName)
         strncpy_s(sDup, fontName, sizeof(sDup) - 1);
         sDup[sizeof(sDup) - 1] = 0;
     }
-    fontName = _strupr(sDup);
+    toupr(sDup);
+    fontName = sDup;
     const uint32_t hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
@@ -3309,7 +3344,9 @@ void DX9RENDER::MakeScreenShot()
         screenshot_path.replace_filename(screenshot_base_filename + "_" + std::to_string(i));
         screenshot_path.replace_extension(screenshotExt);
     }
+#ifdef _WIN32 // FIX_LINUX Screenshot
     D3DXSaveSurfaceToFile(screenshot_path.c_str(), screenshotFormat, surface, nullptr, nullptr);
+#endif
 
     surface->Release();
     renderTarget->Release();
@@ -3622,7 +3659,9 @@ HRESULT DX9RENDER::Release(IUnknown *pObject)
     {
         if (*(void **)pObject == nullptr)
         {
+#ifdef _WIN32 // FIX_LINUX __debugbreak
             __debugbreak();
+#endif
         }
         else
         {
@@ -3750,10 +3789,12 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
 }
+#endif
 
 HRESULT DX9RENDER::SetTexture(uint32_t Stage, IDirect3DBaseTexture9 *pTexture)
 {
@@ -3801,8 +3842,7 @@ HRESULT DX9RENDER::UpdateSurface(IDirect3DSurface9 *pSourceSurface, CONST RECT *
                                  IDirect3DSurface9 *pDestinationSurface, CONST POINT *pDestPointsArray)
 {
     return CHECKD3DERR(D3DXLoadSurfaceFromSurface(pDestinationSurface, nullptr, nullptr, pSourceSurface, nullptr,
-                                                 nullptr,
-                                      D3DX_DEFAULT, 0));
+                                                  nullptr, D3DX_DEFAULT, 0));
     //return CHECKD3DERR(d3d9->UpdateSurface(pSourceSurface, pSourceRectsArray, pDestinationSurface, pDestPointsArray));
 }
 
@@ -4192,7 +4232,11 @@ void DX9RENDER::StartProgressView()
         progressTipsTexture = TextureCreate(progressTipsImage);
         isInPViewProcess = false;
     }
+#ifdef _WIN32 // FIX_LINUX GetTickCount
     progressUpdateTime = GetTickCount() - 1000;
+#else
+    progressUpdateTime = std::chrono::system_clock::now() - std::chrono::milliseconds(1000);
+#endif
 }
 
 void DX9RENDER::ProgressView()
@@ -4203,9 +4247,16 @@ void DX9RENDER::ProgressView()
     if (isInPViewProcess)
         return;
     // Analyzing time
+#ifdef _WIN32 // FIX_LINUX GetTickCount
     const uint32_t time = GetTickCount();
     if (abs(static_cast<int32_t>(progressUpdateTime - time)) < 50)
         return;
+#else
+    const auto time = std::chrono::system_clock::now();
+    const std::chrono::duration<double, std::milli> passedTime = progressUpdateTime - time;
+    if (abs(passedTime.count()) < 50)
+        return;
+#endif
     progressUpdateTime = time;
     isInPViewProcess = true;
     progressSafeCounter = 0;
@@ -4478,9 +4529,11 @@ IDirect3DBaseTexture9 *DX9RENDER::CreateTextureFromFileInMemory(const char *pFil
     IDirect3DTexture9 *pTexture = nullptr;
     auto *pTga = (TGA_H *)pFile;
     const D3DFORMAT d3dFormat = (pTga->bpp == 16) ? D3DFMT_DXT1 : D3DFMT_DXT3;
+#ifdef _WIN32 // FIX_LINUX D3DXCreateTextureFromFileInMemoryEx
     D3DXCreateTextureFromFileInMemoryEx(static_cast<LPDIRECT3DDEVICE9>(GetD3DDevice()), pFile, dwSize, D3DX_DEFAULT,
                                         D3DX_DEFAULT, 1, 0, d3dFormat, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0,
                                         nullptr, nullptr, &pTexture);
+#endif
 
     return pTexture;
 }

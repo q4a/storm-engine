@@ -12,7 +12,11 @@
 #include "os_window.hpp"
 #include "steam_api_impl.hpp"
 #include "file_service.h"
+#ifdef _WIN32 // FIX_LINUX s_debug.h
 #include "s_debug.h"
+#else
+#include "core_impl.h"
+#endif
 #include "v_sound_service.h"
 #include "storm/fs.h"
 #include "watermark.hpp"
@@ -121,13 +125,21 @@ void HandleWindowEvent(const storm::OSWindow::Event &event)
     }
 }
 
+#ifdef _WIN32 // FIX_LINUX HINSTANCE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+#else
+int main(int argc, char *argv[])
+#endif
 {
     // Prevent multiple instances
+#ifdef _WIN32 // FIX_LINUX CreateEventA
     if (!CreateEventA(nullptr, false, false, "Global\\FBBD2286-A9F1-4303-B60C-743C3D7AA7BE") ||
         GetLastError() == ERROR_ALREADY_EXISTS)
+#else
+    if (false)
+#endif
     {
-        MessageBoxA(nullptr, "Another instance is already running!", "Error", MB_ICONERROR);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance is already running!", nullptr);
         return EXIT_SUCCESS;
     }
     mi_register_output(mimalloc_fun, nullptr);
@@ -159,7 +171,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #endif
     if (!lifecycleDiagnosticsGuard)
     {
-        MessageBoxA(nullptr, "Unable to initialize lifecycle service!", "Warning", MB_ICONWARNING);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Warning", "Unable to initialize lifecycle service!", nullptr);
     }
     else
     {
@@ -178,9 +190,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core_internal.Init();
 
     // Init script debugger
+#ifdef _WIN32 // FIX_LINUX s_debug.h
     S_DEBUG debug;
     debug.Init();
     CDebug = &debug;
+#endif
 
     // Read config
     auto ini = fio->OpenIniFile(fs::ENGINE_INI_FILE_NAME);
@@ -226,7 +240,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core_internal.InitBase();
 
     // Message loop
+#ifdef _WIN32 // FIX_LINUX GetTickCount
     auto dwOldTime = GetTickCount();
+#else
+    auto dwOldTime = std::chrono::system_clock::now();
+#endif
 
     isRunning = true;
     while (isRunning)
@@ -239,9 +257,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             if (dwMaxFPS)
             {
                 const auto dwMS = 1000u / dwMaxFPS;
+#ifdef _WIN32 // FIX_LINUX GetTickCount
                 const auto dwNewTime = GetTickCount();
                 if (dwNewTime - dwOldTime < dwMS)
                     continue;
+#else
+                const auto dwNewTime = std::chrono::system_clock::now();
+                const std::chrono::duration<double, std::milli> passedTime = dwNewTime - dwOldTime;
+                if (static_cast<uint32_t>(passedTime.count()) < dwMS)
+                    continue;
+#endif
                 dwOldTime = dwNewTime;
             }
 
@@ -263,7 +288,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core_internal.Event("ExitApplication");
     core_internal.CleanUp();
     core_internal.ReleaseBase();
+#ifdef _WIN32 // FIX_LINUX Cursor
     ClipCursor(nullptr);
+#endif
     SDL_Quit();
 
     return EXIT_SUCCESS;

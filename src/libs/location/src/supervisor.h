@@ -32,12 +32,21 @@ class Supervisor
         Character *c;     // The character we were looking for
         float dx, dy, dz; // Vector from the character to us
         float d2;         // The square of the distance to the character in xz
+
+        FindCharacter(Character *c, float dx, float dy, float dz, float d2)
+            : c(std::move(c)), dx(std::move(dx)), dy(std::move(dy)), dz(std::move(dz)), d2(std::move(d2))
+        {
+        }
     };
 
     struct CharacterEx
     {
         Character *c;
         float lastTime;
+
+        CharacterEx(Character *c, float lastTime) : c(std::move(c)), lastTime(std::move(lastTime))
+        {
+        }
     };
 
     // --------------------------------------------------------------------------------------------

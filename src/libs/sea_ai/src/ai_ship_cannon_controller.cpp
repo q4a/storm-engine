@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "ai_balls.h"
 #include "ai_ship.h"
 #include "inlines.h"
@@ -633,6 +635,10 @@ void AIShipCannonController::Realize(float fDeltaTime)
     {
         CVECTOR vPos;
         uint32_t dwColor;
+
+        tr_vertex(CVECTOR vPos, uint32_t dwColor) : vPos(std::move(vPos)), dwColor(std::move(dwColor))
+        {
+        }
     };
 
     static std::vector<tr_vertex> Verts;
