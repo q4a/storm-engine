@@ -53,6 +53,11 @@ class Vector
     // Operators
     // -----------------------------------------------------------
   public:
+    // Cast
+    operator float *();
+    // Cast
+    operator const float *() const;
+
     // Find the square of the length of a vector
     float operator~() const;
     // Return normalized vector
@@ -253,6 +258,18 @@ inline Vector::Vector(const Vector &v)
 // ===========================================================
 // Operators
 // ===========================================================
+
+// Cast
+inline Vector::operator float *()
+{
+    return (float *)&x;
+}
+
+// Cast
+inline Vector::operator const float *() const
+{
+    return (const float *)&x;
+}
 
 // Find the square of the length of a vector
 inline float Vector::operator~() const
