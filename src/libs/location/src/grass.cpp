@@ -139,7 +139,6 @@ bool Grass::Init()
     }
     rs->UnLockIndexBuffer(ib);
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     // Constants
     static const auto pi2 = 2.0f * 3.141592653f;
     for (size_t i = 0; i < 16; i++)
@@ -150,7 +149,6 @@ bool Grass::Init()
         // Uv table
         aUV[i] = {static_cast<float>(i & 3) * (1.0f / 4.0f), static_cast<float>((i >> 2) & 3) * (1.0f / 4.0f)};
     }
-#endif
 
     return true;
 }
@@ -379,13 +377,8 @@ void Grass::Execute(uint32_t delta_time)
 
 void Grass::Realize(uint32_t delta_time)
 {
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     if (quality == rq_off || fx_ == nullptr)
         return;
-#else
-    if (quality == rq_off)
-        return;
-#endif
     rs->SetTransform(D3DTS_WORLD, CMatrix());
     // Remove textures
     rs->TextureSet(0, -1);
@@ -523,7 +516,6 @@ void Grass::Realize(uint32_t delta_time)
         lColor = 0.3f;
     }
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     // recalculate the parameters of the angles
     for (int32_t i = 0; i < 16; i++)
     {
@@ -533,7 +525,6 @@ void Grass::Realize(uint32_t delta_time)
         if (aAngles[i].z > 1.0f)
             aAngles[i].z = 1.0f;
     }
-#endif
 
     // matrix
     CMatrix view, prj;
@@ -568,15 +559,15 @@ void Grass::Realize(uint32_t delta_time)
     // set constants
 #ifdef _WIN32 // FIX_LINUX ID3DXEffect
     fx_->SetMatrix(hgVP_, cmtx);
+#endif
     fx_->SetValue(haAngles_, &aAngles[0], sizeof(Vector) * 16);
     fx_->SetValue(haUV_, &aUV[0], sizeof(Vector2) * 16);
     fx_->SetValue(hlDir_, Vector2(lDir.x, lDir.z), sizeof(Vector2));
     fx_->SetValue(haColor_, Vector(aColor.x, aColor.y, aColor.z), sizeof(Vector));
     fx_->SetValue(hlColor_, Vector(lColor.x, lColor.y, lColor.z), sizeof(Vector));
-    fx_->SetFloat(hkLitWF_, kLitWF);
-    fx_->SetFloat(hfDataScale_, m_fDataScale);
+    //fx_->SetFloat(hkLitWF_, kLitWF);
+    //fx_->SetFloat(hfDataScale_, m_fDataScale);
     fx_->SetValue(haSize_, Vector2(m_fMaxWidth, m_fMaxHeight), sizeof(Vector2));
-#endif
 
     // Camera position on the map
     int32_t camx = static_cast<int32_t>((pos.x / m_fDataScale - startX) / GRASS_BLK_DST);

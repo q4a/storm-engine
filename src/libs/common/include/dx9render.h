@@ -2,6 +2,9 @@
 
 #include <cstdint>
 #include <d3d9.h>
+#ifndef _WIN32
+#include "storm_d3dx9effect.h"
+#endif
 
 #include "entity.h"
 #include "matrix.h"

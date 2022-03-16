@@ -42,7 +42,6 @@ void Effects::setDevice(IDirect3DDevice9 *device)
 void Effects::compile(const char *fxPath)
 {
     debugMsg_ = fxPath;
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     ID3DXEffect *fx;
     ID3DXBuffer *errors = nullptr;
     std::wstring _fxPath = utf8::ConvertUtf8ToWide(fxPath);
@@ -81,16 +80,13 @@ void Effects::compile(const char *fxPath)
 
         CHECKD3DERR(fx->FindNextValidTechnique(technique, &technique));
     }
-#endif // ID3DXEffect
 }
 
 void Effects::release()
 {
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     for (auto *fx : effects_)
         fx->Release();
     effects_.clear();
-#endif
     techniques_.clear();
     currentTechnique_ = nullptr;
 }
@@ -111,7 +107,6 @@ bool Effects::begin(const std::string &techniqueName)
     }
 
     currentTechnique_ = &technique->second;
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     auto *fx = currentTechnique_->fx;
     CHECKD3DERR(fx->SetTechnique(currentTechnique_->handle));
 
@@ -126,14 +121,10 @@ bool Effects::begin(const std::string &techniqueName)
     currentPass_ = 0;
     CHECKD3DERR(fx->BeginPass(currentPass_++));
     return true;
-#else
-    return false;
-#endif
 }
 
 bool Effects::next()
 {
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     if (currentTechnique_)
     {
         debugMsg_ = currentTechnique_->desc.Name;
@@ -149,11 +140,9 @@ bool Effects::next()
         CHECKD3DERR(fx->End());
         currentTechnique_ = nullptr;
     }
-#endif
     return false;
 }
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *Effects::getEffectPointer(const std::string &techniqueName)
 {
     // transform to lowercase to be compliant with the original code
@@ -164,4 +153,3 @@ ID3DXEffect *Effects::getEffectPointer(const std::string &techniqueName)
     const auto technique = techniques_.find(name_in_lowercase);
     return technique != techniques_.end() ? technique->second.fx : nullptr;
 }
-#endif
