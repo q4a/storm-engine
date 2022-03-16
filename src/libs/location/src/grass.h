@@ -14,6 +14,7 @@
 #include "dx9render.h"
 #include "grs.h"
 #include "v_module_api.h"
+#include "math3d/vector2.h"
 
 #define MSG_GRASS_LOAD_DATA 40666
 #define MSG_GRASS_SET_TEXTURE 41666
@@ -212,8 +213,8 @@ class Grass : public Entity
     int32_t initForce;
 
 #ifdef _WIN32 // FIX_LINUX ID3DXEffect
-    D3DXVECTOR3 aAngles[16];
-    D3DXVECTOR2 aUV[16];
+    Vector aAngles[16];
+    Vector2 aUV[16];
 #endif
 
     char textureName[64];

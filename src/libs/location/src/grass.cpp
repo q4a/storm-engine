@@ -568,14 +568,14 @@ void Grass::Realize(uint32_t delta_time)
     // set constants
 #ifdef _WIN32 // FIX_LINUX ID3DXEffect
     fx_->SetMatrix(hgVP_, cmtx);
-    fx_->SetValue(haAngles_, &aAngles[0], sizeof(D3DXVECTOR3) * 16);
-    fx_->SetValue(haUV_, &aUV[0], sizeof(D3DXVECTOR2) * 16);
-    fx_->SetValue(hlDir_, D3DXVECTOR2(lDir.x, lDir.z), sizeof(D3DXVECTOR2));
-    fx_->SetValue(haColor_, D3DXVECTOR3(aColor.x, aColor.y, aColor.z), sizeof(D3DXVECTOR3));
-    fx_->SetValue(hlColor_, D3DXVECTOR3(lColor.x, lColor.y, lColor.z), sizeof(D3DXVECTOR3));
+    fx_->SetValue(haAngles_, &aAngles[0], sizeof(Vector) * 16);
+    fx_->SetValue(haUV_, &aUV[0], sizeof(Vector2) * 16);
+    fx_->SetValue(hlDir_, Vector2(lDir.x, lDir.z), sizeof(Vector2));
+    fx_->SetValue(haColor_, Vector(aColor.x, aColor.y, aColor.z), sizeof(Vector));
+    fx_->SetValue(hlColor_, Vector(lColor.x, lColor.y, lColor.z), sizeof(Vector));
     fx_->SetFloat(hkLitWF_, kLitWF);
     fx_->SetFloat(hfDataScale_, m_fDataScale);
-    fx_->SetValue(haSize_, D3DXVECTOR2(m_fMaxWidth, m_fMaxHeight), sizeof(D3DXVECTOR2));
+    fx_->SetValue(haSize_, Vector2(m_fMaxWidth, m_fMaxHeight), sizeof(Vector2));
 #endif
 
     // Camera position on the map
