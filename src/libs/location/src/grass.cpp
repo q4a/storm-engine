@@ -575,8 +575,8 @@ void Grass::Realize(uint32_t delta_time)
     fx_->SetValue(hlColor_, Vector(lColor.x, lColor.y, lColor.z), sizeof(Vector));
     fx_->SetFloat(hkLitWF_, kLitWF);
     fx_->SetFloat(hfDataScale_, m_fDataScale);
-    fx_->SetValue(haSize_, Vector2(m_fMaxWidth, m_fMaxHeight), sizeof(Vector2));
 #endif
+    fx_->SetValue(haSize_, Vector2(m_fMaxWidth, m_fMaxHeight), sizeof(Vector2));
 
     // Camera position on the map
     int32_t camx = static_cast<int32_t>((pos.x / m_fDataScale - startX) / GRASS_BLK_DST);

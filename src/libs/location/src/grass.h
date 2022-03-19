@@ -12,6 +12,9 @@
 
 #include "supervisor.h"
 #include "dx9render.h"
+#ifndef _WIN32
+#include "storm_d3dx9effect.h"
+#endif
 #include "grs.h"
 #include "v_module_api.h"
 #include "math3d/vector2.h"
@@ -26,9 +29,9 @@ class Character;
 
 class Grass : public Entity
 {
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     static inline ID3DXEffect *fx_;
     static inline IDirect3DVertexDeclaration9 *vertexDecl_;
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     static inline D3DXHANDLE hgVP_;
     static inline D3DXHANDLE haAngles_;
     static inline D3DXHANDLE haUV_;
@@ -37,10 +40,8 @@ class Grass : public Entity
     static inline D3DXHANDLE haColor_;
     static inline D3DXHANDLE hlColor_;
     static inline D3DXHANDLE hfDataScale_;
-    static inline D3DXHANDLE haSize_;
-#else
-    static inline IDirect3DVertexDeclaration9 *vertexDecl_;
 #endif
+    static inline D3DXHANDLE haSize_;
 
 #pragma pack(push, 1)
 

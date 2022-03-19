@@ -42,13 +42,13 @@ void Effects::setDevice(IDirect3DDevice9 *device)
 void Effects::compile(const char *fxPath)
 {
     debugMsg_ = fxPath;
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     ID3DXEffect *fx;
     ID3DXBuffer *errors = nullptr;
     std::wstring _fxPath = utf8::ConvertUtf8ToWide(fxPath);
     CHECKD3DERR(D3DXCreateEffectFromFile(device_, _fxPath.c_str(), nullptr, nullptr, D3DXSHADER_OPTIMIZATION_LEVEL3,
                                          nullptr, &fx, &errors));
 
+#ifdef _WIN32 // FIX_LINUX ID3DXEffect
     if (errors)
     {
         core.Trace(static_cast<const char *>(errors->GetBufferPointer()));
