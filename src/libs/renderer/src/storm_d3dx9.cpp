@@ -2,8 +2,6 @@
 
 #include "storm_d3dx9.h"
 
-#define WARN(...) fprintf(stdout, __VA_ARGS__)
-
 ///////////////////////// Parts from WINE source code for d3dx9 licensed under GPLv2 /////////////////////////
 
 #define D3DX_FILTER_NONE     0x00000001

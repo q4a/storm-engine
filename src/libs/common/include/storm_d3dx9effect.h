@@ -30,6 +30,15 @@ static inline HRESULT HRESULT_FROM_WIN32(unsigned int x)
 
 #endif  /* __WINE_WINERROR_H */
 
+#ifndef __WINE_WINNLS_H
+#define __WINE_WINNLS_H
+#ifndef NONLS
+
+#define CP_ACP        0
+
+#endif /* !NONLS */
+#endif  /* __WINE_WINNLS_H */
+
 #ifndef _WINNT_
 #define _WINNT_
 /*
@@ -65,7 +74,7 @@ static inline HRESULT HRESULT_FROM_WIN32(unsigned int x)
 
 # define STDMETHOD_C(m) HRESULT (STDMETHODCALLTYPE *m)
 #  define DECLARE_INTERFACE_C(i) \
-     typedef interface i { struct i##Vtbl *lpVtbl; } i; \
+     typedef interface i { const struct i##Vtbl *lpVtbl; } i; \
      typedef struct i##Vtbl i##Vtbl; \
      struct i##Vtbl
 
@@ -124,8 +133,8 @@ DECLARE_INTERFACE_C(ID3DXInclude)
 };
 #undef INTERFACE
 
-#define ID3DXInclude_Open(p,a,b,c,d,e)  (p)->lpVtbl->Open(p,a,b,c,d,e)
-#define ID3DXInclude_Close(p,a)         (p)->lpVtbl->Close(p,a)
+#define ID3DXInclude_Open(p,a,b,c,d,e)  (p)->lpVtbl->Open(a,b,c,d,e)
+#define ID3DXInclude_Close(p,a)         (p)->lpVtbl->Close(a)
 
 typedef struct ID3DXInclude *LPD3DXINCLUDE;
 
