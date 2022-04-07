@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         {
             system_log->set_level(spdlog::level::off);
         }
-        if (ini->GetLong(nullptr, "Steam", 1) != 0)
+        if (ini->GetLong(nullptr, "Steam", 0) != 0)
         {
             bSteam = true;
         }
