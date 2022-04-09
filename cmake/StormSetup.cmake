@@ -157,18 +157,6 @@ macro(_collect_sources)
   )
 endmacro()
 
-macro(STORM_SETUP_RS)
-  set(oneValueArgs TARGET_NAME)
-  cmake_parse_arguments(_SETUP "${options}" "${oneValueArgs}"
-                        "${multiValueArgs}" ${ARGN})
-
-  if(NOT _SETUP_TARGET_NAME)
-    message(FATAL_ERROR "[StormSetup] No 'TARGET_NAME' specified!")
-  endif()
-
-  corrosion_import_crate(MANIFEST_PATH "${_SETUP_TARGET_NAME}/Cargo.toml")
-endmacro()
-
 macro(STORM_SETUP)
   set(options SHARED)
   set(oneValueArgs TARGET_NAME TYPE)
@@ -201,6 +189,9 @@ macro(STORM_SETUP)
     _set_ide_folder("${_SETUP_TARGET_NAME}" "Executables")
   elseif(${_SETUP_TYPE} STREQUAL "library")
     add_library("${_SETUP_TARGET_NAME}" ${lib_mode} ${SRCS})
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_SETUP_TARGET_NAME}-rs")
+      corrosion_import_crate(MANIFEST_PATH "${_SETUP_TARGET_NAME}-rs/Cargo.toml")
+    endif()
     _set_ide_folder("${_SETUP_TARGET_NAME}" "Libs")
   elseif(${_SETUP_TYPE} STREQUAL "storm_module")
     add_library("${_SETUP_TARGET_NAME}" ${lib_mode} ${SRCS})

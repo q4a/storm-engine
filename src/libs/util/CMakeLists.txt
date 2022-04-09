@@ -1,7 +1,3 @@
-STORM_SETUP_RS(
-    TARGET_NAME util-rs
-)
-
 STORM_SETUP(
     TARGET_NAME util
     TYPE library
