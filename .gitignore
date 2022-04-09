@@ -4,4 +4,4 @@
 .vs
 .idea
 *.user
-*/target/debug/
+src/libs/util/util-rs/target/
