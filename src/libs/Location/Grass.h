@@ -26,20 +26,9 @@ class Character;
 
 class Grass : public Entity
 {
-
-    static inline ID3DXEffect *fx_;
-    static inline IDirect3DVertexDeclaration9 *vertexDecl_;
-    static inline D3DXHANDLE hgVP_;
-    static inline D3DXHANDLE haAngles_;
-    static inline D3DXHANDLE haUV_;
-    static inline D3DXHANDLE hlDir_;
-    static inline D3DXHANDLE hkLitWF_;
-    static inline D3DXHANDLE haColor_;
-    static inline D3DXHANDLE hlColor_;
-    static inline D3DXHANDLE hfDataScale_;
-    static inline D3DXHANDLE haSize_;
-
 #pragma pack(push, 1)
+
+    static IDirect3DVertexDeclaration9 *vertexDecl_;
 
     struct Vertex
     {
@@ -135,9 +124,9 @@ class Grass : public Entity
             Realize(delta);
             break;
             /*case Stage::lost_render:
-              LostRender(delta); break;
+                LostRender(delta); break;
             case Stage::restore_render:
-              RestoreRender(delta); break;*/
+                RestoreRender(delta); break;*/
         }
     }
 
@@ -154,7 +143,7 @@ class Grass : public Entity
     //--------------------------------------------------------------------------------------------
   private:
     //Рендер блока
-    void RenderBlock(const CVECTOR &camPos, const PLANE *plane, long numPlanes, long mx, long mz);
+    void RenderBlock(const CVECTOR &camPos, PLANE *plane, long numPlanes, long mx, long mz);
     //Проверка на видимость бокса
     bool VisibleTest(const PLANE *plane, long numPlanes, const CVECTOR &min, const CVECTOR &max);
     //Рендер блока
@@ -164,7 +153,7 @@ class Grass : public Entity
     //Получить цвет
     static long GetColor(CVECTOR color);
     // Vertex declaration
-    void CreateVertexDeclaration() const;
+    void CreateVertexDeclaration();
 
   private:
     //Сервис рендера
@@ -208,8 +197,7 @@ class Grass : public Entity
     float windAng;
     long initForce;
 
-    D3DXVECTOR3 aAngles[16];
-    D3DXVECTOR2 aUV[16];
+    VSConstant consts[42];
 
     char textureName[64];
 
