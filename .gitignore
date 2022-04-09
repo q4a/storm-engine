@@ -1,6 +1,7 @@
-﻿/build/
+/build/
 /cmake-build-*/
 
 .vs
 .idea
 *.user
+*/target/debug/
