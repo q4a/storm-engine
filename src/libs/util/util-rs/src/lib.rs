@@ -1,17 +1,31 @@
-use std::fs::File;
-use std::io::Write;
+use std::path::PathBuf;
+use std::{ffi::OsString, os::windows::prelude::OsStrExt};
+
+mod fs;
 
 #[no_mangle]
-pub extern "C" fn hello_world() {
-    let mut file = File::create("rust.txt").unwrap();
-    writeln!(&mut file, "Hello from Rust").unwrap();
+pub extern "C" fn get_stash_path() -> *mut winapi::ctypes::wchar_t {
+    pathbuf_to_wchar(fs::home_directory())
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
+#[no_mangle]
+pub extern "C" fn get_logs_path() -> *mut winapi::ctypes::wchar_t {
+    pathbuf_to_wchar(fs::logs_directory())
+}
+
+#[no_mangle]
+pub extern "C" fn get_save_data_path() -> *mut winapi::ctypes::wchar_t {
+    pathbuf_to_wchar(fs::save_directory())
+}
+
+#[no_mangle]
+pub extern "C" fn get_screenshots_path() -> *mut winapi::ctypes::wchar_t {
+    pathbuf_to_wchar(fs::screenshot_directory())
+}
+
+fn pathbuf_to_wchar(input: PathBuf) -> *mut winapi::ctypes::wchar_t {
+    OsString::from(input)
+        .encode_wide()
+        .collect::<Vec<_>>()
+        .as_mut_ptr()
 }

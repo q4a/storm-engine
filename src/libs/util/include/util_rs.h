@@ -6,6 +6,12 @@
 
 extern "C" {
 
-void hello_world();
+wchar_t *get_stash_path();
+
+wchar_t *get_logs_path();
+
+wchar_t *get_save_data_path();
+
+wchar_t *get_screenshots_path();
 
 } // extern "C"

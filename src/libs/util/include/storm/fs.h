@@ -13,31 +13,22 @@ using namespace std::filesystem;
 
 inline path GetStashPath()
 {
-    static path path;
-    if (path.empty())
-    {
-        wchar_t *str = nullptr;
-        SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST, nullptr, &str);
-        path = str;
-        path = path / "My Games" / "Sea Dogs";
-        CoTaskMemFree(str);
-    }
-    return path;
+    return get_stash_path();
 }
 
 inline path GetLogsPath()
 {
-    return GetStashPath() / "Logs";
+    return get_logs_path();
 }
 
 inline path GetSaveDataPath()
 {
-    return GetStashPath() / "SaveData";
+    return get_save_data_path();
 }
 
 inline path GetScreenshotsPath()
 {
-    return GetStashPath() / "Screenshots";
+    return get_screenshots_path();
 }
 
 constexpr char ENGINE_INI_FILE_NAME[] = "engine.ini";
