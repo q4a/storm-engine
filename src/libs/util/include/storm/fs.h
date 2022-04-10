@@ -16,7 +16,6 @@ inline path GetStashPath()
     static path path;
     if (path.empty())
     {
-        hello_world();
         wchar_t *str = nullptr;
         SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST, nullptr, &str);
         path = str;
