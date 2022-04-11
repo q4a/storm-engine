@@ -8,6 +8,8 @@ add_library(${PROJECT_NAME} STATIC
     Screenshot.cpp
     sdevice.cpp
     sdevice.h
+    technique.cpp
+    technique.h
     texture.h
     IVBufferManager.cpp
 )

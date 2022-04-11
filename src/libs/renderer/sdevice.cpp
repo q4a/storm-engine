@@ -430,7 +430,12 @@ bool DX9RENDER::Init()
         if (!InitDevice(bWindow, core.GetAppHWND(), screen_size.x, screen_size.y))
             return false;
 
+#ifndef _WIN32 // FIX_LINUX Effects
         RecompileEffects();
+#else
+        pTechnique = new CTechnique(this);
+        pTechnique->DecodeFiles();
+#endif
 
         // получить стартовый ини файл для шрифтов
         if (!ini->ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
@@ -679,7 +684,9 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, long width, long height)
                                           &d3dpp, &d3d9)) == true)
             return false;
     }
+#ifndef _WIN32 // FIX_LINUX Effects
     effects_.setDevice(d3d9);
+#endif
 
     //Создаем рендерtargetы для POST PROCESS эффектов...
     d3d9->GetRenderTarget(0, &pOriginalScreenSurface);
@@ -2005,7 +2012,13 @@ void DX9RENDER::DrawBuffer(long vbuff, long stride, long ibuff, long minv, size_
     // else VertexBuffer already set
 
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
 
     if (bDraw)
         do
@@ -2031,7 +2044,13 @@ void DX9RENDER::DrawIndexedPrimitiveNoVShader(D3DPRIMITIVETYPE dwPrimitiveType, 
     }
 
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -2046,7 +2065,13 @@ void DX9RENDER::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE dwPrimitiveType, uint32_
 {
     bool bDraw = true;
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -2065,7 +2090,13 @@ void DX9RENDER::DrawPrimitiveUP(D3DPRIMITIVETYPE dwPrimitiveType, uint32_t dwVer
         return;
 
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -2086,7 +2117,13 @@ void DX9RENDER::DrawPrimitive(D3DPRIMITIVETYPE dwPrimitiveType, long iVBuff, lon
         return;
 
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -2380,6 +2417,7 @@ void DX9RENDER::RestoreRender()
 
 void DX9RENDER::RecompileEffects()
 {
+#ifndef _WIN32 // FIX_LINUX Effects
     effects_.release();
 
     fs::path cur_path = fs::current_path();
@@ -2391,6 +2429,7 @@ void DX9RENDER::RecompileEffects()
             effects_.compile(s.c_str());
         }
     fs::current_path(cur_path);
+#endif
 }
 
 bool DX9RENDER::ResetDevice()
@@ -2509,7 +2548,13 @@ void DX9RENDER::RunStart()
     // boal del_cheat
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
+#ifndef _WIN32 // FIX_LINUX Effects
         RecompileEffects();
+#else
+        STORM_DELETE(pTechnique);
+        pTechnique = new CTechnique(this);
+        pTechnique->DecodeFiles();
+#endif
     }
 
     SetRenderState(D3DRS_FILLMODE, (core.Controls->GetDebugAsyncKeyState('F') < 0) ? D3DFILL_WIREFRAME : D3DFILL_SOLID);
@@ -3137,16 +3182,38 @@ void DX9RENDER::FindPlanes(IDirect3DDevice9 *d3dDevice)
     viewplane[3].D = (pos.x * viewplane[3].Nx + pos.y * viewplane[3].Ny + pos.z * viewplane[3].Nz);
 }
 
+#ifndef _WIN32 // FIX_LINUX Effects
 bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 {
     if (!cBlockName)
         return false;
     return effects_.begin(cBlockName);
 }
+#else
+bool DX9RENDER::TechniqueSetParamsAndStart(const char *cBlockName, uint32_t _dwNumParams, void *pParams)
+{
+    if (!cBlockName)
+        return false;
+    pTechnique->SetCurrentBlock(cBlockName, _dwNumParams, pParams);
+    return pTechnique->ExecutePassStart();
+}
+
+bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName, uint32_t _dwNumParams, ...)
+{
+    if (!cBlockName)
+        return false;
+    pTechnique->SetCurrentBlock(cBlockName, _dwNumParams, 1 + &_dwNumParams);
+    return pTechnique->ExecutePassStart();
+}
+#endif
 
 bool DX9RENDER::TechniqueExecuteNext()
 {
+#ifndef _WIN32 // FIX_LINUX Effects
     return effects_.next();
+#else
+    return pTechnique->ExecutePassNext();
+#endif
 }
 
 void DX9RENDER::DrawRects(RS_RECT *pRSR, uint32_t dwRectsNum, const char *cBlockName, uint32_t dwSubTexturesX,
@@ -3255,7 +3322,13 @@ void DX9RENDER::DrawRects(RS_RECT *pRSR, uint32_t dwRectsNum, const char *cBlock
         rectsVBuffer->Unlock();
         CHECKD3DERR(SetFVF(RS_RECT_VERTEX_FORMAT));
         if (cBlockName && cBlockName[0])
+        {
+#ifdef _WIN32 // FIX_LINUX Effects_test
             bDraw = TechniqueExecuteStart(cBlockName);
+#else
+            bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+        }
         if (bDraw)
             do
             {
@@ -3290,7 +3363,13 @@ void DX9RENDER::DrawSprites(RS_SPRITE *pRSS, uint32_t dwSpritesNum, const char *
 
     bool bDraw = true;
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -3310,7 +3389,13 @@ void DX9RENDER::DrawLines(RS_LINE *pRSL, uint32_t dwLinesNum, const char *cBlock
     bool bDraw = true;
 
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -3328,7 +3413,13 @@ void DX9RENDER::DrawLines2D(RS_LINE2D *pRSL2D, size_t dwLinesNum, const char *cB
     bool bDraw = true;
 
     if (cBlockName && cBlockName[0])
+    {
+#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
+#else
+        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
+#endif
+    }
     if (bDraw)
         do
         {
@@ -3491,6 +3582,20 @@ HRESULT DX9RENDER::CreatePixelShader(CONST uint32_t *pFunction, IDirect3DPixelSh
     return CHECKD3DERR(d3d9->CreatePixelShader((const DWORD *)pFunction, ppShader));
 }
 
+HRESULT DX9RENDER::DeleteVertexShader(IDirect3DVertexShader9 *pShader)
+{
+    if (pShader)
+        return pShader->Release();
+    return D3D_OK;
+}
+
+HRESULT DX9RENDER::DeletePixelShader(IDirect3DPixelShader9 *pShader)
+{
+    if (pShader)
+        return pShader->Release();
+    return D3D_OK;
+}
+
 HRESULT DX9RENDER::GetVertexShader(IDirect3DVertexShader9 **ppShader)
 {
     return CHECKD3DERR(d3d9->GetVertexShader(ppShader));
@@ -3501,10 +3606,12 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
+#ifndef _WIN32 // FIX_LINUX Effects
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
 }
+#endif
 
 HRESULT DX9RENDER::SetTexture(uint32_t Stage, IDirect3DBaseTexture9 *pTexture)
 {

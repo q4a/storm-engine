@@ -1,7 +1,11 @@
 #ifndef __SDEVICE_H__
 #define __SDEVICE_H__
 
+#ifndef _WIN32 // FIX_LINUX Effects
 #include "Effects.h"
+#else
+#include "technique.h"
+#endif
 #include "Font.h"
 #include "VideoTexture.h"
 #include "defines.h"
@@ -116,7 +120,11 @@ class DX9RENDER : public VDX9RENDER
     CVECTOR Pos, Ang;
     float Fov;
 
+#ifndef _WIN32 // FIX_LINUX Effects
     Effects effects_;
+#else
+    CTechnique *pTechnique;
+#endif
 
     char *fontIniFileName;
     long nFontQuantity;
@@ -336,7 +344,12 @@ class DX9RENDER : public VDX9RENDER
     bool SetFontIniFileName(const char *iniName) override;
 
     // DX9Render: Techniques Section
+#ifndef _WIN32 // FIX_LINUX Effects
     bool TechniqueExecuteStart(const char *cBlockName) override;
+#else
+    bool TechniqueSetParamsAndStart(const char *cBlockName, uint32_t _dwNumParams = 0, void *pParams = nullptr) override;
+    bool TechniqueExecuteStart(const char *cBlockName, uint32_t _dwNumParams = 0, ...) override;
+#endif
     bool TechniqueExecuteNext() override;
 
     // DX9Render: Draw Section
@@ -452,8 +465,8 @@ class DX9RENDER : public VDX9RENDER
     HRESULT SetVertexDeclaration(IDirect3DVertexDeclaration9 *pDecl) override;
     HRESULT CreatePixelShader(CONST uint32_t *pFunction, IDirect3DPixelShader9 **ppShader) override;
     HRESULT CreateVertexShader(CONST uint32_t *pFunction, IDirect3DVertexShader9 **ppShader) override;
-    /*virtual HRESULT DeletePixelShader( DWORD Handle );
-    virtual HRESULT DeleteVertexShader( DWORD Handle );*/
+    HRESULT DeletePixelShader(IDirect3DPixelShader9 *pShader) override;
+    HRESULT DeleteVertexShader(IDirect3DVertexShader9 *pShader) override;
     HRESULT SetVertexShader(IDirect3DVertexShader9 *pShader) override;
     HRESULT SetPixelShader(IDirect3DPixelShader9 *pShader) override;
     /*virtual HRESULT SetFVFConstant(DWORD Register, CONST void* pConstantData, DWORD  ConstantCount );*/
@@ -462,7 +475,9 @@ class DX9RENDER : public VDX9RENDER
     HRESULT SetFVF(uint32_t handle) override;
     HRESULT GetVertexShader(IDirect3DVertexShader9 **ppShader) override;
     HRESULT GetPixelShader(IDirect3DPixelShader9 **ppShader) override;
+#ifndef _WIN32 // FIX_LINUX Effects
     ID3DXEffect *GetEffectPointer(const char *techniqueName) override;
+#endif
 
     // D3D Render Target/Begin/End/Clear
     HRESULT GetRenderTarget(IDirect3DSurface9 **ppRenderTarget) override;

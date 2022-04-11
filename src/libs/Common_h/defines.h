@@ -167,7 +167,7 @@ constexpr auto makeRGB(uint32_t r, uint32_t g, uint32_t b)
     {                                                                                                                  \
         a = new char[strlen(b) + 1];                                                                                   \
         if (a)                                                                                                         \
-            strcpy_s(a, b);                                                                                            \
+            strcpy(a, b);                                                                                              \
     }
 #define COLOR2VECTOR(a) CVECTOR(float((a & 0xFF0000) >> 0x10), float((a & 0xFF00) >> 0x8), float(a & 0xFF));
 #define COLOR2VECTOR4(a)                                                                                               \
