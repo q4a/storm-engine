@@ -11,3 +11,4 @@ crate-type=["staticlib"]
 [dependencies]
 dirs-next = "2.0.0"
 winapi = { version = "0.3", default-features = false }
+regex = "1.5.5"
