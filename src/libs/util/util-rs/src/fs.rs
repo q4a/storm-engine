@@ -1,7 +1,9 @@
 use std::path::PathBuf;
 
 pub fn home_directory() -> PathBuf {
-    dirs_next::document_dir().unwrap_or_else(|| PathBuf::from("user_data"))
+    dirs_next::document_dir()
+        .map(|path| path.join("My Games").join("Sea Dogs"))
+        .unwrap_or_else(|| PathBuf::from("user_data"))
 }
 
 pub fn logs_directory() -> PathBuf {
