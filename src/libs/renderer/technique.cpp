@@ -1,7 +1,10 @@
-#include "Technique.h"
-#include "common_defines.h"
+#ifdef _WIN32 // FIX_LINUX Effects
+#include "technique.h"
+#include "core.h"
+#include "defines.h"
+#include "inlines.h"
 
-#define SHA_DIR "modules\\Techniques"
+#define SHA_DIR "resource\\techniques-sha"
 #define SHA_EXT ".sha"
 
 #define PASS_OK 0
@@ -98,10 +101,11 @@
 // common defines
 #define SAVED_STATES_ADD 128
 
-char *SkipToken(char *str, char *cmp)
+char *SkipToken(char *str, const char *cmp)
 {
     int flag;
-    char *str1, *cmp1;
+    char *str1;
+    const char *cmp1;
 
     if (str == 0 || cmp == 0)
         return 0;
@@ -146,10 +150,11 @@ char *SkipToken(char *str, char *cmp)
     return NULL;
 }
 
-char *FindToken(char *str, char *cmp)
+char *FindToken(char *str, const char *cmp)
 {
     int flag;
-    char *str1, *cmp1;
+    char *str1;
+    const char *cmp1;
 
     if (str == 0 || cmp == 0)
         return 0;
@@ -191,7 +196,7 @@ char *FindToken(char *str, char *cmp)
 }
 
 // Get token before symbol skip
-char *GetTokenWhile(char *src, char *dst, char *skip)
+char *GetTokenWhile(char *src, char *dst, const char *skip)
 {
     if (!src || !dst || !skip)
         return 0;
@@ -229,33 +234,33 @@ char *GetTokenWhile(char *src, char *dst, char *skip)
 typedef struct
 {
     SRSPARAM *pParam;
-    dword dwParamNum;
+    uint32_t dwParamNum;
     bool bUse;
     long dwUseSubCode;
-    dword SrsType;
-    char *cName;
+    uint32_t SrsType;
+    const char *cName;
     D3DRENDERSTATETYPE State;
 } SRS;
 
 typedef struct
 {
     SRSPARAM *pParam;
-    dword dwParamNum;
+    uint32_t dwParamNum;
     bool bUse;
     long dwUseSubCode;
-    dword SrsType;
-    char *cName;
+    uint32_t SrsType;
+    const char *cName;
     D3DSAMPLERSTATETYPE State;
 } SSS;
 
 typedef struct
 {
     SRSPARAM *pParam;
-    dword dwParamNum;
+    uint32_t dwParamNum;
     bool bUse;
     long dwUseSubCode;
-    dword SrsType;
-    char *cName;
+    uint32_t SrsType;
+    const char *cName;
     D3DTEXTURESTAGESTATETYPE State;
 } STSS;
 
@@ -564,7 +569,7 @@ SRSPARAM PARAM_TYPES[] = {
 
 SRSPARAM RESTORE_TYPES[] = {{"states", SUBCODE_RESTORE_STATES}, {"clear", SUBCODE_RESTORE_CLEAR}};
 
-CTechnique::CTechnique(VDX8RENDER *_pRS) : htBlocks(_FL_)
+CTechnique::CTechnique(VDX9RENDER *_pRS)
 {
     dwNumBlocks = 0;
     dwNumShaders = 0;
@@ -575,23 +580,23 @@ CTechnique::CTechnique(VDX8RENDER *_pRS) : htBlocks(_FL_)
     dwCurSavedStatesPos = 0;
     dwCurParamsMax = 0;
 
-    pShaders = null;
-    pBlocks = null;
-    pParams = null;
-    pSavedStates = null;
-    pCurParams = null;
+    pShaders = nullptr;
+    pBlocks = nullptr;
+    pParams = nullptr;
+    pSavedStates = nullptr;
+    pCurParams = nullptr;
 
     pRS = _pRS;
 
     ZERO(sDelimTable);
     char sDelimeters[] = " ,.[]-+\0\n\r\t";
-    for (dword i = 0; i < strlen(sDelimeters); i++)
+    for (uint32_t i = 0; i < strlen(sDelimeters); i++)
         sDelimTable[sDelimeters[i]] = 1;
 }
 
 CTechnique::~CTechnique()
 {
-    dword i, j, k;
+    uint32_t i, j, k;
     for (i = 0; i < dwNumBlocks; i++)
     {
         block_t *pB = &pBlocks[i];
@@ -599,17 +604,19 @@ CTechnique::~CTechnique()
         {
             technique_t *pTech = &pB->pTechniques[j];
             for (k = 0; k < pTech->dwNumPasses; k++)
-                SE_DELETE(pTech->pPasses[k].pPass);
-            SE_DELETE(pTech->pPasses);
+            {
+                STORM_DELETE(pTech->pPasses[k].pPass);
+            }
+            STORM_DELETE(pTech->pPasses);
         }
-        SE_DELETE(pB->pParams);
-        SE_DELETE(pB->pBlockName);
-        SE_DELETE(pB->pTechniques);
+        STORM_DELETE(pB->pParams);
+        STORM_DELETE(pB->pBlockName);
+        STORM_DELETE(pB->pTechniques);
     }
     for (i = 0; i < dwNumShaders; i++)
     {
-        SE_DELETE(pShaders[i].pName);
-        SE_DELETE(pShaders[i].pDecl);
+        STORM_DELETE(pShaders[i].pName);
+        STORM_DELETE(pShaders[i].pDecl);
         if (pShaders[i].dwShaderHandle != INVALID_SHADER_HANDLE)
         {
             if (pShaders[i].dwShaderType == CODE_SVS)
@@ -617,17 +624,17 @@ CTechnique::~CTechnique()
             if (pShaders[i].dwShaderType == CODE_SPS)
                 pRS->DeletePixelShader(pShaders[i].pShader);
         }
-        SE_DELETE(pShaders[i].decl);
+        STORM_DELETE(pShaders[i].decl);
     }
-    SE_DELETE(pShaders);
-    SE_DELETE(pBlocks);
-    SE_DELETE(pSavedStates);
-    SE_DELETE(pCurParams);
+    STORM_DELETE(pShaders);
+    STORM_DELETE(pBlocks);
+    STORM_DELETE(pSavedStates);
+    STORM_DELETE(pCurParams);
 }
 
-#define END_TEST (dword(pCurrent - pBegin) >= dwSize - 2)
+#define END_TEST (uint32_t(pCurrent - pBegin) >= dwSize - 2)
 
-char *GetString(char *pBegin, dword dwSize, char *pCurrent)
+char *GetString(char *pBegin, uint32_t dwSize, char *pCurrent)
 {
     if (END_TEST)
         return 0;
@@ -722,61 +729,61 @@ bool isDigit(char *pStr)
     return ((pStr) ? (pStr[0] >= '0' && pStr[0] <= '9') : false);
 }
 
-dword CTechnique::GetSRSIndex(char *pStr)
+uint32_t CTechnique::GetSRSIndex(char *pStr)
 {
-    dword dwNumParam = sizeof(RenderStates) / sizeof(STSS);
-    for (dword i = 0; i < dwNumParam; i++)
+    uint32_t dwNumParam = sizeof(RenderStates) / sizeof(STSS);
+    for (uint32_t i = 0; i < dwNumParam; i++)
         if (stricmp(pStr, RenderStates[i].cName) == 0)
             return i;
-    api->Trace("ERROR: SetRenderState: unknown parameter type <%s> in <%s> file, technique <%s>", pStr,
+    core.Trace("ERROR: SetRenderState: unknown parameter type <%s> in <%s> file, technique <%s>", pStr,
                sCurrentFileName, sCurrentBlockName);
     // SE_THROW;
     return INVALID_SRS_INDEX;
 }
 
-dword CTechnique::GetSTSSIndex(char *pStr)
+uint32_t CTechnique::GetSTSSIndex(char *pStr)
 {
-    dword dwNumParam = sizeof(TexturesStageStates) / sizeof(STSS);
-    for (dword i = 0; i < dwNumParam; i++)
+    uint32_t dwNumParam = sizeof(TexturesStageStates) / sizeof(STSS);
+    for (uint32_t i = 0; i < dwNumParam; i++)
         if (stricmp(pStr, TexturesStageStates[i].cName) == 0)
             return i;
-    api->Trace("ERROR: SetTextureStageState: unknown parameter type <%s> in <%s> file, technique <%s>", pStr,
+    core.Trace("ERROR: SetTextureStageState: unknown parameter type <%s> in <%s> file, technique <%s>", pStr,
                sCurrentFileName, sCurrentBlockName);
     // SE_THROW;
     return INVALID_STSS_INDEX;
 }
 
-dword CTechnique::GetSSSSIndex(char *pStr)
+uint32_t CTechnique::GetSSSSIndex(char *pStr)
 {
-    dword dwNumParam = sizeof(SamplerStates) / sizeof(SSS);
-    for (dword i = 0; i < dwNumParam; i++)
+    uint32_t dwNumParam = sizeof(SamplerStates) / sizeof(SSS);
+    for (uint32_t i = 0; i < dwNumParam; i++)
         if (stricmp(pStr, SamplerStates[i].cName) == 0)
             return i;
-    api->Trace("ERROR: SetSamplerState: unknown parameter type <%s> in <%s> file, technique <%s>", pStr,
+    core.Trace("ERROR: SetSamplerState: unknown parameter type <%s> in <%s> file, technique <%s>", pStr,
                sCurrentFileName, sCurrentBlockName);
     return INVALID_SSS_INDEX;
 }
 
-dword CTechnique::GetIndex(char *pStr, SRSPARAM *pParam, dword dwNumParam, bool bCanBeNumber)
+uint32_t CTechnique::GetIndex(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, bool bCanBeNumber)
 {
-    for (dword i = 0; i < dwNumParam; i++)
+    for (uint32_t i = 0; i < dwNumParam; i++)
         if (stricmp(pStr, pParam[i].cName) == 0)
             return i;
     if (!bCanBeNumber)
-        api->Trace("ERROR: Unknown parameter type <%s> in <%s> file, technique <%s>", pStr, sCurrentFileName,
+        core.Trace("ERROR: Unknown parameter type <%s> in <%s> file, technique <%s>", pStr, sCurrentFileName,
                    sCurrentBlockName);
     // SE_THROW;
     return INVALID_INDEX;
 }
 
-dword CTechnique::GetCode(char *pStr, SRSPARAM *pParam, dword dwNumParam, dword *pPassCode, bool bCanBeNumber)
+uint32_t CTechnique::GetCode(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, uint32_t *pPassCode, bool bCanBeNumber)
 {
     Assert(pStr);
 
-    dword dwCode = 0;
+    uint32_t dwCode = 0;
     if (pParam && dwNumParam)
     {
-        dword dwIndex = GetIndex(pStr, pParam, dwNumParam, bCanBeNumber);
+        uint32_t dwIndex = GetIndex(pStr, pParam, dwNumParam, bCanBeNumber);
         if (dwIndex != INVALID_INDEX)
             return pParam[dwIndex].dwCode;
     }
@@ -791,19 +798,19 @@ dword CTechnique::GetCode(char *pStr, SRSPARAM *pParam, dword dwNumParam, dword 
     }
     else
     {
-        api->Trace("ERROR: unknown parameter type <%s> in <%s> file, technique <%s>", pStr, sCurrentFileName,
+        core.Trace("ERROR: unknown parameter type <%s> in <%s> file, technique <%s>", pStr, sCurrentFileName,
                    sCurrentBlockName);
         return 0;
     }
 }
 
-dword CTechnique::AddShader(char *pShaderName)
+uint32_t CTechnique::AddShader(char *pShaderName)
 {
     // find exist shader or create empty new
-    for (dword i = 0; i < dwNumShaders; i++)
+    for (uint32_t i = 0; i < dwNumShaders; i++)
         if (stricmp(pShaders[i].pName, pShaderName) == 0)
             return i;
-    pShaders = (shader_t *)RESIZE(pShaders, sizeof(shader_t) * (dwNumShaders + 1));
+    pShaders = (shader_t *)realloc(pShaders, sizeof(shader_t) * (dwNumShaders + 1));
     shader_t *pS = &pShaders[dwNumShaders];
     ZERO(pShaders[dwNumShaders]);
     COPY_STRING(pS->pName, pShaderName);
@@ -813,17 +820,17 @@ dword CTechnique::AddShader(char *pShaderName)
     return (dwNumShaders - 1);
 }
 
-dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
+uint32_t CTechnique::ProcessPass(char *pFile, uint32_t dwSize, char **pStr)
 {
     block_t *pB = &pBlocks[dwNumBlocks];
     technique_t *pTechniques = &pB->pTechniques[pB->dwNumTechniques];
 
-    pTechniques->pPasses = (pass_t *)RESIZE(pTechniques->pPasses, sizeof(pass_t) * (pTechniques->dwNumPasses + 1));
+    pTechniques->pPasses = (pass_t *)realloc(pTechniques->pPasses, sizeof(pass_t) * (pTechniques->dwNumPasses + 1));
     PZERO(&pTechniques->pPasses[pTechniques->dwNumPasses], sizeof pass_t);
 
-    DWORD *pPass = pPassStorage;
-    DWORD *pPassBegin = pPass;
-    dword dwTextureIndex, dwAdditionalFlags = 0;
+    uint32_t *pPass = pPassStorage;
+    uint32_t *pPassBegin = pPass;
+    uint32_t dwTextureIndex, dwAdditionalFlags = 0;
     char *pTemp, temp[256];
     while (0 != (*pStr = GetString(pFile, dwSize, *pStr)))
     {
@@ -839,7 +846,7 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
 
         // check right side of expression for [in] parameters
         bool bIn = false;
-        dword dwInParamIndex = 0;
+        uint32_t dwInParamIndex = 0;
         if (pTemp = SkipToken(*pStr, INPARAM_CHECK)) // STSS or SetTexture
         {
             GetTokenWhile(pTemp, &temp[0], ">");
@@ -860,14 +867,14 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
         if (pTemp = SkipToken(*pStr, RESTORE_STATES_CHECK))
         {
             *pPass++ = CODE_RESTORE;
-            *pPass++ = GetCode(pTemp, RESTORE_TYPES, sizeof(RESTORE_TYPES) / sizeof(SRSPARAM), false);
+            *pPass++ = GetCode(pTemp, RESTORE_TYPES, sizeof(RESTORE_TYPES) / sizeof(SRSPARAM), 0, false);
             // clear STSS and SRS bUse
             ClearSRS_STSS_bUse();
             SKIP3;
         }
         if (isPixelShaderConst(*pStr))
         {
-            dword dwIndex = 0;
+            uint32_t dwIndex = 0;
             *pPass++ = CODE_SPSCONST | dwAdditionalFlags;
             GetTokenWhile(SkipToken(*pStr, "["), &temp[0], "]");
             sscanf(temp, "%d", &dwIndex);
@@ -886,14 +893,14 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
 
         if (isVertexShaderConst(*pStr))
         {
-            dword dwIndex = 0;
+            uint32_t dwIndex = 0;
             *pPass++ = CODE_SVSCONST | dwAdditionalFlags;
             GetTokenWhile(SkipToken(*pStr, "["), &temp[0], "]");
             sscanf(temp, "%d", &dwIndex);
             *pPass++ = dwIndex;
             GetTokenWhile(SkipToken(*pStr, "="), temp, ";");
             *pPass++ = GetCode(temp, &MYSETVERTEXSHADERCONSTANT[0],
-                               sizeof(MYSETVERTEXSHADERCONSTANT) / sizeof(SRSPARAM), null, false);
+                               sizeof(MYSETVERTEXSHADERCONSTANT) / sizeof(SRSPARAM), 0, false);
             SKIP3;
         }
 
@@ -904,19 +911,19 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
             sscanf(temp, "%d", &dwTextureIndex);
 
             // SetSamplerState
-            dword *pPassCode = pPass;
+            uint32_t *pPassCode = pPass;
             *pPass++ = CODE_SSS | dwAdditionalFlags;
             *pPass++ = dwTextureIndex;
 
             // get left side of expression
             GetTokenWhile(*pStr, temp, ".sampler[");
-            dword dwSSSSIndex = GetSSSSIndex(temp);
+            uint32_t dwSSSSIndex = GetSSSSIndex(temp);
 
             Assert(dwSSSSIndex != INVALID_SSS_INDEX);
 
             if (SamplerStates[dwSSSSIndex].bUse && SamplerStates[dwSSSSIndex].dwUseSubCode & (1 << dwTextureIndex) &&
                 dwAdditionalFlags & FLAGS_CODE_RESTORE)
-                api->Trace("WARN: SSSS: dup restore param type <%s[%d]> in <%s> file, technique <%s>", temp,
+                core.Trace("WARN: SSSS: dup restore param type <%s[%d]> in <%s> file, technique <%s>", temp,
                            dwTextureIndex, sCurrentFileName, sCurrentBlockName);
 
             if (dwAdditionalFlags & FLAGS_CODE_RESTORE)
@@ -957,18 +964,18 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
                 SKIP3;
             }
             // SetTextureStageState
-            dword *pPassCode = pPass;
+            uint32_t *pPassCode = pPass;
             *pPass++ = CODE_STSS | dwAdditionalFlags;
             *pPass++ = dwTextureIndex;
 
             // get left side of expression
             GetTokenWhile(*pStr, temp, "[");
-            dword dwSTSSIndex = GetSTSSIndex(temp);
+            uint32_t dwSTSSIndex = GetSTSSIndex(temp);
             Assert(dwSTSSIndex != INVALID_STSS_INDEX);
             if (TexturesStageStates[dwSTSSIndex].bUse &&
                 TexturesStageStates[dwSTSSIndex].dwUseSubCode & (1 << dwTextureIndex) &&
                 dwAdditionalFlags & FLAGS_CODE_RESTORE)
-                api->Trace("WARN: STSS: dup restore param type <%s[%d]> in <%s> file, technique <%s>", temp,
+                core.Trace("WARN: STSS: dup restore param type <%s[%d]> in <%s> file, technique <%s>", temp,
                            dwTextureIndex, sCurrentFileName, sCurrentBlockName);
             if (dwAdditionalFlags & FLAGS_CODE_RESTORE)
             {
@@ -1019,12 +1026,12 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
         {
             //
             GetTokenWhile(SkipToken(*pStr, "."), temp, "=");
-            dword dwCode = GetCode(temp, TRANSFORM_TYPES, sizeof(TRANSFORM_TYPES) / sizeof(SRSPARAM), false);
+            uint32_t dwCode = GetCode(temp, TRANSFORM_TYPES, sizeof(TRANSFORM_TYPES) / sizeof(SRSPARAM), 0, false);
             if (dwCode == 0xFFFFFFFF) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
                 // maybe world0-world256
                 if (0 == (pTemp = SkipToken(*pStr, WORLD_TRANSFORM_CHECK)))
-                    SE_THROW("transform. error!");
+                    throw std::exception("transform. error!");
                 sscanf(pTemp, "%d", &dwCode);
                 dwCode = (DWORD)D3DTS_WORLDMATRIX(dwCode);
             }
@@ -1039,14 +1046,14 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
         {
             // get left side of expression
             GetTokenWhile(*pStr, temp, "=");
-            dword dwSRSIndex = GetSRSIndex(temp);
+            uint32_t dwSRSIndex = GetSRSIndex(temp);
             Assert(dwSRSIndex != INVALID_SRS_INDEX);
             if (RenderStates[dwSRSIndex].bUse && dwAdditionalFlags & FLAGS_CODE_RESTORE)
-                api->Trace("WARN: SRS: dup restore param type <%s> in <%s> file, technique <%s>", temp,
+                core.Trace("WARN: SRS: dup restore param type <%s> in <%s> file, technique <%s>", temp,
                            sCurrentFileName, sCurrentBlockName);
             if (dwAdditionalFlags & FLAGS_CODE_RESTORE)
                 RenderStates[dwSRSIndex].bUse = true;
-            dword *pPassCode = pPass;
+            uint32_t *pPassCode = pPass;
             *pPass++ = CODE_SRS | dwAdditionalFlags;
             *pPass++ = (DWORD)RenderStates[dwSRSIndex].State;
 
@@ -1066,9 +1073,9 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
         SKIP3;
     }
 
-    dword dwSizePass = pPass - pPassBegin;
-    pPassBegin = NEW dword[dwSizePass]; //(dword*)RESIZE(pPassBegin,dwSizePass*sizeof(dword));
-    memcpy(pPassBegin, pPassStorage, dwSizePass * sizeof(dword));
+    uint32_t dwSizePass = pPass - pPassBegin;
+    pPassBegin = new uint32_t[dwSizePass]; //(uint32_t*)realloc(pPassBegin,dwSizePass*sizeof(uint32_t));
+    memcpy(pPassBegin, pPassStorage, dwSizePass * sizeof(uint32_t));
     pTechniques->pPasses[pTechniques->dwNumPasses].dwSize = dwSizePass;
     pTechniques->pPasses[pTechniques->dwNumPasses].isValidate = true;
     pTechniques->pPasses[pTechniques->dwNumPasses].pPass = pPassBegin;
@@ -1077,10 +1084,10 @@ dword CTechnique::ProcessPass(char *pFile, dword dwSize, char **pStr)
     return PASS_OK;
 }
 
-dword CTechnique::ProcessTechnique(char *pFile, dword dwSize, char **pStr)
+uint32_t CTechnique::ProcessTechnique(char *pFile, uint32_t dwSize, char **pStr)
 {
     block_t *pB = &pBlocks[dwNumBlocks];
-    pB->pTechniques = (technique_t *)RESIZE(pB->pTechniques, sizeof(technique_t) * (pB->dwNumTechniques + 1));
+    pB->pTechniques = (technique_t *)realloc(pB->pTechniques, sizeof(technique_t) * (pB->dwNumTechniques + 1));
     PZERO(&pB->pTechniques[pB->dwNumTechniques], sizeof technique_t);
     // clear STSS and SRS bUse
     ClearSRS_STSS_bUse();
@@ -1115,7 +1122,7 @@ dword CTechnique::ProcessTechnique(char *pFile, dword dwSize, char **pStr)
 D3DVERTEXELEMENT9 *AddDeclElementVShader(shader_t *pS)
 {
     pS->dwDeclSize++;
-    pS->decl = (D3DVERTEXELEMENT9 *)RESIZE(pS->decl, sizeof(D3DVERTEXELEMENT9) * pS->dwDeclSize);
+    pS->decl = (D3DVERTEXELEMENT9 *)realloc(pS->decl, sizeof(D3DVERTEXELEMENT9) * pS->dwDeclSize);
     pS->decl[pS->dwDeclSize - 1].Stream = 0;
     pS->decl[pS->dwDeclSize - 1].Offset = 0;
     pS->decl[pS->dwDeclSize - 1].Type = D3DDECLTYPE_UNUSED;
@@ -1125,16 +1132,16 @@ D3DVERTEXELEMENT9 *AddDeclElementVShader(shader_t *pS)
     return &pS->decl[pS->dwDeclSize - 1];
 }
 
-dword *AddDeclElement(shader_t *pS)
+uint32_t *AddDeclElement(shader_t *pS)
 {
     pS->dwDeclSize++;
-    pS->pDecl = (dword *)RESIZE(pS->pDecl, sizeof(dword) * pS->dwDeclSize);
+    pS->pDecl = (uint32_t *)realloc(pS->pDecl, sizeof(uint32_t) * pS->dwDeclSize);
     return &pS->pDecl[pS->dwDeclSize - 1];
 }
 
-dword CTechnique::ProcessVertexDeclaration(shader_t *pS, char *pFile, dword dwSize, char **pStr)
+uint32_t CTechnique::ProcessVertexDeclaration(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr)
 {
-    dword dwTemp, dwTemp1, dwStream = 0, dwOffset = 0, dwIndex = 0;
+    uint32_t dwTemp, dwTemp1, dwStream = 0, dwOffset = 0, dwIndex = 0;
     byte bIndex = 0;
     HRESULT hr;
 
@@ -1252,7 +1259,7 @@ char *CTechnique::GetToken(char *pToken, char *pResult, bool &bToken)
         pToken++;
     pResult[pToken - pStart] = 0;
     if (pToken - pStart == 0 && *pToken == 0)
-        return null;
+        return nullptr;
     if (pToken - pStart == 0 && sDelimTable[*pToken])
     {
         bToken = true;
@@ -1264,19 +1271,19 @@ char *CTechnique::GetToken(char *pToken, char *pResult, bool &bToken)
     return pToken;
 }
 
-char *CTechnique::Preprocessor(char *pBuffer, dword &dwSize)
+char *CTechnique::Preprocessor(char *pBuffer, uint32_t &dwSize)
 {
     bool bToken;
     char sValue[256], sName[256], sToken[1024];
     char *pStr = pBuffer;
-    dword dwBufSize = strlen(pBuffer);
-    dword i, dwNumDefines = 0;
-    char *pProgram = null;
-    dword dwProgramSize = 0;
-    define_t *pDefines = null;
-    dword dwMaxDefineElements = 0;
-    dword dwMaxProgramElements = 0;
-    dword dwNewSize;
+    uint32_t dwBufSize = strlen(pBuffer);
+    uint32_t i, dwNumDefines = 0;
+    char *pProgram = nullptr;
+    uint32_t dwProgramSize = 0;
+    define_t *pDefines = nullptr;
+    uint32_t dwMaxDefineElements = 0;
+    uint32_t dwMaxProgramElements = 0;
+    uint32_t dwNewSize;
 
     // change all 0xd 0xa to 0x0
     for (i = 0; i < dwSize; i++)
@@ -1298,7 +1305,7 @@ char *CTechnique::Preprocessor(char *pBuffer, dword &dwSize)
             if (dwMaxDefineElements != dwNewSize)
             {
                 dwMaxDefineElements = dwNewSize;
-                pDefines = (define_t *)RESIZE(pDefines, sizeof(define_t) * dwMaxDefineElements);
+                pDefines = (define_t *)realloc(pDefines, sizeof(define_t) * dwMaxDefineElements);
             }
             COPY_STRING(pDefines[dwNumDefines].pName, sName);
             COPY_STRING(pDefines[dwNumDefines].pValue, sValue);
@@ -1312,7 +1319,7 @@ char *CTechnique::Preprocessor(char *pBuffer, dword &dwSize)
         char *pToken = pStr;
         while (0 != (pToken = GetToken(pToken, sToken, bToken)))
         {
-            dword dwTempLen = strlen(sToken);
+            uint32_t dwTempLen = strlen(sToken);
             if (!bToken)
             {
                 // find define
@@ -1330,7 +1337,7 @@ char *CTechnique::Preprocessor(char *pBuffer, dword &dwSize)
             if (dwNewSize > dwMaxProgramElements)
             {
                 dwMaxProgramElements = dwNewSize;
-                pProgram = (char *)RESIZE(pProgram, dwMaxProgramElements);
+                pProgram = (char *)realloc(pProgram, dwMaxProgramElements);
             }
             strcpy(&pProgram[dwProgramSize], sToken);
             dwProgramSize += dwTempLen;
@@ -1346,26 +1353,26 @@ char *CTechnique::Preprocessor(char *pBuffer, dword &dwSize)
         pStr++;
         continue;
     }
-    SE_DELETE(pBuffer);
+    STORM_DELETE(pBuffer);
     if (pProgram)
         pProgram[dwProgramSize] = 0x0;
     dwSize = dwProgramSize;
-    //	api->Trace(pProgram);
+    //	core.Trace(pProgram);
     for (i = 0; i < dwNumDefines; i++)
     {
-        SE_DELETE(pDefines[i].pName);
-        SE_DELETE(pDefines[i].pValue);
+        STORM_DELETE(pDefines[i].pName);
+        STORM_DELETE(pDefines[i].pValue);
     }
-    SE_DELETE(pDefines);
+    STORM_DELETE(pDefines);
 
     return pProgram;
 }
 
-dword CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, dword dwSize, char **pStr, dword dwShaderType)
+uint32_t CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType)
 {
-    dword dwFileSize;
-    dword dwTotalLen = 0;
-    char *pBuffer = null;
+    uint32_t dwFileSize;
+    uint32_t dwTotalLen = 0;
+    char *pBuffer = nullptr;
     char *pErrStr;
 
     while (0 != (*pStr = GetString(pFile, dwSize, *pStr)))
@@ -1377,7 +1384,7 @@ dword CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, dword dwSize, char
             break; // end of declaration
 
         char *pTemp = *pStr;
-        char *pTempBuffer = null;
+        char *pTempBuffer = nullptr;
 
         if (isInclude(*pStr))
         {
@@ -1386,7 +1393,7 @@ dword CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, dword dwSize, char
             sprintf(sIncFileName, "%s\\%s", sCurrentDir, sName);
             if (!fio->LoadFile(sIncFileName, &pTempBuffer, &dwFileSize))
             {
-                api->Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, sIncFileName);
+                core.Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, sIncFileName);
                 TOTAL_SKIP;
             }
             pTempBuffer[dwFileSize - 1] = 0x0;
@@ -1394,14 +1401,14 @@ dword CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, dword dwSize, char
         }
 
         long iLen = strlen(pTemp) - 1;
-        pBuffer = (char *)RESIZE(pBuffer, dwTotalLen + iLen + 4);
+        pBuffer = (char *)realloc(pBuffer, dwTotalLen + iLen + 4);
         strcpy(&pBuffer[dwTotalLen], pTemp);
         strcpy(&pBuffer[dwTotalLen + iLen + 1], "\r\n\0");
         dwTotalLen += iLen + 2;
-        SE_DELETE(pTempBuffer);
+        STORM_DELETE(pTempBuffer);
         TOTAL_SKIP;
     }
-    ID3DXBuffer *CompiledShader = null, *ErrorShader = null;
+    ID3DXBuffer *CompiledShader = nullptr, *ErrorShader = nullptr;
 
     HRESULT hr;
     pBuffer = Preprocessor(pBuffer, dwTotalLen);
@@ -1410,42 +1417,42 @@ dword CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, dword dwSize, char
 
     if (D3D_OK != hr && ErrorShader)
     {
-        char *pErrStr = NEW char[ErrorShader->GetBufferSize() + 1];
+        char *pErrStr = new char[ErrorShader->GetBufferSize() + 1];
         strncpy(pErrStr, (char *)ErrorShader->GetBufferPointer(), ErrorShader->GetBufferSize());
         pErrStr[ErrorShader->GetBufferSize()] = 0;
-        api->Trace("ERROR: in compile shader %s\nerror:\n%s", pS->pName, pErrStr);
+        core.Trace("ERROR: in compile shader %s\nerror:\n%s", pS->pName, pErrStr);
         RELEASE(CompiledShader);
         RELEASE(ErrorShader);
-        SE_DELETE(pBuffer);
-        SE_DELETE(pErrStr);
+        STORM_DELETE(pBuffer);
+        STORM_DELETE(pErrStr);
         return 0;
     }
 
     if (ErrorShader)
     {
-        char *pInfoStr = NEW char[ErrorShader->GetBufferSize() + 1];
+        char *pInfoStr = new char[ErrorShader->GetBufferSize() + 1];
         strncpy(pInfoStr, (char *)ErrorShader->GetBufferPointer(), ErrorShader->GetBufferSize());
         pInfoStr[ErrorShader->GetBufferSize()] = 0;
-        //		api->Trace("DebugInfo: in compile shader %s\ninfo:\n%s", pS->pName, pInfoStr);
-        SE_DELETE(pInfoStr);
+        //		core.Trace("DebugInfo: in compile shader %s\ninfo:\n%s", pS->pName, pInfoStr);
+        STORM_DELETE(pInfoStr);
     }
 
     if (dwShaderType == CODE_SVS)
     {
-        hr = pRS->CreateVertexShader((const dword *)CompiledShader->GetBufferPointer(), &(pS->vShader));
+        hr = pRS->CreateVertexShader((const uint32_t *)CompiledShader->GetBufferPointer(), &(pS->vShader));
     }
     else
     {
-        hr = pRS->CreatePixelShader((const dword *)CompiledShader->GetBufferPointer(), &(pS->pShader));
+        hr = pRS->CreatePixelShader((const uint32_t *)CompiledShader->GetBufferPointer(), &(pS->pShader));
     }
 
     RELEASE(CompiledShader);
     RELEASE(ErrorShader);
-    SE_DELETE(pBuffer);
+    STORM_DELETE(pBuffer);
     return 0;
 }
 
-dword CTechnique::ProcessVertexShader(char *pFile, dword dwSize, char **pStr)
+uint32_t CTechnique::ProcessVertexShader(char *pFile, uint32_t dwSize, char **pStr)
 {
     char temp[1024];
 
@@ -1472,7 +1479,7 @@ dword CTechnique::ProcessVertexShader(char *pFile, dword dwSize, char **pStr)
     return SHADER_OK;
 }
 
-dword CTechnique::ProcessPixelShader(char *pFile, dword dwSize, char **pStr)
+uint32_t CTechnique::ProcessPixelShader(char *pFile, uint32_t dwSize, char **pStr)
 {
     char temp[1024];
 
@@ -1497,13 +1504,13 @@ dword CTechnique::ProcessPixelShader(char *pFile, dword dwSize, char **pStr)
     return SHADER_OK;
 }
 
-dword CTechnique::ProcessBlock(char *pFile, dword dwSize, char **pStr)
+uint32_t CTechnique::ProcessBlock(char *pFile, uint32_t dwSize, char **pStr)
 {
-    dword i;
+    uint32_t i;
     char temp[1024], pTempParamStr[1024];
 
-    // resize
-    pBlocks = (block_t *)RESIZE(pBlocks, sizeof(block_t) * (dwNumBlocks + 1));
+    // realloc
+    pBlocks = (block_t *)realloc(pBlocks, sizeof(block_t) * (dwNumBlocks + 1));
 
     block_t *pB = &pBlocks[dwNumBlocks];
     PZERO(pB, sizeof block_t);
@@ -1517,14 +1524,17 @@ dword CTechnique::ProcessBlock(char *pFile, dword dwSize, char **pStr)
     pB->dwHashBlockName = hash_string(temp);
     COPY_STRING(pB->pBlockName, temp);
     for (i = 0; i < dwNumBlocks; i++)
+    {
         if (pBlocks[i].dwHashBlockName == pB->dwHashBlockName &&
             (stricmp(pBlocks[i].pBlockName, pBlocks[i].pBlockName) == 0))
         {
-            api->Trace("ERROR: Techniques: Find duplicate technique name: %s", pB->pBlockName);
+            core.Trace("ERROR: Techniques: Find duplicate technique name: %s", pB->pBlockName);
             break;
         }
+    }
 
-    htBlocks.Add(pB->pBlockName, dwNumBlocks);
+    //htBlocks.Add(pB->pBlockName, dwNumBlocks);
+    htBlocks[pB->pBlockName] = dwNumBlocks;
     // get parameters
     pTempParamStr[0] = 0;
     GetTokenWhile(SkipToken(*pStr, "("), &pTempParamStr[0], ")");
@@ -1535,13 +1545,13 @@ dword CTechnique::ProcessBlock(char *pFile, dword dwSize, char **pStr)
         pParamStr = GetTokenWhile(pParamStr, &temp[0], " ");
         if (!pParamStr[0])
             break;
-        pParams = (SRSPARAM *)RESIZE(pParams, sizeof(SRSPARAM) * (dwNumParams + 1));
-        pB->pParams = (dword *)RESIZE(pB->pParams, sizeof(dword) * (dwNumParams + 1));
+        pParams = (SRSPARAM *)realloc(pParams, sizeof(SRSPARAM) * (dwNumParams + 1));
+        pB->pParams = (uint32_t *)realloc(pB->pParams, sizeof(uint32_t) * (dwNumParams + 1));
         pParams[dwNumParams].dwCode = GetCode(&temp[0], PARAM_TYPES, sizeof(PARAM_TYPES) / sizeof(SRSPARAM));
         pB->pParams[dwNumParams] = pParams[dwNumParams].dwCode;
         // get parameter name
         pParamStr = GetTokenWhile(pParamStr, &temp[0], ",");
-        pParams[dwNumParams].cName = NEW char[strlen(temp) + 1];
+        pParams[dwNumParams].cName = new char[strlen(temp) + 1];
         strcpy(pParams[dwNumParams].cName, temp);
         dwNumParams++;
         pB->dwNumParams++;
@@ -1566,9 +1576,9 @@ dword CTechnique::ProcessBlock(char *pFile, dword dwSize, char **pStr)
 
     // delete parameters
     for (i = 0; i < dwNumParams; i++)
-        SE_DELETE(pParams[i].cName);
+        STORM_DELETE(pParams[i].cName);
     dwNumParams = 0;
-    SE_DELETE(pParams);
+    STORM_DELETE(pParams);
 
     sCurrentBlockName[0] = 0;
 
@@ -1577,7 +1587,7 @@ dword CTechnique::ProcessBlock(char *pFile, dword dwSize, char **pStr)
 
 void CTechnique::ClearSRS_STSS_bUse()
 {
-    dword i, dwNumParam;
+    uint32_t i, dwNumParam;
 
     dwNumParam = sizeof(RenderStates) / sizeof(SRS);
     for (i = 0; i < dwNumParam; i++)
@@ -1600,21 +1610,21 @@ void CTechnique::ClearSRS_STSS_bUse()
 
 void CTechnique::DecodeFiles(char *sub_dir)
 {
-    dword dwRDTSC;
+    uint32_t dwRDTSC;
     RDTSC_B(dwRDTSC);
-    pPassStorage = NEW dword[16384];
+    pPassStorage = new uint32_t[16384];
 
     InnerDecodeFiles(sub_dir);
 
-    SE_DELETE(pPassStorage);
+    STORM_DELETE(pPassStorage);
     RDTSC_E(dwRDTSC);
-    api->Trace("Techniques: %d shaders compiled.", dwNumShaders);
-    api->Trace("Techniques: %d techniques compiled.", dwNumBlocks);
-    api->Trace("Techniques: compiled by %d ticks.", dwRDTSC);
+    core.Trace("Techniques: %d shaders compiled.", dwNumShaders);
+    core.Trace("Techniques: %d techniques compiled.", dwNumBlocks);
+    core.Trace("Techniques: compiled by %d ticks.", dwRDTSC);
 
     // some optimize
-    for (dword i = 0; i < dwNumBlocks; i++)
-        SE_DELETE(pBlocks[i].pBlockName);
+    for (uint32_t i = 0; i < dwNumBlocks; i++)
+        STORM_DELETE(pBlocks[i].pBlockName);
 }
 
 void CTechnique::InnerDecodeFiles(char *sub_dir)
@@ -1659,14 +1669,14 @@ bool CTechnique::DecodeFile(char *sname)
     sprintf(fname, "%s%s", SHA_DIR, sname);
     strcpy(sCurrentFileName, sname);
     HANDLE hFile = fio->_CreateFile(fname, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
-    dword dwSize = fio->_GetFileSize(hFile, 0);
+    uint32_t dwSize = fio->_GetFileSize(hFile, 0);
     Assert(dwSize != 0);
-    char *pFile = NEW char[dwSize];
+    char *pFile = new char[dwSize];
     fio->_ReadFile(hFile, pFile, dwSize, 0);
     fio->_CloseHandle(hFile);
 
     // change 0xd and 0xa to 0x0
-    for (dword i = 0; i < dwSize; i++)
+    for (uint32_t i = 0; i < dwSize; i++)
     {
         if (pFile[i] == 0xD || pFile[i] == 0xA)
             pFile[i] = 0x0;
@@ -1687,19 +1697,19 @@ bool CTechnique::DecodeFile(char *sname)
         ClearComment(pStr);
         if (isPixelShader(pStr))
         {
-            dword dwRes = ProcessPixelShader(pFile, dwSize, &pStr);
+            uint32_t dwRes = ProcessPixelShader(pFile, dwSize, &pStr);
             if (dwRes == SHADER_ERROR)
                 return false;
         }
         if (isVertexShader(pStr))
         {
-            dword dwRes = ProcessVertexShader(pFile, dwSize, &pStr);
+            uint32_t dwRes = ProcessVertexShader(pFile, dwSize, &pStr);
             if (dwRes == SHADER_ERROR)
                 return false;
         }
         if (isBlock(pStr))
         {
-            dword dwRes = ProcessBlock(pFile, dwSize, &pStr);
+            uint32_t dwRes = ProcessBlock(pFile, dwSize, &pStr);
             if (dwRes == BLOCK_ERROR)
                 return false;
             dwNumBlocks++;
@@ -1707,7 +1717,7 @@ bool CTechnique::DecodeFile(char *sname)
         SKIP;
     }
 
-    SE_DELETE(pFile);
+    STORM_DELETE(pFile);
     return true;
 }
 
@@ -1715,9 +1725,10 @@ bool CTechnique::DecodeFile(char *sname)
 bool CTechnique::ExecutePassStart()
 {
     // search block
-    if (!htBlocks.Find(dwHashCode, sCurrentBlockName, dwCurBlock))
+    //if (!htBlocks.Find(dwHashCode, sCurrentBlockName, dwCurBlock))
+    if (htBlocks.count(sCurrentBlockName) == 0)
         return false;
-    // for (dword i=0;i<dwNumBlocks;i++) if (pBlocks[i].dwHashBlockName == dwHashCode &&
+    // for (uint32_t i=0;i<dwNumBlocks;i++) if (pBlocks[i].dwHashBlockName == dwHashCode &&
     // (stricmp(pBlocks[i].pBlockName,sCurrentBlockName)==0)) break; if (i==dwNumBlocks) return false;	// don't find
     // concur block Assert(i == dwFind); dwCurBlock = i;
 
@@ -1758,12 +1769,12 @@ bool CTechnique::ExecutePassClose()
     return true;
 }
 
-dword CTechnique::GetPassParameter(dword dwParam, dword dwFlags)
+uint32_t CTechnique::GetPassParameter(uint32_t dwParam, uint32_t dwFlags)
 {
     if (dwFlags & FLAGS_CODE_IN_PARAM)
     {
         if (dwParam >= dwCurNumParams)
-            SE_THROW("Technique: Exceeded parameter numbers!");
+            throw std::exception("Technique: Exceeded parameter numbers!");
         return pCurParams[dwParam];
     }
 
@@ -1772,8 +1783,8 @@ dword CTechnique::GetPassParameter(dword dwParam, dword dwFlags)
 
 bool CTechnique::ExecutePass(bool bStart)
 {
-    dword dwStage, dwValue, dwSaveValue;
-    dword dwCode, dwSubCode, dwRenderSubCode, dwRestoreSubCode;
+    uint32_t dwStage, dwValue, dwSaveValue;
+    uint32_t dwCode, dwSubCode, dwRenderSubCode, dwRestoreSubCode;
     bool bSave;
     HRESULT hr;
 
@@ -1793,10 +1804,10 @@ bool CTechnique::ExecutePass(bool bStart)
         dwCurPassSize = pCurPass->dwSize;
     }
     // begin or continue execute current pass
-    dword *pPassStart = &pCurPass->pPass[0];
-    dword *pPass = &pCurPass->pPass[dwCurPassPos];
+    uint32_t *pPassStart = &pCurPass->pPass[0];
+    uint32_t *pPass = &pCurPass->pPass[dwCurPassPos];
 
-    while (dword(pPass - pPassStart) < dwCurPassSize)
+    while (uint32_t(pPass - pPassStart) < dwCurPassSize)
     {
         dwCode = (*pPass++);
         dwSubCode = dwCode & 0xFFFF0000;
@@ -1859,7 +1870,7 @@ bool CTechnique::ExecutePass(bool bStart)
         break;
         case CODE_TEXTURE: // SetTexture(
         {
-            dword dwTextureIndex = *pPass++;
+            uint32_t dwTextureIndex = *pPass++;
             long iTextureIndex = (long)*pPass++;
             if (iTextureIndex >= 0)
                 iTextureIndex = (long)GetPassParameter(*pPass++, dwSubCode);
@@ -1869,7 +1880,8 @@ bool CTechnique::ExecutePass(bool bStart)
         case CODE_TRANSFORM: // SetTransform(
         {
             D3DTRANSFORMSTATETYPE TransformType = (D3DTRANSFORMSTATETYPE)*pPass++;
-            pRS->SetTransform(TransformType, (D3DMATRIX *)GetPassParameter(*pPass++, dwSubCode));
+            throw std::exception("conversion from uint32_t to D3DMATRIX*");
+            //pRS->SetTransform(TransformType, (D3DMATRIX *)GetPassParameter(*pPass++, dwSubCode));
         }
         break;
         case CODE_RENDER: // Render functions
@@ -1886,10 +1898,10 @@ bool CTechnique::ExecutePass(bool bStart)
         break;
 
         case CODE_SVS: {
-            dword dwShaderIndex = *pPass++;
+            uint32_t dwShaderIndex = *pPass++;
             if (bSave)
             {
-                api->Trace("ExecutePass::GetVertexShader  bSave");
+                core.Trace("ExecutePass::GetVertexShader  bSave");
                 dwSaveValue = 1;
                 //						pRS->GetVertexShader(&dwSaveValue);
                 AddState2Restore2(dwCode, dwSaveValue);
@@ -1905,13 +1917,14 @@ bool CTechnique::ExecutePass(bool bStart)
         break;
 
         case CODE_SPSCONST: {
-            dword dwShaderConstIndex = *pPass++;
-            pRS->SetPixelShaderConstant(dwShaderConstIndex, (const void *)GetPassParameter(*pPass++, dwSubCode), 1);
+            uint32_t dwShaderConstIndex = *pPass++;
+            throw std::exception("conversion from uint32_t to const float *");
+            //pRS->SetPixelShaderConstantF(dwShaderConstIndex, (const float *)GetPassParameter(*pPass++, dwSubCode), 1);
         }
         break;
         case CODE_SVSCONST: {
-            dword dwShaderConstIndex = *pPass++;
-            dword dwCode = *pPass++;
+            uint32_t dwShaderConstIndex = *pPass++;
+            uint32_t dwCode = *pPass++;
             switch (dwCode)
             {
             case SUBCODE_SVSCONST_WORLDVIEWPROJ: {
@@ -1929,7 +1942,7 @@ bool CTechnique::ExecutePass(bool bStart)
 
                 // Projection to clip space
                 D3DXMatrixTranspose(&matWorldViewProj, &matWorldViewProj);
-                pRS->SetVertexShaderConstant(dwShaderConstIndex, &matWorldViewProj(0, 0), 4);
+                pRS->SetVertexShaderConstantF(dwShaderConstIndex, &matWorldViewProj(0, 0), 4);
             }
             break;
             }
@@ -1937,10 +1950,10 @@ bool CTechnique::ExecutePass(bool bStart)
         break;
 
         case CODE_SPS: {
-            dword dwShaderIndex = *pPass++;
+            uint32_t dwShaderIndex = *pPass++;
             if (bSave)
             {
-                api->Trace("ExecutePass::GetPixelShader  bSave");
+                core.Trace("ExecutePass::GetPixelShader  bSave");
                 //						pRS->GetPixelShader(&dwSaveValue);
                 dwSaveValue = 1;
                 AddState2Restore2(dwCode, dwSaveValue);
@@ -1971,12 +1984,12 @@ bool CTechnique::ExecutePass(bool bStart)
     return false;
 }
 
-void inline CTechnique::AddState2Restore2(dword dwState, dword dw1)
+void inline CTechnique::AddState2Restore2(uint32_t dwState, uint32_t dw1)
 {
     // add new memory if need
     if ((dwCurSavedStatesPos + 2) >= dwCurMaxSavedSize / sizeof(pSavedStates[0]))
     {
-        pSavedStates = (dword *)RESIZE(pSavedStates, dwCurMaxSavedSize + SAVED_STATES_ADD * sizeof(pSavedStates[0]));
+        pSavedStates = (uint32_t *)realloc(pSavedStates, dwCurMaxSavedSize + SAVED_STATES_ADD * sizeof(pSavedStates[0]));
         dwCurMaxSavedSize += SAVED_STATES_ADD;
     }
 
@@ -1985,12 +1998,12 @@ void inline CTechnique::AddState2Restore2(dword dwState, dword dw1)
     pSavedStates[dwCurSavedStatesPos++] = dw1;
 }
 
-void inline CTechnique::AddState2Restore3(dword dwState, dword dw1, dword dw2)
+void inline CTechnique::AddState2Restore3(uint32_t dwState, uint32_t dw1, uint32_t dw2)
 {
     // add new memory if need
     if ((dwCurSavedStatesPos + 3) >= dwCurMaxSavedSize / sizeof(pSavedStates[0]))
     {
-        pSavedStates = (dword *)RESIZE(pSavedStates, dwCurMaxSavedSize + SAVED_STATES_ADD * sizeof(pSavedStates[0]));
+        pSavedStates = (uint32_t *)realloc(pSavedStates, dwCurMaxSavedSize + SAVED_STATES_ADD * sizeof(pSavedStates[0]));
         dwCurMaxSavedSize += SAVED_STATES_ADD;
     }
 
@@ -2000,12 +2013,12 @@ void inline CTechnique::AddState2Restore3(dword dwState, dword dw1, dword dw2)
     pSavedStates[dwCurSavedStatesPos++] = dw2;
 }
 
-void inline CTechnique::AddState2Restore(dword dwState)
+void inline CTechnique::AddState2Restore(uint32_t dwState)
 {
     // add new memory if need
     if (dwCurSavedStatesPos >= dwCurMaxSavedSize / sizeof(pSavedStates[0]))
     {
-        pSavedStates = (dword *)RESIZE(pSavedStates, dwCurMaxSavedSize + SAVED_STATES_ADD * sizeof(pSavedStates[0]));
+        pSavedStates = (uint32_t *)realloc(pSavedStates, dwCurMaxSavedSize + SAVED_STATES_ADD * sizeof(pSavedStates[0]));
         dwCurMaxSavedSize += SAVED_STATES_ADD;
     }
 
@@ -2021,11 +2034,11 @@ void CTechnique::ClearSavedStates()
 
 void CTechnique::RestoreSavedStates()
 {
-    dword dwCode, dwValue, dwStage;
+    uint32_t dwCode, dwValue, dwStage;
     // restore saved render states and texture stage states
 
     // for walking
-    dword dwTempSavedStatesPos = 0;
+    uint32_t dwTempSavedStatesPos = 0;
 
     while (dwTempSavedStatesPos < dwCurSavedStatesPos)
     {
@@ -2054,12 +2067,12 @@ void CTechnique::RestoreSavedStates()
         break;
 
         case CODE_SPS:
-            api->Trace("RestoreSavedStates::SetPixelShader");
+            core.Trace("RestoreSavedStates::SetPixelShader");
             dwValue = pSavedStates[dwTempSavedStatesPos++];
             //					pRS->SetPixelShader(dwValue);
             break;
         case CODE_SVS:
-            api->Trace("RestoreSavedStates::SetVertexShader");
+            core.Trace("RestoreSavedStates::SetVertexShader");
             dwValue = pSavedStates[dwTempSavedStatesPos++];
             //					pRS->SetVertexShader(dwValue);
             break;
@@ -2069,27 +2082,28 @@ void CTechnique::RestoreSavedStates()
     ClearSavedStates();
 }
 
-void CTechnique::SetCurrentBlock(const char *name, dword _dwNumParams, void *pParams)
+void CTechnique::SetCurrentBlock(const char *name, uint32_t _dwNumParams, void *pParams)
 {
     if (name && name[0])
     {
         strcpy(sCurrentBlockName, name);
         _strlwr(sCurrentBlockName);
-        dwHashCode = hash_string(sCurrentBlockName);
+        //dwHashCode = hash_string(sCurrentBlockName);
         dwCurNumParams = _dwNumParams;
 
         if (dwCurNumParams > dwCurParamsMax)
         {
             while (dwCurNumParams > dwCurParamsMax)
                 dwCurParamsMax += 10;
-            pCurParams = (dword *)RESIZE(pCurParams, sizeof(dword) * dwCurParamsMax);
+            pCurParams = (uint32_t *)realloc(pCurParams, sizeof(uint32_t) * dwCurParamsMax);
         }
 
-        for (dword i = 0; i < _dwNumParams; i++)
-            pCurParams[i] = ((dword *)pParams)[i];
+        for (uint32_t i = 0; i < _dwNumParams; i++)
+            pCurParams[i] = ((uint32_t *)pParams)[i];
     }
     else
     {
-        api->Trace("ERROR: SetCurrentBlock: unknown technique <%s> first character is <%s> ", name, name[0]);
+        core.Trace("ERROR: SetCurrentBlock: unknown technique <%s> first character is <%s> ", name, name[0]);
     }
 }
+#endif // FIX_LINUX Effects

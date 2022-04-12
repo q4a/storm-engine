@@ -1,54 +1,60 @@
-#ifndef TECHNIQUE_HPP
-#define TECHNIQUE_HPP
+#ifdef _WIN32 // FIX_LINUX Effects
+#pragma once
 
-#include "dx8render.h"
-#include "templates\htable.h"
-#include "templates\string.h"
+#include "dx9render.h"
+//#include "templates\htable.h"
+//#include "templates\string.h"
 #include "vmodule_api.h"
 #include <stdio.h>
 
 struct SRSPARAM
 {
     char *cName;
-    dword dwCode;
+    uint32_t dwCode;
+
+    SRSPARAM(const char *cName, uint32_t dwCode)
+    {
+        this->cName = strdup(cName);
+        this->dwCode = dwCode;
+    }
 };
 
 struct pass_t
 {
     bool isValidate; // check for validate this pass for current device
-    dword dwSize;    // size of full pass decode buffer
-    dword *pPass;    // pass decode buffer
+    uint32_t dwSize; // size of full pass decode buffer
+    uint32_t *pPass; // pass decode buffer
 };
 
 struct technique_t
 {
-    dword dwNumPasses; // number of passes
+    uint32_t dwNumPasses; // number of passes
     pass_t *pPasses;
 };
 
 struct block_t
 {
-    dword dwHashBlockName; // hash code for block name
+    uint32_t dwHashBlockName; // hash code for block name
     char *pBlockName;      // block name
 
     // parameters section
-    dword dwNumParams; // number of parameters
-    dword *pParams;    // parameters block
+    uint32_t dwNumParams; // number of parameters
+    uint32_t *pParams;    // parameters block
 
     // techniques section
-    dword dwNumTechniques; // number of techniques
+    uint32_t dwNumTechniques; // number of techniques
     technique_t *pTechniques;
 };
 
 struct shader_t // pixel/vertex shader structure
 {
     char *pName;      // shader name
-    dword dwHashName; // hash code for shader name
-    dword dwShaderType;
+    uint32_t dwHashName; // hash code for shader name
+    uint32_t dwShaderType;
 
-    dword *pDecl; // declarations for vertex shader
-    dword dwDeclSize;
-    dword dwShaderHandle; // shader handle
+    uint32_t *pDecl; // declarations for vertex shader
+    uint32_t dwDeclSize;
+    uint32_t dwShaderHandle; // shader handle
 
     D3DVERTEXELEMENT9 *decl;
     IDirect3DVertexDeclaration9 *vDecl;
@@ -59,50 +65,50 @@ struct shader_t // pixel/vertex shader structure
 struct define_t
 {
     char *pName;
-    dword dwNameLen;
+    uint32_t dwNameLen;
     char *pValue;
 };
 
 struct shader_find_t
 {
     char *pName;
-    dword *pDest;
+    uint32_t *pDest;
 };
 
 class CTechnique
 {
   protected:
-    VDX8RENDER *pRS;
+    VDX9RENDER *pRS;
     IDirect3DDevice9 *d3d9;
 
     // shaders
-    dword dwNumShaders;
+    uint32_t dwNumShaders;
     shader_t *pShaders;
 
     // blocks
-    dword dwNumBlocks;
+    uint32_t dwNumBlocks;
     block_t *pBlocks;
-    htable<dword> htBlocks;
+    std::unordered_map<std::string, uint32_t> htBlocks;
 
     // temporary used
-    dword dwNumParams;
+    uint32_t dwNumParams;
     SRSPARAM *pParams;
-    dword *pPassStorage;
+    uint32_t *pPassStorage;
 
     // executed technique section
 
-    dword *pCurParams;
-    dword dwCurParamsMax; //
+    uint32_t *pCurParams;
+    uint32_t dwCurParamsMax; //
 
-    dword dwHashCode;     // current block name
-    dword dwCurNumParams; // current parameters count
+    //uint32_t dwHashCode;  // current block name
+    uint32_t dwCurNumParams; // current parameters count
 
-    dword dwCurBlock;     // current(executed) block
-    dword dwCurNumPass;   // number of passes in current technique
-    dword dwCurTechnique; // current technique
-    dword dwCurPass;      // current pass of current technique
-    dword dwCurPassSize;  // current pass size
-    dword dwCurPassPos;   // current pass position
+    uint32_t dwCurBlock;  // current(executed) block
+    uint32_t dwCurNumPass; // number of passes in current technique
+    uint32_t dwCurTechnique; // current technique
+    uint32_t dwCurPass;      // current pass of current technique
+    uint32_t dwCurPassSize;  // current pass size
+    uint32_t dwCurPassPos;   // current pass position
 
     char sCurrentBlockName[256]; // current block name
     char sCurrentFileName[256];  // current block name
@@ -111,38 +117,39 @@ class CTechnique
 
     // saved states section
 
-    dword dwNumSavedStates;    //
-    dword dwCurSavedStatesPos; //
-    dword dwCurMaxSavedSize;   //
-    dword *pSavedStates;       // saved states
+    uint32_t dwNumSavedStates; //
+    uint32_t dwCurSavedStatesPos; //
+    uint32_t dwCurMaxSavedSize;   //
+    uint32_t *pSavedStates;       // saved states
 
-    dword ProcessTechnique(char *pFile, dword dwSize, char **pStr);
-    dword ProcessBlock(char *pFile, dword dwSize, char **pStr);
-    dword ProcessPass(char *pFile, dword dwSize, char **pStr);
+    uint32_t ProcessTechnique(char *pFile, uint32_t dwSize, char **pStr);
+    uint32_t ProcessBlock(char *pFile, uint32_t dwSize, char **pStr);
+    uint32_t ProcessPass(char *pFile, uint32_t dwSize, char **pStr);
 
-    dword ProcessVertexShader(char *pFile, dword dwSize, char **pStr);
-    dword ProcessVertexDeclaration(shader_t *pS, char *pFile, dword dwSize, char **pStr);
-    dword ProcessPixelShader(char *pFile, dword dwSize, char **pStr);
-    dword ProcessShaderAsm(shader_t *pS, char *pFile, dword dwSize, char **pStr, dword dwShaderType);
+    uint32_t ProcessVertexShader(char *pFile, uint32_t dwSize, char **pStr);
+    uint32_t ProcessVertexDeclaration(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr);
+    uint32_t ProcessPixelShader(char *pFile, uint32_t dwSize, char **pStr);
+    uint32_t ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType);
 
-    dword AddShader(char *pShaderName);
-    char *Preprocessor(char *pBuffer, dword &dwSize);
+    uint32_t AddShader(char *pShaderName);
+    char *Preprocessor(char *pBuffer, uint32_t &dwSize);
 
-    dword GetPassParameter(dword dwParam, dword dwFlags);
+    uint32_t GetPassParameter(uint32_t dwParam, uint32_t dwFlags);
 
     void RestoreSavedStates();
     void ClearSavedStates();
-    void AddState2Restore(dword dwState);
-    void AddState2Restore2(dword dwState, dword dw1);
-    void AddState2Restore3(dword dwState, dword dw1, dword dw2);
+    void AddState2Restore(uint32_t dwState);
+    void AddState2Restore2(uint32_t dwState, uint32_t dw1);
+    void AddState2Restore3(uint32_t dwState, uint32_t dw1, uint32_t dw2);
 
     bool ExecutePassClose();
 
-    dword GetCode(char *pStr, SRSPARAM *pParam, dword dwNumParam, dword *pPassCode = 0, bool bCanBeNumber = false);
-    dword GetSRSIndex(char *pStr);
-    dword GetSTSSIndex(char *pStr);
-    dword GetSSSSIndex(char *pStr);
-    dword GetIndex(char *pStr, SRSPARAM *pParam, dword dwNumParam, bool bCanBeNumber);
+    uint32_t GetCode(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, uint32_t *pPassCode = 0,
+                  bool bCanBeNumber = false);
+    uint32_t GetSRSIndex(char *pStr);
+    uint32_t GetSTSSIndex(char *pStr);
+    uint32_t GetSSSSIndex(char *pStr);
+    uint32_t GetIndex(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, bool bCanBeNumber);
 
     char *GetToken(char *pToken, char *pResult, bool &bToken);
     void InnerDecodeFiles(char *sub_dir = 0);
@@ -150,7 +157,7 @@ class CTechnique
     void ClearSRS_STSS_bUse();
 
   public:
-    void SetCurrentBlock(const char *name, dword _dwNumParams, void *pParams);
+    void SetCurrentBlock(const char *name, uint32_t _dwNumParams, void *pParams);
 
     bool DecodeFile(char *sname);
     void DecodeFiles(char *sub_dir = 0);
@@ -159,8 +166,8 @@ class CTechnique
     bool ExecutePassNext();
     bool ExecutePass(bool bStart);
 
-    CTechnique(VDX8RENDER *_pRS);
+    CTechnique(VDX9RENDER *_pRS);
     ~CTechnique();
 };
 
-#endif
+#endif // FIX_LINUX Effects
