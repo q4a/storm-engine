@@ -2013,11 +2013,7 @@ void DX9RENDER::DrawBuffer(long vbuff, long stride, long ibuff, long minv, size_
 
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
 
     if (bDraw)
@@ -2045,11 +2041,7 @@ void DX9RENDER::DrawIndexedPrimitiveNoVShader(D3DPRIMITIVETYPE dwPrimitiveType, 
 
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do
@@ -2066,11 +2058,7 @@ void DX9RENDER::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE dwPrimitiveType, uint32_
     bool bDraw = true;
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do
@@ -2091,11 +2079,7 @@ void DX9RENDER::DrawPrimitiveUP(D3DPRIMITIVETYPE dwPrimitiveType, uint32_t dwVer
 
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do
@@ -2118,11 +2102,7 @@ void DX9RENDER::DrawPrimitive(D3DPRIMITIVETYPE dwPrimitiveType, long iVBuff, lon
 
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do
@@ -3190,14 +3170,6 @@ bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
     return effects_.begin(cBlockName);
 }
 #else
-bool DX9RENDER::TechniqueSetParamsAndStart(const char *cBlockName, uint32_t _dwNumParams, void *pParams)
-{
-    if (!cBlockName)
-        return false;
-    pTechnique->SetCurrentBlock(cBlockName, _dwNumParams, pParams);
-    return pTechnique->ExecutePassStart();
-}
-
 bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName, uint32_t _dwNumParams, ...)
 {
     if (!cBlockName)
@@ -3323,11 +3295,7 @@ void DX9RENDER::DrawRects(RS_RECT *pRSR, uint32_t dwRectsNum, const char *cBlock
         CHECKD3DERR(SetFVF(RS_RECT_VERTEX_FORMAT));
         if (cBlockName && cBlockName[0])
         {
-#ifdef _WIN32 // FIX_LINUX Effects_test
             bDraw = TechniqueExecuteStart(cBlockName);
-#else
-            bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
         }
         if (bDraw)
             do
@@ -3364,11 +3332,7 @@ void DX9RENDER::DrawSprites(RS_SPRITE *pRSS, uint32_t dwSpritesNum, const char *
     bool bDraw = true;
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do
@@ -3390,11 +3354,7 @@ void DX9RENDER::DrawLines(RS_LINE *pRSL, uint32_t dwLinesNum, const char *cBlock
 
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do
@@ -3414,11 +3374,7 @@ void DX9RENDER::DrawLines2D(RS_LINE2D *pRSL2D, size_t dwLinesNum, const char *cB
 
     if (cBlockName && cBlockName[0])
     {
-#ifdef _WIN32 // FIX_LINUX Effects_test
         bDraw = TechniqueExecuteStart(cBlockName);
-#else
-        bDraw = TechniqueSetParamsAndStart(cBlockName, dwNumParams, 1 + &dwNumParams);
-#endif
     }
     if (bDraw)
         do

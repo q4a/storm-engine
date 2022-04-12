@@ -142,8 +142,6 @@ class VDX9RENDER : public SERVICE
 #ifndef _WIN32 // FIX_LINUX Effects
     virtual bool TechniqueExecuteStart(const char *cBlockName) = 0;
 #else
-    virtual bool TechniqueSetParamsAndStart(const char *cBlockName, uint32_t _dwNumParams = 0,
-                                            void *pParams = nullptr) = 0;
     virtual bool TechniqueExecuteStart(const char *cBlockName, uint32_t _dwNumParams = 0, ...) = 0;
 #endif
     virtual bool TechniqueExecuteNext() = 0;

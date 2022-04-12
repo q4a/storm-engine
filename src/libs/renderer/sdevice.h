@@ -347,7 +347,6 @@ class DX9RENDER : public VDX9RENDER
 #ifndef _WIN32 // FIX_LINUX Effects
     bool TechniqueExecuteStart(const char *cBlockName) override;
 #else
-    bool TechniqueSetParamsAndStart(const char *cBlockName, uint32_t _dwNumParams = 0, void *pParams = nullptr) override;
     bool TechniqueExecuteStart(const char *cBlockName, uint32_t _dwNumParams = 0, ...) override;
 #endif
     bool TechniqueExecuteNext() override;
