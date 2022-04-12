@@ -87,6 +87,7 @@ pub extern "C" fn ignore_case_equal_first_n(
 fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {
     OsString::from(input)
         .encode_wide()
+        .chain(Some(0))
         .collect::<Vec<_>>()
         .as_mut_ptr()
 }
