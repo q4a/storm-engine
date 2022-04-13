@@ -1,3 +1,4 @@
+#ifdef _WIN32 // FIX_LINUX Effects
 #include "effects.h"
 
 #include "core.h"
@@ -165,3 +166,4 @@ ID3DXEffect *Effects::getEffectPointer(const std::string &techniqueName)
     return technique != techniques_.end() ? technique->second.fx : nullptr;
 }
 #endif
+#endif // FIX_LINUX Effects
