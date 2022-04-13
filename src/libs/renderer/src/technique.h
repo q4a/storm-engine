@@ -1,10 +1,7 @@
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifndef _WIN32 // FIX_LINUX Effects
 #pragma once
 
 #include "dx9render.h"
-//#include "templates\htable.h"
-//#include "templates\string.h"
-#include "vmodule_api.h"
 #include <stdio.h>
 
 struct SRSPARAM
@@ -159,7 +156,7 @@ class CTechnique
   public:
     void SetCurrentBlock(const char *name, uint32_t _dwNumParams, void *pParams);
 
-    bool DecodeFile(char *sname);
+    bool DecodeFile(std::string sname);
     void DecodeFiles(char *sub_dir = 0);
 
     bool ExecutePassStart();
