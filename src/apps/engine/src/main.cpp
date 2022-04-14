@@ -131,6 +131,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         return EXIT_SUCCESS;
     }
     AllocConsole();
+    init_logger();
+    info("Test from C++");
 
     mi_register_output(mimalloc_fun, nullptr);
     mi_option_set(mi_option_show_errors, 1);

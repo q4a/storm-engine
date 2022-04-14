@@ -2,10 +2,54 @@ use std::ffi::CStr;
 use std::path::PathBuf;
 use std::{ffi::OsString, os::windows::prelude::OsStrExt};
 
+use env_logger::{Builder, Target};
 use winapi::{ctypes::*, vc::vcruntime::size_t};
+
+#[macro_use]
+extern crate log;
 
 mod fs;
 mod string_compare;
+
+#[no_mangle]
+pub extern "C" fn init_logger() {
+    let mut builder = Builder::from_default_env();
+    builder.target(Target::Stdout);
+    builder.filter_level(log::LevelFilter::Debug);
+    builder.init();
+    error!("Test error");
+    warn!("Test warn");
+    info!("Test info");
+    debug!("Test debug");
+}
+
+#[no_mangle]
+pub extern "C" fn error(message: *const c_char) {
+    let message_c_str = unsafe { CStr::from_ptr(message) };
+    let message_str = message_c_str.to_str().unwrap();
+    error!("{}", message_str);
+}
+
+#[no_mangle]
+pub extern "C" fn warn(message: *const c_char) {
+    let message_c_str = unsafe { CStr::from_ptr(message) };
+    let message_str = message_c_str.to_str().unwrap();
+    warn!("{}", message_str);
+}
+
+#[no_mangle]
+pub extern "C" fn info(message: *const c_char) {
+    let message_c_str = unsafe { CStr::from_ptr(message) };
+    let message_str = message_c_str.to_str().unwrap();
+    info!("{}", message_str);
+}
+
+#[no_mangle]
+pub extern "C" fn debug(message: *const c_char) {
+    let message_c_str = unsafe { CStr::from_ptr(message) };
+    let message_str = message_c_str.to_str().unwrap();
+    debug!("{}", message_str);
+}
 
 #[no_mangle]
 pub extern "C" fn get_stash_path() -> *mut wchar_t {
