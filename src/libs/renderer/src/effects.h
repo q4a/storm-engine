@@ -1,4 +1,4 @@
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifndef _WIN32 // FIX_LINUX Effects
 #pragma once
 
 #include <cstdint>

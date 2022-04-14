@@ -1,4 +1,4 @@
-#ifndef _WIN32 // FIX_LINUX Effects
+#ifdef _WIN32 // FIX_LINUX Effects
 #include "technique.h"
 #include "core.h"
 #include "defines.h"
@@ -65,6 +65,15 @@
         if (a)                                                                                                         \
             strcpy(a, b);                                                                                              \
     }
+
+inline void tolwr(char *str)
+{
+    while (*str != '\0')
+    {
+        *str = tolower(*str);
+        str++;
+    }
+}
 
 // codes
 
@@ -1640,7 +1649,7 @@ void CTechnique::InnerDecodeFiles(char *sub_dir)
 {
     sprintf(sCurrentDir, "%s%s", SHA_DIR, (sub_dir) ? sub_dir : "");
 
-    const auto vFilenames = fio->_GetPathsOrFilenamesByMask(sCurrentDir, SHA_EXT, true);
+    const auto vFilenames = fio->_GetPathsOrFilenamesByMask(sCurrentDir, SHA_EXT, true, false, true, true);
     for (std::string path : vFilenames)
     {
         DecodeFile(path);
