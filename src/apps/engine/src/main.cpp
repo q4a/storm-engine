@@ -130,6 +130,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         MessageBoxA(nullptr, "Another instance is already running!", "Error", MB_ICONERROR);
         return EXIT_SUCCESS;
     }
+    AllocConsole();
+    init_logger();
+    info("Test from C++");
+
     mi_register_output(mimalloc_fun, nullptr);
     mi_option_set(mi_option_show_errors, 1);
     mi_option_set(mi_option_show_stats, 1);

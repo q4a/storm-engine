@@ -1,0 +1,2 @@
+include_guard = "rust_util_h"
+pragma_once = true

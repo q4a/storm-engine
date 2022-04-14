@@ -185,15 +185,8 @@ macro(STORM_SETUP)
 
   if(${_SETUP_TYPE} STREQUAL "executable")
     add_executable("${_SETUP_TARGET_NAME}" WIN32 ${SRCS})
-    target_link_libraries("${_SETUP_TARGET_NAME}" PUBLIC util-rs)
     _set_ide_folder("${_SETUP_TARGET_NAME}" "Executables")
   elseif(${_SETUP_TYPE} STREQUAL "library")
-    set(_SETUP_RUST_NAME ${_SETUP_TARGET_NAME}-rs)
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_SETUP_RUST_NAME}")
-      corrosion_import_crate(MANIFEST_PATH "${_SETUP_RUST_NAME}/Cargo.toml")
-      execute_process(COMMAND cbindgen --config cbindgen.toml --crate ${_SETUP_RUST_NAME} --output "../include/${_SETUP_TARGET_NAME}_rs.h"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${_SETUP_RUST_NAME}")
-    endif()
     add_library("${_SETUP_TARGET_NAME}" ${lib_mode} ${SRCS})
     _set_ide_folder("${_SETUP_TARGET_NAME}" "Libs")
   elseif(${_SETUP_TYPE} STREQUAL "storm_module")
@@ -218,6 +211,14 @@ macro(STORM_SETUP)
       COMMENT "Run ${test_target}"
       POST_BUILD
       COMMAND ${test_target})
+  endif()
+
+  set(_SETUP_RUST_NAME ${_SETUP_TARGET_NAME}-rs)
+  if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_SETUP_RUST_NAME}")
+    corrosion_import_crate(MANIFEST_PATH "${_SETUP_RUST_NAME}/Cargo.toml")
+    execute_process(COMMAND cbindgen --config cbindgen.toml --crate ${_SETUP_RUST_NAME} --output "../include/${_SETUP_TARGET_NAME}_rs.h"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${_SETUP_RUST_NAME}")
+    target_link_libraries("${_SETUP_TARGET_NAME}" INTERFACE "${_SETUP_RUST_NAME}")
   endif()
 
   set_target_properties(
