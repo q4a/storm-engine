@@ -22,11 +22,22 @@ You need to install [Conan](https://conan.io/downloads.html) and add it to the `
 - C++ Clang Compiler for Windows
 - C++ MFC for latest v142 build tools (x86 & x64)
 - Windows 10 SDK
+- [Rust with Cargo](https://rustup.rs/)
+- [CBindgen](https://github.com/eqrion/cbindgen)
+- [Corrosion installed as CMake package](https://github.com/corrosion-rs/corrosion)
 
 Open the repo root as a CMake project in Visual Studio 2019 and select `engine.exe` as a startup item.
 
 For running `engine.exe` you need to have [DirectX 9 runtime libraries](https://www.microsoft.com/en-us/download/details.aspx?id=8109) installed.
 You will also need assets from one of the supported games. 
+
+## Oxidation
+
+To rewrite a library in Rust you need:
+
+* Create new `lib` project named `library-rs` within library folder
+* Set crate type to `staticlib`
+* Create new `cbindgen.toml` file with `pragma_once` set to `true` and `include_guard` set to `rust_<library>_h`
 
 ## Roadmap
 Since our development team is small, we want to reduce the amount of code we have to maintain.
