@@ -87,6 +87,17 @@ pub extern "C" fn ignore_case_find(
         .unwrap_or(-1)
 }
 
+#[no_mangle]
+pub extern "C" fn ignore_case_starts_with(first: *const c_char, second: *const c_char) -> bool {
+    let fisrt_str = unsafe { CStr::from_ptr(first) };
+    let first = fisrt_str.to_str().unwrap();
+
+    let second_str = unsafe { CStr::from_ptr(second) };
+    let second = second_str.to_str().unwrap();
+
+    string_compare::ignore_case_starts_with(first, second)
+}
+
 fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {
     OsString::from(input)
         .encode_wide()

@@ -1,0 +1,6 @@
+To print formatted string:
+
+std::ostringstream ss;
+ss << "<" << inStr << ">,<" << begStr << ">,<" << 0 << ">,<" << lcn << ">,<" << rust_lcn << ">";
+std::string data_sample = ss.str();
+error(data_sample.data());

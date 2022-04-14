@@ -31,6 +31,8 @@ wchar_t *get_screenshots_path();
 
 int ignore_case_find(const char *first, const char *second, size_t start);
 
+bool ignore_case_starts_with(const char *first, const char *second);
+
 } // extern "C"
 
 #endif // rust_util_h

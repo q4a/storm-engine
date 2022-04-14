@@ -2787,13 +2787,13 @@ if(storm::iEquals(eventName, "Blade to belt"))
     {
         const char *pcActionName = nullptr;
         int32_t nIdx = -1;
-        if (storm::iEquals(alliace, "set", 3))
+        if (storm::iStartsWith(alliace, "set"))
         {
             pcActionName = "set";
             if (alliace[3] >= '0' && alliace[3] <= '9')
                 nIdx = atoi(&alliace[3]);
         }
-        else if (storm::iEquals(alliace, "reset", 5))
+        else if (storm::iStartsWith(alliace, "reset"))
         {
             pcActionName = "reset";
             if (alliace[5] >= '0' && alliace[5] <= '9')

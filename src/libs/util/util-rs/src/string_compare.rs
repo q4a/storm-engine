@@ -13,9 +13,20 @@ pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
     s_lowercase.find(&pat_lowercase).map(|index| index + n)
 }
 
+pub fn ignore_case_starts_with(s: &str, pat: &str) -> bool {
+    let s_lowercase = s.to_lowercase();
+    let pat_lowercase = pat.to_lowercase();
+    s_lowercase.starts_with(&pat_lowercase)
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::string_compare::ignore_case_find;
+    use std::{
+        fs::File,
+        io::{BufRead, BufReader},
+    };
+
+    use crate::string_compare::{ignore_case_find, ignore_case_starts_with};
 
     #[test]
     fn ignore_case_find_test() {
@@ -63,5 +74,53 @@ mod tests {
 
             assert_eq!(result, expected);
         }
+    }
+
+    #[test]
+    fn ignore_case_starts_with_test() {
+        let datatest = vec![
+            (r"ships\Fleut1\Fleut1", "mast", false),
+            ("mast4", "mast", true),
+            ("editsection:nation", "editsection:", true),
+            (
+                "papirus_character_remove_officer,col:{255,128,128,128},pos:{190,190,610,360}",
+                "editsection:",
+                false,
+            ),
+        ];
+
+        for (s, pat, expected) in datatest {
+            let result = ignore_case_starts_with(s, pat);
+            assert_eq!(result, expected);
+        }
+    }
+
+    fn for_each_line(file_name: &str, func: fn(&str)) -> Result<(), std::io::Error> {
+        let file = File::open(&file_name)?;
+
+        // uses a reader buffer
+        let mut reader = BufReader::new(file);
+        let mut line = String::new();
+
+        loop {
+            match reader.read_line(&mut line) {
+                Ok(bytes_read) => {
+                    // EOF: save last file address to restart from this address for next run
+                    if bytes_read == 0 {
+                        break;
+                    }
+
+                    func(line.trim());
+
+                    // do not accumulate data
+                    line.clear();
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            };
+        }
+
+        Ok(())
     }
 }

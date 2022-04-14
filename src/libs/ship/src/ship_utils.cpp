@@ -169,7 +169,7 @@ bool SHIP::BuildMasts()
         }
         const auto *const cNodeName = pNode->GetName();
 
-        if (storm::iEquals(cNodeName, MAST_IDENTIFY, std::size(MAST_IDENTIFY) - 1))
+        if (storm::iStartsWith(cNodeName, MAST_IDENTIFY))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 
@@ -245,7 +245,7 @@ bool SHIP::BuildHulls()
         if (!pNode)
             break;
         const auto *const cNodeName = pNode->GetName();
-        if (storm::iEquals(cNodeName, HULL_IDENTIFY, std::size(HULL_IDENTIFY) - 1))
+        if (storm::iStartsWith(cNodeName, HULL_IDENTIFY))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 

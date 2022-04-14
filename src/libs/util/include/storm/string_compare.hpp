@@ -41,38 +41,9 @@ inline int32_t iFind(const char *first, const char *second, const size_t start)
     return ignore_case_find(first, second, start);
 }
 
-template <typename Range1T, typename Range2T = Range1T>
-bool iEquals(const Range1T &first, const Range2T &second, const size_t count)
+inline bool iStartsWith(const char *first, const char *second)
 {
-    detail::is_iequal comp;
-
-    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
-    const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
-
-    const auto first_begin = std::begin(first_normalized);
-    const auto second_begin = std::begin(second_normalized);
-
-    const auto first_end = std::end(first_normalized);
-    const auto second_end = std::end(second_normalized);
-
-    const auto first_length = std::distance(first_begin, first_end);
-    const auto second_length = std::distance(second_begin, second_end);
-    if (first_length < count || second_length < count)
-    {
-        if (first_length != second_length)
-        {
-            return false;
-        }
-        else
-        {
-            return std::equal(first_begin, first_begin + first_length, second_begin, second_begin + second_length,
-                              comp);
-        }
-    }
-    else
-    {
-        return std::equal(first_begin, first_begin + count, second_begin, second_begin + count, comp);
-    }
+    return ignore_case_starts_with(first, second);
 }
 
 template <typename Range1T, typename Range2T = Range1T> bool iEquals(const Range1T &first, const Range2T &second)
