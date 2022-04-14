@@ -1,109 +1,59 @@
-pub fn ignore_case_equal(first: &str, second: &str) -> bool {
-    let first_uppercase = first.to_uppercase();
-    let second_uppercase = second.to_uppercase();
-    first_uppercase == second_uppercase
-}
-
-pub fn ignore_case_less(first: &str, second: &str) -> bool {
-    let first_uppercase = first.to_uppercase();
-    let second_uppercase = second.to_uppercase();
-    first_uppercase < second_uppercase
-}
-
-pub fn ignore_case_less_or_equal(first: &str, second: &str) -> bool {
-    let first_uppercase = first.to_uppercase();
-    let second_uppercase = second.to_uppercase();
-    first_uppercase <= second_uppercase
-}
-
-pub fn ignore_case_equal_first_n(first: &str, second: &str, n: usize) -> bool {
-    if first.len() < n || second.len() < n {
-        if first.len() != second.len() {
-            false
-        } else {
-            ignore_case_equal(first, second)
-        }
-    } else {
-        let sliced_first = &first[..n];
-        let sliced_second = &second[..n];
-        ignore_case_equal(sliced_first, sliced_second)
+pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
+    let mut n = start;
+    while n < s.len() && !s.is_char_boundary(n) {
+        n += 1;
     }
-}
 
-pub fn wildcmp(wild: &str, string: &str) -> bool {
-    regex::Regex::new(wild)
-        .map(|pattern| pattern.is_match(string))
-        .unwrap_or(false)
-}
+    if n >= s.len() {
+        return None;
+    }
 
-pub fn wildicmp(wild: &str, string: &str) -> bool {
-    let wild_lowercase = wild.to_lowercase();
-    let string_lowercase = string.to_lowercase();
-    wildcmp(&wild_lowercase, &string_lowercase)
+    let s_lowercase = (&s[n..]).to_lowercase();
+    let pat_lowercase = pat.to_lowercase();
+    s_lowercase.find(&pat_lowercase).map(|index| index + n)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::string_compare::{ignore_case_equal, ignore_case_equal_first_n, ignore_case_less};
+    use crate::string_compare::ignore_case_find;
+    use std::fs::File;
+    use std::io::{self, BufRead};
+    use std::path::Path;
 
     #[test]
-    fn ignore_case_equal_test() {
-        let str_lowercase = "mystring";
-        let str_uppercase = "MYSTRING";
-        let str_mixedcase = "mYsTrInG";
+    fn index_of_test() {
+        let mut test_data = read_lines("control_data/ignore_case_index_of.txt").unwrap();
+        while let Some(s1) = test_data.next() {
+            let s1 = s1.unwrap();
+            let s2 = test_data.next().unwrap().unwrap();
+            let start = test_data
+                .next()
+                .unwrap()
+                .unwrap()
+                .parse::<usize>()
+                .expect("Not usize");
+            let expected_string = test_data.next().unwrap().unwrap();
+            let expected = match expected_string.parse::<i32>() {
+                Ok(v) => v,
+                Err(_) => panic!("<{}> is not i32", expected_string),
+            };
 
-        let str_other = "m_string";
-        let str_long = "mystrings";
-
-        // Strings with same case should be considered equal
-        assert!(ignore_case_equal(str_lowercase, str_lowercase));
-        assert!(ignore_case_equal(str_uppercase, str_uppercase));
-        assert!(ignore_case_equal(str_mixedcase, str_mixedcase));
-
-        // Strings with different case should be considered equal
-        assert!(ignore_case_equal(str_lowercase, str_uppercase));
-        assert!(ignore_case_equal(str_lowercase, str_mixedcase));
-        assert!(ignore_case_equal(str_uppercase, str_mixedcase));
-
-        // Strings with different value should be considered not equal
-        assert!(!ignore_case_equal(str_lowercase, str_other));
-
-        // Strings with different length should be considered not equal
-        assert!(!ignore_case_equal(str_lowercase, str_long));
-
-        // Compare only count number of character at most
-        assert!(ignore_case_equal_first_n(str_lowercase, str_long, 8));
-        assert!(ignore_case_equal_first_n(str_long, str_lowercase, 8));
-        assert!(!ignore_case_equal_first_n(".txt1", ".txt2", 5));
+            let result = ignore_case_find(&s1, &s2, start)
+                .map(|i| i as i32)
+                .unwrap_or(-1);
+            assert_eq!(
+                result, expected,
+                "s1: <{}>, s2: <{}>, start: <{}>",
+                &s1, &s2, start
+            );
+        }
     }
 
-    #[test]
-    fn ignore_case_less_test() {
-        let str_lowercase = "mystring";
-        let str_uppercase = "MYSTRING";
-        let str_mixedcase = "mYsTrInG";
-
-        let str_long = "mystrings";
-
-        // Identical string should not be less
-        assert!(!ignore_case_less(str_lowercase, str_lowercase));
-        assert!(!ignore_case_less(str_uppercase, str_uppercase));
-        assert!(!ignore_case_less(str_mixedcase, str_mixedcase));
-
-        // Lowercase should not be considered before uppercase
-        assert!(!ignore_case_less(str_lowercase, str_uppercase));
-        assert!(!ignore_case_less(str_uppercase, str_lowercase));
-        assert!(!ignore_case_less(str_lowercase, str_mixedcase));
-        assert!(!ignore_case_less(str_mixedcase, str_lowercase));
-        assert!(!ignore_case_less(str_mixedcase, str_uppercase));
-        assert!(!ignore_case_less(str_uppercase, str_mixedcase));
-
-        // Characters that appear earlier in the alphabet should be cosidered less than character after it
-        assert!(ignore_case_less("A", "b"));
-        assert!(!ignore_case_less("c", "B"));
-
-        // Shorter string should be considered before longer string, when they have the same starting sequence
-        assert!(ignore_case_less(str_lowercase, str_long));
-        assert!(!ignore_case_less(str_long, str_lowercase));
+    fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+    where
+        P: AsRef<Path>,
+    {
+        let file = File::open(filename)?;
+        Ok(io::BufReader::new(file).lines())
     }
 }

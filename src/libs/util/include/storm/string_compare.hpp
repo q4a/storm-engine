@@ -4,6 +4,8 @@
 #include <cctype>
 #include <string>
 
+#include "../util_rs.h"
+
 namespace storm
 {
 namespace detail
@@ -33,6 +35,11 @@ struct is_iless_eq
 };
 
 } // namespace detail
+
+inline int32_t iFind(const char *first, const char *second, const size_t start)
+{
+    return ignore_case_find(first, second, start);
+}
 
 template <typename Range1T, typename Range2T = Range1T>
 bool iEquals(const Range1T &first, const Range2T &second, const size_t count)

@@ -1,3 +1,6 @@
+#ifndef rust_util_h
+#define rust_util_h
+
 #pragma once
 
 #include <cstdarg>
@@ -26,16 +29,8 @@ wchar_t *get_save_data_path();
 
 wchar_t *get_screenshots_path();
 
-bool ignore_case_equal(const char *first, const char *second);
-
-bool ignore_case_less(const char *first, const char *second);
-
-bool ignore_case_less_or_equal(const char *first, const char *second);
-
-bool ignore_case_greater(const char *first, const char *second);
-
-bool ignore_case_greater_or_equal(const char *first, const char *second);
-
-bool ignore_case_equal_first_n(const char *first, const char *second, size_t count);
+int ignore_case_find(const char *first, const char *second, size_t start);
 
 } // extern "C"
+
+#endif // rust_util_h

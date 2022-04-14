@@ -72,60 +72,19 @@ pub extern "C" fn get_screenshots_path() -> *mut wchar_t {
 }
 
 #[no_mangle]
-pub extern "C" fn ignore_case_equal(first: *const c_char, second: *const c_char) -> bool {
-    let fisrt_str = unsafe { CStr::from_ptr(first) };
-    let first = fisrt_str.to_str().unwrap();
-
-    let second_str = unsafe { CStr::from_ptr(second) };
-    let second = second_str.to_str().unwrap();
-    string_compare::ignore_case_equal(first, second)
-}
-
-#[no_mangle]
-pub extern "C" fn ignore_case_less(first: *const c_char, second: *const c_char) -> bool {
-    let fisrt_str = unsafe { CStr::from_ptr(first) };
-    let first = fisrt_str.to_str().unwrap();
-
-    let second_str = unsafe { CStr::from_ptr(second) };
-    let second = second_str.to_str().unwrap();
-    string_compare::ignore_case_less(first, second)
-}
-
-#[no_mangle]
-pub extern "C" fn ignore_case_less_or_equal(first: *const c_char, second: *const c_char) -> bool {
-    let fisrt_str = unsafe { CStr::from_ptr(first) };
-    let first = fisrt_str.to_str().unwrap();
-
-    let second_str = unsafe { CStr::from_ptr(second) };
-    let second = second_str.to_str().unwrap();
-    string_compare::ignore_case_less_or_equal(first, second)
-}
-
-#[no_mangle]
-pub extern "C" fn ignore_case_greater(first: *const c_char, second: *const c_char) -> bool {
-    !ignore_case_less_or_equal(first, second)
-}
-
-#[no_mangle]
-pub extern "C" fn ignore_case_greater_or_equal(
+pub extern "C" fn ignore_case_find(
     first: *const c_char,
     second: *const c_char,
-) -> bool {
-    !ignore_case_less(first, second)
-}
-
-#[no_mangle]
-pub extern "C" fn ignore_case_equal_first_n(
-    first: *const c_char,
-    second: *const c_char,
-    count: size_t,
-) -> bool {
+    start: size_t,
+) -> c_int {
     let fisrt_str = unsafe { CStr::from_ptr(first) };
     let first = fisrt_str.to_str().unwrap();
 
     let second_str = unsafe { CStr::from_ptr(second) };
     let second = second_str.to_str().unwrap();
-    string_compare::ignore_case_equal_first_n(first, second, count)
+    string_compare::ignore_case_find(first, second, start)
+        .map(|index| index as i32)
+        .unwrap_or(-1)
 }
 
 fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {
