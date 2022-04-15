@@ -54,13 +54,6 @@ TEST_CASE("Case-insensitive string comparison", "[utils]")
             CHECK(iEquals(string_array, str_lowercase));
 
         }
-
-        SECTION("Compare only count number of character at most")
-        {
-            CHECK(iEquals(str_lowercase, str_long, 8));
-            CHECK(iEquals(str_long, str_lowercase, 8));
-            CHECK_FALSE(iEquals(".txt1", ".txt2", 5));
-        }
     }
 
     SECTION("iLess")
