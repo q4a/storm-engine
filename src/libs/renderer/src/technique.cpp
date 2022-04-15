@@ -1478,7 +1478,8 @@ uint32_t CTechnique::ProcessVertexShader(char *pFile, uint32_t dwSize, char **pS
     char *pName = SkipToken(*pStr, VERTEX_SHADER);
     GetTokenWhile(pName, &temp[0], " ");
 
-    shader_t *pS = &pShaders[AddShader(temp)];
+    auto shaderId = AddShader(temp);
+    shader_t *pS = &pShaders[shaderId];
     pS->dwShaderType = CODE_SVS;
 
     while (0 != (*pStr = GetString(pFile, dwSize, *pStr)))
