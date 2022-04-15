@@ -173,7 +173,6 @@ block battle_tf_rectangle()
 
 			ColorOp[0] = SelectArg1;
 			ColorArg1[0] = tfactor;
-//			ColorArg1[0] = texture;
 
 			AlphaOp[0] = SelectArg1;
 			AlphaArg1[0] = texture;
@@ -380,7 +379,6 @@ block battle_textureXtfactor()
 			ColorVertex = true;
 
 			ColorOp[0] = modulate;
-//			ColorOp[0] = dotproduct3;
 
 			ColorArg1[0] = texture;
 			ColorArg2[0] = tfactor;
@@ -415,7 +413,6 @@ block battle_colorRectangle()
 
 			ColorOp[0] = selectarg1;
 			ColorArg1[0] = texture;
-//			ColorArg2[0] = tfactor;
 
 			AlphaOp[0] = SelectArg1;
 			AlphaArg1[0] = texture;

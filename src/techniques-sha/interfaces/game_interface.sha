@@ -56,6 +56,9 @@ block iStartTechnique()
 			AlphaOp[1] = disable;
 			ColorOp[2] = disable;
 			AlphaOp[2] = disable;
+
+			Render.Draw
+			Restore.States
 		}
 	}
 }
@@ -295,7 +298,6 @@ block iLineCollection()
 			AlphaTestEnable = false;
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			multisampleantialias = true;
 
 			ColorOp[0] = SelectArg1;
 			ColorArg1[0] = diffuse;
@@ -789,7 +791,7 @@ block iExitTechnique()
 		{
 			ZWriteEnable = true;
 			CullMode = ccw;
-			zenable = true;
+			ZEnable = true;
 			Lighting = false;
 			AlphaBlendEnable = true;
 			AlphaTestEnable = true;
@@ -797,7 +799,7 @@ block iExitTechnique()
 			ColorOp[0] = modulate2x;
 			ColorArg1[0] = diffuse;
 			ColorArg2[0] = texture;
-                        ColorOp[1] = disable;
+			ColorOp[1] = disable;
 			ColorArg1[1] = current;
 			ColorArg2[1] = texture;
 
@@ -837,8 +839,8 @@ block iBlindPictures()
 			AlphaArg1[0] = texture;
 			AlphaArg2[0] = tfactor;
 
-                        ColorOp[1] = disable;
-                        AlphaOp[1] = disable;
+			ColorOp[1] = disable;
+			AlphaOp[1] = disable;
 
 			Render.Draw
 			Restore.States
@@ -909,7 +911,6 @@ block iRotate()
 			addressv.sampler[0] = clamp;
 
 			Render.Draw
-
 			Restore.States
 		}
 	}
@@ -989,7 +990,7 @@ block iInfoShowerPicWithTips()
 			CullMode = none;
 			texcoordindex[1] = 0;
 			AlphaTestEnable = false;
-			AlphaBlendEnable = true;			
+			AlphaBlendEnable = true;
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
 			ColorArg1[0] = texture;

@@ -9,7 +9,7 @@ block InterfaceBackScene_Menu()
 			FogEnable = false;
 			AlphaTestEnable = true;
 			AlphaBlendEnable = true;
-			AlphaRef = 1
+			AlphaRef = 1;
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
 
