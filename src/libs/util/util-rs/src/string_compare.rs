@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
+pub fn ignore_case_find(s: &str, pattern: &str, start: usize) -> Option<usize> {
     let mut n = start;
     while n < s.len() && !s.is_char_boundary(n) {
         n += 1;
@@ -11,14 +11,14 @@ pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
     }
 
     let s_lowercase = (&s[n..]).to_lowercase();
-    let pat_lowercase = pat.to_lowercase();
-    s_lowercase.find(&pat_lowercase).map(|index| index + n)
+    let pattern_lowercase = pattern.to_lowercase();
+    s_lowercase.find(&pattern_lowercase).map(|index| index + n)
 }
 
-pub fn ignore_case_starts_with(s: &str, pat: &str) -> bool {
+pub fn ignore_case_starts_with(s: &str, pattern: &str) -> bool {
     let s_lowercase = s.to_lowercase();
-    let pat_lowercase = pat.to_lowercase();
-    s_lowercase.starts_with(&pat_lowercase)
+    let pattern_lowercase = pattern.to_lowercase();
+    s_lowercase.starts_with(&pattern_lowercase)
 }
 
 fn ignore_case_compare(s1: &str, s2: &str) -> Ordering {
@@ -40,6 +40,11 @@ pub fn ignore_case_less_or_equal(s1: &str, s2: &str) -> bool {
     !matches!(ignore_case_compare(s1, s2), Ordering::Greater)
 }
 
+pub fn ignore_case_glob(s: &str, pattern: &str) -> bool {
+    let glob = globset::Glob::new(pattern).unwrap().compile_matcher();
+    glob.is_match(s)
+}
+
 #[cfg(test)]
 mod tests {
     use std::{
@@ -47,7 +52,7 @@ mod tests {
         io::{BufRead, BufReader},
     };
 
-    use crate::string_compare::{ignore_case_find, ignore_case_less, ignore_case_starts_with};
+    use crate::string_compare::{ignore_case_find, ignore_case_less, ignore_case_starts_with, ignore_case_glob};
 
     #[test]
     fn ignore_case_find_test() {
@@ -143,6 +148,26 @@ mod tests {
         // Shorter string should be considered before longer string, when they have the same starting sequence
         assert!(ignore_case_less(str_lowercase, str_long));
         assert!(!ignore_case_less(str_long, str_lowercase));
+    }
+
+    #[test]
+    fn ignore_case_glob_test() {
+        for_each_line("test_data.txt", |line| {
+            let splits = line.split("|").collect::<Vec<_>>();
+            assert_eq!(splits.len(), 3);
+
+            let pat = splits[0];
+            let path = splits[1];
+            let expected = str::parse::<i8>(splits[2]).unwrap();
+            let expected = match expected {
+                0 => false,
+                1 => true,
+                _ => panic!("Can't convert the value")
+            };
+
+            let result = ignore_case_glob(path, pat);
+            assert_eq!(result, expected);
+        }).unwrap();
     }
 
     #[allow(dead_code)]
