@@ -41,8 +41,12 @@ pub fn ignore_case_less_or_equal(s1: &str, s2: &str) -> bool {
 }
 
 pub fn ignore_case_glob(s: &str, pattern: &str) -> bool {
-    let glob = globset::Glob::new(pattern).unwrap().compile_matcher();
-    glob.is_match(s)
+    let s_lowercase = s.to_lowercase();
+    let pattern_lowercase = pattern.to_lowercase();
+    let glob = globset::Glob::new(&pattern_lowercase)
+        .unwrap()
+        .compile_matcher();
+    glob.is_match(&s_lowercase)
 }
 
 #[cfg(test)]
@@ -52,7 +56,9 @@ mod tests {
         io::{BufRead, BufReader},
     };
 
-    use crate::string_compare::{ignore_case_find, ignore_case_less, ignore_case_starts_with, ignore_case_glob};
+    use crate::string_compare::{
+        ignore_case_find, ignore_case_glob, ignore_case_less, ignore_case_starts_with,
+    };
 
     #[test]
     fn ignore_case_find_test() {
@@ -152,22 +158,20 @@ mod tests {
 
     #[test]
     fn ignore_case_glob_test() {
-        for_each_line("test_data.txt", |line| {
-            let splits = line.split("|").collect::<Vec<_>>();
-            assert_eq!(splits.len(), 3);
+        let datatest = vec![
+            ("max.ini", "*.ini", true),
+            ("max.ini", "*.INI", true),
+            ("max.INI", "*.ini", true),
+            ("AoP.prj", "*.xps", false),
+            ("cancloud_coulverines.xps", "*.xps", true),
+            ("0001_initial.c", "????_*.c", true),
+            ("TestCase", "*", true),
+        ];
 
-            let pat = splits[0];
-            let path = splits[1];
-            let expected = str::parse::<i8>(splits[2]).unwrap();
-            let expected = match expected {
-                0 => false,
-                1 => true,
-                _ => panic!("Can't convert the value")
-            };
-
-            let result = ignore_case_glob(path, pat);
+        for (s, pat, expected) in datatest {
+            let result = ignore_case_glob(s, pat);
             assert_eq!(result, expected);
-        }).unwrap();
+        }
     }
 
     #[allow(dead_code)]
