@@ -560,7 +560,12 @@ bool DX9RENDER::Init()
         if (!InitDevice(bWindow, static_cast<HWND>(core.GetAppHWND()), screen_size.x, screen_size.y))
             return false;
 
+#ifndef _WIN32 // FIX_LINUX Effects
         RecompileEffects();
+#else
+        pTechnique = new CTechnique(this);
+        pTechnique->DecodeFiles();
+#endif
 
         // get start ini file for fonts
         if (!ini->ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
@@ -803,7 +808,9 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
             }
         }
     }
+#ifndef _WIN32 // FIX_LINUX Effects
     effects_.setDevice(d3d9);
+#endif
 
     // Create render targets for POST PROCESS effects
     d3d9->GetRenderTarget(0, &pOriginalScreenSurface);
@@ -2646,7 +2653,13 @@ void DX9RENDER::RestoreRender()
     SetCommonStates();
     d3d9->GetGammaRamp(0, &DefaultRamp);
 
+#ifndef _WIN32 // FIX_LINUX Effects
     RecompileEffects();
+#else
+    STORM_DELETE(pTechnique);
+    pTechnique = new CTechnique(this);
+    pTechnique->DecodeFiles();
+#endif
 
     InvokeEntitiesRestoreRender();
 
@@ -2655,6 +2668,7 @@ void DX9RENDER::RestoreRender()
 
 void DX9RENDER::RecompileEffects()
 {
+#ifndef _WIN32 // FIX_LINUX Effects
     effects_.release();
 
     std::filesystem::path cur_path = std::filesystem::current_path();
@@ -2666,6 +2680,7 @@ void DX9RENDER::RecompileEffects()
             effects_.compile(s.c_str());
         }
     std::filesystem::current_path(cur_path);
+#endif
 }
 
 bool DX9RENDER::ResetDevice()
@@ -2755,7 +2770,13 @@ void DX9RENDER::RunStart()
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
         InvokeEntitiesLostRender();
+#ifndef _WIN32 // FIX_LINUX Effects
         RecompileEffects();
+#else
+        STORM_DELETE(pTechnique);
+        pTechnique = new CTechnique(this);
+        pTechnique->DecodeFiles();
+#endif
         InvokeEntitiesRestoreRender();
     }
 
@@ -3347,16 +3368,30 @@ void DX9RENDER::FindPlanes(IDirect3DDevice9 *d3dDevice)
     viewplane[3].D = (pos.x * viewplane[3].Nx + pos.y * viewplane[3].Ny + pos.z * viewplane[3].Nz);
 }
 
+#ifndef _WIN32 // FIX_LINUX Effects
 bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 {
     if (!cBlockName)
         return false;
     return effects_.begin(cBlockName);
 }
+#else
+bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
+{
+    if (!cBlockName)
+        return false;
+    pTechnique->SetCurrentBlock(cBlockName, 0, nullptr);
+    return pTechnique->ExecutePassStart();
+}
+#endif
 
 bool DX9RENDER::TechniqueExecuteNext()
 {
+#ifndef _WIN32 // FIX_LINUX Effects
     return effects_.next();
+#else
+    return pTechnique->ExecutePassNext();
+#endif
 }
 
 void DX9RENDER::DrawRects(RS_RECT *pRSR, uint32_t dwRectsNum, const char *cBlockName, uint32_t dwSubTexturesX,
@@ -3711,6 +3746,24 @@ HRESULT DX9RENDER::CreatePixelShader(CONST uint32_t *pFunction, IDirect3DPixelSh
     return CHECKD3DERR(d3d9->CreatePixelShader((const DWORD *)pFunction, ppShader));
 }
 
+HRESULT DX9RENDER::DeleteVertexShader(IDirect3DVertexShader9 *pShader)
+{
+    if (pShader)
+    {
+        return pShader->Release();
+    }
+    return D3D_OK;
+}
+
+HRESULT DX9RENDER::DeletePixelShader(IDirect3DPixelShader9 *pShader)
+{
+    if (pShader)
+    {
+        return pShader->Release();
+    }
+    return D3D_OK;
+}
+
 HRESULT DX9RENDER::GetVertexShader(IDirect3DVertexShader9 **ppShader)
 {
     return CHECKD3DERR(d3d9->GetVertexShader(ppShader));
@@ -3721,10 +3774,12 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
+#ifndef _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
 }
+#endif
 
 HRESULT DX9RENDER::SetTexture(uint32_t Stage, IDirect3DBaseTexture9 *pTexture)
 {
