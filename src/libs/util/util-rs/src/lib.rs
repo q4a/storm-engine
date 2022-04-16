@@ -133,6 +133,28 @@ pub extern "C" fn equal(first: *const c_char, second: *const c_char) -> bool {
     first.eq(second)
 }
 
+#[no_mangle]
+pub extern "C" fn ignore_case_less(first: *const c_char, second: *const c_char) -> bool {
+    let first_str = unsafe { CStr::from_ptr(first) };
+    let first = first_str.to_str().unwrap();
+
+    let second_str = unsafe { CStr::from_ptr(second) };
+    let second = second_str.to_str().unwrap();
+
+    string_compare::ignore_case_less(first, second)
+}
+
+#[no_mangle]
+pub extern "C" fn ignore_case_less_or_equal(first: *const c_char, second: *const c_char) -> bool {
+    let first_str = unsafe { CStr::from_ptr(first) };
+    let first = first_str.to_str().unwrap();
+
+    let second_str = unsafe { CStr::from_ptr(second) };
+    let second = second_str.to_str().unwrap();
+
+    string_compare::ignore_case_less_or_equal(first, second)
+}
+
 fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {
     OsString::from(input)
         .encode_wide()

@@ -39,6 +39,10 @@ bool ignore_case_equal_win1251(const char *first, const char *second);
 
 bool equal(const char *first, const char *second);
 
+bool ignore_case_less(const char *first, const char *second);
+
+bool ignore_case_less_or_equal(const char *first, const char *second);
+
 } // extern "C"
 
 #endif // rust_util_h

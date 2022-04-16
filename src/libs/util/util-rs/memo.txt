@@ -1,6 +1,11 @@
 To print formatted string:
 
-std::ostringstream ss;
-ss << "<" << inStr << ">,<" << begStr << ">,<" << 0 << ">,<" << lcn << ">,<" << rust_lcn << ">";
-std::string data_sample = ss.str();
-error(data_sample.data());
+std::string sample = "<";
+sample += first_normalized;
+sample += ">,<";
+sample += second_normalized;
+sample += ">,<";
+sample += result ? "t" : "f";
+sample += ">";
+
+error(sample.data());

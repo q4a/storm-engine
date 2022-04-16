@@ -67,8 +67,7 @@ template <typename Range1T, typename Range2T = Range1T> bool iLess(const Range1T
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
 
-    return std::lexicographical_compare(std::begin(first_normalized), std::end(first_normalized),
-                                        std::begin(second_normalized), std::end(second_normalized), detail::is_iless{});
+    return ignore_case_less(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> bool iLessOrEqual(const Range1T &first, const Range2T &second)
@@ -76,9 +75,7 @@ template <typename Range1T, typename Range2T = Range1T> bool iLessOrEqual(const 
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
 
-    return std::lexicographical_compare(std::begin(first_normalized), std::end(first_normalized),
-                                        std::begin(second_normalized), std::end(second_normalized),
-                                        detail::is_iless_eq{});
+    return ignore_case_less_or_equal(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> bool iGreater(const Range1T &first, const Range2T &second)
@@ -89,59 +86,6 @@ template <typename Range1T, typename Range2T = Range1T> bool iGreater(const Rang
 template <typename Range1T, typename Range2T = Range1T> bool iGreaterOrEqual(const Range1T &first, const Range2T &second)
 {
     return !iLess(first, second);
-}
-
-
-// The wildcmp function was taken from http://www.codeproject.com/KB/string/wildcmp.aspx; the
-// wildicmp (case insensitive wildcard comparison) was based on it.
-
-inline int wildcmp(const char *wild, const char *string)
-{
-    // Written by Jack Handy - jakkhandy@hotmail.com
-
-    const char *cp = NULL, *mp = NULL;
-
-    while ((*string) && (*wild != '*'))
-    {
-        if ((*wild != *string) && (*wild != '?'))
-        {
-            return 0;
-        }
-        wild++;
-        string++;
-    }
-
-    while (*string)
-    {
-        if (*wild == '*')
-        {
-            if (!*++wild)
-            {
-                return 1;
-            }
-            mp = wild;
-            cp = string + 1;
-        }
-        else if ((*wild == *string) || (*wild == '?'))
-        {
-            wild++;
-            string++;
-        }
-        else
-        {
-            wild = mp;
-            if (cp != nullptr)
-            {
-                string = cp++;
-            }
-        }
-    }
-
-    while (*wild == '*')
-    {
-        wild++;
-    }
-    return !*wild;
 }
 
 inline int wildicmp(const char *wild, const char *string)
