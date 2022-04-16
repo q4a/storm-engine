@@ -1,4 +1,6 @@
-pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
+use std::cmp::Ordering;
+
+pub fn ignore_case_find(s: &str, pattern: &str, start: usize) -> Option<usize> {
     let mut n = start;
     while n < s.len() && !s.is_char_boundary(n) {
         n += 1;
@@ -9,13 +11,54 @@ pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
     }
 
     let s_lowercase = (&s[n..]).to_lowercase();
-    let pat_lowercase = pat.to_lowercase();
-    s_lowercase.find(&pat_lowercase).map(|index| index + n)
+    let pattern_lowercase = pattern.to_lowercase();
+    s_lowercase.find(&pattern_lowercase).map(|index| index + n)
+}
+
+pub fn ignore_case_starts_with(s: &str, pattern: &str) -> bool {
+    let s_lowercase = s.to_lowercase();
+    let pattern_lowercase = pattern.to_lowercase();
+    s_lowercase.starts_with(&pattern_lowercase)
+}
+
+fn ignore_case_compare(s1: &str, s2: &str) -> Ordering {
+    let s1_lowercase = s1.to_lowercase();
+    let s2_lowercase = s2.to_lowercase();
+
+    s1_lowercase.cmp(&s2_lowercase)
+}
+
+pub fn ignore_case_equal(s1: &str, s2: &str) -> bool {
+    matches!(ignore_case_compare(s1, s2), Ordering::Equal)
+}
+
+pub fn ignore_case_less(s1: &str, s2: &str) -> bool {
+    matches!(ignore_case_compare(s1, s2), Ordering::Less)
+}
+
+pub fn ignore_case_less_or_equal(s1: &str, s2: &str) -> bool {
+    !matches!(ignore_case_compare(s1, s2), Ordering::Greater)
+}
+
+pub fn ignore_case_glob(s: &str, pattern: &str) -> bool {
+    let s_lowercase = s.to_lowercase();
+    let pattern_lowercase = pattern.to_lowercase();
+    let glob = globset::Glob::new(&pattern_lowercase)
+        .unwrap()
+        .compile_matcher();
+    glob.is_match(&s_lowercase)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::string_compare::ignore_case_find;
+    use std::{
+        fs::File,
+        io::{BufRead, BufReader},
+    };
+
+    use crate::string_compare::{
+        ignore_case_find, ignore_case_glob, ignore_case_less, ignore_case_starts_with,
+    };
 
     #[test]
     fn ignore_case_find_test() {
@@ -63,5 +106,101 @@ mod tests {
 
             assert_eq!(result, expected);
         }
+    }
+
+    #[test]
+    fn ignore_case_starts_with_test() {
+        let datatest = vec![
+            (r"ships\Fleut1\Fleut1", "mast", false),
+            ("mast4", "mast", true),
+            ("editsection:nation", "editsection:", true),
+            (
+                "papirus_character_remove_officer,col:{255,128,128,128},pos:{190,190,610,360}",
+                "editsection:",
+                false,
+            ),
+        ];
+
+        for (s, pat, expected) in datatest {
+            let result = ignore_case_starts_with(s, pat);
+            assert_eq!(result, expected);
+        }
+    }
+
+    #[test]
+    fn ignore_case_less_test() {
+        let str_lowercase = "mystring";
+        let str_uppercase = "MYSTRING";
+        let str_mixedcase = "mYsTrInG";
+        let str_long = "mystrings";
+
+        // Identical string should not be less
+        assert!(!ignore_case_less(str_lowercase, str_lowercase));
+        assert!(!ignore_case_less(str_uppercase, str_uppercase));
+        assert!(!ignore_case_less(str_mixedcase, str_mixedcase));
+
+        // Lowercase should not be considered before uppercase
+        assert!(!ignore_case_less(str_lowercase, str_uppercase));
+        assert!(!ignore_case_less(str_uppercase, str_lowercase));
+        assert!(!ignore_case_less(str_lowercase, str_mixedcase));
+        assert!(!ignore_case_less(str_mixedcase, str_lowercase));
+        assert!(!ignore_case_less(str_mixedcase, str_uppercase));
+        assert!(!ignore_case_less(str_uppercase, str_mixedcase));
+
+        // Characters that appear earlier in the alphabet should be cosidered less than character after it
+        assert!(ignore_case_less("A", "b"));
+        assert!(!ignore_case_less("c", "B"));
+
+        // Shorter string should be considered before longer string, when they have the same starting sequence
+        assert!(ignore_case_less(str_lowercase, str_long));
+        assert!(!ignore_case_less(str_long, str_lowercase));
+    }
+
+    #[test]
+    fn ignore_case_glob_test() {
+        let datatest = vec![
+            ("max.ini", "*.ini", true),
+            ("max.ini", "*.INI", true),
+            ("max.INI", "*.ini", true),
+            ("AoP.prj", "*.xps", false),
+            ("cancloud_coulverines.xps", "*.xps", true),
+            ("0001_initial.c", "????_*.c", true),
+            ("TestCase", "*", true),
+        ];
+
+        for (s, pat, expected) in datatest {
+            let result = ignore_case_glob(s, pat);
+            assert_eq!(result, expected);
+        }
+    }
+
+    #[allow(dead_code)]
+    fn for_each_line(file_name: &str, func: fn(&str)) -> Result<(), std::io::Error> {
+        let file = File::open(&file_name)?;
+
+        // uses a reader buffer
+        let mut reader = BufReader::new(file);
+        let mut line = String::new();
+
+        loop {
+            match reader.read_line(&mut line) {
+                Ok(bytes_read) => {
+                    // EOF: save last file address to restart from this address for next run
+                    if bytes_read == 0 {
+                        break;
+                    }
+
+                    func(line.trim());
+
+                    // do not accumulate data
+                    line.clear();
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            };
+        }
+
+        Ok(())
     }
 }

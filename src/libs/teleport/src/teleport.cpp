@@ -361,7 +361,7 @@ bool FINDDIALOGNODES::Init()
             auto nodIdx = 0;
             while (GetStringLine(pStr, param, sizeof(param) - 1))
             {
-                if (strlen(param) < 5 || !storm::iEquals(param, "case", 4))
+                if (strlen(param) < 5 || !storm::iStartsWith(param, "case"))
                     continue;
                 char param2[512];
                 GetQuotedString(param, param2, sizeof(param2) - 1);

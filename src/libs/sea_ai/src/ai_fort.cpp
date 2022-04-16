@@ -351,19 +351,19 @@ bool AIFort::ScanFortForCannons(AI_FORT *pFort, char *pModelsDir, char *pLocator
             pNode->geo->GetLabel(i, label);
             AICannon *pCannon = nullptr;
 
-            if (storm::iEquals(label.name, "cannon", 6) && pFort->dwCannonType != -1)
+            if (storm::iStartsWith(label.name, "cannon") && pFort->dwCannonType != -1)
             {
                 pFort->aCannons.push_back(AICannon{});
                 pCannon = &pFort->aCannons.back();
                 // pCannon = &pFort->aCannons[pFort->aCannons.Add()];
             }
-            if (storm::iEquals(label.name, "culverin", 8) && pFort->dwCulverinType != -1)
+            if (storm::iStartsWith(label.name, "culverin") && pFort->dwCulverinType != -1)
             {
                 pFort->aCulverins.push_back(AICannon{});
                 pCannon = &pFort->aCulverins.back();
                 // pCannon = &pFort->aCulverins[pFort->aCulverins.Add()];
             }
-            if (storm::iEquals(label.name, "mortar", 6) && pFort->dwMortarType != -1)
+            if (storm::iStartsWith(label.name, "mortar") && pFort->dwMortarType != -1)
             {
                 pFort->aMortars.push_back(AICannon{});
                 pCannon = &pFort->aMortars.back();

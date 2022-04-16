@@ -56,8 +56,11 @@ class SECTION
     void DelNode(KEY_NODE *);
 
     KEY_NODE *FindKey(KEY_NODE *from, const char *key_name, const char *key_value);
+    KEY_NODE *FindKeyCS(KEY_NODE *from, const char *key_name, const char *key_value);
     KEY_NODE *FindKey(const char *key_name, const char *key_value);
+    KEY_NODE *FindKeyCS(const char *key_name, const char *key_value);
     KEY_NODE *FindKey(const char *key_name);
+    KEY_NODE *FindKeyCS(const char *key_name);
     KEY_NODE *GetRoot();
 
     void SetName(const char *name);
@@ -90,6 +93,8 @@ class IFS : public INIFILE
     // KEY_NODE * FindKey(KEY_NODE * from, char * section_name, char * key_name, char * key_value);
     KEY_NODE *FindKey(const char *section_name, const char *key_name, const char *key_value);
     KEY_NODE *FindKey(const char *section_name, const char *key_name);
+    KEY_NODE *FindKeyCS(const char *section_name, const char *key_name, const char *key_value);
+    KEY_NODE *FindKeyCS(const char *section_name, const char *key_name);
     SECTION *FindSection(const char *section_name);
     SECTION *FindSection(const char *section_name, SECTION *snode);
 
@@ -113,6 +118,8 @@ class IFS : public INIFILE
                                         size_t buffer_size))
     IFS_NOT_IMPLEMENTED(bool ReadString(const char *section_name, const char *key_name, char *buffer,
                                         size_t buffer_size, const char *def_string))
+    IFS_NOT_IMPLEMENTED(bool ReadStringCS(const char *section_name, const char *key_name, char *buffer,
+                                          size_t buffer_size, const char *def_string))
     IFS_NOT_IMPLEMENTED(bool ReadStringNext(const char *section_name, const char *key_name, char *buffer,
                                             size_t buffer_size))
     IFS_NOT_IMPLEMENTED(int32_t GetInt(const char *section_name, const char *key_name))
@@ -153,6 +160,8 @@ class IFS : public INIFILE
 
     bool ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer, uint32_t buffer_size,
                     const char *def_string);
+    bool ReadStringCS(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer, uint32_t buffer_size,
+                      const char *def_string);
     void ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer,
                     uint32_t buffer_size); // rise exception on fault
     bool ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer,

@@ -333,13 +333,7 @@ bool CINODE::GetMidStr(const char *inStr, char *buf, size_t bufSize, const char 
     const int lenEnd = strlen(endStr);
 
     int i;
-    auto fcn = -1, lcn = -1;
-    for (i = 0; i <= lenIn - lenBeg; i++)
-        if (storm::iEquals(&inStr[i], begStr, lenBeg))
-        {
-            fcn = i;
-            break;
-        }
+    auto fcn = storm::iFind(inStr, begStr, 0);
     if (fcn < 0)
     {
         buf[0] = 0;
@@ -347,12 +341,7 @@ bool CINODE::GetMidStr(const char *inStr, char *buf, size_t bufSize, const char 
     }
     fcn += lenBeg;
 
-    for (i = fcn; i <= lenIn - lenEnd; i++)
-        if (storm::iEquals(&inStr[i], endStr, lenEnd))
-        {
-            lcn = i;
-            break;
-        }
+    auto lcn = storm::iFind(inStr, endStr, fcn);
     if (lcn <= fcn)
     {
         buf[0] = 0;

@@ -1,229 +1,89 @@
 #pragma once
 
 #include <algorithm>
-#include <cctype>
-#include <string>
 
 #include "../util_rs.h"
 
 namespace storm
 {
-namespace detail
-{
-struct is_iequal
-{
-    template <typename T1, typename T2 = T1> bool operator()(const T1 &first, const T2 &second) const
-    {
-        return std::toupper(first) == std::toupper(second);
-    }
-};
-
-struct is_iless
-{
-    template <typename T1, typename T2 = T1> bool operator()(const T1 &first, const T2 &second) const
-    {
-        return std::toupper(first) < std::toupper(second);
-    }
-};
-
-struct is_iless_eq
-{
-    template <typename T1, typename T2 = T1> bool operator()(const T1 &first, const T2 &second) const
-    {
-        return std::toupper(first) <= std::toupper(second);
-    }
-};
-
-} // namespace detail
-
-inline int32_t iFind(const char *first, const char *second, const size_t start)
-{
-    return ignore_case_find(first, second, start);
-}
-
 template <typename Range1T, typename Range2T = Range1T>
-bool iEquals(const Range1T &first, const Range2T &second, const size_t count)
+int32_t iFind(const Range1T &first, const Range2T &second, const size_t start)
 {
-    detail::is_iequal comp;
-
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
-    const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    const auto first_begin = std::begin(first_normalized);
-    const auto second_begin = std::begin(second_normalized);
-
-    const auto first_end = std::end(first_normalized);
-    const auto second_end = std::end(second_normalized);
-
-    const auto first_length = std::distance(first_begin, first_end);
-    const auto second_length = std::distance(second_begin, second_end);
-    if (first_length < count || second_length < count)
-    {
-        if (first_length != second_length)
-        {
-            return false;
-        }
-        else
-        {
-            return std::equal(first_begin, first_begin + first_length, second_begin, second_begin + second_length,
-                              comp);
-        }
-    }
-    else
-    {
-        return std::equal(first_begin, first_begin + count, second_begin, second_begin + count, comp);
-    }
+    return ignore_case_find(first_normalized.data(), second_normalized.data(), start);
 }
 
-template <typename Range1T, typename Range2T = Range1T> bool iEquals(const Range1T &first, const Range2T &second)
+template <typename Range1T, typename Range2T = Range1T> 
+bool iStartsWith(const Range1T &first, const Range2T &second)
 {
-    detail::is_iequal comp;
-
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
-    const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    const auto first_begin = std::begin(first_normalized);
-    const auto second_begin = std::begin(second_normalized);
-
-    const auto first_end = std::end(first_normalized);
-    const auto second_end = std::end(second_normalized);
-
-    return std::equal(first_begin, first_end, second_begin, second_end, comp);
+    return ignore_case_starts_with(first_normalized.data(), second_normalized.data());
 }
 
-template <typename Range1T, typename Range2T = Range1T> bool iLess(const Range1T &first, const Range2T &second)
+template <typename Range1T, typename Range2T = Range1T> 
+bool iEquals(const Range1T &first, const Range2T &second)
+{
+    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
+
+    return ignore_case_equal(first_normalized.data(), second_normalized.data());
+}
+
+template <typename Range1T, typename Range2T = Range1T> 
+bool Equals(const Range1T &first, const Range2T &second)
+{
+    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
+
+    return equal(first_normalized.data(), second_normalized.data());
+}
+
+template <typename Range1T, typename Range2T = Range1T> 
+bool iEqualsWin1251(const Range1T &first, const Range2T &second)
 {
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
 
-    return std::lexicographical_compare(std::begin(first_normalized), std::end(first_normalized),
-                                        std::begin(second_normalized), std::end(second_normalized), detail::is_iless{});
+    return ignore_case_equal_win1251(first_normalized.data(), second_normalized.data());
 }
 
-template <typename Range1T, typename Range2T = Range1T> bool iLessOrEqual(const Range1T &first, const Range2T &second)
+template <typename Range1T, typename Range2T = Range1T> 
+bool iLess(const Range1T &first, const Range2T &second)
 {
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
-    const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return std::lexicographical_compare(std::begin(first_normalized), std::end(first_normalized),
-                                        std::begin(second_normalized), std::end(second_normalized),
-                                        detail::is_iless_eq{});
+    return ignore_case_less(first_normalized.data(), second_normalized.data());
 }
 
-template <typename Range1T, typename Range2T = Range1T> bool iGreater(const Range1T &first, const Range2T &second)
+template <typename Range1T, typename Range2T = Range1T> 
+bool iLessOrEqual(const Range1T &first, const Range2T &second)
+{
+    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
+
+    return ignore_case_less_or_equal(first_normalized.data(), second_normalized.data());
+}
+
+template <typename Range1T, typename Range2T = Range1T> 
+bool iGreater(const Range1T &first, const Range2T &second)
 {
     return !iLessOrEqual(first, second);
 }
 
-template <typename Range1T, typename Range2T = Range1T> bool iGreaterOrEqual(const Range1T &first, const Range2T &second)
+template <typename Range1T, typename Range2T = Range1T> 
+bool iGreaterOrEqual(const Range1T &first, const Range2T &second)
 {
     return !iLess(first, second);
 }
 
-
-// The wildcmp function was taken from http://www.codeproject.com/KB/string/wildcmp.aspx; the
-// wildicmp (case insensitive wildcard comparison) was based on it.
-
-inline int wildcmp(const char *wild, const char *string)
+inline bool wildicmp(const char *wild, const char8_t *string)
 {
-    // Written by Jack Handy - jakkhandy@hotmail.com
-
-    const char *cp = NULL, *mp = NULL;
-
-    while ((*string) && (*wild != '*'))
-    {
-        if ((*wild != *string) && (*wild != '?'))
-        {
-            return 0;
-        }
-        wild++;
-        string++;
-    }
-
-    while (*string)
-    {
-        if (*wild == '*')
-        {
-            if (!*++wild)
-            {
-                return 1;
-            }
-            mp = wild;
-            cp = string + 1;
-        }
-        else if ((*wild == *string) || (*wild == '?'))
-        {
-            wild++;
-            string++;
-        }
-        else
-        {
-            wild = mp;
-            if (cp != nullptr)
-            {
-                string = cp++;
-            }
-        }
-    }
-
-    while (*wild == '*')
-    {
-        wild++;
-    }
-    return !*wild;
-}
-
-inline int wildicmp(const char *wild, const char *string)
-{
-    const char *cp = nullptr, *mp = nullptr;
-
-    while ((*string) && (*wild != '*'))
-    {
-        if ((tolower(*wild) != tolower(*string)) && (*wild != '?'))
-        {
-            return 0;
-        }
-        wild++;
-        string++;
-    }
-
-    while (*string)
-    {
-        if (*wild == '*')
-        {
-            if (!*++wild)
-            {
-                return 1;
-            }
-            mp = wild;
-            cp = string + 1;
-        }
-        else if ((tolower(*wild) == tolower(*string)) || (*wild == '?'))
-        {
-            wild++;
-            string++;
-        }
-        else
-        {
-            wild = mp;
-            if (cp != nullptr)
-            {
-                string = cp++;
-            }
-        }
-    }
-
-    while (*wild == '*')
-    {
-        wild++;
-    }
-    return !*wild;
-}
-
-inline int wildicmp(const char *wild, const char8_t *string)
-{
-    // TODO: implement for UTF8!
-    return wildicmp(wild, reinterpret_cast<const char *>(string));
+    return ignore_case_glob(reinterpret_cast<const char *>(string), wild);
 }
 
 class iStrHasher

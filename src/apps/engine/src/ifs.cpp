@@ -248,14 +248,62 @@ KEY_NODE *SECTION::FindKey(KEY_NODE *from, const char *key_name, const char *key
     return nullptr;
 }
 
+KEY_NODE *SECTION::FindKeyCS(KEY_NODE *from, const char *key_name, const char *key_value)
+{
+    KEY_NODE *node;
+
+    if (Root == nullptr)
+        return nullptr;
+
+    if (key_name == nullptr)
+        return nullptr;
+
+    if (from == nullptr)
+        node = Root;
+    else
+        node = from;
+
+    while (node)
+    {
+        const auto flags = node->SetFlags(0);
+        if (flags & KNF_KEY)
+        {
+            if (storm::Equals(key_name, node->GetName()))
+            {
+                if (key_value == nullptr)
+                    return node;
+
+                auto *const char_PTR = node->GetValue();
+                if (char_PTR != nullptr)
+                {
+                    if (storm::iEquals(key_value, char_PTR))
+                        return node;
+                }
+            }
+        }
+        node = node->GetRightNode();
+    }
+    return nullptr;
+}
+
 KEY_NODE *SECTION::FindKey(const char *key_name, const char *key_value)
 {
     return FindKey(Root, key_name, key_value);
 }
 
+KEY_NODE *SECTION::FindKeyCS(const char *key_name, const char *key_value)
+{
+    return FindKeyCS(Root, key_name, key_value);
+}
+
 KEY_NODE *SECTION::FindKey(const char *key_name)
 {
     return FindKey(Root, key_name, nullptr);
+}
+
+KEY_NODE *SECTION::FindKeyCS(const char *key_name)
+{
+    return FindKeyCS(Root, key_name, nullptr);
 }
 
 SECTION *SECTION::GetLeftNode()
@@ -673,6 +721,11 @@ KEY_NODE *IFS::FindKey(const char *section_name, const char *key_name)
     return FindKey(section_name, key_name, nullptr);
 }
 
+KEY_NODE *IFS::FindKeyCS(const char *section_name, const char *key_name)
+{
+    return FindKeyCS(section_name, key_name, nullptr);
+}
+
 KEY_NODE *IFS::FindKey(const char *section_name, const char *key_name, const char *key_value)
 {
     if (SectionRoot == nullptr)
@@ -681,6 +734,18 @@ KEY_NODE *IFS::FindKey(const char *section_name, const char *key_name, const cha
     if (snode == nullptr)
         return nullptr;
     return snode->FindKey(key_name, key_value);
+
+    // return FindKey(0,section_name,key_name,key_value);
+}
+
+KEY_NODE *IFS::FindKeyCS(const char *section_name, const char *key_name, const char *key_value)
+{
+    if (SectionRoot == nullptr)
+        return nullptr;
+    auto *snode = FindSection(section_name);
+    if (snode == nullptr)
+        return nullptr;
+    return snode->FindKeyCS(key_name, key_value);
 
     // return FindKey(0,section_name,key_name,key_value);
 }
@@ -875,6 +940,48 @@ bool IFS::ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_
     return true;
 }
 
+bool IFS::ReadStringCS(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer,
+                       uint32_t buffer_size, const char *def_string)
+{
+    auto *node = FindKeyCS(section_name, key_name);
+    if (node == nullptr)
+    {
+        sd->Key = nullptr;
+        sd->Section = nullptr;
+        if (def_string == nullptr)
+        {
+            core_internal.Trace("Warning! IniFile Read String: section=%s, key=%s", section_name, key_name);
+            if (buffer)
+                buffer[0] = 0;
+            // throw std::runtime_error(string not found);
+        }
+        else if (buffer)
+            strcpy_s(buffer, buffer_size, def_string);
+        return false;
+    }
+
+    sd->Key = node;
+    sd->Section = FindSection(section_name);
+
+    if (buffer == nullptr)
+        throw std::runtime_error("zero buffer");
+    auto *const char_PTR = node->GetValue();
+    if (char_PTR == nullptr)
+    {
+        if (def_string == nullptr)
+            throw std::runtime_error("no key value");
+        strcpy_s(buffer, buffer_size, def_string);
+        return false;
+    }
+
+    uint32_t write_size = strlen(char_PTR) + 1;
+    // commented out because it didn't let to load new ani
+    // if(write_size > buffer_size) throw std::runtime_error(buffer size too small);
+
+    strcpy_s(buffer, buffer_size, node->GetValue());
+    return true;
+}
+
 bool IFS::ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *key_name, char *buffer,
                          uint32_t buffer_size)
 {
@@ -891,7 +998,7 @@ bool IFS::ReadStringNext(SEARCH_DATA *sd, const char *section_name, const char *
         if (start == true)
         {
             // if(CompareStrings(node->GetName(),key_name) == 0)
-            if (storm::iEquals(node->GetName(), key_name))
+            if (storm::iEqualsWin1251(node->GetName(), key_name))
             {
                 if (buffer == nullptr)
                     throw std::runtime_error("zero buffer");

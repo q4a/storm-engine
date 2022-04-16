@@ -39,6 +39,19 @@ To rewrite a library in Rust you need:
 * Set crate type to `staticlib`
 * Create new `cbindgen.toml` file with `pragma_once` set to `true` and `include_guard` set to `rust_<library>_h`
 
+### Oxidation Workflow
+
+Necessary steps when rewriting C++ to Rust:
+
+* Collect live samples by playing the game (preferably a few thousands of samples)
+* Make sure your code returns correct value for each sample
+* Compare values returned from your Rust code with values returned by original C++ code during live gameplay
+* Reduce collected live samples to a simple unit-test
+* Replace calls to C++ code with calls to Rust code
+
+**Notice:** in certain cases Step 1 can be skipped (when it slows down the game to unplayable state even in release mode).
+**Notice:** Rust code assumes all strings to be in valid UTF-8 encoding. However, that is not always the case. In such cases create a separate method for each encoding used.
+
 ## Roadmap
 Since our development team is small, we want to reduce the amount of code we have to maintain.
 For this reason, we decided to rely on the C++ standard library or third-party libraries if possible.
