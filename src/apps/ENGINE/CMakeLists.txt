@@ -116,12 +116,12 @@ add_executable(${PROJECT_NAME} WIN32
 	token.h
 	vbuffer.h
 
-	${Storm_RESOURCE_DIR}/engine/resource.rc
+	${STORM_RESOURCE_DIR}/engine/resource.rc
 )
 
 target_include_directories(${PROJECT_NAME}
 	PRIVATE
-	${Storm_RESOURCE_DIR}/engine
+	${STORM_RESOURCE_DIR}/engine
 	${SteamSdk_INCLUDE_DIR}
 )
 
