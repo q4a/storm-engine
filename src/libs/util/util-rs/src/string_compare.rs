@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 pub fn ignore_case_find(s: &str, pat: &str, start: usize) -> Option<usize> {
     let mut n = start;
     while n < s.len() && !s.is_char_boundary(n) {
@@ -17,6 +19,17 @@ pub fn ignore_case_starts_with(s: &str, pat: &str) -> bool {
     let s_lowercase = s.to_lowercase();
     let pat_lowercase = pat.to_lowercase();
     s_lowercase.starts_with(&pat_lowercase)
+}
+
+fn ignore_case_compare(s1: &str, s2: &str) -> Ordering {
+    let s1_lowercase = s1.to_lowercase();
+    let s2_lowercase = s2.to_lowercase();
+
+    s1_lowercase.cmp(&s2_lowercase)
+}
+
+pub fn ignore_case_equal(s1: &str, s2: &str) -> bool {
+    matches!(ignore_case_compare(s1, s2), Ordering::Equal)
 }
 
 #[cfg(test)]
@@ -95,6 +108,7 @@ mod tests {
         }
     }
 
+    #[allow(dead_code)]
     fn for_each_line(file_name: &str, func: fn(&str)) -> Result<(), std::io::Error> {
         let file = File::open(&file_name)?;
 

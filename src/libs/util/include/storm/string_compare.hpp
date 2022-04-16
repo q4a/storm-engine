@@ -10,14 +10,6 @@ namespace storm
 {
 namespace detail
 {
-struct is_iequal
-{
-    template <typename T1, typename T2 = T1> bool operator()(const T1 &first, const T2 &second) const
-    {
-        return std::toupper(first) == std::toupper(second);
-    }
-};
-
 struct is_iless
 {
     template <typename T1, typename T2 = T1> bool operator()(const T1 &first, const T2 &second) const
@@ -48,18 +40,26 @@ inline bool iStartsWith(const char *first, const char *second)
 
 template <typename Range1T, typename Range2T = Range1T> bool iEquals(const Range1T &first, const Range2T &second)
 {
-    detail::is_iequal comp;
-
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
 
-    const auto first_begin = std::begin(first_normalized);
-    const auto second_begin = std::begin(second_normalized);
+    return ignore_case_equal(first_normalized.data(), second_normalized.data());
+}
 
-    const auto first_end = std::end(first_normalized);
-    const auto second_end = std::end(second_normalized);
+template <typename Range1T, typename Range2T = Range1T> bool Equals(const Range1T &first, const Range2T &second)
+{
+    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
+    const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
 
-    return std::equal(first_begin, first_end, second_begin, second_end, comp);
+    return equal(first_normalized.data(), second_normalized.data());
+}
+
+template <typename Range1T, typename Range2T = Range1T> bool iEqualsWin1251(const Range1T &first, const Range2T &second)
+{
+    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
+    const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
+
+    return ignore_case_equal_win1251(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> bool iLess(const Range1T &first, const Range2T &second)

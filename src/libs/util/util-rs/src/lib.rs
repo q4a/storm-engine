@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::ffi::CStr;
 use std::path::PathBuf;
 use std::{ffi::OsString, os::windows::prelude::OsStrExt};
@@ -77,8 +78,8 @@ pub extern "C" fn ignore_case_find(
     second: *const c_char,
     start: size_t,
 ) -> c_int {
-    let fisrt_str = unsafe { CStr::from_ptr(first) };
-    let first = fisrt_str.to_str().unwrap();
+    let first_str = unsafe { CStr::from_ptr(first) };
+    let first = first_str.to_str().unwrap();
 
     let second_str = unsafe { CStr::from_ptr(second) };
     let second = second_str.to_str().unwrap();
@@ -89,13 +90,47 @@ pub extern "C" fn ignore_case_find(
 
 #[no_mangle]
 pub extern "C" fn ignore_case_starts_with(first: *const c_char, second: *const c_char) -> bool {
-    let fisrt_str = unsafe { CStr::from_ptr(first) };
-    let first = fisrt_str.to_str().unwrap();
+    let first_str = unsafe { CStr::from_ptr(first) };
+    let first = first_str.to_str().unwrap();
 
     let second_str = unsafe { CStr::from_ptr(second) };
     let second = second_str.to_str().unwrap();
 
     string_compare::ignore_case_starts_with(first, second)
+}
+
+#[no_mangle]
+pub extern "C" fn ignore_case_equal(first: *const c_char, second: *const c_char) -> bool {
+    let first_str = unsafe { CStr::from_ptr(first) };
+    let first = first_str.to_str().unwrap();
+
+    let second_str = unsafe { CStr::from_ptr(second) };
+    let second = second_str.to_str().unwrap();
+
+    string_compare::ignore_case_equal(first, second)
+}
+
+#[no_mangle]
+pub extern "C" fn ignore_case_equal_win1251(first: *const c_char, second: *const c_char) -> bool {
+    let encoding = encoding_rs::WINDOWS_1251;
+    let first = unsafe { CStr::from_ptr(first).to_bytes_with_nul() };
+    let (first, _, _) = encoding.decode(first);
+
+    let second = unsafe { CStr::from_ptr(second).to_bytes_with_nul() };
+    let (second, _, _) = encoding.decode(second);
+
+    string_compare::ignore_case_equal(first.borrow(), second.borrow())
+}
+
+#[no_mangle]
+pub extern "C" fn equal(first: *const c_char, second: *const c_char) -> bool {
+    let first_str = unsafe { CStr::from_ptr(first) };
+    let first = first_str.to_str().unwrap();
+
+    let second_str = unsafe { CStr::from_ptr(second) };
+    let second = second_str.to_str().unwrap();
+
+    first.eq(second)
 }
 
 fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {

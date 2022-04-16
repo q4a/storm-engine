@@ -49,6 +49,9 @@ Necessary steps when rewriting C++ to Rust:
 * Reduce collected live samples to a simple unit-test
 * Replace calls to C++ code with calls to Rust code
 
+**Notice:** in certain cases Step 1 can be skipped (when it slows down the game to unplayable state even in release mode).
+**Notice:** Rust code assumes all strings to be in valid UTF-8 encoding. However, that is not always the case. In such cases create a separate method for each encoding used.
+
 ## Roadmap
 Since our development team is small, we want to reduce the amount of code we have to maintain.
 For this reason, we decided to rely on the C++ standard library or third-party libraries if possible.

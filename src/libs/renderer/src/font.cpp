@@ -146,7 +146,7 @@ bool FONT::Init(const char *font_name, const char *iniName, IDirect3DDevice9 *_d
             sprintf_s(key_name, "char_equ");
         else
             sprintf_s(key_name, "char_%s", utf8);
-        if (!ini->ReadString(font_name, key_name, buffer, sizeof(buffer), ""))
+        if (!ini->ReadStringCS(font_name, key_name, buffer, sizeof(buffer), ""))
             continue;
         pData = buffer;
         if (!MakeLong(&pData, &ltmp))
