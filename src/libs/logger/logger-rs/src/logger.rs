@@ -18,7 +18,7 @@ use log4rs::{
 use once_cell::sync::Lazy;
 
 static ROOT_LOGGER_NAME: &str = "stdout";
-static LOG_LINE_PATTERN: &str = "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {f}:{L} — {m}{n}";
+static LOG_LINE_PATTERN: &str = "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {t} — {m}{n}";
 static TRIGGER_SIZE: u64 = size_in_mb(30);
 static ROLLER_COUNT: u32 = 5;
 static ROLLER_BASE: u32 = 1;
@@ -51,7 +51,9 @@ impl AppenderType {
     fn get_appender(&self, name: &str) -> Appender {
         match self {
             AppenderType::Console => {
-                let appender = ConsoleAppender::builder().build();
+                let appender = ConsoleAppender::builder()
+                    .encoder(Box::new(PatternEncoder::new(LOG_LINE_PATTERN)))
+                    .build();
                 Appender::builder().build(name, Box::new(appender))
             }
             AppenderType::File {
@@ -102,7 +104,7 @@ impl From<GlobalConfig> for Config {
                 Logger::builder()
                     .appender(&logger.appender_name)
                     .additive(false)
-                    .build(&logger.name, logger.level)
+                    .build(&logger.name, logger.level),
             );
         }
 

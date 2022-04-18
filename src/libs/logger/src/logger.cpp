@@ -21,8 +21,13 @@ Logger Logger::file_logger(std::string name, LogLevel level)
     return Logger(name);
 }
 
+Logger::Logger(std::string name) : m_name(name)
+{
+}
+
 Logger Logger::console_logger(std::string name, LogLevel level)
 {
+    create_console();
     add_console_logger(name.data(), level);
     return Logger(name);
 }

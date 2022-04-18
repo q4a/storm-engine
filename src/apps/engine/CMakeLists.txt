@@ -16,9 +16,9 @@ STORM_SETUP(
     # internal
     common
     diagnostics
-    logger
     util
     window
+    logger
 
     # VM
     animals

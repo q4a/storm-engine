@@ -14,7 +14,6 @@
 #include "s_debug.h"
 #include "v_sound_service.h"
 #include "storm/fs.h"
-#include "storm/logger.hpp"
 #include "watermark.hpp"
 
 VFILE_SERVICE *fio = nullptr;
@@ -130,10 +129,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         MessageBoxA(nullptr, "Another instance is already running!", "Error", MB_ICONERROR);
         return EXIT_SUCCESS;
     }
-
-    std::string log_name = "test_logger";
-    const auto logger = storm::Logger::console_logger(log_name, LogLevel::Debug);
-    logger.log_debug(log_name);
 
     mi_register_output(mimalloc_fun, nullptr);
     mi_option_set(mi_option_show_errors, 1);

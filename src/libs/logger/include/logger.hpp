@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../logger_rs.h"
+#include "logger_rs.h"
 
 namespace storm
 {
