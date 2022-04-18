@@ -1,0 +1,14 @@
+[package]
+name = "logger-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type=["staticlib"]
+
+[dependencies]
+log = "0.4"
+log4rs = { version = "1", default-features = false, features = ["console_appender", "compound_policy", "size_trigger", "rolling_file_appender", "fixed_window_roller", "gzip"] }
+once_cell = "1"

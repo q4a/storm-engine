@@ -10,9 +10,6 @@ crate-type=["staticlib"]
 
 [dependencies]
 dirs-next = "2.0"
-winapi = { version = "0.3", default-features = false }
 regex = "1.5.5"
-log = "0.4"
-env_logger = "0.9"
 encoding_rs = "0.8"
 globset = "0.4"

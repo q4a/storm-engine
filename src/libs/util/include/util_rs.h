@@ -11,16 +11,6 @@
 
 extern "C" {
 
-void init_logger();
-
-void error(const char *message);
-
-void warn(const char *message);
-
-void info(const char *message);
-
-void debug(const char *message);
-
 wchar_t *get_stash_path();
 
 wchar_t *get_logs_path();
