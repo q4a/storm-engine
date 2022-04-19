@@ -1,8 +1,7 @@
 #pragma once
 
-#include <cstdarg>
 #include <string>
-#include <vector>
+#include <memory>
 
 #include "logger_rs.h"
 
@@ -11,14 +10,14 @@ namespace storm
 class Logger
 {
   public:
-    static Logger file_logger(std::string name, LogLevel level);
-    static Logger console_logger(std::string name, LogLevel level);
+    static std::shared_ptr<Logger> file_logger(const std::string &name, LogLevel level);
+    static std::shared_ptr<Logger> console_logger(const std::string &name, LogLevel level);
 
-    void log_error(std::string message) const;
-    void log_warn(std::string message) const;
-    void log_info(std::string message) const;
-    void log_debug(std::string message) const;
-    void log_trace(std::string message) const;
+    void log_error(const char *const format, ...) const;
+    void log_warn(const char *const format, ...) const;
+    void log_info(const char *const format, ...) const;
+    void log_debug(const char *const format, ...) const;
+    void log_trace(const char *const format, ...) const;
 
   private:
     Logger(std::string name);

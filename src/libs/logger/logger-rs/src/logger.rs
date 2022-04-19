@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{collections::HashMap, path::PathBuf, sync::Mutex};
 
 use log::LevelFilter;
 use log4rs::{
@@ -18,7 +18,7 @@ use log4rs::{
 use once_cell::sync::Lazy;
 
 static ROOT_LOGGER_NAME: &str = "stdout";
-static LOG_LINE_PATTERN: &str = "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {t} — {m}{n}";
+static LOG_LINE_PATTERN: &str = "{d(%Y-%m-%d %H:%M:%S)} | {t} | {({l}):5.5} | {m}{n}";
 static TRIGGER_SIZE: u64 = size_in_mb(30);
 static ROLLER_COUNT: u32 = 5;
 static ROLLER_BASE: u32 = 1;
@@ -40,8 +40,17 @@ enum AppenderType {
 
 impl AppenderType {
     fn new_file_type(path: &str, name: &str) -> AppenderType {
-        let roller_pattern = format!("{}/{}_{{}}.gz", path, name);
-        let log_path = format!("{}/{}.log", path, name);
+        let mut path = PathBuf::from(path);
+
+        let roller_pattern = format!("{}_{{}}.gz", name);
+        path.push(roller_pattern);
+        let roller_pattern = path.to_str().unwrap().to_string();
+
+        let log_path = format!("{}.log", name);
+        path.pop();
+        path.push(log_path);
+        let log_path = path.to_str().unwrap().to_string();
+
         AppenderType::File {
             roller_pattern,
             log_path,
@@ -82,7 +91,6 @@ impl AppenderType {
 
 #[derive(Clone, Debug)]
 struct LoggerConfig {
-    name: String,
     level: LevelFilter,
     appender_name: String,
     appender_type: AppenderType,
@@ -90,7 +98,7 @@ struct LoggerConfig {
 
 #[derive(Clone, Debug)]
 struct GlobalConfig {
-    loggers: Vec<LoggerConfig>,
+    loggers: HashMap<String, LoggerConfig>,
 }
 
 impl From<GlobalConfig> for Config {
@@ -98,13 +106,13 @@ impl From<GlobalConfig> for Config {
         let root_appender = AppenderType::Console.get_appender(ROOT_LOGGER_NAME);
 
         let mut builder = Config::builder().appender(root_appender);
-        for logger in &config.loggers {
+        for (name, logger) in &config.loggers {
             let appender = logger.appender_type.get_appender(&logger.appender_name);
             builder = builder.appender(appender).logger(
                 Logger::builder()
                     .appender(&logger.appender_name)
                     .additive(false)
-                    .build(&logger.name, logger.level),
+                    .build(name, logger.level),
             );
         }
 
@@ -124,13 +132,13 @@ pub fn add_console_logger(name: &str, level: LevelFilter) {
 
         let appender_name = format!("{}_ap", name);
         let appender_type = AppenderType::Console;
-        config.loggers.push(LoggerConfig {
-            name: name.to_string(),
+        let logger_config = LoggerConfig {
             level,
             appender_name,
             appender_type,
-        });
+        };
 
+        config.loggers.insert(name.to_string(), logger_config);
         let config_clone = config.clone();
         handle.set_config(config_clone.into())
     }
@@ -142,12 +150,12 @@ pub fn add_file_logger(path: &str, name: &str, level: LevelFilter) {
 
         let appender_name = format!("{}_ap", name);
         let appender_type = AppenderType::new_file_type(path, name);
-        config.loggers.push(LoggerConfig {
-            name: name.to_string(),
+        let logger_config = LoggerConfig {
             level,
             appender_name,
             appender_type,
-        });
+        };
+        config.loggers.insert(name.to_string(), logger_config);
 
         let config_clone = config.clone();
         handle.set_config(config_clone.into())
@@ -156,10 +164,21 @@ pub fn add_file_logger(path: &str, name: &str, level: LevelFilter) {
 
 fn initial_setup() -> (Handle, GlobalConfig) {
     let initial_config = GlobalConfig {
-        loggers: Vec::new(),
+        loggers: HashMap::new(),
     };
 
     let config_clone = initial_config.clone();
     let handle = log4rs::init_config(config_clone.into()).unwrap();
     (handle, initial_config)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::add_console_logger;
+
+    #[test]
+    fn recreate_logger_test() {
+        add_console_logger("test", log::LevelFilter::Trace);
+        add_console_logger("test", log::LevelFilter::Trace);
+    }
 }

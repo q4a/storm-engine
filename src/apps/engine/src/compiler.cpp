@@ -6,7 +6,6 @@
 #include <zlib.h>
 
 #include "s_debug.h"
-#include "logging.hpp"
 #include "script_cache.h"
 #include "storm_assert.h"
 
@@ -64,11 +63,9 @@ COMPILER::COMPILER()
 
     // bScriptTrace = false;
 
-    using storm::logging::getOrCreateLogger;
-    logTrace_ = getOrCreateLogger("compile");
-    logError_ = getOrCreateLogger("error");
-    logStack_ = getOrCreateLogger("script_stack");
-    logStack_->set_pattern("%v");
+    logTrace_ = storm::Logger::file_logger("compile", LogLevel::Trace);
+    logError_ = storm::Logger::file_logger("error", LogLevel::Trace);
+    logStack_ = storm::Logger::file_logger("script_stack", LogLevel::Trace);
 }
 
 COMPILER::~COMPILER()
@@ -220,7 +217,7 @@ void COMPILER::Trace(const char *data_PTR, ...)
     va_start(args, data_PTR);
     vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
     va_end(args);
-    logTrace_->trace(LogBuffer);
+    logTrace_->log_trace(LogBuffer);
 }
 
 // write to compilation log file
@@ -236,7 +233,7 @@ void COMPILER::DTrace(const char *data_PTR, ...)
     va_start(args, data_PTR);
     vsnprintf(LogBuffer, sizeof(LogBuffer) - 4, data_PTR, args);
     va_end(args);
-    logTrace_->trace(LogBuffer);
+    logTrace_->log_trace(LogBuffer);
 }
 
 // append one block of code to another
@@ -325,7 +322,7 @@ void COMPILER::SetError(const char *data_PTR, ...)
     }
     va_end(args);
 
-    logError_->error(ErrorBuffer);
+    logError_->log_error(ErrorBuffer);
 
     if (bBreakOnError)
         CDebug->SetTraceMode(TMODE_MAKESTEP);
@@ -351,7 +348,7 @@ void COMPILER::SetWarning(const char *data_PTR, ...)
     sprintf_s(ErrorBuffer, "WARNING in %s(%d): %s", DebugSourceFileName, DebugSourceLine + 1, LogBuffer);
     va_end(args);
 
-    logTrace_->warn(ErrorBuffer);
+    logTrace_->log_warn(ErrorBuffer);
 }
 
 void COMPILER::LoadPreprocess()
@@ -7110,7 +7107,7 @@ DATA *COMPILER::GetOperand(const char *pCodeBase, uint32_t &ip, S_TOKEN_TYPE *pT
 
 void COMPILER::CollectCallStack() const
 {
-    logStack_->trace("Call stack:");
+    logStack_->log_trace("Call stack:");
     auto callStackCopy = callStack_;
     while (!callStackCopy.empty())
     {
@@ -7122,15 +7119,15 @@ void COMPILER::CollectCallStack() const
 
         if (filename[0] == '\0')
         {
-            logStack_->trace("{} (EVENT)", name);
+            logStack_->log_trace("{} (EVENT)", name);
         }
         else if (strcmp(filename, "engine") == 0)
         {
-            logStack_->trace("{} (INTERNAL FUNCTION)", name);
+            logStack_->log_trace("{} (INTERNAL FUNCTION)", name);
         }
         else
         {
-            logStack_->trace("{} (FUNCTION) at {}:{}", name, filename, line);
+            logStack_->log_trace("{} (FUNCTION) at {}:{}", name, filename, line);
         }
 
         callStackCopy.pop();
@@ -7142,7 +7139,7 @@ void COMPILER::PrintoutUsage()
     if (bRuntimeLog && core.Controls->GetDebugAsyncKeyState(VK_BACK) < 0 &&
         core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
     {
-        logTrace_->debug("Script Function Time Usage[func name/code(release mode) : ticks]");
+        logTrace_->log_debug("Script Function Time Usage[func name/code(release mode) : ticks]");
         for (size_t m = 0; m < FuncTab.GetFuncNum(); m++)
         {
             FuncInfo fi;
@@ -7157,28 +7154,29 @@ void COMPILER::PrintoutUsage()
                 FuncTab.GetFunc(fi, n);
                 if (!fi.name.empty())
                 {
-                    logTrace_->debug("  {}", fi.name);
+                    logTrace_->log_debug("  {}", fi.name);
                 }
                 else
                 {
-                    logTrace_->debug("  {}", n);
+                    logTrace_->log_debug("  {}", n);
                 }
-                logTrace_->debug("  ticks summary  : {}", fi.usage_time);
-                logTrace_->debug("  calls          : {}", fi.number_of_calls);
+                logTrace_->log_debug("  ticks summary  : {}", fi.usage_time);
+                logTrace_->log_debug("  calls          : {}", fi.number_of_calls);
                 if (fi.number_of_calls != 0)
                 {
-                    logTrace_->debug("  average ticks  : {}", static_cast<float>(fi.usage_time) / fi.number_of_calls);
+                    logTrace_->log_debug("  average ticks  : {}",
+                                         static_cast<float>(fi.usage_time) / fi.number_of_calls);
                 }
 
                 FuncTab.AddTime(n, ~fi.usage_time);
-                logTrace_->debug("");
+                logTrace_->log_debug("");
             }
         }
 
-        logTrace_->debug("Script Run Time Log [sec : ms]");
+        logTrace_->log_debug("Script Run Time Log [sec : ms]");
         for (size_t n = 0; n < nRuntimeLogEventsNum; n++)
         {
-            logTrace_->debug("  %d : %d", n, pRuntimeLogEvent[n]);
+            logTrace_->log_debug("  %d : %d", n, pRuntimeLogEvent[n]);
         }
     }
 }
