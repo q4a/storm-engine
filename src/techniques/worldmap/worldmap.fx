@@ -1,4 +1,63 @@
-#include "worldmap_shader.h"
+struct VS_OUTPUT
+{
+    float4 pos      : POSITION;
+    vector diffuse  : COLOR0;
+    vector specular : COLOR1;
+    float2 uv1out   : TEXCOORD0;
+    float4 norm     : TEXCOORD1;
+};
+
+uniform extern float4x4 prj1; // c0 - c3
+uniform extern float4x4 prj2; // c4 - c6
+
+// pos is dcl_position v0, col is dcl_color v1, uv1 is dcl_texcoord v2
+VS_OUTPUT main(float3 pos : POSITION, float4 col : COLOR, float2 uv1 : TEXCOORD)
+{
+    //VS_OUTPUT Output;
+    VS_OUTPUT Output = (VS_OUTPUT)0;
+
+    // Position
+    // mov  r0, v0
+    // mul  r1, r0.xxxx, c[0]
+    // mad  r1, r0.yyyy, c[1], r1
+    // mad  r1, r0.zzzz, c[2], r1
+    // add  oPos, r1, c[3]
+    Output.pos = mul(pos.xxxx, prj1[0]) + mul(pos.yyyy, prj1[1]) + mul(pos.zzzz, prj1[2]) + prj1[3];
+
+    // Color
+    // mov  oD0, v1.xxxw
+    Output.diffuse = col.xxxw;
+    // mul  oD1, v1.yyyw, c[6]
+    Output.specular = mul(col.yyyw, prj2[2]);
+
+    // Texture coordinates of the first stage
+    // mov  oT0, v2
+    Output.uv1out = uv1;
+
+    // Generate texture coordinates of the second stage
+    // Vector length for a given square
+    ////////// vlen is r2.w, prj2[1] is r2 //////////
+    // mov  r2, c[5]
+    // mad  r2.w, v1.z, r2.z, r2.x
+    //float vlen = mul(col.z, prj2[1].z) + prj2[1].x;
+    float vlen = col.z * prj2[1].z + prj2[1].x;
+
+    // Vertical component of the vector
+    ////////// vhigh is r1.w //////////
+    // dp4  r1, r0, c[4]
+    //float vhigh = (pos.x*prj2[0].x) + (pos.y*prj2[0].y) + (pos.z*prj2[0].z) + (pos.w*prj2[0].w);
+    float vhigh = pos.x*prj2[0].x + pos.y*prj2[0].y + pos.z*prj2[0].z;
+
+    // Normalize and reduce to unit range
+    // rcp  r2.w, r2.w
+    // mad  r1.w, r1.w, r2.w, c[5].w
+    vhigh = vhigh/vlen + prj2[1].w;
+    // mov oT1, r1.wwww
+    Output.norm = float4(vhigh, vhigh, vhigh, vhigh);
+
+    return Output;
+}
+
 
 technique WdmModelDrawStd
 {
@@ -136,7 +195,7 @@ technique WdmClouds
         AddressU[1] = clamp;
         AddressV[1] = clamp;
 
-        VertexShader = SHADER;
+        VertexShader = compile vs_1_1 main();
     }
 }
 

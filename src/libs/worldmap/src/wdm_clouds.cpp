@@ -19,8 +19,6 @@
 #define WdmCloudsSizeMin 30.0f
 #define WdmCloudsSizeMax 50.0f
 
-IDirect3DVertexDeclaration9 *WdmClouds::vertexDecl_ = nullptr;
-
 WdmClouds::Cloud::Cloud()
 {
     count = 0;
@@ -363,7 +361,8 @@ void WdmClouds::LRender(VDX9RENDER *rs)
         CMatrix prj;
         rs->GetTransform(D3DTS_PROJECTION, prj);
         view.Transposition();
-        rs->SetVertexShaderConstantF(0, prj, 4);
+        //rs->SetVertexShaderConstantF(0, prj, 4);
+        fx_->SetMatrix(hprj1_, prj);
         prj.matrix[0] = view.matrix[1];
         prj.matrix[1] = view.matrix[5];
         prj.matrix[2] = view.matrix[9];
@@ -372,7 +371,12 @@ void WdmClouds::LRender(VDX9RENDER *rs)
         prj.matrix[5] = 0.0f;
         prj.matrix[6] = (WdmCloudsSizeMax - WdmCloudsSizeMin) * 1.4f;
         prj.matrix[7] = 0.5f;
-        rs->SetVertexShaderConstantF(4, prj, 2);
+        prj.matrix[8] = 0.0f;
+        prj.matrix[9] = 0.0f;
+        prj.matrix[10] = 0.0f;
+        prj.matrix[11] = 0.0f;
+        //rs->SetVertexShaderConstantF(4, prj, 2);
+        fx_->SetMatrix(hprj2_, prj);
         rs->DrawRects(rects, count, "WdmClouds", 2, 2);
     }
     // rs->Print(20, 200, "Visible clouds = %i, Visible particles = %i", cnt, count);
@@ -390,4 +394,11 @@ void WdmClouds::CreateVertexDeclaration(VDX9RENDER *rs)
         D3DDECL_END()};
 
     rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
+
+    fx_ = rs->GetEffectPointer("WdmClouds");
+    if (fx_ != nullptr)
+    {
+        hprj1_ = fx_->GetParameterByName(nullptr, "prj1");
+        hprj2_ = fx_->GetParameterByName(nullptr, "prj2");
+    }
 }

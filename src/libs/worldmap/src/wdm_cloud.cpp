@@ -16,8 +16,6 @@
 #define WdmStormSizeMin 40.0f
 #define WdmStormSizeMax 60.0f
 
-IDirect3DVertexDeclaration9 *WdmCloud::vertexDecl_ = nullptr;
-
 // ============================================================================================
 // Construction, destruction
 // ============================================================================================
@@ -311,7 +309,8 @@ void WdmCloud::Render(VDX9RENDER *rs)
     // Constants
     CMatrix prj;
     rs->GetTransform(D3DTS_PROJECTION, prj);
-    rs->SetVertexShaderConstantF(0, prj, 4);
+    //rs->SetVertexShaderConstantF(0, prj, 4);
+    fx_->SetMatrix(hprj1_, prj);
     prj.matrix[0] = view.matrix[1];
     prj.matrix[1] = view.matrix[5];
     prj.matrix[2] = view.matrix[9];
@@ -324,7 +323,8 @@ void WdmCloud::Render(VDX9RENDER *rs)
     prj.matrix[9] = 0.6f;
     prj.matrix[10] = 1.0f;
     prj.matrix[11] = 1.0f;
-    rs->SetVertexShaderConstantF(4, prj, 3);
+    //rs->SetVertexShaderConstantF(4, prj, 3);
+    fx_->SetMatrix(hprj2_, prj);
     // Render
     rs->DrawRects(rect, numRects, "WdmClouds", 2, 2);
 }
@@ -385,4 +385,11 @@ void WdmCloud::CreateVertexDeclaration(VDX9RENDER *rs)
         D3DDECL_END()};
 
     rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
+
+    fx_ = rs->GetEffectPointer("WdmClouds");
+    if (fx_ != nullptr)
+    {
+        hprj1_ = fx_->GetParameterByName(nullptr, "prj1");
+        hprj2_ = fx_->GetParameterByName(nullptr, "prj2");
+    }
 }

@@ -15,7 +15,10 @@
 
 class WdmCloud : public WdmRenderObject
 {
-    static IDirect3DVertexDeclaration9 *vertexDecl_;
+    static inline IDirect3DVertexDeclaration9 *vertexDecl_;
+    static inline ID3DXEffect *fx_;
+    static inline D3DXHANDLE hprj1_;
+    static inline D3DXHANDLE hprj2_;
     void CreateVertexDeclaration(VDX9RENDER *rs);
 
     struct MoveInfo
