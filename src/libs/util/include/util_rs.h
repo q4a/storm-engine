@@ -11,13 +11,13 @@
 
 extern "C" {
 
-wchar_t *get_stash_path();
+const wchar_t *get_stash_path();
 
-wchar_t *get_logs_path();
+const wchar_t *get_logs_path();
 
-wchar_t *get_save_data_path();
+const wchar_t *get_save_data_path();
 
-wchar_t *get_screenshots_path();
+const wchar_t *get_screenshots_path();
 
 int ignore_case_find(const char *s, const char *pattern, size_t start);
 

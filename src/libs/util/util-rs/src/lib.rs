@@ -13,22 +13,22 @@ pub type size_t = usize;
 pub type wchar_t = c_ushort;
 
 #[no_mangle]
-pub extern "C" fn get_stash_path() -> *mut wchar_t {
+pub extern "C" fn get_stash_path() -> *const wchar_t {
     pathbuf_to_wchar(fs::home_directory())
 }
 
 #[no_mangle]
-pub extern "C" fn get_logs_path() -> *mut wchar_t {
+pub extern "C" fn get_logs_path() -> *const wchar_t {
     pathbuf_to_wchar(fs::logs_directory())
 }
 
 #[no_mangle]
-pub extern "C" fn get_save_data_path() -> *mut wchar_t {
+pub extern "C" fn get_save_data_path() -> *const wchar_t {
     pathbuf_to_wchar(fs::save_directory())
 }
 
 #[no_mangle]
-pub extern "C" fn get_screenshots_path() -> *mut wchar_t {
+pub extern "C" fn get_screenshots_path() -> *const wchar_t {
     pathbuf_to_wchar(fs::screenshot_directory())
 }
 
@@ -101,12 +101,12 @@ pub extern "C" fn ignore_case_glob(s: *const c_char, pattern: *const c_char) -> 
     string_compare::ignore_case_glob(s, pattern)
 }
 
-fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {
+fn pathbuf_to_wchar(input: PathBuf) -> *const wchar_t {
     OsString::from(input)
         .encode_wide()
         .chain(Some(0))
         .collect::<Vec<_>>()
-        .as_mut_ptr()
+        .as_ptr()
 }
 
 fn c_char_to_str<'a>(s: *const c_char) -> &'a str {
