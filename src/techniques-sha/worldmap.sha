@@ -48,8 +48,6 @@ block WdmModelDrawStdAlphaTest()
 	}
 }
 
-
-
 block WdmModelDrawStdA()
 {
 	technique t0
@@ -71,7 +69,7 @@ block WdmModelDrawStdA()
 
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			
+
 			Render.Draw
 
 			Restore.States
@@ -141,39 +139,38 @@ VertexShader WdmCloudsVS
 {
 	decl
 	{
-        stream[0];
+		stream[0];
 
-        float position[3];	//Position
-		color;				//color
-		float texcoord[2];	//uv1
-    }
-    
+		float v0[3] .position:0;	//Position
+		color v1 .color:0;		//color
+		float v5[2] .texcoord:0;	//uv1
+	}
+	
 	asm
 	{
 		vs.1.1
-
 		dcl_position v0
 		dcl_color v1
-		dcl_texcoord v2
+		dcl_texcoord v5
 
-		//Позиция
+		//РџРѕР·РёС†РёСЏ
 		mov  r0, v0
 		mul  r1, r0.xxxx, c[0]
 		mad  r1, r0.yyyy, c[1], r1
 		mad  r1, r0.zzzz, c[2], r1
 		add  oPos, r1, c[3]
-		//Цвет
+		//Р¦РІРµС‚
 		mov  oD0, v1.xxxw
 		mul  oD1, v1.yyyw, c[6]
-		//Текстурные координаты первой стадии
-		mov  oT0, v2
-		//Генерим текстурные координаты второй стадии
-		//Длинна вектора для данного квадрата
+		//РўРµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРµСЂРІРѕР№ СЃС‚Р°РґРёРё
+		mov  oT0, v5
+		//Р“РµРЅРµСЂРёРј С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІС‚РѕСЂРѕР№ СЃС‚Р°РґРёРё
+		//Р”Р»РёРЅРЅР° РІРµРєС‚РѕСЂР° РґР»СЏ РґР°РЅРЅРѕРіРѕ РєРІР°РґСЂР°С‚Р°
 		mov  r2, c[5]
 		mad  r2.w, v1.z, r2.z, r2.x
-		//Вертикальная компонента вектора
+		//Р’РµСЂС‚РёРєР°Р»СЊРЅР°СЏ РєРѕРјРїРѕРЅРµРЅС‚Р° РІРµРєС‚РѕСЂР°
 		dp4  r1, r0, c[4]
-		//Нормализуем и приводим к единичному диапазону
+		//РќРѕСЂРјР°Р»РёР·СѓРµРј Рё РїСЂРёРІРѕРґРёРј Рє РµРґРёРЅРёС‡РЅРѕРјСѓ РґРёР°РїР°Р·РѕРЅСѓ
 		rcp  r2.w, r2.w
 		mad  r1.w, r1.w, r2.w, c[5].w
 		mov oT1, r1.wwww
@@ -189,16 +186,15 @@ block WdmClouds()
 			Lighting = false;
 			FogEnable = false;
 
-			zwriteenable = false;
-			
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
-			//AlphaBlendEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorArg2[0] = diffuse;
 			ColorOp[0] = modulate;
@@ -213,10 +209,10 @@ block WdmClouds()
 			AlphaArg2[0] = diffuse;
 			AlphaOp[0] = modulate;
 			AlphaOp[1] = disable;
-			
-			AddressU[1] = clamp;
-			AddressV[1] = clamp;
-			
+
+			AddressU.sampler[1] = clamp;
+			AddressV.sampler[1] = clamp;
+
 			VertexShader = "WdmCloudsVS";
 
 			Render.Draw
@@ -235,16 +231,15 @@ block WdmLightning()
 			Lighting = false;
 			FogEnable = false;
 
-			zwriteenable = false;
-			
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = one;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
-			//AlphaBlendEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorOp[0] = SelectArg1;
 			ColorOp[1] = disable;
@@ -268,16 +263,15 @@ block WdmRain()
 			Lighting = false;
 			FogEnable = false;
 
-			zwriteenable = false;
-			
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
-			//AlphaBlendEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorOp[0] = SelectArg1;
 			ColorOp[1] = disable;
@@ -293,7 +287,6 @@ block WdmRain()
 	}
 }
 
-
 block WdmWarringShipClouds()
 {
 	technique t0
@@ -303,15 +296,15 @@ block WdmWarringShipClouds()
 			Lighting = false;
 			FogEnable = false;
 
-			zwriteenable = false;
-			
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorArg2[0] = diffuse;
 			ColorOp[0] = modulate;
@@ -337,15 +330,15 @@ block WdmShipWaterTrack()
 			Lighting = false;
 			FogEnable = false;
 
-			zwriteenable = false;
-			
+			ZWriteEnable = false;
+
 			SrcBlend = one;
 			DestBlend = one;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorArg2[0] = diffuse;
 			ColorOp[0] = modulate;
@@ -368,16 +361,16 @@ block WdmDebugDraw()
 			Lighting = false;
 			FogEnable = false;
 
-			zenable = false;
-			zwriteenable = false;
-			
+			ZEnable = false;
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorArg2[0] = diffuse;
 			ColorOp[0] = SelectArg2;
@@ -400,16 +393,16 @@ block WdmDrawLabelIcon()
 			Lighting = false;
 			FogEnable = false;
 
-			zenable = false;
-			zwriteenable = false;
-			
+			ZEnable = false;
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = diffuse;
 			ColorArg2[0] = texture;
 			ColorOp[0] = selectarg2;
@@ -423,7 +416,6 @@ block WdmDrawLabelIcon()
 			AlphaArg1[1] = texture;
 			AlphaArg2[1] = current;
 			AlphaOp[1] = blendfactoralpha;
-
 
 			ColorOp[2] = disable;
 			AlphaArg1[2] = diffuse;
@@ -448,16 +440,16 @@ block WdmDrawMapBlend()
 			Lighting = false;
 			FogEnable = false;
 
-			zenable = false;
-			zwriteenable = false;
-			
+			ZEnable = false;
+			ZWriteEnable = false;
+
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			cullmode = none;
-			
+			CullMode = none;
+
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
-			
+
 			ColorArg1[0] = texture;
 			ColorArg2[0] = diffuse;
 			ColorOp[0] = modulate;
@@ -484,11 +476,11 @@ block WdmSeaDraw1()
 			FogEnable = false;
 
 			TextureTransformFlags[0] = count2;
-			AddressU[0] = clamp;
-			AddressV[0] = clamp;
+			AddressU.sampler[0] = clamp;
+			AddressV.sampler[0] = clamp;
 
-			zenable = false;
-			zwriteenable = false;
+			ZEnable = false;
+			ZWriteEnable = false;
 
 			AlphaTestEnable = false;
 			AlphaBlendEnable = false;
@@ -515,11 +507,11 @@ block WdmSeaDraw2()
 			FogEnable = false;
 
 			TextureTransformFlags[0] = count2;
-			AddressU[0] = clamp;
-			AddressV[0] = clamp;
+			AddressU.sampler[0] = clamp;
+			AddressV.sampler[0] = clamp;
 
-			zenable = false;
-			zwriteenable = false;
+			ZEnable = false;
+			ZWriteEnable = false;
 
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
@@ -553,10 +545,10 @@ block WdmSeaDraw3()
 			TextureTransformFlags[0] = count2;
 			TextureTransformFlags[1] = count2;
 			TexCoordIndex[0] = 0;
-			TexCoordIndex[1] = 0;			
+			TexCoordIndex[1] = 0;
 
-			zenable = false;
-			zwriteenable = false;
+			ZEnable = false;
+			ZWriteEnable = false;
 
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
@@ -595,14 +587,13 @@ block WdmSeaDraw4()
 			TexCoordIndex[0] = 0;
 			TexCoordIndex[1] = 0;
 
-			zenable = false;
-			zwriteenable = false;
+			ZEnable = false;
+			ZWriteEnable = false;
 
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
 			SrcBlend = one;
 			DestBlend = one;
-			//DestBlend = zero;
 
 			ColorArg1[0] = texture;
 			ColorOp[0] = SelectArg1;
@@ -611,12 +602,12 @@ block WdmSeaDraw4()
 			ColorOp[1] = blendfactoralpha;
 			ColorArg1[2] = current;
 			ColorArg2[2] = tfactor;
-			ColorOp[2] = substract;
+			ColorOp[2] = subtract;
 			ColorArg1[3] = current;
 			ColorArg2[3] = current;
-			ColorOp[3] = modulate4x;			
+			ColorOp[3] = modulate4x;
 			ColorOp[4] = disable;
-			
+
 			AlphaArg2[0] = tfactor;
 			AlphaOp[0] = SelectArg2;
 			AlphaArg2[1] = tfactor;
@@ -641,8 +632,8 @@ block WdmSeaDrawFlare()
 			Lighting = false;
 			FogEnable = false;
 
-			zenable = true;
-			zwriteenable = false;
+			ZEnable = true;
+			ZWriteEnable = false;
 
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
@@ -654,9 +645,6 @@ block WdmSeaDrawFlare()
 			ColorOp[1] = disable;
 
 			AlphaArg1[0] = texture;
-			//AlphaArg2[0] = diffuse;
-			//AlphaOp[0] = modulate;
-			//AlphaArg1[0] = current;
 			AlphaArg2[0] = tfactor;
 			AlphaOp[0] = modulate;
 			AlphaOp[1] = disable;
@@ -667,7 +655,6 @@ block WdmSeaDrawFlare()
 		}
 	}
 }
-
 
 block WdmInterfaceDrawBlend()
 {
@@ -682,7 +669,7 @@ block WdmInterfaceDrawBlend()
 			ColorArg2[0] = diffuse;
 			ColorOp[0] = modulate;
 			ColorOp[1] = disable;
-			
+
 			AlphaArg1[0] = texture;
 			AlphaArg2[0] = diffuse;
 			AlphaOp[0] = modulate;
@@ -692,7 +679,7 @@ block WdmInterfaceDrawBlend()
 			AlphaBlendEnable = true;
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			
+
 			Render.Draw
 
 			Restore.States
@@ -708,29 +695,29 @@ block WdmInterfaceDrawSky()
 		{
 			Lighting = false;
 			FogEnable = false;
-			
-			zenable = false;
-			zwriteenable = false;
-			cullmode = none;
-			
+
+			ZEnable = false;
+			ZWriteEnable = false;
+			CullMode = none;
+
 			AlphaTestEnable = false;
 			AlphaBlendEnable = true;
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
-			
+
 			ColorArg1[0] = texture;
 			ColorOp[0] = SelectArg1;
 			ColorArg1[1] = current;
 			ColorOp[1] = SelectArg1;
 			ColorOp[2] = disable;
-			
+
 			AlphaArg1[0] = texture;
 			AlphaOp[0] = SelectArg1;
 			AlphaArg1[1] = texture;
 			AlphaArg2[1] = current;
 			AlphaOp[1] = modulate;
 			AlphaOp[2] = disable;
-			
+
 			Render.Draw
 
 			Restore.States
@@ -748,15 +735,15 @@ block WdmIslandWaves()
 			Lighting = false;
 			FogEnable = false;
 			ZWriteEnable = false;
-			
+
 			AlphaTestEnable = false;
-			AlphaBlendEnable = true;			
+			AlphaBlendEnable = true;
 			SrcBlend = srcalpha;
 			DestBlend = invsrcalpha;
 
 			TextureTransformFlags[0] = count2;
-			AddressV[0] = clamp;
-			
+			AddressV.sampler[0] = clamp;
+
 			ColorOp[0] = SelectArg1;
 			ColorArg1[0] = texture;
 			ColorOp[1] = disable;
