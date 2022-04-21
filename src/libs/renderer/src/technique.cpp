@@ -29,6 +29,7 @@
 #define PIXEL_SHADER_CONST	"pixelshaderconstant"
 #define VERTEX_DECL			"decl"
 #define ASM_SHADER			"asm"
+#define BIN_SHADER			"bin_shader"
 #define	PASS				"pass"
 #define INCLUDE				"#include"
 #define DEFINE				"#define"
@@ -714,6 +715,7 @@ void ClearComment(char * pStr)
 
 bool isVertexDeclaration(char *pStr) { return (SkipToken(pStr,VERTEX_DECL)) ? true : false; }
 bool isAsm(char *pStr) { return (SkipToken(pStr,ASM_SHADER)) ? true : false; }
+bool isBin(char *pStr) { return (SkipToken(pStr,BIN_SHADER)) ? true : false; }
 bool isVertexShaderConst(char *pStr) { return (SkipToken(pStr,VERTEX_SHADER_CONST)) ? true : false; }
 bool isPixelShaderConst(char *pStr) { return (SkipToken(pStr,PIXEL_SHADER_CONST)) ? true : false; }
 bool isVertexShader(char *pStr) { return (SkipToken(pStr,VERTEX_SHADER)) ? true : false; }
@@ -1360,6 +1362,41 @@ uint32_t CTechnique::ProcessShaderAsm(shader_t * pS, char *pFile, uint32_t dwSiz
 	return 0;
 }
 
+uint32_t CTechnique::ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType)
+{
+	uint32_t dwFileSize;
+	char *pBuffer = nullptr;
+	char sIncFileName[256], sName[256];
+	while (nullptr != (*pStr = GetString(pFile, dwSize, *pStr)))
+	{
+		ClearComment(*pStr);
+		if (isBeginBracket(*pStr))
+			TOTAL_SKIP;
+		if (isEndBracket(*pStr))
+			break; // end of declaration
+
+		GetTokenWhile(SkipToken(*pStr, "\""), &sName[0], "\"");
+		sprintf_s(sIncFileName, "%s\\%s", sCurrentDir, sName);
+		if (!fio->LoadFile(sIncFileName, &pBuffer, &dwFileSize))
+		{
+			core.Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, sIncFileName);
+			return 0;
+		}
+		TOTAL_SKIP;
+	}
+	HRESULT hr;
+	if (dwShaderType == CODE_SVS)
+		hr = pRS->CreateVertexShader((uint32_t *)pBuffer, &pS->pVertexShader);
+	else
+		hr = pRS->CreatePixelShader((uint32_t *)pBuffer, &pS->pPixelShader);
+
+	if (hr != D3D_OK)
+		core.Trace("ERROR: can't create shader from %s\nfrom file: %s", pS->pName, sIncFileName);
+
+	STORM_DELETE(pBuffer);
+	return 0;
+}
+
 uint32_t CTechnique::ProcessVertexShader(char *pFile, uint32_t dwSize, char **pStr)
 {
 	char	temp[1024];
@@ -1379,6 +1416,7 @@ uint32_t CTechnique::ProcessVertexShader(char *pFile, uint32_t dwSize, char **pS
 		if (isEndBracket(*pStr)) break;		// end of vertex shader
 		if (isVertexDeclaration(*pStr)) ProcessVertexDeclaration(pS, pFile, dwSize, pStr);
 		if (isAsm(*pStr)) ProcessShaderAsm(pS, pFile, dwSize, pStr, CODE_SVS);
+		if (isBin(*pStr)) ProcessShaderBin(pS, pFile, dwSize, pStr, CODE_SVS);
 		TOTAL_SKIP;
 	}
 

@@ -124,6 +124,7 @@ protected:
 	uint32_t		ProcessVertexDeclaration(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr);
 	uint32_t		ProcessPixelShader(char *pFile, uint32_t dwSize, char **pStr);
 	uint32_t		ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType, bool HLSL = false);
+	uint32_t		ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType);
 
 	uint32_t		AddShader(char *pShaderName);
 	char		*Preprocessor(char *pBuffer, uint32_t & dwSize);
