@@ -10,11 +10,11 @@ inline void __Storm_Assert__(bool expression, const char *file, int32_t line, co
     {
         if (str)
         {
-            storm::Logger::default_logger->error("Assert failed in {} line {}, expression string {}", file, line, str);
+            storm::Logger::default_logger->error("Assert failed in %s line %d, expression string %s", file, line, str);
         }
         else
         {
-            storm::Logger::default_logger->error("Assert failed in {} line {}", file, line);
+            storm::Logger::default_logger->error("Assert failed in %s line %d", file, line);
         }
 #ifdef EX_OFF
         __debugbreak();
