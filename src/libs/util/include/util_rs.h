@@ -9,15 +9,23 @@
 #include <ostream>
 #include <new>
 
+struct ArrayWchar {
+  wchar_t *ptr;
+  size_t len;
+  size_t capacity;
+};
+
 extern "C" {
 
-const wchar_t *get_stash_path();
+ArrayWchar *get_stash_path();
 
-const wchar_t *get_logs_path();
+ArrayWchar *get_logs_path();
 
-const wchar_t *get_save_data_path();
+ArrayWchar *get_save_data_path();
 
-const wchar_t *get_screenshots_path();
+ArrayWchar *get_screenshots_path();
+
+void free_array_wchar(ArrayWchar *ptr);
 
 int ignore_case_find(const char *s, const char *pattern, size_t start);
 

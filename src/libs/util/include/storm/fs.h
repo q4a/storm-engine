@@ -13,22 +13,34 @@ using namespace std::filesystem;
 
 inline path GetStashPath()
 {
-    return get_stash_path();
+    auto const r_path = get_stash_path();
+    const path c_path = r_path->ptr;
+    free_array_wchar(r_path);
+    return c_path;
 }
 
 inline path GetLogsPath()
 {
-    return get_logs_path();
+    auto const r_path = get_logs_path();
+    const path c_path = r_path->ptr;
+    free_array_wchar(r_path);
+    return c_path;
 }
 
 inline path GetSaveDataPath()
 {
-    return get_save_data_path();
+    auto const r_path = get_save_data_path();
+    const path c_path = r_path->ptr;
+    free_array_wchar(r_path);
+    return c_path;
 }
 
 inline path GetScreenshotsPath()
 {
-    return get_screenshots_path();
+    auto const r_path = get_screenshots_path();
+    const path c_path = r_path->ptr;
+    free_array_wchar(r_path);
+    return c_path;
 }
 
 constexpr char ENGINE_INI_FILE_NAME[] = "engine.ini";

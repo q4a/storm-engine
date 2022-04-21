@@ -23,15 +23,15 @@ void add_console_logger(const char *name, LogLevel level);
 
 void add_file_logger(const char *path, const char *name, LogLevel level);
 
-void error(const char *logger, const char *message);
+void rs_error(const char *logger, const char *message);
 
-void warn(const char *logger, const char *message);
+void rs_warn(const char *logger, const char *message);
 
-void info(const char *logger, const char *message);
+void rs_info(const char *logger, const char *message);
 
-void debug(const char *logger, const char *message);
+void rs_debug(const char *logger, const char *message);
 
-void trace(const char *logger, const char *message);
+void rs_trace(const char *logger, const char *message);
 
 } // extern "C"
 

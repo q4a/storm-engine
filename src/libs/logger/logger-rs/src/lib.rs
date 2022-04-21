@@ -42,35 +42,35 @@ pub extern "C" fn add_file_logger(path: *const c_char, name: *const c_char, leve
 }
 
 #[no_mangle]
-pub extern "C" fn error(logger: *const c_char, message: *const c_char) {
+pub extern "C" fn rs_error(logger: *const c_char, message: *const c_char) {
     let logger = c_char_to_str(logger);
     let message = c_char_to_str(message);
     error!(target: logger, "{}", message);
 }
 
 #[no_mangle]
-pub extern "C" fn warn(logger: *const c_char, message: *const c_char) {
+pub extern "C" fn rs_warn(logger: *const c_char, message: *const c_char) {
     let logger = c_char_to_str(logger);
     let message = c_char_to_str(message);
     warn!(target: logger, "{}", message);
 }
 
 #[no_mangle]
-pub extern "C" fn info(logger: *const c_char, message: *const c_char) {
+pub extern "C" fn rs_info(logger: *const c_char, message: *const c_char) {
     let logger = c_char_to_str(logger);
     let message = c_char_to_str(message);
     info!(target: logger, "{}", message);
 }
 
 #[no_mangle]
-pub extern "C" fn debug(logger: *const c_char, message: *const c_char) {
+pub extern "C" fn rs_debug(logger: *const c_char, message: *const c_char) {
     let logger = c_char_to_str(logger);
     let message = c_char_to_str(message);
     debug!(target: logger, "{}", message);
 }
 
 #[no_mangle]
-pub extern "C" fn trace(logger: *const c_char, message: *const c_char) {
+pub extern "C" fn rs_trace(logger: *const c_char, message: *const c_char) {
     let logger = c_char_to_str(logger);
     let message = c_char_to_str(message);
     trace!(target: logger, "{}", message);

@@ -130,6 +130,10 @@ pub fn add_console_logger(name: &str, level: LevelFilter) {
     if let Ok(ref mut mutex) = LOGGER_HANDLE.lock() {
         let (handle, config) = mutex.get_or_insert_with(initial_setup);
 
+        if config.loggers.contains_key(name) {
+            return;
+        }
+
         let appender_name = format!("{}_ap", name);
         let appender_type = AppenderType::Console;
         let logger_config = LoggerConfig {
@@ -147,6 +151,10 @@ pub fn add_console_logger(name: &str, level: LevelFilter) {
 pub fn add_file_logger(path: &str, name: &str, level: LevelFilter) {
     if let Ok(ref mut mutex) = LOGGER_HANDLE.lock() {
         let (handle, config) = mutex.get_or_insert_with(initial_setup);
+
+        if config.loggers.contains_key(name) {
+            return;
+        }
 
         let appender_name = format!("{}_ap", name);
         let appender_type = AppenderType::new_file_type(path, name);
