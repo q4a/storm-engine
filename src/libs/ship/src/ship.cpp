@@ -1539,7 +1539,7 @@ bool SHIP::Mount(ATTRIBUTES *_pAShip)
         pShipsLights->ProcessStage(Stage::execute, 0);
     }
     else {
-        spdlog::warn("Mounted ship with no active ShipsLights");
+        storm::Logger::default_logger->warn("Mounted ship with no active ShipsLights");
     }
 
     NODE *pFDay = pModel->FindNode("fonar_day");
@@ -1769,7 +1769,7 @@ float SHIP::Cannon_Trace(int32_t iBallOwner, const CVECTOR &vSrc, const CVECTOR 
                     }
                     else
                     {
-                        spdlog::warn("no answer from SHIP_HULL_DAMAGE evt");
+                        storm::Logger::default_logger->warn("no answer from SHIP_HULL_DAMAGE evt");
                     }
                 }
             }

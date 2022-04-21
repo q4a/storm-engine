@@ -6123,7 +6123,7 @@ char *COMPILER::ReadString()
     ReadData(pBuffer, n);
     if (!utf8::IsValidUtf8(pBuffer))
     {
-        spdlog::warn("Deserializing invalid utf8 string: {}", pBuffer);
+        storm::Logger::default_logger->warn("Deserializing invalid utf8 string: {}", pBuffer);
     }
     return pBuffer;
 }

@@ -308,7 +308,7 @@ bool CoreImpl::LoadClassesTable()
 
 void CoreImpl::CheckAutoExceptions(uint32_t = 0) const
 {
-    spdlog::warn("exception thrown");
+    storm::Logger::default_logger->warn("exception thrown");
 }
 
 void CoreImpl::Exit()
@@ -508,7 +508,7 @@ void CoreImpl::Trace(const char *format, ...)
     va_start(args, format);
     vsnprintf(buffer_4k, sizeof(buffer_4k) - 4, format, args);
     va_end(args);
-    spdlog::info(buffer_4k);
+    storm::Logger::default_logger->info(buffer_4k);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -943,7 +943,8 @@ void CoreImpl::loadCompatibilitySettings(INIFILE &inifile)
     targetVersion_ = getTargetEngineVersion(target_engine_version);
     if (targetVersion_ == ENGINE_VERSION::UNKNOWN)
     {
-        spdlog::warn("Unknown target version '{}' in engine compatibility settings", target_engine_version);
+        storm::Logger::default_logger->warn("Unknown target version '{}' in engine compatibility settings",
+                                            target_engine_version);
         targetVersion_ = ENGINE_VERSION::LATEST;
     }
 }

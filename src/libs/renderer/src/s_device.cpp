@@ -774,7 +774,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
     if (videoAdapterIndex > adapters_num - 1)
         videoAdapterIndex = 0U;
 
-    spdlog::info("Querying available DirectX 9 adapters... detected {}:", adapters_num);
+    storm::Logger::default_logger->info("Querying available DirectX 9 adapters... detected %u:", adapters_num);
     for (UINT i = 0; i != adapters_num; ++i)
     {
         D3DCAPS9 caps;
@@ -783,10 +783,11 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
         {
             D3DADAPTER_IDENTIFIER9 id;
             d3d->GetAdapterIdentifier(i, 0, &id);
-            spdlog::info("{}: {} ({}) ", i, id.Description, id.DeviceName);
+            storm::Logger::default_logger->info("%u: %s (%s) ", i, id.Description, id.DeviceName);
         }
     }
-    spdlog::info("Using adapter with index {} (configurable by setting adapter=<index> inside engine.ini)",
+    storm::Logger::default_logger->info(
+        "Using adapter with index %u (configurable by setting adapter=<index> inside engine.ini)",
              videoAdapterIndex);
 
     // Create device

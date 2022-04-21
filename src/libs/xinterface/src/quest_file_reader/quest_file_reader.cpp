@@ -109,7 +109,7 @@ std::pair<std::string_view, std::string_view::const_iterator> ReadUserDataID(con
 
     if (textEnd == str.cend())
     {
-        spdlog::error("Quest log file parse error: the end of pattern is not found");
+        storm::Logger::default_logger->error("Quest log file parse error: the end of pattern is not found");
         return {"", patternStart};
     }
 
@@ -138,7 +138,7 @@ bool QuestFileReader::GetQuestTitle(const std::string_view &questId, const std::
     const auto n = FindQuestByID(questId);
     if (!n.has_value())
     {
-        spdlog::warn("Can`t find title whith ID = %s", questId);
+        storm::Logger::default_logger->warn("Can`t find title whith ID = %s", questId);
         return false;
     }
 
@@ -328,7 +328,7 @@ void QuestFileReader::AddQuestToList(const std::string_view &questID, const std:
     }
     else
     {
-        spdlog::warn("Quest with id \"%s\" is already in list", questID);
+        storm::Logger::default_logger->warn("Quest with id \"%s\" is already in list", questID);
     }
 }
 
@@ -341,7 +341,7 @@ void QuestFileReader::AddTextToQuest(const std::string_view &questID, const std:
     auto q = FindQuestByID(questID);
     if (!q.has_value())
     {
-        spdlog::warn("Quest with id \"%s\" is not found in list", questID);
+        storm::Logger::default_logger->warn("Quest with id \"%s\" is not found in list", questID);
         return;
     }
 

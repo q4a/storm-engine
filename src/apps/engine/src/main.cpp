@@ -171,8 +171,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // Init logging
     storm::Logger::default_logger = storm::Logger::file_logger(defaultLoggerName, LogLevel::Trace);
-    storm::Logger::default_logger->info("Logging system initialized. Running on {}", STORM_BUILD_WATERMARK_STRING);
-    storm::Logger::default_logger->info("mimalloc-redirect status: {}", mi_is_redirected());
+    storm::Logger::default_logger->info("Logging system initialized. Running on %s", STORM_BUILD_WATERMARK_STRING);
+    storm::Logger::default_logger->info("mimalloc-redirect status: %s", mi_is_redirected() ? "true" : "false");
 
     // Init core
     core_internal.Init();

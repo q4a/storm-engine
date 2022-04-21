@@ -1,5 +1,6 @@
 #pragma once
 #include <spdlog/spdlog.h>
+#include "logger.hpp"
 
 #define EX_OFF
 
@@ -9,11 +10,11 @@ inline void __Storm_Assert__(bool expression, const char *file, int32_t line, co
     {
         if (str)
         {
-            spdlog::critical("Assert failed in {} line {}, expression string {}", file, line, str);
+            storm::Logger::default_logger->error("Assert failed in {} line {}, expression string {}", file, line, str);
         }
         else
         {
-            spdlog::critical("Assert failed in {} line {}", file, line);
+            storm::Logger::default_logger->error("Assert failed in {} line {}", file, line);
         }
 #ifdef EX_OFF
         __debugbreak();

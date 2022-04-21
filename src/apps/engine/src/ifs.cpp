@@ -415,7 +415,7 @@ bool IFS::LoadFile(const char *_file_name)
     auto fileS = fs->_CreateFile(_file_name, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        spdlog::trace("Unable to load file: {}", _file_name);
+        storm::Logger::default_logger->trace("Unable to load file: %s", _file_name);
         return false;
     }
 

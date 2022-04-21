@@ -381,7 +381,7 @@ void CXI_CHECKBUTTONS::AddButton(const char *pcText, bool bDisable, bool bSelect
         const auto strNum = pStringService->GetStringNum(pcText);
         if (strNum < 0)
         {
-            spdlog::error("CXI_CHECKBUTTONS: No string '{:}' found in language files", pcText);
+            storm::Logger::default_logger->error("CXI_CHECKBUTTONS: No string '{:}' found in language files", pcText);
             delete pBD;
             return;
         }
