@@ -1,4 +1,4 @@
-#ifndef _WIN32 // FIX_LINUX Effects
+#ifdef UNICODE // #ifndef _WIN32 // FIX_LINUX Effects
 #include "technique.h"
 #include "core.h"
 #include "defines.h"

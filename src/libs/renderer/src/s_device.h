@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
 #include "effects.h"
 #else
 #include "technique.h"
@@ -309,7 +309,7 @@ class DX9RENDER : public VDX9RENDER
     HRESULT SetFVF(uint32_t handle) override;
     HRESULT GetVertexShader(IDirect3DVertexShader9 **ppShader) override;
     HRESULT GetPixelShader(IDirect3DPixelShader9 **ppShader) override;
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     ID3DXEffect *GetEffectPointer(const char *techniqueName) override;
 #endif
 
@@ -468,7 +468,7 @@ private:
 
     float FovMultiplier{ 1.0f };
 
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
     Effects effects_;
 #else
     CTechnique *pTechnique;
