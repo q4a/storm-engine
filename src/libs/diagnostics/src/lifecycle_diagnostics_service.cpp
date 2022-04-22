@@ -5,12 +5,10 @@
 #include <mutex>
 #include <thread>
 
-#include <spdlog/spdlog.h>
-
 #include "storm/fs.h"
 #include "v_file_service.h"
-#include "spdlog_sinks/syncable_sink.hpp"
 #include "watermark.hpp"
+#include "logger.hpp"
 
 #ifdef _UNICODE
 #include <tchar.h>
@@ -24,7 +22,6 @@
 #endif
 
 #ifdef _WIN32
-#include "logging.hpp"
 #include "seh_extractor.hpp"
 #endif
 
@@ -94,7 +91,6 @@ class LoggingService final
 
             std::unique_lock lock(mtx_);
             cv_.wait_for(lock, 5s, [this] { return !flushRequested_; });
-            spdlog::shutdown();
         }
     }
 
@@ -115,20 +111,6 @@ class LoggingService final
 
     void flushAll(const bool terminate) const
     {
-        spdlog::apply_all([terminate](std::shared_ptr<spdlog::logger> l) {
-            l->flush();
-
-            if (terminate)
-            {
-                for (auto &sink : l->sinks())
-                {
-                    if (const auto syncable_sink = std::dynamic_pointer_cast<logging::sinks::syncable_sink>(sink))
-                    {
-                        syncable_sink->terminate_immediately();
-                    }
-                }
-            }
-        });
     }
 
     void loggingThread()
@@ -220,8 +202,7 @@ sentry_value_t LifecycleDiagnosticsService::beforeCrash(const sentry_value_t eve
     {
         if(const seh_extractor seh(static_cast<EXCEPTION_POINTERS *>(hint)); seh.is_abnormal())
         {
-            static auto logger = logging::getOrCreateLogger("exceptions");
-            logger->set_pattern("%v");
+            static auto logger = storm::Logger::file_logger("exceptions", LogLevel::Trace);
             seh.sink([](const char *msg) { logger->trace(msg); });
         }
     }

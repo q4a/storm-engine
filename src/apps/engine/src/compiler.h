@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <tuple>
+#include <filesystem>
 
 #include "data.h"
 #include "message.h"
@@ -16,7 +17,7 @@
 #include "string_codec.h"
 #include "strings_list.h"
 #include "token.h"
-#include "logging.hpp"
+#include "logger.hpp"
 #include "script_cache.h"
 
 #include "storm/ringbuffer_stack.hpp"
@@ -355,9 +356,9 @@ private:
     ATTRIBUTES *rAP;
 
     // loggers
-    storm::logging::logger_ptr logTrace_;
-    storm::logging::logger_ptr logError_;
-    storm::logging::logger_ptr logStack_;
+    std::shared_ptr<storm::Logger> logTrace_;
+    std::shared_ptr<storm::Logger> logError_;
+    std::shared_ptr<storm::Logger> logStack_;
 
     // backtrace stack
     // NB: pointers are safe as long as we pop elements before they expire

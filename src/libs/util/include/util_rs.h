@@ -9,25 +9,33 @@
 #include <ostream>
 #include <new>
 
+struct ArrayWchar {
+  wchar_t *ptr;
+  size_t len;
+  size_t capacity;
+};
+
+struct ArrayCchar {
+  char *ptr;
+  size_t len;
+  size_t capacity;
+};
+
 extern "C" {
 
-void init_logger();
+ArrayWchar *get_stash_path();
 
-void error(const char *message);
+ArrayWchar *get_logs_path();
 
-void warn(const char *message);
+ArrayWchar *get_save_data_path();
 
-void info(const char *message);
+ArrayWchar *get_screenshots_path();
 
-void debug(const char *message);
+ArrayCchar *get_screenshot_filename();
 
-wchar_t *get_stash_path();
+void free_array_wchar(ArrayWchar *ptr);
 
-wchar_t *get_logs_path();
-
-wchar_t *get_save_data_path();
-
-wchar_t *get_screenshots_path();
+void free_array_cchar(ArrayCchar *ptr);
 
 int ignore_case_find(const char *s, const char *pattern, size_t start);
 

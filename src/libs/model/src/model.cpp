@@ -403,7 +403,7 @@ uint64_t MODELR::ProcessMessage(MESSAGE &message)
         }
         else
         {
-            spdlog::trace("MODELR: Cannot substitute geometry node {}", geometry_node);
+            storm::Logger::default_logger->trace("MODELR: Cannot substitute geometry node {}", geometry_node);
         }
         break;
     }

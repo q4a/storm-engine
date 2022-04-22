@@ -4,10 +4,8 @@
 #include <SDL2/SDL.h>
 #include <mimalloc-new-delete.h>
 #include <mimalloc.h>
-#include <spdlog/spdlog.h>
 
 #include "lifecycle_diagnostics_service.hpp"
-#include "logging.hpp"
 #include "compiler.h"
 #include "os_window.hpp"
 #include "steam_api_impl.hpp"
@@ -15,6 +13,7 @@
 #include "s_debug.h"
 #include "v_sound_service.h"
 #include "storm/fs.h"
+#include "logger.hpp"
 #include "watermark.hpp"
 
 VFILE_SERVICE *fio = nullptr;
@@ -130,9 +129,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         MessageBoxA(nullptr, "Another instance is already running!", "Error", MB_ICONERROR);
         return EXIT_SUCCESS;
     }
-    AllocConsole();
-    init_logger();
-    info("Test from C++");
 
     mi_register_output(mimalloc_fun, nullptr);
     mi_option_set(mi_option_show_errors, 1);
@@ -174,9 +170,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     create_directories(fs::GetSaveDataPath());
 
     // Init logging
-    spdlog::set_default_logger(storm::logging::getOrCreateLogger(defaultLoggerName));
-    spdlog::info("Logging system initialized. Running on {}", STORM_BUILD_WATERMARK_STRING);
-    spdlog::info("mimalloc-redirect status: {}", mi_is_redirected());
+    storm::Logger::default_logger = storm::Logger::file_logger(defaultLoggerName, LogLevel::Trace);
+    storm::Logger::default_logger->info("Logging system initialized. Running on %s", STORM_BUILD_WATERMARK_STRING);
+    storm::Logger::default_logger->info("mimalloc-redirect status: %s", mi_is_redirected() ? "true" : "false");
 
     // Init core
     core_internal.Init();
@@ -199,10 +195,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         dwMaxFPS = static_cast<uint32_t>(ini->GetInt(nullptr, "max_fps", 0));
         auto bDebugWindow = ini->GetInt(nullptr, "DebugWindow", 0) == 1;
         auto bAcceleration = ini->GetInt(nullptr, "Acceleration", 0) == 1;
-        if (ini->GetInt(nullptr, "logs", 1) == 0) // disable logging
-        {
-            spdlog::set_level(spdlog::level::off);
-        }
         width = ini->GetInt(nullptr, "screen_x", 1024);
         height = ini->GetInt(nullptr, "screen_y", 768);
         fullscreen = ini->GetInt(nullptr, "full_screen", false) ? true : false;
@@ -216,7 +208,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     }
     catch (const std::exception &e)
     {
-        spdlog::critical(e.what());
+        storm::Logger::default_logger->error(e.what());
         return EXIT_FAILURE;
     }
 

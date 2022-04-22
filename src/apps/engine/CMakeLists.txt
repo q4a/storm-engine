@@ -18,6 +18,7 @@ STORM_SETUP(
     diagnostics
     util
     window
+    logger
 
     # VM
     animals

@@ -9,8 +9,6 @@
 #include "v_s_stack.h"
 #include "storm/fs.h"
 
-#include <fmt/chrono.h>
-
 #include <DxErr.h>
 #include <corecrt_io.h>
 
@@ -774,7 +772,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
     if (videoAdapterIndex > adapters_num - 1)
         videoAdapterIndex = 0U;
 
-    spdlog::info("Querying available DirectX 9 adapters... detected {}:", adapters_num);
+    storm::Logger::default_logger->info("Querying available DirectX 9 adapters... detected %u:", adapters_num);
     for (UINT i = 0; i != adapters_num; ++i)
     {
         D3DCAPS9 caps;
@@ -783,10 +781,11 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
         {
             D3DADAPTER_IDENTIFIER9 id;
             d3d->GetAdapterIdentifier(i, 0, &id);
-            spdlog::info("{}: {} ({}) ", i, id.Description, id.DeviceName);
+            storm::Logger::default_logger->info("%u: %s (%s) ", i, id.Description, id.DeviceName);
         }
     }
-    spdlog::info("Using adapter with index {} (configurable by setting adapter=<index> inside engine.ini)",
+    storm::Logger::default_logger->info(
+        "Using adapter with index %u (configurable by setting adapter=<index> inside engine.ini)",
              videoAdapterIndex);
 
     // Create device
@@ -3272,7 +3271,7 @@ void DX9RENDER::MakeScreenShot()
         return;
     }
 
-    const auto screenshot_base_filename = fmt::format("{:%Y-%m-%d_%H-%M-%S}", fmt::localtime(std::time(nullptr)));
+    const auto screenshot_base_filename = fs::GetScreenshotFilename();
     auto screenshot_path = fs::GetScreenshotsPath() / screenshot_base_filename;
     screenshot_path.replace_extension(screenshotExt);
     for(size_t i = 0; exists(screenshot_path); ++i)

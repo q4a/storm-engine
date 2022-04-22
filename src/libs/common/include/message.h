@@ -3,7 +3,9 @@
 #include <cstdarg>
 #include <cstring>
 #include <variant>
+#include <cassert>
 
+#include "fmt.hpp"
 #include "c_vector.h"
 #include "entity.h"
 
@@ -249,7 +251,7 @@ class MESSAGE final
             return std::string(ptr);
         }
         default:
-            throw std::runtime_error(fmt::format("Unknown message format: '{}'", c));
+            throw std::runtime_error(fmt::format("Unknown message format: '%c'", c));
         }
     }
 

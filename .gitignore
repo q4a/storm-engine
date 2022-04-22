@@ -5,3 +5,4 @@
 .idea
 *.user
 src/libs/util/util-rs/target/
+src/libs/logger/logger-rs/target/

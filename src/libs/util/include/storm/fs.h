@@ -13,22 +13,42 @@ using namespace std::filesystem;
 
 inline path GetStashPath()
 {
-    return get_stash_path();
+    const auto r_str = get_stash_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
 }
 
 inline path GetLogsPath()
 {
-    return get_logs_path();
+    const auto r_str = get_logs_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
 }
 
 inline path GetSaveDataPath()
 {
-    return get_save_data_path();
+    const auto r_str = get_save_data_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
 }
 
 inline path GetScreenshotsPath()
 {
-    return get_screenshots_path();
+    const auto r_str = get_screenshots_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
+}
+
+inline std::string GetScreenshotFilename()
+{
+    const auto r_str = get_screenshot_filename();
+    const std::string c_str = r_str->ptr;
+    free_array_cchar(r_str);
+    return c_str;
 }
 
 constexpr char ENGINE_INI_FILE_NAME[] = "engine.ini";

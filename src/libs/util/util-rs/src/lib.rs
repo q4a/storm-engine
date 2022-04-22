@@ -1,71 +1,122 @@
 use std::borrow::{Borrow, Cow};
 use std::ffi::CStr;
+use std::os::raw::{c_char, c_int, c_ushort};
+use std::os::windows::prelude::OsStrExt;
 use std::path::PathBuf;
-use std::{ffi::OsString, os::windows::prelude::OsStrExt};
 
-use env_logger::{Builder, Target};
-use winapi::{ctypes::*, vc::vcruntime::size_t};
+pub mod fs;
+pub mod string_compare;
 
-#[macro_use]
-extern crate log;
+#[allow(non_camel_case_types)]
+pub type size_t = usize;
+#[allow(non_camel_case_types)]
+pub type wchar_t = c_ushort;
 
-mod fs;
-mod string_compare;
+#[repr(C)]
+pub struct ArrayWchar {
+    ptr: *mut wchar_t,
+    len: size_t,
+    capacity: size_t,
+}
 
-#[no_mangle]
-pub extern "C" fn init_logger() {
-    let mut builder = Builder::from_default_env();
-    builder.target(Target::Stdout);
-    builder.filter_level(log::LevelFilter::Debug);
-    builder.init();
-    error!("Test error");
-    warn!("Test warn");
-    info!("Test info");
-    debug!("Test debug");
+#[repr(C)]
+pub struct ArrayCchar {
+    ptr: *mut c_char,
+    len: size_t,
+    capacity: size_t,
+}
+
+impl From<PathBuf> for Box<ArrayWchar> {
+    fn from(path: PathBuf) -> Self {
+        let mut data = path
+            .as_os_str()
+            .encode_wide()
+            .chain(Some(0))
+            .collect::<Vec<_>>();
+
+        // Vec already stores all data on heap, no need to box it.
+        let ptr = data.as_mut_ptr();
+        let len = data.len();
+        let capacity = data.capacity();
+
+        // Prevent `data` from deallocating by forcing Rust to "forget" about it
+        std::mem::forget(data);
+
+        let array = ArrayWchar { ptr, len, capacity };
+        Box::new(array)
+    }
+}
+
+impl From<String> for Box<ArrayCchar> {
+    fn from(str: String) -> Self {
+        let mut data = str.bytes()
+            .chain(Some(0u8))
+            .map(|b| b as c_char)
+            .collect::<Vec<_>>();
+
+        // Vec already stores all data on heap, no need to box it.
+        let ptr = data.as_mut_ptr();
+        let len = data.len();
+        let capacity = data.capacity();
+
+        // Prevent `data` from deallocating by forcing Rust to "forget" about it
+        std::mem::forget(data);
+
+        let array = ArrayCchar { ptr, len, capacity };
+        Box::new(array)
+    }
 }
 
 #[no_mangle]
-pub extern "C" fn error(message: *const c_char) {
-    let message = c_char_to_str(message);
-    error!("{}", message);
+pub extern "C" fn get_stash_path() -> *mut ArrayWchar {
+    let array: Box<ArrayWchar> = fs::home_directory().into();
+    Box::into_raw(array)
 }
 
 #[no_mangle]
-pub extern "C" fn warn(message: *const c_char) {
-    let message = c_char_to_str(message);
-    warn!("{}", message);
+pub extern "C" fn get_logs_path() -> *mut ArrayWchar {
+    let array: Box<ArrayWchar> = fs::logs_directory().into();
+    Box::into_raw(array)
 }
 
 #[no_mangle]
-pub extern "C" fn info(message: *const c_char) {
-    let message = c_char_to_str(message);
-    info!("{}", message);
+pub extern "C" fn get_save_data_path() -> *mut ArrayWchar {
+    let array: Box<ArrayWchar> = fs::save_directory().into();
+    Box::into_raw(array)
 }
 
 #[no_mangle]
-pub extern "C" fn debug(message: *const c_char) {
-    let message = c_char_to_str(message);
-    debug!("{}", message);
+pub extern "C" fn get_screenshots_path() -> *mut ArrayWchar {
+    let array: Box<ArrayWchar> = fs::screenshot_directory().into();
+    Box::into_raw(array)
 }
 
 #[no_mangle]
-pub extern "C" fn get_stash_path() -> *mut wchar_t {
-    pathbuf_to_wchar(fs::home_directory())
+pub extern "C" fn get_screenshot_filename() -> *mut ArrayCchar {
+    let filename: Box<ArrayCchar> = fs::screenshot_filename().into();
+    Box::into_raw(filename)
 }
 
 #[no_mangle]
-pub extern "C" fn get_logs_path() -> *mut wchar_t {
-    pathbuf_to_wchar(fs::logs_directory())
+pub extern "C" fn free_array_wchar(ptr: *mut ArrayWchar) {
+    unsafe {
+        if ptr.is_null() {
+            return;
+        }
+        let wrapper = Box::from_raw(ptr);
+        Vec::from_raw_parts(wrapper.ptr, wrapper.len, wrapper.capacity);
+    };
 }
 
 #[no_mangle]
-pub extern "C" fn get_save_data_path() -> *mut wchar_t {
-    pathbuf_to_wchar(fs::save_directory())
-}
-
-#[no_mangle]
-pub extern "C" fn get_screenshots_path() -> *mut wchar_t {
-    pathbuf_to_wchar(fs::screenshot_directory())
+pub extern "C" fn free_array_cchar(ptr: *mut ArrayCchar) {
+    unsafe {
+        if ptr.is_null() {
+            return;
+        }
+        let wrapper = Box::from_raw(ptr);
+        Vec::from_raw_parts(wrapper.ptr, wrapper.len, wrapper.capacity);
+    };
 }
 
 #[no_mangle]
@@ -137,14 +188,6 @@ pub extern "C" fn ignore_case_glob(s: *const c_char, pattern: *const c_char) -> 
     string_compare::ignore_case_glob(s, pattern)
 }
 
-fn pathbuf_to_wchar(input: PathBuf) -> *mut wchar_t {
-    OsString::from(input)
-        .encode_wide()
-        .chain(Some(0))
-        .collect::<Vec<_>>()
-        .as_mut_ptr()
-}
-
 fn c_char_to_str<'a>(s: *const c_char) -> &'a str {
     let s_str = unsafe { CStr::from_ptr(s) };
     s_str.to_str().unwrap()
@@ -155,4 +198,28 @@ fn win1251_char_to_str<'a>(s: *const c_char) -> Cow<'a, str> {
     let s = unsafe { CStr::from_ptr(s).to_bytes_with_nul() };
     let (s, _, _) = encoding.decode(s);
     s
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use crate::{free_array_wchar, ArrayWchar, ArrayCchar, free_array_cchar};
+
+    // Testing correct allocation and deallocation using miri
+    #[test]
+    fn test_array_wchar() {
+        let path = PathBuf::from("C:\\Users\\User\\Documents\\My Games\\Sea Dogs\\Logs");
+        let array: Box<ArrayWchar> = path.into();
+        let ptr = Box::into_raw(array);
+        free_array_wchar(ptr);
+    }
+
+    #[test]
+    fn test_array_cchar() {
+        let path = "Test String".to_string();
+        let array: Box<ArrayCchar> = path.into();
+        let ptr = Box::into_raw(array);
+        free_array_cchar(ptr);
+    }
 }

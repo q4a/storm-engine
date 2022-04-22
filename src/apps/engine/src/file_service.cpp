@@ -72,7 +72,7 @@ bool FILE_SERVICE::_WriteFile(std::fstream &fileS, const void *s, std::streamsiz
     }
     catch (const std::fstream::failure &e)
     {
-        spdlog::error("Failed to WriteFile: {}", e.what());
+        storm::Logger::default_logger->error("Failed to WriteFile: {}", e.what());
         return false;
     }
 }
@@ -87,7 +87,7 @@ bool FILE_SERVICE::_ReadFile(std::fstream &fileS, void *s, std::streamsize count
     }
     catch (const std::fstream::failure &e)
     {
-        spdlog::error("Failed to ReadFile: {}", e.what());
+        storm::Logger::default_logger->error("Failed to ReadFile: {}", e.what());
         return false;
     }
 }
@@ -99,7 +99,7 @@ bool FILE_SERVICE::_FileOrDirectoryExists(const char *p)
     bool result = std::filesystem::exists(path, ec);
     if (ec)
     {
-        spdlog::error("Failed to to check if {} exists: {}", p, ec.message());
+        storm::Logger::default_logger->error("Failed to to check if {} exists: {}", p, ec.message());
         return false;
     }
 
@@ -141,7 +141,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
     auto it = std::filesystem::directory_iterator(srcPath, ec);
     if (ec)
     {
-        spdlog::warn("Failed to open save folder: {}", ec.message());
+        storm::Logger::default_logger->warn("Failed to open save folder: {}", ec.message());
         return result;
     }
 
@@ -241,7 +241,7 @@ std::unique_ptr<INIFILE> FILE_SERVICE::CreateIniFile(const char *file_name, bool
     fileS = _CreateFile(file_name, std::ios::binary | std::ios::out);
     if (!fileS.is_open())
     {
-        spdlog::error("Can't create ini file: {}", file_name);
+        storm::Logger::default_logger->error("Can't create ini file: {}", file_name);
         return nullptr;
     }
     _CloseFile(fileS);
@@ -338,7 +338,7 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
     auto fileS = fio->_CreateFile(file_name, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        spdlog::trace("Can't load file: {}", file_name);
+        storm::Logger::default_logger->trace("Can't load file: {}", file_name);
         return false;
     }
     const auto dwLowSize = _GetFileSize(file_name);
@@ -370,7 +370,7 @@ INIFILE_T::~INIFILE_T()
         }
         catch (const std::exception &e)
         {
-            spdlog::error(e.what());
+            storm::Logger::default_logger->error(e.what());
         }
     }
 }

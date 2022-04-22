@@ -813,7 +813,7 @@ bool ShipWalk::Init(entid_t _shipID, int editorMode, const char *shipType)
 
         if (mastsAttr == nullptr)
         {
-            spdlog::error("Cannot initialize ShipWalk: Ship.Masts is empty");
+            storm::Logger::default_logger->error("Cannot initialize ShipWalk: Ship.Masts is empty");
             return false;
         }
 

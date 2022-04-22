@@ -6,7 +6,6 @@
 #include <zlib.h>
 
 #include "s_debug.h"
-#include "logging.hpp"
 #include "script_cache.h"
 #include "storm_assert.h"
 
@@ -64,11 +63,9 @@ COMPILER::COMPILER()
 
     // bScriptTrace = false;
 
-    using storm::logging::getOrCreateLogger;
-    logTrace_ = getOrCreateLogger("compile");
-    logError_ = getOrCreateLogger("error");
-    logStack_ = getOrCreateLogger("script_stack");
-    logStack_->set_pattern("%v");
+    logTrace_ = storm::Logger::file_logger("compile", LogLevel::Trace);
+    logError_ = storm::Logger::file_logger("error", LogLevel::Trace);
+    logStack_ = storm::Logger::file_logger("script_stack", LogLevel::Trace);
 }
 
 COMPILER::~COMPILER()
@@ -6126,7 +6123,7 @@ char *COMPILER::ReadString()
     ReadData(pBuffer, n);
     if (!utf8::IsValidUtf8(pBuffer))
     {
-        spdlog::warn("Deserializing invalid utf8 string: {}", pBuffer);
+        storm::Logger::default_logger->warn("Deserializing invalid utf8 string: {}", pBuffer);
     }
     return pBuffer;
 }
@@ -7167,7 +7164,8 @@ void COMPILER::PrintoutUsage()
                 logTrace_->debug("  calls          : {}", fi.number_of_calls);
                 if (fi.number_of_calls != 0)
                 {
-                    logTrace_->debug("  average ticks  : {}", static_cast<float>(fi.usage_time) / fi.number_of_calls);
+                    logTrace_->debug("  average ticks  : {}",
+                                         static_cast<float>(fi.usage_time) / fi.number_of_calls);
                 }
 
                 FuncTab.AddTime(n, ~fi.usage_time);
