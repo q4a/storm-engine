@@ -13,34 +13,42 @@ using namespace std::filesystem;
 
 inline path GetStashPath()
 {
-    auto const r_path = get_stash_path();
-    const path c_path = r_path->ptr;
-    free_array_wchar(r_path);
-    return c_path;
+    const auto r_str = get_stash_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
 }
 
 inline path GetLogsPath()
 {
-    auto const r_path = get_logs_path();
-    const path c_path = r_path->ptr;
-    free_array_wchar(r_path);
-    return c_path;
+    const auto r_str = get_logs_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
 }
 
 inline path GetSaveDataPath()
 {
-    auto const r_path = get_save_data_path();
-    const path c_path = r_path->ptr;
-    free_array_wchar(r_path);
-    return c_path;
+    const auto r_str = get_save_data_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
 }
 
 inline path GetScreenshotsPath()
 {
-    auto const r_path = get_screenshots_path();
-    const path c_path = r_path->ptr;
-    free_array_wchar(r_path);
-    return c_path;
+    const auto r_str = get_screenshots_path();
+    const path c_str = r_str->ptr;
+    free_array_wchar(r_str);
+    return c_str;
+}
+
+inline std::string GetScreenshotFilename()
+{
+    const auto r_str = get_screenshot_filename();
+    const std::string c_str = r_str->ptr;
+    free_array_cchar(r_str);
+    return c_str;
 }
 
 constexpr char ENGINE_INI_FILE_NAME[] = "engine.ini";

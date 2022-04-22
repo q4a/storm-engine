@@ -19,6 +19,13 @@ pub struct ArrayWchar {
     capacity: size_t,
 }
 
+#[repr(C)]
+pub struct ArrayCchar {
+    ptr: *mut c_char,
+    len: size_t,
+    capacity: size_t,
+}
+
 impl From<PathBuf> for Box<ArrayWchar> {
     fn from(path: PathBuf) -> Self {
         let mut data = path
@@ -36,6 +43,26 @@ impl From<PathBuf> for Box<ArrayWchar> {
         std::mem::forget(data);
 
         let array = ArrayWchar { ptr, len, capacity };
+        Box::new(array)
+    }
+}
+
+impl From<String> for Box<ArrayCchar> {
+    fn from(str: String) -> Self {
+        let mut data = str.bytes()
+            .chain(Some(0u8))
+            .map(|b| b as c_char)
+            .collect::<Vec<_>>();
+
+        // Vec already stores all data on heap, no need to box it.
+        let ptr = data.as_mut_ptr();
+        let len = data.len();
+        let capacity = data.capacity();
+
+        // Prevent `data` from deallocating by forcing Rust to "forget" about it
+        std::mem::forget(data);
+
+        let array = ArrayCchar { ptr, len, capacity };
         Box::new(array)
     }
 }
@@ -65,7 +92,24 @@ pub extern "C" fn get_screenshots_path() -> *mut ArrayWchar {
 }
 
 #[no_mangle]
+pub extern "C" fn get_screenshot_filename() -> *mut ArrayCchar {
+    let filename: Box<ArrayCchar> = fs::screenshot_filename().into();
+    Box::into_raw(filename)
+}
+
+#[no_mangle]
 pub extern "C" fn free_array_wchar(ptr: *mut ArrayWchar) {
+    unsafe {
+        if ptr.is_null() {
+            return;
+        }
+        let wrapper = Box::from_raw(ptr);
+        Vec::from_raw_parts(wrapper.ptr, wrapper.len, wrapper.capacity);
+    };
+}
+
+#[no_mangle]
+pub extern "C" fn free_array_cchar(ptr: *mut ArrayCchar) {
     unsafe {
         if ptr.is_null() {
             return;
@@ -160,7 +204,7 @@ fn win1251_char_to_str<'a>(s: *const c_char) -> Cow<'a, str> {
 mod tests {
     use std::path::PathBuf;
 
-    use crate::{free_array_wchar, ArrayWchar};
+    use crate::{free_array_wchar, ArrayWchar, ArrayCchar, free_array_cchar};
 
     // Testing correct allocation and deallocation using miri
     #[test]
@@ -169,5 +213,13 @@ mod tests {
         let array: Box<ArrayWchar> = path.into();
         let ptr = Box::into_raw(array);
         free_array_wchar(ptr);
+    }
+
+    #[test]
+    fn test_array_cchar() {
+        let path = "Test String".to_string();
+        let array: Box<ArrayCchar> = path.into();
+        let ptr = Box::into_raw(array);
+        free_array_cchar(ptr);
     }
 }

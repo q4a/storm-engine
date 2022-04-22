@@ -15,6 +15,12 @@ struct ArrayWchar {
   size_t capacity;
 };
 
+struct ArrayCchar {
+  char *ptr;
+  size_t len;
+  size_t capacity;
+};
+
 extern "C" {
 
 ArrayWchar *get_stash_path();
@@ -25,7 +31,11 @@ ArrayWchar *get_save_data_path();
 
 ArrayWchar *get_screenshots_path();
 
+ArrayCchar *get_screenshot_filename();
+
 void free_array_wchar(ArrayWchar *ptr);
+
+void free_array_cchar(ArrayCchar *ptr);
 
 int ignore_case_find(const char *s, const char *pattern, size_t start);
 

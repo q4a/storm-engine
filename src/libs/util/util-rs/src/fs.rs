@@ -17,3 +17,7 @@ pub fn save_directory() -> PathBuf {
 pub fn screenshot_directory() -> PathBuf {
     home_directory().join("Screenshots")
 }
+
+pub fn screenshot_filename() -> String {
+    chrono::Local::now().format("%Y-%m-%d_%H-%M-%S").to_string()
+}

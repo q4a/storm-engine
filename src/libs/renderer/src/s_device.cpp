@@ -9,8 +9,6 @@
 #include "v_s_stack.h"
 #include "storm/fs.h"
 
-#include <fmt/chrono.h>
-
 #include <DxErr.h>
 #include <corecrt_io.h>
 
@@ -3273,7 +3271,7 @@ void DX9RENDER::MakeScreenShot()
         return;
     }
 
-    const auto screenshot_base_filename = fmt::format("{:%Y-%m-%d_%H-%M-%S}", fmt::localtime(std::time(nullptr)));
+    const auto screenshot_base_filename = fs::GetScreenshotFilename();
     auto screenshot_path = fs::GetScreenshotsPath() / screenshot_base_filename;
     screenshot_path.replace_extension(screenshotExt);
     for(size_t i = 0; exists(screenshot_path); ++i)
