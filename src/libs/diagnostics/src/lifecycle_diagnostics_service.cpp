@@ -5,11 +5,8 @@
 #include <mutex>
 #include <thread>
 
-#include <spdlog/spdlog.h>
-
 #include "storm/fs.h"
 #include "v_file_service.h"
-#include "spdlog_sinks/syncable_sink.hpp"
 #include "watermark.hpp"
 #include "logger.hpp"
 
@@ -94,7 +91,6 @@ class LoggingService final
 
             std::unique_lock lock(mtx_);
             cv_.wait_for(lock, 5s, [this] { return !flushRequested_; });
-            spdlog::shutdown();
         }
     }
 
@@ -115,20 +111,6 @@ class LoggingService final
 
     void flushAll(const bool terminate) const
     {
-        spdlog::apply_all([terminate](std::shared_ptr<spdlog::logger> l) {
-            l->flush();
-
-            if (terminate)
-            {
-                for (auto &sink : l->sinks())
-                {
-                    if (const auto syncable_sink = std::dynamic_pointer_cast<logging::sinks::syncable_sink>(sink))
-                    {
-                        syncable_sink->terminate_immediately();
-                    }
-                }
-            }
-        });
     }
 
     void loggingThread()

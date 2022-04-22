@@ -3,5 +3,5 @@ STORM_SETUP(
     TYPE library
     DEPENDENCIES 
         common util
-        spdlog sentry-native
+        sentry-native
 )
