@@ -1,5 +1,6 @@
 #include "logger.hpp"
 #include "storm/fs.h"
+#include "fmt.hpp"
 
 namespace storm
 {
@@ -36,7 +37,7 @@ void Logger::error(const char *const format, ...) const
 {
     va_list args;
     va_start(args, format);
-    auto const message = Logger::format_message(format, args);
+    auto const message = fmt::format(format, args);
     rs_error(m_name.data(), message.data());
     va_end(args);
 }
@@ -45,7 +46,7 @@ void Logger::warn(const char *const format, ...) const
 {
     va_list args;
     va_start(args, format);
-    auto const message = Logger::format_message(format, args);
+    auto const message = fmt::format(format, args);
     rs_warn(m_name.data(), message.data());
     va_end(args);
 }
@@ -54,7 +55,7 @@ void Logger::info(const char *const format, ...) const
 {
     va_list args;
     va_start(args, format);
-    auto const message = Logger::format_message(format, args);
+    auto const message = fmt::format(format, args);
     rs_info(m_name.data(), message.data());
     va_end(args);
 }
@@ -63,7 +64,7 @@ void Logger::debug(const char *const format, ...) const
 {
     va_list args;
     va_start(args, format);
-    auto const message = Logger::format_message(format, args);
+    auto const message = fmt::format(format, args);
     rs_debug(m_name.data(), message.data());
     va_end(args);
 }
@@ -72,7 +73,7 @@ void Logger::trace(const char *const format, ...) const
 {
     va_list args;
     va_start(args, format);
-    auto const message = Logger::format_message(format, args);
+    auto const message = fmt::format(format, args);
     rs_trace(m_name.data(), message.data());
     va_end(args);
 }
