@@ -1,7 +1,8 @@
-#ifdef UNICODE // #ifndef _WIN32 // FIX_LINUX Effects
+#ifdef _WIN32 // FIX_LINUX Effects
 #pragma once
 
 #include "dx9render.h"
+#include <stdio.h>
 
 struct SRSPARAM
 {
@@ -31,7 +32,7 @@ struct technique_t
 struct block_t
 {
     uint32_t dwHashBlockName; // hash code for block name
-    char *pBlockName;         // block name
+    char *pBlockName;      // block name
 
     // parameters section
     uint32_t dwNumParams; // number of parameters
@@ -44,16 +45,18 @@ struct block_t
 
 struct shader_t // pixel/vertex shader structure
 {
-    char *pName;         // shader name
+    char *pName;      // shader name
     uint32_t dwHashName; // hash code for shader name
     uint32_t dwShaderType;
 
-    D3DVERTEXELEMENT9 *pDecl; // declarations for vertex shader
-    IDirect3DVertexDeclaration9 *pVertexDecl;
-    IDirect3DVertexShader9 *pVertexShader;
-    IDirect3DPixelShader9 *pPixelShader;
+    uint32_t *pDecl; // declarations for vertex shader
     uint32_t dwDeclSize;
-    // uint32_t	dwShaderHandle;		// shader handle
+    uint32_t dwShaderHandle; // shader handle
+
+    D3DVERTEXELEMENT9 *decl;
+    IDirect3DVertexDeclaration9 *vDecl;
+    IDirect3DVertexShader9 *vShader;
+    IDirect3DPixelShader9 *pShader;
 };
 
 struct define_t
@@ -94,11 +97,11 @@ class CTechnique
     uint32_t *pCurParams;
     uint32_t dwCurParamsMax; //
 
-    uint32_t dwHashCode;     // current block name
+    //uint32_t dwHashCode;  // current block name
     uint32_t dwCurNumParams; // current parameters count
 
-    uint32_t dwCurBlock;     // current(executed) block
-    uint32_t dwCurNumPass;   // number of passes in current technique
+    uint32_t dwCurBlock;  // current(executed) block
+    uint32_t dwCurNumPass; // number of passes in current technique
     uint32_t dwCurTechnique; // current technique
     uint32_t dwCurPass;      // current pass of current technique
     uint32_t dwCurPassSize;  // current pass size
@@ -111,7 +114,7 @@ class CTechnique
 
     // saved states section
 
-    uint32_t dwNumSavedStates;    //
+    uint32_t dwNumSavedStates; //
     uint32_t dwCurSavedStatesPos; //
     uint32_t dwCurMaxSavedSize;   //
     uint32_t *pSavedStates;       // saved states
@@ -123,9 +126,7 @@ class CTechnique
     uint32_t ProcessVertexShader(char *pFile, uint32_t dwSize, char **pStr);
     uint32_t ProcessVertexDeclaration(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr);
     uint32_t ProcessPixelShader(char *pFile, uint32_t dwSize, char **pStr);
-    uint32_t ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType,
-                              bool HLSL = false);
-    uint32_t ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType);
+    uint32_t ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType);
 
     uint32_t AddShader(char *pShaderName);
     char *Preprocessor(char *pBuffer, uint32_t &dwSize);
@@ -140,15 +141,15 @@ class CTechnique
 
     bool ExecutePassClose();
 
-    uint32_t GetCode(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, uint32_t *pPassCode = nullptr,
-                     bool bCanBeNumber = false);
+    uint32_t GetCode(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, uint32_t *pPassCode = 0,
+                  bool bCanBeNumber = false);
     uint32_t GetSRSIndex(char *pStr);
     uint32_t GetSTSSIndex(char *pStr);
-    uint32_t GetSAMPIndex(char *pStr);
+    uint32_t GetSSSSIndex(char *pStr);
     uint32_t GetIndex(char *pStr, SRSPARAM *pParam, uint32_t dwNumParam, bool bCanBeNumber);
 
     char *GetToken(char *pToken, char *pResult, bool &bToken);
-    void InnerDecodeFiles(char *sub_dir = nullptr);
+    void InnerDecodeFiles(char *sub_dir = 0);
 
     void ClearSRS_STSS_bUse();
 
@@ -156,7 +157,7 @@ class CTechnique
     void SetCurrentBlock(const char *name, uint32_t _dwNumParams, void *pParams);
 
     bool DecodeFile(std::string sname);
-    void DecodeFiles(char *sub_dir = nullptr);
+    void DecodeFiles(char *sub_dir = 0);
 
     bool ExecutePassStart();
     bool ExecutePassNext();
