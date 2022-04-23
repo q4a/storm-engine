@@ -36,7 +36,6 @@
 #define PIXEL_SHADER_CONST "pixelshaderconstant"
 #define VERTEX_DECL "decl"
 #define ASM_SHADER "asm"
-#define BIN_SHADER "bin_shader"
 #define PASS "pass"
 #define INCLUDE "#include"
 #define DEFINE "#define"
@@ -716,10 +715,6 @@ bool isAsm(char *pStr)
 {
     return (SkipToken(pStr, ASM_SHADER)) ? true : false;
 }
-bool isBin(char *pStr)
-{
-    return (SkipToken(pStr, BIN_SHADER)) ? true : false;
-}
 bool isVertexShaderConst(char *pStr)
 {
     return (SkipToken(pStr, VERTEX_SHADER_CONST)) ? true : false;
@@ -1051,8 +1046,20 @@ uint32_t CTechnique::ProcessPass(char *pFile, uint32_t dwSize, char **pStr)
         if (SkipToken(*pStr, PIXEL_SHADER))
         {
             *pPass++ = CODE_SPS;
+#ifdef USE_FX // will load compiled shader from "currentFilename_shaderName.vso" file in same folder
+            pTemp = SkipToken(*pStr, "=");
+            GetTokenWhile(SkipToken(sCurrentFileName, "techniques"), temp, ".");
+            sprintf(temp + strlen(temp), "_%s.pso", pTemp);
+
+            auto i = AddShader(temp);
+            shader_t *pS = &pShaders[i];
+            pS->dwShaderType = CODE_SPS;
+
+            ProcessShaderBin(pS, temp, dwSize, pStr, CODE_SPS);
+#else
             GetTokenWhile(SkipToken(*pStr, "\""), temp, "\"");
             auto i = AddShader(temp);
+#endif
             *pPass++ = i;
             SKIP3;
         }
@@ -1060,8 +1067,20 @@ uint32_t CTechnique::ProcessPass(char *pFile, uint32_t dwSize, char **pStr)
         if (SkipToken(*pStr, VERTEX_SHADER))
         {
             *pPass++ = CODE_SVS;
+#ifdef USE_FX // will load compiled shader from "currentFilename_shaderName.vso" file in same folder
+            pTemp = SkipToken(*pStr, "=");
+            GetTokenWhile(SkipToken(sCurrentFileName, "techniques"), temp, ".");
+            sprintf(temp + strlen(temp), "_%s.vso", pTemp);
+
+            auto i = AddShader(temp);
+            shader_t *pS = &pShaders[i];
+            pS->dwShaderType = CODE_SVS;
+
+            ProcessShaderBin(pS, temp, dwSize, pStr, CODE_SVS);
+#else
             GetTokenWhile(SkipToken(*pStr, "\""), temp, "\"");
             auto i = AddShader(temp);
+#endif
             *pPass++ = i;
             SKIP3;
         }
@@ -1490,26 +1509,15 @@ uint32_t CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize
 
 uint32_t CTechnique::ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType)
 {
-    uint32_t dwFileSize;
     char *pBuffer = nullptr;
-    char sIncFileName[256], sName[256];
-    while (nullptr != (*pStr = GetString(pFile, dwSize, *pStr)))
+    char sIncFileName[256];
+    sprintf_s(sIncFileName, "%s%s", sCurrentDir, pFile);
+    if (!fio->LoadFile(sIncFileName, &pBuffer, nullptr))
     {
-        ClearComment(*pStr);
-        if (isBeginBracket(*pStr))
-            TOTAL_SKIP;
-        if (isEndBracket(*pStr))
-            break; // end of declaration
-
-        GetTokenWhile(SkipToken(*pStr, "\""), &sName[0], "\"");
-        sprintf_s(sIncFileName, "%s\\%s", sCurrentDir, sName);
-        if (!fio->LoadFile(sIncFileName, &pBuffer, &dwFileSize))
-        {
-            core.Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, sIncFileName);
-            return 0;
-        }
-        TOTAL_SKIP;
+        core.Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, sIncFileName);
+        return 0;
     }
+
     HRESULT hr;
     if (dwShaderType == CODE_SVS)
         hr = pRS->CreateVertexShader((uint32_t *)pBuffer, &pS->pVertexShader);
@@ -1545,8 +1553,6 @@ uint32_t CTechnique::ProcessVertexShader(char *pFile, uint32_t dwSize, char **pS
             ProcessVertexDeclaration(pS, pFile, dwSize, pStr);
         if (isAsm(*pStr))
             ProcessShaderAsm(pS, pFile, dwSize, pStr, CODE_SVS);
-        if (isBin(*pStr))
-            ProcessShaderBin(pS, pFile, dwSize, pStr, CODE_SVS);
         TOTAL_SKIP;
     }
 
