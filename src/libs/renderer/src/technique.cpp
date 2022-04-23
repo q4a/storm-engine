@@ -1,4 +1,4 @@
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef UNICODE // #ifndef _WIN32 // FIX_LINUX Effects
 #include "technique.h"
 #include "core.h"
 #include "defines.h"
@@ -65,15 +65,6 @@
         if (a)                                                                                                         \
             strcpy(a, b);                                                                                              \
     }
-
-inline void tolwr(char *str)
-{
-    while (*str != '\0')
-    {
-        *str = tolower(*str);
-        str++;
-    }
-}
 
 // codes
 
