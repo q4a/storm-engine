@@ -1046,16 +1046,17 @@ uint32_t CTechnique::ProcessPass(char *pFile, uint32_t dwSize, char **pStr)
         if (SkipToken(*pStr, PIXEL_SHADER))
         {
             *pPass++ = CODE_SPS;
-#ifdef USE_FX // will load compiled shader from "currentFilename_shaderName.vso" file in same folder
+#ifdef USE_FX
             pTemp = SkipToken(*pStr, "=");
-            GetTokenWhile(SkipToken(sCurrentFileName, "techniques"), temp, ".");
-            sprintf(temp + strlen(temp), "_%s.pso", pTemp);
+            GetShaderBinPath(pTemp, CODE_SPS, temp);
 
             auto i = AddShader(temp);
             shader_t *pS = &pShaders[i];
-            pS->dwShaderType = CODE_SPS;
-
-            ProcessShaderBin(pS, temp, dwSize, pStr, CODE_SPS);
+            if (pS->dwShaderType == 0)
+            {
+                pS->dwShaderType = CODE_SPS;
+                ProcessShaderBin(pS, temp, CODE_SPS);
+            }
 #else
             GetTokenWhile(SkipToken(*pStr, "\""), temp, "\"");
             auto i = AddShader(temp);
@@ -1067,16 +1068,17 @@ uint32_t CTechnique::ProcessPass(char *pFile, uint32_t dwSize, char **pStr)
         if (SkipToken(*pStr, VERTEX_SHADER))
         {
             *pPass++ = CODE_SVS;
-#ifdef USE_FX // will load compiled shader from "currentFilename_shaderName.vso" file in same folder
+#ifdef USE_FX
             pTemp = SkipToken(*pStr, "=");
-            GetTokenWhile(SkipToken(sCurrentFileName, "techniques"), temp, ".");
-            sprintf(temp + strlen(temp), "_%s.vso", pTemp);
+            GetShaderBinPath(pTemp, CODE_SVS, temp);
 
             auto i = AddShader(temp);
             shader_t *pS = &pShaders[i];
-            pS->dwShaderType = CODE_SVS;
-
-            ProcessShaderBin(pS, temp, dwSize, pStr, CODE_SVS);
+            if (pS->dwShaderType == 0)
+            {
+                pS->dwShaderType = CODE_SVS;
+                ProcessShaderBin(pS, temp, CODE_SVS);
+            }
 #else
             GetTokenWhile(SkipToken(*pStr, "\""), temp, "\"");
             auto i = AddShader(temp);
@@ -1507,14 +1509,34 @@ uint32_t CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize
     return 0;
 }
 
-uint32_t CTechnique::ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwSize, char **pStr, uint32_t dwShaderType)
+void CTechnique::GetShaderBinPath(char *pShaderStr, uint32_t dwShaderType, char *dest)
+{
+    // dest will contain path to shader file "currentFilename_shaderName.vso" (or .pso) in folder of sCurrentFileName
+    char sShaderName[256];
+    if (pShaderStr[strlen(pShaderStr) - 2] == '(' && pShaderStr[strlen(pShaderStr) - 1] == ')')
+    {
+        // for pShaderStr like "compile vs_1_0 main()"
+        GetTokenWhile(SkipToken(SkipToken(pShaderStr, " "), " "), sShaderName, "(");
+    }
+    else
+    {
+        strcpy_s(sShaderName, pShaderStr);
+    }
+
+    GetTokenWhile(sCurrentFileName, dest, ".");
+    sprintf(dest + strlen(dest), "_%s", sShaderName);
+    if (dwShaderType == CODE_SVS)
+        sprintf(dest + strlen(dest), ".vso");
+    else
+        sprintf(dest + strlen(dest), ".pso");
+}
+
+uint32_t CTechnique::ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwShaderType)
 {
     char *pBuffer = nullptr;
-    char sIncFileName[256];
-    sprintf_s(sIncFileName, "%s%s", sCurrentDir, pFile);
-    if (!fio->LoadFile(sIncFileName, &pBuffer, nullptr))
+    if (!fio->LoadFile(pFile, &pBuffer, nullptr))
     {
-        core.Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, sIncFileName);
+        core.Trace("ERROR: in file %s, file not found : %s", sCurrentFileName, pFile);
         return 0;
     }
 
@@ -1525,7 +1547,7 @@ uint32_t CTechnique::ProcessShaderBin(shader_t *pS, char *pFile, uint32_t dwSize
         hr = pRS->CreatePixelShader((uint32_t *)pBuffer, &pS->pPixelShader);
 
     if (hr != D3D_OK)
-        core.Trace("ERROR: can't create shader from %s\nfrom file: %s", pS->pName, sIncFileName);
+        core.Trace("ERROR: can't create shader from %s\nfrom file: %s", pS->pName, pFile);
 
     STORM_DELETE(pBuffer);
     return 0;
