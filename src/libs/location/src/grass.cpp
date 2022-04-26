@@ -139,9 +139,9 @@ bool Grass::Init()
     }
     rs->UnLockIndexBuffer(ib);
 
-#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     // Constants
     static const auto pi2 = 2.0f * 3.141592653f;
+#ifdef false // _WIN32 // FIX_LINUX Effects
     for (size_t i = 0; i < 16; i++)
     {
         // Angle table
@@ -150,6 +150,25 @@ bool Grass::Init()
         // Uv table
         aUV[i] = {static_cast<float>(i & 3) * (1.0f / 4.0f), static_cast<float>((i >> 2) & 3) * (1.0f / 4.0f)};
     }
+#else
+    for (size_t i = 0; i < 16; i++)
+    {
+        // Angle table
+        consts[i].x = sinf(i * pi2 / 16.0f);
+        consts[i].y = cosf(i * pi2 / 16.0f);
+        consts[i].z = 0.0f;
+        consts[i].w = 1.0f;
+
+        // Uv table
+        consts[i + 16].x = (i & 3) * (1.0f / 4.0f);
+        consts[i + 16].y = ((i >> 2) & 3) * (1.0f / 4.0f);
+        consts[i + 16].z = 0.0f;
+        consts[i + 16].w = 1.0f;
+    }
+    consts[36].w = 0.0f;
+    consts[39] = VSConstant(0.9f, 1.0f, 0.245f, -0.245f);
+    consts[40] = VSConstant(15.0f, -0.5f, 1.0f, 0.8f);
+    consts[41] = VSConstant(0.3f * m_fMaxWidth, 0.4f * m_fMaxHeight, 0.7f * m_fMaxWidth, 0.6f * m_fMaxHeight);
 #endif
 
     return true;
@@ -379,7 +398,7 @@ void Grass::Execute(uint32_t delta_time)
 
 void Grass::Realize(uint32_t delta_time)
 {
-#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX Effects
     if (quality == rq_off || fx_ == nullptr)
         return;
 #else
@@ -523,24 +542,47 @@ void Grass::Realize(uint32_t delta_time)
         lColor = 0.3f;
     }
 
-#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
     // recalculate the parameters of the angles
     for (int32_t i = 0; i < 16; i++)
     {
+#ifdef false // _WIN32 // FIX_LINUX Effects
         aAngles[i].z = fabsf(-aAngles[i].y * lDir.x + aAngles[i].x * lDir.z);
         if (aAngles[i].z < 0.0f)
             aAngles[i].z = 0.0f;
         if (aAngles[i].z > 1.0f)
             aAngles[i].z = 1.0f;
-    }
+#else
+        consts[i].z = fabsf(-consts[i].y * lDir.x + consts[i].x * lDir.z);
+        if (consts[i].z < 0.0f)
+            consts[i].z = 0.0f;
+        if (consts[i].z > 1.0f)
+            consts[i].z = 1.0f;
 #endif
+    }
 
     // matrix
     CMatrix view, prj;
     rs->GetTransform(D3DTS_VIEW, view);
     rs->GetTransform(D3DTS_PROJECTION, prj);
+#ifdef false // _WIN32 // FIX_LINUX Effects
     CMatrix cmtx;
     cmtx.EqMultiply(view, prj);
+#else
+    auto &cmtx = (CMatrix &)consts[32];
+    cmtx.EqMultiply(view, prj);
+    // Source Options
+    consts[36].x = lDir.x;
+    consts[36].y = lDir.z;
+    consts[37].x = aColor.x;
+    consts[37].y = aColor.y;
+    consts[37].z = aColor.z;
+    consts[37].w = 1.0f;
+    consts[38].x = lColor.x;
+    consts[38].y = lColor.y;
+    consts[38].z = lColor.z;
+    consts[38].w = m_fDataScale; // 1.f;
+    consts[39].y = kLitWF;
+#endif
 
     // Camera position
     CVECTOR pos, ang;
@@ -566,7 +608,7 @@ void Grass::Realize(uint32_t delta_time)
     rs->TextureSet(0, texture);
     rs->TextureSet(1, texture);
     // set constants
-#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX Effects
     fx_->SetMatrix(hgVP_, cmtx);
     fx_->SetValue(haAngles_, &aAngles[0], sizeof(Vector) * 16);
     fx_->SetValue(haUV_, &aUV[0], sizeof(Vector2) * 16);
@@ -576,6 +618,8 @@ void Grass::Realize(uint32_t delta_time)
     fx_->SetFloat(hkLitWF_, kLitWF);
     fx_->SetFloat(hfDataScale_, m_fDataScale);
     fx_->SetValue(haSize_, Vector2(m_fMaxWidth, m_fMaxHeight), sizeof(Vector2));
+#else
+    rs->SetVertexShaderConstantF(0, (const float *)consts, sizeof(consts) / sizeof(VSConstant));
 #endif
 
     // Camera position on the map
@@ -666,6 +710,9 @@ uint64_t Grass::ProcessMessage(MESSAGE &message)
 
         m_fMaxWidth = message.Float();
         m_fMaxHeight = message.Float();
+#ifndef false // _WIN32 // FIX_LINUX Effects
+        consts[41] = VSConstant(0.3f * m_fMaxWidth, 0.4f * m_fMaxHeight, 0.7f * m_fMaxWidth, 0.6f * m_fMaxHeight);
+#endif
 
         m_fMinVisibleDist = message.Float();
         m_fMaxVisibleDist = message.Float();
@@ -997,7 +1044,7 @@ void Grass::CreateVertexDeclaration() const
         rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
     }
 
-#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX Effects
     fx_ = rs->GetEffectPointer("Grass");
     if (fx_ != nullptr)
     {
