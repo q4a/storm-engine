@@ -165,5 +165,5 @@ ID3DXEffect *Effects::getEffectPointer(const std::string &techniqueName)
     const auto technique = techniques_.find(name_in_lowercase);
     return technique != techniques_.end() ? technique->second.fx : nullptr;
 }
-#endif
-#endif // FIX_LINUX Effects
+#endif // ID3DXEffect
+#endif // Effects

@@ -61,6 +61,6 @@ class Effects final
 #ifdef _WIN32 // FIX_LINUX ID3DXEffect
     // Get effect pointer by technique name
     ID3DXEffect *getEffectPointer(const std::string &techniqueName);
-#endif
+#endif // ID3DXEffect
 };
-#endif // FIX_LINUX Effects
+#endif // Effects
