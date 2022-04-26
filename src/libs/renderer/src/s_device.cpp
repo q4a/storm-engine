@@ -1483,7 +1483,8 @@ bool DX9RENDER::TextureLoad(int32_t t)
     sprintf_s(fn, TEXTURESDIR, Textures[t].name);
     for (int32_t s = 0, d = 0; fn[d]; s++)
     {
-        if (d > 0 && fn[d - 1] == '\\' && fn[s] == '\\')
+        if (d > 0 && (fn[d - 1] == PATH_SEP || fn[d - 1] == WRONG_PATH_SEP) &&
+            (fn[s] == PATH_SEP || fn[s] == WRONG_PATH_SEP))
         {
             continue;
         }
