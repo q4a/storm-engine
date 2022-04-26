@@ -4,7 +4,7 @@
 #include "modelr.h"
 #include "shared/messages.h"
 
-#ifdef _WIN32 // FIX_LINUX DirectXMath
+#ifdef false // _WIN32 // FIX_LINUX DirectXMath
 #include <DirectXMath.h>
 #endif
 
@@ -81,7 +81,7 @@ void *VBTransform(void *vb, int32_t startVrt, int32_t nVerts, int32_t totVerts)
         // Inverse blending coefficient
         const auto wNeg = 1.0f - vrt.weight;
 
-#ifdef _WIN32 // FIX_LINUX DirectXMath
+#ifdef false // _WIN32 // FIX_LINUX DirectXMath
 #ifdef __AVX__
         // apparently, _mm256_set1_ps seems to be better using msvc with lat=~7+1*2+4+1*5+5+7+1*2==24 vs ~7+1*2+4+1*5+1+3+1*2==32 for _mm256_broadcast_ss
         // TODO: check clang listings

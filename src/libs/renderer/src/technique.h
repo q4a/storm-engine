@@ -1,4 +1,4 @@
-#ifndef _WIN32 // FIX_LINUX Effects
+#ifndef false // _WIN32 // FIX_LINUX
 #pragma once
 
 #include "dx9render.h"

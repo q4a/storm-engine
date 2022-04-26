@@ -290,7 +290,7 @@ void CoreImpl::ProcessEngineIniFile()
 
             if (iScriptVersion != ENGINE_SCRIPT_VERSION)
             {
-#ifdef _WIN32 // FIX_LINUX Cursor
+#ifdef false // _WIN32 // FIX_LINUX Cursor
                 ShowCursor(true);
 #endif
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Wrong script version", nullptr);
@@ -329,7 +329,7 @@ void* CoreImpl::GetAppHWND()
     return App_Hwnd;
 }
 
-#ifdef _WIN32 // FIX_LINUX HINSTANCE
+#ifdef false // _WIN32 // FIX_LINUX HINSTANCE
 HINSTANCE CoreImpl::GetAppInstance()
 {
     return hInstance;

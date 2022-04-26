@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#ifdef _WIN32 // FIX_LINUX SHGetKnownFolderPath
+#ifdef false // _WIN32 // FIX_LINUX SHGetKnownFolderPath
 #include <ShlObj.h>
 #else
 #include <SDL2/SDL.h>
@@ -18,7 +18,7 @@ inline path GetStashPath()
     static path path;
     if (path.empty())
     {
-#ifdef _WIN32 // FIX_LINUX SHGetKnownFolderPath
+#ifdef false // _WIN32 // FIX_LINUX SHGetKnownFolderPath
         wchar_t *str = nullptr;
         SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST, nullptr, &str);
         path = str;

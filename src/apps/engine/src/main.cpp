@@ -116,14 +116,14 @@ void HandleWindowEvent(const storm::OSWindow::Event &event)
     }
 }
 
-#ifdef _WIN32 // FIX_LINUX HINSTANCE
+#ifdef false // _WIN32 // FIX_LINUX HINSTANCE
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 #else
 int main(int argc, char *argv[])
 #endif
 {
     // Prevent multiple instances
-#ifdef _WIN32 // FIX_LINUX CreateEventA
+#ifdef false // _WIN32 // FIX_LINUX CreateEventA
     if (!CreateEventA(nullptr, false, false, "Global\\FBBD2286-A9F1-4303-B60C-743C3D7AA7BE") ||
         GetLastError() == ERROR_ALREADY_EXISTS)
 #else
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
     core_private->InitBase();
 
     // Message loop
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     auto dwOldTime = GetTickCount();
 #else
     auto dwOldTime = std::chrono::system_clock::now();
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
             if (dwMaxFPS)
             {
                 const auto dwMS = 1000u / dwMaxFPS;
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
                 const auto dwNewTime = GetTickCount();
                 if (dwNewTime - dwOldTime < dwMS)
                     continue;
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
     core_private->Event("ExitApplication");
     core_private->CleanUp();
     core_private->ReleaseBase();
-#ifdef _WIN32 // FIX_LINUX Cursor
+#ifdef false // _WIN32 // FIX_LINUX Cursor
     ClipCursor(nullptr);
 #endif
     SDL_Quit();

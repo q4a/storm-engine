@@ -94,7 +94,7 @@ inline void tolwr(char *str)
     }
 }
 
-#ifdef _WIN32 // FIX_LINUX RDTSC_*
+#ifdef false // _WIN32 // FIX_LINUX RDTSC_*
 #define RDTSC_B(x)                                                                                                     \
     {                                                                                                                  \
         LARGE_INTEGER li;                                                                                              \

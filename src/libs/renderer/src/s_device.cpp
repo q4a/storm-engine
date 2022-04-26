@@ -35,7 +35,7 @@ namespace
 {
     constexpr auto kKeyTakeScreenshot = "TakeScreenshot";
 
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
     D3DXIMAGE_FILEFORMAT GetScreenshotFormat(const std::string &fmt)
     {
         if (fmt == "bmp")
@@ -382,7 +382,7 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
-#ifdef _WIN32 // FIX_LINUX DxErr.h
+#ifdef false // _WIN32 // FIX_LINUX DxErr.h
         core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
 #else
         core.Trace("[%s:%s:%d] (%s)", file, func, line, expr);
@@ -465,7 +465,7 @@ DX9RENDER::DX9RENDER()
     back0Texture = -1;
     progressSafeCounter = 0;
     isInPViewProcess = false;
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     progressUpdateTime = 0;
 #else
     progressUpdateTime = std::chrono::system_clock::now();
@@ -512,7 +512,7 @@ bool DX9RENDER::Init()
         screenshotExt = str;
         std::ranges::transform(screenshotExt, screenshotExt.begin(),
                                [](const unsigned char c) { return std::tolower(c); });
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
         screenshotFormat = GetScreenshotFormat(str);
         if (screenshotFormat == D3DXIFF_FORCE_DWORD)
         {
@@ -576,7 +576,7 @@ bool DX9RENDER::Init()
         if (!InitDevice(bWindow, static_cast<HWND>(core.GetAppHWND()), screen_size.x, screen_size.y))
             return false;
 
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
         RecompileEffects();
 #else
         pTechnique = new CTechnique(this);
@@ -824,7 +824,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
             }
         }
     }
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
     effects_.setDevice(d3d9);
 #endif
 
@@ -1299,7 +1299,7 @@ bool DX9RENDER::DX9EndScene()
 
     if (bSafeRendering)
     {
-#ifdef _WIN32 // FIX_LINUX ReleaseDC
+#ifdef false // _WIN32 // FIX_LINUX ReleaseDC
         const HDC dc = GetDC(hwnd);
         SetPixel(dc, 0, 0, 0);
         ReleaseDC(hwnd, dc);
@@ -1807,7 +1807,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
 
 bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
 {
-#ifdef _WIN32 // FIX_LINUX D3DXCreateTextureFromFileA
+#ifdef false // _WIN32 // FIX_LINUX D3DXCreateTextureFromFileA
     // TODO: reimplement the whole thing in a tidy way
     IDirect3DTexture9 *pTex;
     if(CHECKD3DERR(D3DXCreateTextureFromFileA(d3d9, path, &pTex)))
@@ -2683,7 +2683,7 @@ void DX9RENDER::RestoreRender()
     SetCommonStates();
     d3d9->GetGammaRamp(0, &DefaultRamp);
 
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
     RecompileEffects();
 #else
     STORM_DELETE(pTechnique);
@@ -2698,7 +2698,7 @@ void DX9RENDER::RestoreRender()
 
 void DX9RENDER::RecompileEffects()
 {
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
     effects_.release();
 
     std::filesystem::path cur_path = std::filesystem::current_path();
@@ -2800,7 +2800,7 @@ void DX9RENDER::RunStart()
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
         InvokeEntitiesLostRender();
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
         RecompileEffects();
 #else
         STORM_DELETE(pTechnique);
@@ -3334,7 +3334,7 @@ void DX9RENDER::MakeScreenShot()
         screenshot_path.replace_filename(screenshot_base_filename + "_" + std::to_string(i));
         screenshot_path.replace_extension(screenshotExt);
     }
-#ifdef _WIN32 // FIX_LINUX Screenshot
+#ifdef false // _WIN32 // FIX_LINUX Screenshot
     D3DXSaveSurfaceToFile(screenshot_path.c_str(), screenshotFormat, surface, nullptr, nullptr);
 #endif
 
@@ -3403,7 +3403,7 @@ void DX9RENDER::FindPlanes(IDirect3DDevice9 *d3dDevice)
     viewplane[3].D = (pos.x * viewplane[3].Nx + pos.y * viewplane[3].Ny + pos.z * viewplane[3].Nz);
 }
 
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
 bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 {
     if (!cBlockName)
@@ -3422,7 +3422,7 @@ bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 
 bool DX9RENDER::TechniqueExecuteNext()
 {
-#ifdef _WIN32 // FIX_LINUX Effects
+#ifdef false // _WIN32 // FIX_LINUX Effects
     return effects_.next();
 #else
     return pTechnique->ExecutePassNext();
@@ -3802,7 +3802,7 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
-#ifdef _WIN32 // FIX_LINUX ID3DXEffect
+#ifdef false // _WIN32 // FIX_LINUX ID3DXEffect
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
@@ -4245,7 +4245,7 @@ void DX9RENDER::StartProgressView()
         progressTipsTexture = TextureCreate(progressTipsImage);
         isInPViewProcess = false;
     }
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     progressUpdateTime = GetTickCount() - 1000;
 #else
     progressUpdateTime = std::chrono::system_clock::now() - std::chrono::milliseconds(1000);
@@ -4260,7 +4260,7 @@ void DX9RENDER::ProgressView()
     if (isInPViewProcess)
         return;
     // Analyzing time
-#ifdef _WIN32 // FIX_LINUX GetTickCount
+#ifdef false // _WIN32 // FIX_LINUX GetTickCount
     const uint32_t time = GetTickCount();
     if (abs(static_cast<int32_t>(progressUpdateTime - time)) < 50)
         return;
