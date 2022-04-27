@@ -70,7 +70,7 @@ void *VBTransform(void *vb, int32_t startVrt, int32_t nVerts, int32_t totVerts)
     GEOS::VERTEX0 *dst;
     dest_vb->Lock(0, 0, (VOID **)&dst, D3DLOCK_DISCARD | D3DLOCK_NOSYSLOCK);
 
-#ifndef _WIN32 // FIX_LINUX DirectXMath
+#ifndef false // _WIN32 // FIX_LINUX DirectXMath
     CMatrix mtx;
 #endif
     for (int32_t v = 0; v < totVerts; v++)
