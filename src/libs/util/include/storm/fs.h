@@ -15,7 +15,7 @@ using namespace std::filesystem;
 
 inline path GetStashPath()
 {
-    static path path;
+    path path;
     if (path.empty())
     {
 #ifdef _WIN32 // FIX_LINUX SHGetKnownFolderPath
