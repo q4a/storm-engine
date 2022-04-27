@@ -1,6 +1,7 @@
 #include "file_service.h"
 #include "core_impl.h"
 #include "storm_assert.h"
+#include "storm/fs.h"
 #include "storm/string_compare.hpp"
 
 #include <SDL2/SDL.h>
@@ -388,16 +389,6 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
 // Resource paths
 //
 
-static bool starts_with(const std::string &str, const std::string &prefix)
-{
-    return str.size() >= prefix.size() && 0 == str.compare(0, prefix.size(), prefix);
-}
-
-static bool ends_with(const std::string &str, const std::string &suffix)
-{
-    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
-}
-
 void terminate_with_char(std::string &buffer, const char chr)
 {
     // Check if already has
@@ -458,8 +449,8 @@ void FILE_SERVICE::ScanResourcePaths()
             std::string path = get_dir_iterator_path(entry.path());
             std::string path_lwr = convert_path(path.c_str());
             tolwr(path_lwr.data());
-            if (starts_with(path_lwr, "program") || starts_with(path_lwr, "resource") ||
-                starts_with(path_lwr, "save") || ends_with(path_lwr, ".ini"))
+            if (fs::starts_with(path_lwr, "program") || fs::starts_with(path_lwr, "resource") ||
+                fs::starts_with(path_lwr, "save") || fs::ends_with(path_lwr, ".ini"))
             {
                 ResourcePaths[path_lwr] = path;
                 if (entry.is_directory())
@@ -482,7 +473,7 @@ std::string FILE_SERVICE::ConvertPathResource(const char *path)
     std::string conv = convert_path(path);
     std::string path_lwr = conv;
     tolwr(path_lwr.data());
-    if (starts_with(path_lwr, "./"))
+    if (fs::starts_with(path_lwr, "./"))
     {
         string_replace(path_lwr, "./", "");
     }

@@ -64,6 +64,13 @@ void mimalloc_fun(const char *msg, void *arg)
         std::error_code ec;
         remove(mimalloc_log_path, ec);
     }
+#ifndef _WIN32 // FIX_LINUX mimalloc_fun
+    if (!fs::ends_with(mimalloc_log_path.string(), "mimalloc.log"))
+    {
+        // Linux can't get fs::GetLogsPath() / "mimalloc.log" after exiting main
+        return;
+    }
+#endif
 
     FILE *mimalloc_log =
 #ifdef _MSC_VER
