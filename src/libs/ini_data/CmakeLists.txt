@@ -1,0 +1,4 @@
+STORM_SETUP(
+    TARGET_NAME ini_data
+    TYPE library
+)

@@ -1,0 +1,4 @@
+include_guard = "rust_ini_data_h"
+pragma_once = true
+
+[export]
