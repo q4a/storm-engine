@@ -28,6 +28,7 @@
 #include "wdm_wind_ui.h"
 #include "defines.h"
 #include "entity.h"
+#include "string_compare.hpp"
 
 #ifdef GetObject
 #undef GetObject
@@ -226,7 +227,7 @@ bool WorldMap::Init()
             AttributesPointer->GetAttributeAsFloat("stormBrnDistMax", wdmObjects->stormBrnDistMax);
         wdmObjects->stormZone = AttributesPointer->GetAttributeAsFloat("stormZone", wdmObjects->stormZone);
         auto *const s = AttributesPointer->GetAttribute("debug");
-        wdmObjects->isDebug = s && (storm::iEquals(s, "true"));
+        wdmObjects->isDebug = s && (rust::string::iEquals(s, "true"));
         saveData = AttributesPointer->CreateSubAClass(AttributesPointer, "encounters");
         wdmObjects->resizeRatio = AttributesPointer->GetAttributeAsFloat("resizeRatio", wdmObjects->resizeRatio);
     }
@@ -317,7 +318,7 @@ bool WorldMap::Init()
                 saveData->DeleteAttributeClassX(a);
                 continue;
             }
-            if (storm::iEquals(type, "Merchant") && modelName && modelName[0])
+            if (rust::string::iEquals(type, "Merchant") && modelName && modelName[0])
             {
                 if (!CreateMerchantShip(modelName, nullptr, nullptr, 1.0f, -1.0f, a))
                 {
@@ -325,7 +326,7 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (storm::iEquals(type, "Follow") && modelName && modelName[0])
+            if (rust::string::iEquals(type, "Follow") && modelName && modelName[0])
             {
                 if (!CreateFollowShip(modelName, 1.0f, -1.0f, a))
                 {
@@ -333,7 +334,7 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (storm::iEquals(type, "Warring") && modelName && modelName[0])
+            if (rust::string::iEquals(type, "Warring") && modelName && modelName[0])
             {
                 auto *const attacked = a->GetAttribute("attacked");
                 if (attacked)
@@ -359,11 +360,11 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (storm::iEquals(type, "Attacked"))
+            if (rust::string::iEquals(type, "Attacked"))
             {
                 continue;
             }
-            if (storm::iEquals(type, "Storm"))
+            if (rust::string::iEquals(type, "Storm"))
             {
                 const auto isTornado = (a->GetAttributeAsDword("isTornado", 0) != 0);
                 if (!CreateStorm(isTornado, -1.0f, a))
@@ -645,7 +646,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
     float x, z, ay;
     if (!apnt || !AttributesPointer)
         return 0;
-    if (storm::iEquals(apnt->GetThisName(), "deleteUpdate"))
+    if (rust::string::iEquals(apnt->GetThisName(), "deleteUpdate"))
     {
         for (int32_t i = 0; i < wdmObjects->ships.size(); i++)
         {
@@ -658,7 +659,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             wdmObjects->storms[i]->DeleteUpdate();
         }
     }
-    else if (storm::iEquals(apnt->GetThisName(), "playerShipUpdate"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "playerShipUpdate"))
     {
         if (wdmObjects->playerShip)
         {
@@ -669,7 +670,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             AttributesPointer->SetAttributeUseFloat("playerShipAY", ay);
         }
     }
-    else if (storm::iEquals(apnt->GetThisName(), "cur"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "cur"))
     {
         auto *pa = apnt->GetParent();
         if (pa == aStorm)
@@ -743,7 +744,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             }
         }
     }
-    else if (storm::iEquals(apnt->GetThisName(), "updateinfo"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "updateinfo"))
     {
         auto *pa = apnt->GetParent();
         if (pa == aInfo)
@@ -755,7 +756,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
     {
         for (auto *pa = apnt; pa; pa = pa->GetParent())
         {
-            if (storm::iEquals(pa->GetThisName(), "labels"))
+            if (rust::string::iEquals(pa->GetThisName(), "labels"))
             {
                 wdmObjects->islands->SetIslandsData(AttributesPointer, true);
                 return 0;

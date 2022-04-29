@@ -1,5 +1,5 @@
 [package]
-name = "util-rs"
+name = "rust-rs"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,8 +9,8 @@ edition = "2021"
 crate-type=["staticlib"]
 
 [dependencies]
-dirs-next = "2.0"
-regex = "1.5.5"
-encoding_rs = "0.8"
-globset = "0.4"
-chrono = { version = "0.4.19", default-features = false, features = ["alloc", "clock"] }
+log = "^0"
+encoding_rs = "^0"
+dirs-next = "^2"
+chrono = { version = "^0", default-features = false, features = ["alloc", "clock"] }
+globset = "^0"

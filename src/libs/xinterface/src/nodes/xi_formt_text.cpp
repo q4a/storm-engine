@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "utf8.h"
 #include "xi_scroller.h"
-
+#include "string_compare.hpp"
 #include <cstdio>
 
 CXI_FORMATEDTEXT::STRING_DESCRIBER::STRING_DESCRIBER(char *ls) : color(0)
@@ -467,9 +467,9 @@ void CXI_FORMATEDTEXT::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     }
 
     ReadIniString(ini1, name1, ini2, name2, "alignment", param, sizeof(param), "left");
-    if (storm::iEquals(param, "center"))
+    if (rust::string::iEquals(param, "center"))
         m_nAlignment = PR_ALIGN_CENTER;
-    else if (storm::iEquals(param, "right"))
+    else if (rust::string::iEquals(param, "right"))
         m_nAlignment = PR_ALIGN_RIGHT;
     else
         m_nAlignment = PR_ALIGN_LEFT;
@@ -663,13 +663,13 @@ bool CXI_FORMATEDTEXT::GetLineNext(int fontNum, const char *&pInStr, char *buf, 
         {
             if (pStart[i] == '<')
             {
-                if (storm::iStartsWith(&pStart[i], "<color"))
+                if (rust::string::iStartsWith(&pStart[i], "<color"))
                 {
                     while (i < lineSize && i < bufSize - 1 && pStart[i] != '>')
                         i++;
                     continue;
                 }
-                if (storm::iStartsWith(&pStart[i], "</color>"))
+                if (rust::string::iStartsWith(&pStart[i], "</color>"))
                 {
                     i += 7;
                     continue;
@@ -700,13 +700,13 @@ bool CXI_FORMATEDTEXT::GetLineNext(int fontNum, const char *&pInStr, char *buf, 
         {
             if (pStart[i] == '<')
             {
-                if (storm::iStartsWith(&pStart[i], "<color"))
+                if (rust::string::iStartsWith(&pStart[i], "<color"))
                 {
                     while (i < lineSize && i < bufSize - 1 && pStart[i] != '>')
                         i++;
                     continue;
                 }
-                if (storm::iStartsWith(&pStart[i], "</color>"))
+                if (rust::string::iStartsWith(&pStart[i], "</color>"))
                 {
                     i += 7;
                     continue;
@@ -952,7 +952,7 @@ void CXI_FORMATEDTEXT::MakeTagChecking(bool &tagState, uint32_t &tagColor, uint3
         {
             if (tagState)
             {
-                if (storm::iStartsWith(str, "</color>"))
+                if (rust::string::iStartsWith(str, "</color>"))
                 {
                     tagState = false;
                     q = str - tagBegin;
@@ -961,7 +961,7 @@ void CXI_FORMATEDTEXT::MakeTagChecking(bool &tagState, uint32_t &tagColor, uint3
             }
             else
             {
-                if (storm::iStartsWith(str, "<color="))
+                if (rust::string::iStartsWith(str, "<color="))
                 {
                     tagState = true;
                     int32_t a = 255, r = 255, g = 255, b = 255;

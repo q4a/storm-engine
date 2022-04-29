@@ -11,6 +11,7 @@
 #include "../i_common/names.h"
 #include "../system/data_source/data_string.h"
 #include "defines.h"
+#include "string_compare.hpp"
 
 #include <filesystem>
 
@@ -104,7 +105,7 @@ bool ParticleManager::OpenProject(const char *FileName)
     // std::string LongFileName = "resource\\particles\\";
     auto path = std::filesystem::path() / "resource" / "particles" / FileName;
     auto pathStr = path.extension().string();
-    if (!storm::iEquals(pathStr, ".prj"))
+    if (!rust::string::iEquals(pathStr, ".prj"))
         path += ".prj";
     pathStr = path.string();
     // MessageBoxA(NULL, (LPCSTR)path.c_str(), "", MB_OK); //~!~
@@ -480,7 +481,7 @@ bool ParticleManager::FindInEnumUsedGeom(const char *GeomName)
     for (uint32_t n = 0; n < EnumUsedGeom.size(); n++)
     {
         const char *StoredGeomName = EnumUsedGeom[n].c_str();
-        if (storm::iEquals(StoredGeomName, GeomName))
+        if (rust::string::iEquals(StoredGeomName, GeomName))
             return true;
     }
     return false;

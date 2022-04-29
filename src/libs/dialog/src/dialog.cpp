@@ -2,7 +2,7 @@
 #include "v_sound_service.h"
 #include "core.h"
 #include "defines.h"
-
+#include "string_compare.hpp"
 #include "v_file_service.h"
 
 CREATE_CLASS(DIALOG)
@@ -1049,7 +1049,7 @@ void DIALOG::Realize(uint32_t Delta_Time)
             if (pA)
             {
                 const char* goName = pA->GetAttribute("go");
-                if (!goName || storm::iEquals(goName, selectedLinkName))
+                if (!goName || rust::string::iEquals(goName, selectedLinkName))
                     EmergencyExit();
                 else
                 {
@@ -1101,14 +1101,14 @@ uint32_t DIALOG::AttributeChanged(ATTRIBUTES *pA)
     if (par != nullptr)
     {
         const char *parname = par->GetThisName();
-        if (parname != nullptr && storm::iEquals(parname, "Links"))
+        if (parname != nullptr && rust::string::iEquals(parname, "Links"))
             parLinks = true;
     }
 
     const char *nm = pA->GetThisName();
 
     // play sound d.speech
-    if (!parLinks && nm && storm::iEquals(nm, "greeting")) // was "snd"
+    if (!parLinks && nm && rust::string::iEquals(nm, "greeting")) // was "snd"
     {
         strcpy_s(soundName, pA->GetThisAttr());
         if (start)

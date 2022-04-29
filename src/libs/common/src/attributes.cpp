@@ -1,4 +1,5 @@
 #include "attributes.h"
+#include "string_compare.hpp"
 
 ATTRIBUTES::ATTRIBUTES(VSTRING_CODEC *p): ATTRIBUTES(*p)
 {
@@ -40,7 +41,7 @@ bool ATTRIBUTES::operator==(const char *str) const
 {
     if (!str || !str[0])
         return false;
-    return storm::iEquals(stringCodec_.Convert(nameCode_), str);
+    return rust::string::iEquals(stringCodec_.Convert(nameCode_), str);
 }
 
 const char *ATTRIBUTES::GetThisName() const
@@ -98,7 +99,7 @@ size_t ATTRIBUTES::GetAttributesNum() const
 ATTRIBUTES * ATTRIBUTES::GetAttributeClass(const std::string_view &name) const
 {
     for (const auto &attribute : attributes_)
-        if (storm::iEquals(name, attribute->GetThisName()))
+        if (rust::string::iEquals(name, attribute->GetThisName()))
             return attribute.get();
     return nullptr;
 }
@@ -137,7 +138,7 @@ const char * ATTRIBUTES::GetAttributeName(size_t n) const
 const char * ATTRIBUTES::GetAttribute(const std::string_view &name) const
 {
     for (const auto &attribute : attributes_)
-        if (storm::iEquals(name, attribute->GetThisName())) {
+        if (rust::string::iEquals(name, attribute->GetThisName())) {
             if (attribute->value_) {
                 return attribute->value_->c_str();
             }

@@ -5,6 +5,7 @@
 #include "defines.h"
 #include "pcs_controls.h"
 #include "v_file_service.h"
+#include "string_compare.hpp"
 
 CREATE_CLASS(TMPTELEPORT)
 
@@ -361,7 +362,7 @@ bool FINDDIALOGNODES::Init()
             auto nodIdx = 0;
             while (GetStringLine(pStr, param, sizeof(param) - 1))
             {
-                if (strlen(param) < 5 || !storm::iStartsWith(param, "case"))
+                if (strlen(param) < 5 || !rust::string::iStartsWith(param, "case"))
                     continue;
                 char param2[512];
                 GetQuotedString(param, param2, sizeof(param2) - 1);

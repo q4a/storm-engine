@@ -11,7 +11,7 @@
 #include "animation_service_imp.h"
 
 #include "core.h"
-
+#include "string_compare.hpp"
 #include "animation_imp.h"
 #include "an_file.h"
 #include "v_file_service.h"
@@ -244,13 +244,13 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
         auto type = at_normal;
         if (ani->ReadString(path, ASKW_TYPE, key, 256, ASKWAT_NORMAL))
         {
-            if (storm::iEquals(key, ASKWAT_NORMAL))
+            if (rust::string::iEquals(key, ASKWAT_NORMAL))
                 type = at_normal;
-            else if (storm::iEquals(key, ASKWAT_REVERSE))
+            else if (rust::string::iEquals(key, ASKWAT_REVERSE))
                 type = at_reverse;
-            else if (storm::iEquals(key, ASKWAT_PINGPONG))
+            else if (rust::string::iEquals(key, ASKWAT_PINGPONG))
                 type = at_pingpong;
-            else if (storm::iEquals(key, ASKWAT_RPINGPONG))
+            else if (rust::string::iEquals(key, ASKWAT_RPINGPONG))
                 type = at_rpingpong;
             else
             {
@@ -263,9 +263,9 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
         auto isLoop = true;
         if (ani->ReadString(path, ASKW_LOOP, key, 256, "false"))
         {
-            if (storm::iEquals(key, ASKWAL_TRUE))
+            if (rust::string::iEquals(key, ASKWAL_TRUE))
                 isLoop = true;
-            else if (storm::iEquals(key, ASKWAL_FALSE))
+            else if (rust::string::iEquals(key, ASKWAL_FALSE))
                 isLoop = false;
             else
             {
@@ -368,15 +368,15 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                     if (em[0] == 0)
                     {
                     }
-                    else if (storm::iEquals(em, ASKWAE_ALWAYS))
+                    else if (rust::string::iEquals(em, ASKWAE_ALWAYS))
                     {
                         ev = eae_always;
                     }
-                    else if (storm::iEquals(em, ASKWAE_NORMAL))
+                    else if (rust::string::iEquals(em, ASKWAE_NORMAL))
                     {
                         ev = eae_normal;
                     }
-                    else if (storm::iEquals(em, ASKWAE_REVERSE))
+                    else if (rust::string::iEquals(em, ASKWAE_REVERSE))
                     {
                         ev = eae_reverse;
                     }

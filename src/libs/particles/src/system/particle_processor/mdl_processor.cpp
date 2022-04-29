@@ -9,6 +9,7 @@
 #include "defines.h"
 #include "geos.h"
 #include "physic.h"
+#include "string_compare.hpp"
 
 // how many models there can be
 #define MAX_MODELS 8192
@@ -141,7 +142,7 @@ void ModelProcessor::AddParticle(ParticleSystem *pSystem, const Vector &velocity
     pData->KTrackZ = FRAND(1.0f);
 
     const auto *const pEmitterName = pFields->GetString(ATTACHEDEMITTER_NAME);
-    if (storm::iEquals(pEmitterName, "none"))
+    if (rust::string::iEquals(pEmitterName, "none"))
     {
         pData->AttachedEmitter = nullptr;
     }

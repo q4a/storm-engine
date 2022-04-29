@@ -21,7 +21,7 @@
 #include "shared/battle_interface/msg_control.h"
 
 #include "../interface_manager/interface_manager.h"
-
+#include "string_compare.hpp"
 #include "ship_info_images.h"
 
 CREATE_CLASS(BATTLE_INTERFACE)
@@ -318,7 +318,7 @@ uint64_t BATTLE_INTERFACE::ProcessMessage(MESSAGE &message)
 
     case MSG_BATTLE_LAND_MAKE_COMMAND: {
         const std::string &param = message.String();
-        if (storm::iEquals(param, "cancel"))
+        if (rust::string::iEquals(param, "cancel"))
         {
             if (m_pShipIcon)
                 m_pShipIcon->ExecuteCommand(BIShipIcon::Command_cancel);

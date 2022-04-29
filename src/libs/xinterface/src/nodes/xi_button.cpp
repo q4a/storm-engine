@@ -1,4 +1,5 @@
 #include "xi_button.h"
+#include "string_compare.hpp"
 
 CXI_BUTTON::CXI_BUTTON()
 {
@@ -320,7 +321,7 @@ uint32_t CXI_BUTTON::MessageProc(int32_t msgcode, MESSAGE &message)
         if (len == 1)
             break;
 
-        if (m_sGroupName == nullptr || !storm::iEquals(m_sGroupName, param))
+        if (m_sGroupName == nullptr || !rust::string::iEquals(m_sGroupName, param))
         {
             PICTURE_TEXTURE_RELEASE(pPictureService, m_sGroupName, m_idTex);
             STORM_DELETE(m_sGroupName);

@@ -1,6 +1,7 @@
 #include "core.h"
 
 #include "geometry_r.h"
+#include "string_compare.hpp"
 
 CREATE_SERVICE(GEOMETRY)
 
@@ -194,7 +195,7 @@ std::fstream GEOM_SERVICE_R::OpenFile(const char *fname)
     auto fileS = fio->_CreateFile(fname, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        if (storm::iEquals(&fname[strlen(fname) - 4], ".col"))
+        if (rust::string::iEquals(&fname[strlen(fname) - 4], ".col"))
         {
             //    core.Trace("geometry::can't open file %s", fname);
         }
@@ -235,7 +236,7 @@ void GEOM_SERVICE_R::free(void *ptr)
 GEOS::ID GEOM_SERVICE_R::CreateTexture(const char *fname)
 {
     char tex[256];
-    if (storm::iEquals(fname, "shadow.tga"))
+    if (rust::string::iEquals(fname, "shadow.tga"))
     {
         sprintf_s(tex, "lighting\\%s\\%s", lightPath, fname);
     }

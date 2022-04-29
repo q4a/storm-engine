@@ -1,5 +1,6 @@
 #include "ai_fort.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 AIFort *AIFort::pAIFort = nullptr;
 
@@ -351,19 +352,19 @@ bool AIFort::ScanFortForCannons(AI_FORT *pFort, const char *pModelsDir, const ch
             pNode->geo->GetLabel(i, label);
             AICannon *pCannon = nullptr;
 
-            if (storm::iStartsWith(label.name, "cannon") && pFort->dwCannonType != -1)
+            if (rust::string::iStartsWith(label.name, "cannon") && pFort->dwCannonType != -1)
             {
                 pFort->aCannons.push_back(AICannon{});
                 pCannon = &pFort->aCannons.back();
                 // pCannon = &pFort->aCannons[pFort->aCannons.Add()];
             }
-            if (storm::iStartsWith(label.name, "culverin") && pFort->dwCulverinType != -1)
+            if (rust::string::iStartsWith(label.name, "culverin") && pFort->dwCulverinType != -1)
             {
                 pFort->aCulverins.push_back(AICannon{});
                 pCannon = &pFort->aCulverins.back();
                 // pCannon = &pFort->aCulverins[pFort->aCulverins.Add()];
             }
-            if (storm::iStartsWith(label.name, "mortar") && pFort->dwMortarType != -1)
+            if (rust::string::iStartsWith(label.name, "mortar") && pFort->dwMortarType != -1)
             {
                 pFort->aMortars.push_back(AICannon{});
                 pCannon = &pFort->aMortars.back();

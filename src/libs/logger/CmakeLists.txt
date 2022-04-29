@@ -1,5 +1,5 @@
 STORM_SETUP(
     TARGET_NAME logger
     TYPE library
-    DEPENDENCIES util
+    DEPENDENCIES util rust
 )

@@ -9,6 +9,7 @@
 
 #include "../../i_common/names.h"
 #include "v_module_api.h"
+#include "string_compare.hpp"
 
 #define HEADER "PSYS"
 #define VERSION "v3.5"
@@ -285,7 +286,7 @@ int DataSource::FindEmitter(const char *Name)
         auto *const pString = Emitters[n].Fields.FindString(EMITTER_NAME);
         if (pString)
         {
-            if (storm::iEquals(pString->GetValue(), Name))
+            if (rust::string::iEquals(pString->GetValue(), Name))
             {
                 return n;
             }

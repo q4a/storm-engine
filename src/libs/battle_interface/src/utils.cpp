@@ -4,6 +4,7 @@
 
 #include "image/img_render.h"
 #include "v_module_api.h"
+#include "string_compare.hpp"
 
 // extern data
 entid_t BIUtils::idBattleInterface;
@@ -141,11 +142,11 @@ int32_t BIUtils::GetAlignmentFromAttr(ATTRIBUTES *pA, const char *name, int32_t 
         const char *pcTmp = pA->GetAttribute(name);
         if (pcTmp)
         {
-            if (storm::iEquals(pcTmp, "left"))
+            if (rust::string::iEquals(pcTmp, "left"))
                 return PR_ALIGN_LEFT;
-            if (storm::iEquals(pcTmp, "center"))
+            if (rust::string::iEquals(pcTmp, "center"))
                 return PR_ALIGN_CENTER;
-            if (storm::iEquals(pcTmp, "right"))
+            if (rust::string::iEquals(pcTmp, "right"))
                 return PR_ALIGN_RIGHT;
         }
     }

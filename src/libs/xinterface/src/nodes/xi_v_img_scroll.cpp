@@ -1,5 +1,5 @@
 #include "xi_v_img_scroll.h"
-
+#include "string_compare.hpp"
 #include "core.h"
 
 #define MAXIMAGEQUANTITY 100
@@ -413,11 +413,11 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
         sprintf_s(param1, sizeof(param1), "align%d", i + 1);
         if (ReadIniString(ini1, name1, ini2, name2, param1, param, sizeof(param), ""))
         {
-            if (storm::iEquals(param, "left"))
+            if (rust::string::iEquals(param, "left"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_LEFT;
-            else if (storm::iEquals(param, "right"))
+            else if (rust::string::iEquals(param, "right"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_RIGHT;
-            else if (storm::iEquals(param, "center"))
+            else if (rust::string::iEquals(param, "center"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_CENTER;
             else
                 core.Trace("Warning! unknown align: %s", param);
@@ -1641,7 +1641,7 @@ int CXI_VIMAGESCROLL::FindTexGroupFromOld(char **pGroupList, const char *groupNa
         return -1;
     for (int i = 0; i < listSize; i++)
     {
-        if (pGroupList[i] != nullptr && storm::iEquals(pGroupList[i], groupName))
+        if (pGroupList[i] != nullptr && rust::string::iEquals(pGroupList[i], groupName))
             return i;
     }
     return -1;

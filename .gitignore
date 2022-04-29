@@ -6,3 +6,4 @@
 *.user
 src/libs/util/util-rs/target/
 src/libs/logger/logger-rs/target/
+src/libs/rust/rust-rs/target/

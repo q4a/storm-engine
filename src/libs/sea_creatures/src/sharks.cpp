@@ -13,6 +13,7 @@
 #include "core.h"
 #include "geometry.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 CREATE_CLASS(Sharks)
 
@@ -416,7 +417,7 @@ void Sharks::Shark::Event(Animation *animation, int32_t index, int32_t eventID, 
         animation->Player(0).SetAction(actSwim);
         aniTime = 3.0f + rand() * 3.0f / RAND_MAX;
     }
-    if (storm::iEquals(act, actSwim) || (rnd & 1))
+    if (rust::string::iEquals(act, actSwim) || (rnd & 1))
     {
         animation->Player(0).SetAction(actStand);
         aniTime = 3.0f + rand() * 3.0f / RAND_MAX;

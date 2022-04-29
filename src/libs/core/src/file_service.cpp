@@ -1,7 +1,7 @@
 #include "file_service.h"
 #include "core_impl.h"
 #include "storm_assert.h"
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 #include <SDL2/SDL.h>
 #include <exception>
@@ -160,7 +160,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
             continue;
         }
         curPath = dirEntry.path();
-        if (mask == nullptr || storm::wildicmp(mask, curPath.filename().u8string().c_str()))
+        if (mask == nullptr || rust::string::wildicmp(mask, curPath.filename().u8string().c_str()))
         {
             if (getPaths)
             {
@@ -261,7 +261,7 @@ std::unique_ptr<INIFILE> FILE_SERVICE::OpenIniFile(const char *file_name)
     {
         if (OpenFiles[n] == nullptr || OpenFiles[n]->GetFileName() == nullptr)
             continue;
-        if (storm::iEquals(OpenFiles[n]->GetFileName(), file_name))
+        if (rust::string::iEquals(OpenFiles[n]->GetFileName(), file_name))
         {
             OpenFiles[n]->IncReference();
 

@@ -1,4 +1,5 @@
 #include "s_deftab.h"
+#include "string_compare.hpp"
 
 #define DTMAKEHASHINDEX(x) (x & 0xff)
 
@@ -67,7 +68,7 @@ uint32_t S_DEFTAB::AddDef(DEFINFO &di)
     for (n = 0; n < Def_num; n++)
     {
         if (pTable[n].hash == hash)
-            if (storm::iEquals(pTable[n].name, di.name))
+            if (rust::string::iEquals(pTable[n].name, di.name))
             {
                 // define with such name already registred,
                 if (pTable[n].segment_id == INVALID_SEGMENT_ID)
@@ -162,7 +163,7 @@ uint32_t S_DEFTAB::FindDef(const char *def_name)
     {
         const auto ni = HashLine[hash_index].pElements[n];
         if (pTable[ni].hash == hash) // return n;
-            if (storm::iEquals(pTable[ni].name, def_name))
+            if (rust::string::iEquals(pTable[ni].name, def_name))
                 return ni;
     }
     return INVALID_DEF_CODE;

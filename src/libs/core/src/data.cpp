@@ -1,7 +1,7 @@
 #include "data.h"
 #include "core_impl.h"
 
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 #include <fast_float/fast_float.h>
 
@@ -2719,22 +2719,22 @@ bool DATA::CompareAndSetResult(DATA *pV, S_TOKEN_TYPE op)
             switch (op)
             {
             case OP_BOOL_EQUAL:
-                Set(static_cast<int32_t>(storm::iEquals(sValue, pV->sValue)));
+                Set(static_cast<int32_t>(rust::string::iEquals(sValue, pV->sValue)));
                 break;
             case OP_GREATER:
-                Set(static_cast<int32_t>(storm::iGreater(sValue, pV->sValue)));
+                Set(static_cast<int32_t>(rust::string::iGreater(sValue, pV->sValue)));
                 break;
             case OP_GREATER_OR_EQUAL:
-                Set(static_cast<int32_t>(storm::iGreaterOrEqual(sValue, pV->sValue)));
+                Set(static_cast<int32_t>(rust::string::iGreaterOrEqual(sValue, pV->sValue)));
                 break;
             case OP_LESSER:
-                Set(static_cast<int32_t>(storm::iLess(sValue, pV->sValue)));
+                Set(static_cast<int32_t>(rust::string::iLess(sValue, pV->sValue)));
                 break;
             case OP_LESSER_OR_EQUAL:
-                Set(static_cast<int32_t>(storm::iLessOrEqual(sValue, pV->sValue)));
+                Set(static_cast<int32_t>(rust::string::iLessOrEqual(sValue, pV->sValue)));
                 break;
             case OP_NOT_EQUAL:
-                Set(static_cast<int32_t>(!storm::iEquals(sValue, pV->sValue)));
+                Set(static_cast<int32_t>(!rust::string::iEquals(sValue, pV->sValue)));
                 break;
             case OP_BOOL_AND:
             case OP_BOOL_OR:

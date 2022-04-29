@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "shared/layers.h"
 #include "v_module_api.h"
+#include "string_compare.hpp"
 
 #include <algorithm>
 #include <array>
@@ -216,7 +217,7 @@ class EntityManager final
         VMA *pClass = nullptr;
         for (const auto &c : __STORM_CLASSES_REGISTRY)
         {
-            if (c->GetHash() == hash && storm::iEquals(name, c->GetName()))
+            if (c->GetHash() == hash && rust::string::iEquals(name, c->GetName()))
             {
                 pClass = c;
                 break;

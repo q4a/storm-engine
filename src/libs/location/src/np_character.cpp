@@ -12,6 +12,7 @@
 #include "characters_groups.h"
 #include "defines.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 //============================================================================================
 
@@ -603,7 +604,7 @@ void NPCharacter::UpdateFightCharacter(float dltTime)
     bool bCurrentActionIsFire = false;
     if (fgtCurType == fgt_none && priorityAction.name && shot.name)
     {
-        if (storm::iEquals(priorityAction.name, shot.name))
+        if (rust::string::iEquals(priorityAction.name, shot.name))
         {
             bCurrentActionIsFire = true;
         }
@@ -764,7 +765,7 @@ void NPCharacter::UpdateFightCharacter(float dltTime)
     SetExCharacter(c);
     if (fgtCurType == fgt_none && priorityAction.name && shot.name)
     {
-        if (storm::iEquals(priorityAction.name, shot.name))
+        if (rust::string::iEquals(priorityAction.name, shot.name))
         {
             float kdst;
             auto target = static_cast<NPCharacter *>(FindGunTarget(kdst, true));
@@ -1299,7 +1300,7 @@ NPCharacter::NPCTask NPCharacter::GetTaskID(const char *taskName)
     for (int32_t i = 0; i < npct_max; i++)
     {
         const char *task = GetTaskName(static_cast<NPCTask>(i));
-        if (storm::iEquals(task, taskName))
+        if (rust::string::iEquals(task, taskName))
             return static_cast<NPCTask>(i);
     }
     return npct_unknow;

@@ -7,8 +7,8 @@
 #include "s_import_func.h"
 #include "texture.h"
 #include "v_s_stack.h"
-#include "storm/fs.h"
-
+#include "fs.hpp"
+#include "string_compare.hpp"
 #include <DxErr.h>
 #include <corecrt_io.h>
 
@@ -483,7 +483,7 @@ bool DX9RENDER::Init()
     d3d = nullptr;
     d3d9 = nullptr;
 
-    create_directories(fs::GetScreenshotsPath());
+    create_directories(rust::fs::GetScreenshotsPath());
 
     auto ini = fio->OpenIniFile(core.EngineIniFileName());
     if (ini)
@@ -524,17 +524,17 @@ bool DX9RENDER::Init()
         ini->ReadString(nullptr, "screen_bpp", str, sizeof(str), "D3DFMT_R5G6B5");
         screen_bpp = D3DFMT_R5G6B5;
         stencil_format = D3DFMT_D16;
-        if (storm::iEquals(str, "D3DFMT_A8R8G8B8"))
+        if (rust::string::iEquals(str, "D3DFMT_A8R8G8B8"))
         {
             screen_bpp = D3DFMT_A8R8G8B8;
             stencil_format = D3DFMT_D24S8;
         }
-        if (storm::iEquals(str, "D3DFMT_X8R8G8B8"))
+        if (rust::string::iEquals(str, "D3DFMT_X8R8G8B8"))
         {
             screen_bpp = D3DFMT_X8R8G8B8;
             stencil_format = D3DFMT_D24S8;
         }
-        if (storm::iEquals(str, "D3DFMT_R5G6B5"))
+        if (rust::string::iEquals(str, "D3DFMT_R5G6B5"))
         {
             screen_bpp = D3DFMT_R5G6B5;
             stencil_format = D3DFMT_D16;
@@ -1328,7 +1328,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
 
     std::filesystem::path path = fname;
     std::string pathStr = path.extension().string();
-    if (storm::iEquals(pathStr, ".tx"))
+    if (rust::string::iEquals(pathStr, ".tx"))
         path.replace_extension();
     pathStr = path.string();
     fname = pathStr.c_str(); //~!~ msvc still doesn't have working c_str for path
@@ -1368,7 +1368,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
 
         if (strlen(_fname) > std::size(".tx") - 1)
         {
-            if (storm::iEquals(&_fname[strlen(_fname) - 3], ".tx"))
+            if (rust::string::iEquals(&_fname[strlen(_fname) - 3], ".tx"))
                 _fname[strlen(_fname) - 3] = 0;
         }
 
@@ -1380,7 +1380,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
         for (t = 0; t < MAX_STEXTURES; t++)
             if (Textures[t].ref != 0)
                 if (Textures[t].name)
-                    if (Textures[t].hash == hf && storm::iEquals(Textures[t].name, _fname))
+                    if (Textures[t].hash == hf && rust::string::iEquals(Textures[t].name, _fname))
                     {
                         Textures[t].ref++;
                         return t;
@@ -2944,7 +2944,7 @@ int32_t DX9RENDER::LoadFont(const char *fontName)
 
     int32_t i;
     for (i = 0; i < nFontQuantity; i++)
-        if (FontList[i].hash == hashVal && storm::iEquals(FontList[i].name, fontName))
+        if (FontList[i].hash == hashVal && rust::string::iEquals(FontList[i].name, fontName))
         {
             if (FontList[i].ref > 0)
                 FontList[i].ref++;
@@ -2994,7 +2994,7 @@ bool DX9RENDER::UnloadFont(const char *fontName)
     const uint32_t hashVal = hash_string(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
-        if (FontList[i].hash == hashVal && storm::iEquals(FontList[i].name, fontName))
+        if (FontList[i].hash == hashVal && rust::string::iEquals(FontList[i].name, fontName))
             return UnloadFont(i);
     core.Trace("Font name \"%s\" is not containing", fontName);
     return false;
@@ -3078,7 +3078,7 @@ char *DX9RENDER::GetFontIniFileName()
 
 bool DX9RENDER::SetFontIniFileName(const char *iniName)
 {
-    if (fontIniFileName != nullptr && iniName != nullptr && storm::iEquals(fontIniFileName, iniName))
+    if (fontIniFileName != nullptr && iniName != nullptr && rust::string::iEquals(fontIniFileName, iniName))
         return true;
 
     delete fontIniFileName;
@@ -3271,8 +3271,8 @@ void DX9RENDER::MakeScreenShot()
         return;
     }
 
-    const auto screenshot_base_filename = fs::GetScreenshotFilename();
-    auto screenshot_path = fs::GetScreenshotsPath() / screenshot_base_filename;
+    const auto screenshot_base_filename = rust::fs::GetScreenshotFilename();
+    auto screenshot_path = rust::fs::GetScreenshotsPath() / screenshot_base_filename;
     screenshot_path.replace_extension(screenshotExt);
     for(size_t i = 0; exists(screenshot_path); ++i)
     {
@@ -3854,7 +3854,7 @@ CVideoTexture *DX9RENDER::GetVideoTexture(const char *sVideoName)
     const uint32_t newHash = hash_string(sVideoName);
     while (pVTLcur != nullptr)
     {
-        if (pVTLcur->hash == newHash && storm::iEquals(pVTLcur->name, sVideoName))
+        if (pVTLcur->hash == newHash && rust::string::iEquals(pVTLcur->name, sVideoName))
         {
             if (EntityManager::GetEntityPointer(pVTLcur->videoTexture_id))
             {

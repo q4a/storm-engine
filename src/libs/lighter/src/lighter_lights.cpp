@@ -10,7 +10,7 @@
 
 #include "lighter_lights.h"
 
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 // ============================================================================================
 // Construction, destruction
@@ -110,7 +110,7 @@ void LighterLights::PostInit()
             continue;
         int32_t j;
         for (j = 0; j < numGrp; j++)
-            if (storm::iEquals(grp[j], light[i].group))
+            if (rust::string::iEquals(grp[j], light[i].group))
                 break;
         if (j == numGrp)
             grp[numGrp++] = light[i].group;
@@ -135,7 +135,7 @@ void LighterLights::PostInit()
         auto nrm = 0.0f;
         for (int32_t j = 0; j < numLights; j++)
         {
-            if (light[j].group && storm::iEquals(light[j].group, grp[i]))
+            if (light[j].group && rust::string::iEquals(light[j].group, grp[i]))
             {
                 nrm += 1.0f;
                 light[numLights].color += light[j].color;
@@ -194,7 +194,7 @@ void LighterLights::UpdateLights(int32_t lit)
             {
                 if (light[j].type == Light::t_point && light[j].group)
                 {
-                    if (storm::iEquals(light[j].group, light[i].group))
+                    if (rust::string::iEquals(light[j].group, light[i].group))
                     {
                         light[j].color = light[i].color;
                         light[j].cosine = light[i].cosine;

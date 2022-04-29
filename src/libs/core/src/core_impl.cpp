@@ -2,12 +2,11 @@
 
 #include "compiler.h"
 #include "controls.h"
-#include "storm/fs.h"
 #include "steam_api.hpp"
+#include "fs.hpp"
+#include "string_compare.hpp"
 
 #include <fstream>
-
-#include "storm/string_compare.hpp"
 
 Core& core = core_internal;
 
@@ -19,27 +18,27 @@ ENGINE_VERSION getTargetEngineVersion(const std::string_view &version)
 {
     using namespace std::string_view_literals;
 
-    if (iEquals(version, "sd"sv))
+    if (rust::string::iEquals(version, "sd"sv))
     {
         return ENGINE_VERSION::SEA_DOGS;
     }
-    else if (iEquals(version, "potc"sv))
+    else if (rust::string::iEquals(version, "potc"sv))
     {
         return ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN;
     }
-    else if (iEquals(version, "ct"sv))
+    else if (rust::string::iEquals(version, "ct"sv))
     {
         return ENGINE_VERSION::CARIBBEAN_TALES;
     }
-    else if (iEquals(version, "coas"sv))
+    else if (rust::string::iEquals(version, "coas"sv))
     {
         return ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS;
     }
-    else if (iEquals(version, "teho"sv))
+    else if (rust::string::iEquals(version, "teho"sv))
     {
         return ENGINE_VERSION::TO_EACH_HIS_OWN;
     }
-    else if (iEquals(version, "latest"sv))
+    else if (rust::string::iEquals(version, "latest"sv))
     {
         return ENGINE_VERSION::LATEST;
     }
@@ -244,7 +243,7 @@ void CoreImpl::ProcessEngineIniFile()
 
     bEngineIniProcessed = true;
 
-    auto engine_ini = fio->OpenIniFile(fs::ENGINE_INI_FILE_NAME);
+    auto engine_ini = fio->OpenIniFile(rust::fs::ENGINE_INI_FILE_NAME);
     if (!engine_ini)
         throw std::runtime_error("no 'engine.ini' file");
 
@@ -437,7 +436,7 @@ void *CoreImpl::MakeClass(const char *class_name)
 {
     const int32_t hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
-        if (c->GetHash() == hash && storm::iEquals(class_name, c->GetName()))
+        if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c->CreateClass();
 
     return nullptr;
@@ -456,7 +455,7 @@ VMA *CoreImpl::FindVMA(const char *class_name)
 {
     const int32_t hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
-        if (c->GetHash() == hash && storm::iEquals(class_name, c->GetName()))
+        if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c;
 
     return nullptr;
@@ -881,7 +880,7 @@ uint32_t CoreImpl::SetScriptFunction(IFUNCINFO *pFuncInfo)
 
 const char *CoreImpl::EngineIniFileName()
 {
-    return fs::ENGINE_INI_FILE_NAME;
+    return rust::fs::ENGINE_INI_FILE_NAME;
 }
 
 void *CoreImpl::GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex)

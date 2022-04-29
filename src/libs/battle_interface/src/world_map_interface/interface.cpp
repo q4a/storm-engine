@@ -4,6 +4,7 @@
 #include "shared/battle_interface/msg_control.h"
 #include "ship_command.h"
 #include "ship_sign.h"
+#include "string_compare.hpp"
 
 WM_INTERFACE::WM_INTERFACE() : rs(nullptr)
 {
@@ -70,7 +71,7 @@ uint64_t WM_INTERFACE::ProcessMessage(MESSAGE &message)
     {
     case MSG_BATTLE_LAND_MAKE_COMMAND: {
         const std::string &param = message.String();
-        if (storm::iEquals(param, "cancel"))
+        if (rust::string::iEquals(param, "cancel"))
         {
             ExecuteCommand(BI_MSG_COMMAND_DEACTIVATE);
         }

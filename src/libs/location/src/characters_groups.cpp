@@ -11,6 +11,7 @@
 #include "characters_groups.h"
 #include "np_character.h"
 #include "storm_assert.h"
+#include "string_compare.hpp"
 
 #define CGS_LOOK 15.0f
 #define CGS_HEAR 2.5f
@@ -107,7 +108,7 @@ bool CharactersGroups::String::Cmp(const char *str, int32_t l, int32_t h) const
         return false;
     if (len != l)
         return false;
-    return storm::iEquals(name, str);
+    return rust::string::iEquals(name, str);
 }
 
 int32_t CharactersGroups::String::GetHash(const char *str)
@@ -339,7 +340,7 @@ bool CharactersGroups::AddEnemyTarget(Character *chr, Character *enemy, float ma
     if (chr->numTargets >= sizeof(chr->grpTargets) / sizeof(Character::GrpTarget))
         return false;
     // Add a new target
-    Assert(!storm::iEquals(chr->group, enemy->group));
+    Assert(!rust::string::iEquals(chr->group, enemy->group));
     auto &trg = chr->grpTargets[chr->numTargets++];
     trg.chr = enemy->GetId();
     trg.time = 0.0f;
@@ -408,117 +409,117 @@ uint64_t CharactersGroups::ProcessMessage(MESSAGE &message)
     const std::string &cmd = message.String();
     if (cmd.empty())
         return 0;
-    if (storm::iEquals(cmd, "VldTrg"))
+    if (rust::string::iEquals(cmd, "VldTrg"))
     {
         return MsgIsValidateTarget(message);
     }
-    if (storm::iEquals(cmd, "GetTrg"))
+    if (rust::string::iEquals(cmd, "GetTrg"))
     {
         return MsgGetOptimalTarget(message);
     }
-    if (storm::iEquals(cmd, "IsEnemy"))
+    if (rust::string::iEquals(cmd, "IsEnemy"))
     {
         return MsgIsEnemy(message);
     }
-    if (storm::iEquals(cmd, "MoveChr"))
+    if (rust::string::iEquals(cmd, "MoveChr"))
     {
         return MoveCharacterToGroup(message);
     }
-    if (storm::iEquals(cmd, "Attack"))
+    if (rust::string::iEquals(cmd, "Attack"))
     {
         MsgAttack(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "AddTarget"))
+    if (rust::string::iEquals(cmd, "AddTarget"))
     {
         MsgAddTarget(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "UpdChrTrg"))
+    if (rust::string::iEquals(cmd, "UpdChrTrg"))
     {
         MsgUpdChrTrg(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "RegistryGroup"))
+    if (rust::string::iEquals(cmd, "RegistryGroup"))
     {
         MsgRegistryGroup(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "ReleaseGroup"))
+    if (rust::string::iEquals(cmd, "ReleaseGroup"))
     {
         MsgReleaseGroup(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "SetRelation"))
+    if (rust::string::iEquals(cmd, "SetRelation"))
     {
         MsgSetRelation(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "SetAlarmReaction"))
+    if (rust::string::iEquals(cmd, "SetAlarmReaction"))
     {
         MsgSetAlarmReaction(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "SetGroupLook"))
+    if (rust::string::iEquals(cmd, "SetGroupLook"))
     {
         return MsgSetGroupLook(message);
     }
-    if (storm::iEquals(cmd, "SetGroupHear"))
+    if (rust::string::iEquals(cmd, "SetGroupHear"))
     {
         return MsgSetGroupHear(message);
     }
-    if (storm::iEquals(cmd, "SetGroupSay"))
+    if (rust::string::iEquals(cmd, "SetGroupSay"))
     {
         return MsgSetGroupSay(message);
     }
-    if (storm::iEquals(cmd, "SetGroupPriority"))
+    if (rust::string::iEquals(cmd, "SetGroupPriority"))
     {
         return MsgSetGroupPriority(message);
     }
-    if (storm::iEquals(cmd, "UnloadCharacter"))
+    if (rust::string::iEquals(cmd, "UnloadCharacter"))
     {
         UnloadCharacter(message);
         return 1;
     }
-    if (storm::iEquals(cmd, "ResetWaveTime"))
+    if (rust::string::iEquals(cmd, "ResetWaveTime"))
     {
         waveTime = 1000.0f;
         return 1;
     }
-    if (storm::iEquals(cmd, "SetAlarm"))
+    if (rust::string::iEquals(cmd, "SetAlarm"))
     {
         return MsgSetAlarm(message);
     }
-    if (storm::iEquals(cmd, "SetAlarmDown"))
+    if (rust::string::iEquals(cmd, "SetAlarmDown"))
     {
         return MsgSetAlarmDown(message);
     }
-    if (storm::iEquals(cmd, "ClearAllTargets"))
+    if (rust::string::iEquals(cmd, "ClearAllTargets"))
     {
         ClearAllTargets();
         return 1;
     }
-    if (storm::iEquals(cmd, "SaveData"))
+    if (rust::string::iEquals(cmd, "SaveData"))
     {
         SaveData();
         return 1;
     }
-    if (storm::iEquals(cmd, "LoadDataRelations"))
+    if (rust::string::iEquals(cmd, "LoadDataRelations"))
     {
         LoadDataRelations();
         return 1;
     }
-    if (storm::iEquals(cmd, "RestoreStates"))
+    if (rust::string::iEquals(cmd, "RestoreStates"))
     {
         RestoreStates();
         return 1;
     }
-    if (storm::iEquals(cmd, "DeleteEmptyGroups"))
+    if (rust::string::iEquals(cmd, "DeleteEmptyGroups"))
     {
         DeleteEmptyGroups();
         return 1;
     }
-    if (storm::iEquals(cmd, "DumpRelations"))
+    if (rust::string::iEquals(cmd, "DumpRelations"))
     {
         DumpRelations();
         return 1;
@@ -959,7 +960,7 @@ void CharactersGroups::MsgSetRelation(MESSAGE &message)
     const std::string &buf = message.String();
     auto actState = rs_enemy;
     auto relState = rs_neitral;
-    if (storm::iEquals(buf, "friend"))
+    if (rust::string::iEquals(buf, "friend"))
     {
         r.curState = rs_friend;
         actState = rs_enemy;
@@ -970,7 +971,7 @@ void CharactersGroups::MsgSetRelation(MESSAGE &message)
         r.alarmmax = CGS_ALARMMAX;
         r.isActive = false;
     }
-    else if (storm::iEquals(buf, "neitral"))
+    else if (rust::string::iEquals(buf, "neitral"))
     {
         r.curState = rs_neitral;
         actState = rs_enemy;
@@ -980,7 +981,7 @@ void CharactersGroups::MsgSetRelation(MESSAGE &message)
         r.alarmmin = CGS_ALARMMIN;
         r.alarmmax = CGS_ALARMMAX;
     }
-    else if (storm::iEquals(buf, "enemy"))
+    else if (rust::string::iEquals(buf, "enemy"))
     {
         r.curState = rs_enemy;
         actState = rs_enemy;
@@ -1007,20 +1008,20 @@ void CharactersGroups::MsgSetAlarmReaction(MESSAGE &message)
     const std::string &act = message.String();
     const std::string &rel = message.String();
     auto actState = rs_enemy;
-    if (storm::iEquals(act, "neitral"))
+    if (rust::string::iEquals(act, "neitral"))
     {
         actState = rs_neitral;
     }
-    else if (storm::iEquals(act, "friend"))
+    else if (rust::string::iEquals(act, "friend"))
     {
         actState = rs_friend;
     }
     auto relState = rs_neitral;
-    if (storm::iEquals(rel, "enemy"))
+    if (rust::string::iEquals(rel, "enemy"))
     {
         relState = rs_enemy;
     }
-    else if (storm::iEquals(rel, "friend"))
+    else if (rust::string::iEquals(rel, "friend"))
     {
         relState = rs_friend;
     }
@@ -1164,7 +1165,7 @@ int32_t CharactersGroups::GetCharacterGroup(Character *c)
         return -1;
     if (c->groupID >= 0 && c->groupID < numGroups)
     {
-        if (storm::iEquals(c->group, groups[c->groupID]->name.name))
+        if (rust::string::iEquals(c->group, groups[c->groupID]->name.name))
         {
             return c->groupID;
         }

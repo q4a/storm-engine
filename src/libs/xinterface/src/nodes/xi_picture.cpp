@@ -2,6 +2,7 @@
 
 #include "storm_assert.h"
 #include "v_file_service.h"
+#include "string_compare.hpp"
 
 CXI_PICTURE::CXI_PICTURE()
 {
@@ -208,7 +209,7 @@ void CXI_PICTURE::SetNewPictureFromDir(const char *dirName)
 
 void CXI_PICTURE::SetNewPictureByGroup(const char *groupName, const char *picName)
 {
-    if (!m_pcGroupName || !storm::iEquals(m_pcGroupName, groupName))
+    if (!m_pcGroupName || !rust::string::iEquals(m_pcGroupName, groupName))
     {
         ReleasePicture();
         if (groupName)

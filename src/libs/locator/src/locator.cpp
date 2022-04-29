@@ -2,6 +2,7 @@
 #include "core.h"
 #include "entity.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 CREATE_CLASS(LOCATOR)
 
@@ -122,7 +123,7 @@ void LOCATOR::LocateForI(VDATA *pData)
                             core.Trace("LOCATOR: no name");
                             continue;
                         }
-                        if (storm::iEquals(pAA->GetAttributeClass(n)->GetAttribute("name"), label.name))
+                        if (rust::string::iEquals(pAA->GetAttributeClass(n)->GetAttribute("name"), label.name))
                         {
                             pAA->GetAttributeClass(n)->SetAttributeUseFloat("x", label.m[3][0]);
                             pAA->GetAttributeClass(n)->SetAttributeUseFloat("y", label.m[3][1]);

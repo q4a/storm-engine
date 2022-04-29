@@ -1,6 +1,7 @@
 #include "logger.hpp"
-#include "storm/fs.h"
 #include "fmt.hpp"
+#include "fs.hpp"
+#include <Windows.h>
 
 namespace storm
 {
@@ -19,7 +20,7 @@ Logger::Logger(std::string name) : m_name(name)
 
 std::shared_ptr<Logger> Logger::file_logger(const std::string &name, LogLevel level)
 {
-    auto const logs_path = fs::GetLogsPath();
+    auto const logs_path = rust::fs::GetLogsPath();
     add_file_logger(logs_path.string().data(), name.data(), level);
     auto const logger = Logger(name);
     return std::make_shared<Logger>(logger);

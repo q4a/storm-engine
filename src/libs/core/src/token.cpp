@@ -4,7 +4,7 @@
 
 #include "defines.h"
 #include "utf8.h"
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 #define DISCARD_DATABUFFER                                                                                             \
     {                                                                                                                  \
@@ -1217,7 +1217,7 @@ S_TOKEN_TYPE TOKEN::Keyword2TokenType(const char *pString)
     for (uint32_t n = 0; n < KeywordsHash[hash].dwNum; n++)
     {
         const uint32_t index = KeywordsHash[hash].pIndex[n];
-        if (storm::iEquals(pString, Keywords[index].name))
+        if (rust::string::iEquals(pString, Keywords[index].name))
         {
             return Keywords[index].type;
         }

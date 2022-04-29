@@ -4,6 +4,7 @@
 #include "message.h"
 #include "shared/battle_interface/log_msg.h"
 #include <stdio.h>
+#include "string_compare.hpp"
 
 static entid_t g_ILogAndActions;
 
@@ -182,7 +183,7 @@ uint64_t ILogAndActions::ProcessMessage(MESSAGE &message)
         break;
     case LI_OTHER_MSG: {
         const std::string &param = message.String();
-        if (storm::iEquals(param, "SetTimeScale"))
+        if (rust::string::iEquals(param, "SetTimeScale"))
         {
             core.SetTimeScale(message.Float());
         }
@@ -428,7 +429,7 @@ void ILogAndActions::SetString(const char *str, bool immortal)
             last = last->next;
 
     // Return if such a line already exists and it is last
-    if (last != nullptr && last->str != nullptr && storm::iEquals(last->str, str))
+    if (last != nullptr && last->str != nullptr && rust::string::iEquals(last->str, str))
         return;
 
     // create a new line descriptor

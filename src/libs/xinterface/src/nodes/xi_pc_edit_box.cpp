@@ -1,6 +1,7 @@
 #include "xi_pc_edit_box.h"
 #include "xi_image.h"
 #include "xi_util.h"
+#include "string_compare.hpp"
 #include <stdio.h>
 
 #include <string>
@@ -190,9 +191,9 @@ void CXI_PCEDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
     m_nStringAlign = PR_ALIGN_LEFT;
     if (ReadIniString(ini1, name1, ini2, name2, "stringalign", param, sizeof(param), "center"))
     {
-        if (storm::iEquals(param, "center"))
+        if (rust::string::iEquals(param, "center"))
             m_nStringAlign = PR_ALIGN_CENTER;
-        else if (storm::iEquals(param, "right"))
+        else if (rust::string::iEquals(param, "right"))
             m_nStringAlign = PR_ALIGN_RIGHT;
     }
     // m_pntFontOffset.x += m_rect.left;

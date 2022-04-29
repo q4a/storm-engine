@@ -1,5 +1,6 @@
 #include "particle_system.h"
 #include "../emitters/point.h"
+#include "string_compare.hpp"
 
 // Global GUID to assign to emitters
 uint32_t EmitterID = 0;
@@ -189,7 +190,7 @@ IEmitter *ParticleSystem::FindEmitter(const char *name)
 {
     for (uint32_t n = 0; n < Emitters.size(); n++)
     {
-        if (storm::iEquals(Emitters[n].pEmitter->GetName(), name))
+        if (rust::string::iEquals(Emitters[n].pEmitter->GetName(), name))
             return Emitters[n].pEmitter;
     }
 

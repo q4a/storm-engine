@@ -16,7 +16,7 @@
 #include "wdm_ship.h"
 #include "world_map.h"
 #include "defines.h"
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 // ============================================================================================
 // Collision data
@@ -55,24 +55,24 @@ WdmIslands::WdmIslands()
         baseModel->geo->GetLabel(i, label);
         if (!label.group_name || !label.group_name[0])
             continue;
-        if (storm::iEquals(label.group_name, "locators"))
+        if (rust::string::iEquals(label.group_name, "locators"))
         {
-            if (storm::iEquals(label.name, "min"))
+            if (rust::string::iEquals(label.name, "min"))
             {
                 vmn = ((CMatrix *)label.m)->Pos();
                 isMin = true;
             }
-            if (storm::iEquals(label.name, "max"))
+            if (rust::string::iEquals(label.name, "max"))
             {
                 vmx = ((CMatrix *)label.m)->Pos();
                 isMax = true;
             }
         }
-        else if (storm::iEquals(label.group_name, "merchant"))
+        else if (rust::string::iEquals(label.group_name, "merchant"))
         {
             merchants.push_back(((CMatrix *)label.m)->Pos());
         }
-        else if (label.name && label.name[0] && storm::iEquals(label.group_name, "quests"))
+        else if (label.name && label.name[0] && rust::string::iEquals(label.group_name, "quests"))
         {
             quests.push_back(Quest{((CMatrix *)label.m)->Pos(), label.name});
             // Quest & q = quests[quests.Add()];
@@ -103,7 +103,7 @@ WdmIslands::WdmIslands()
             continue;
         if (!label.name || !label.name[0])
             continue;
-        if (!storm::iEquals(label.group_name, "islands"))
+        if (!rust::string::iEquals(label.group_name, "islands"))
             continue;
         // Skip if added
         int32_t j;
@@ -410,7 +410,7 @@ void WdmIslands::SetIslandsData(ATTRIBUTES *apnt, bool isChange)
         }
         else
         {
-            if (!storm::iEquals(labels[index].locatorName, locator))
+            if (!rust::string::iEquals(labels[index].locatorName, locator))
             {
                 if (LabelsFindLocator(locator, pos))
                 {
@@ -517,7 +517,7 @@ int32_t WdmIslands::LabelsFind(const char *id, uint32_t hash)
     {
         if (labels[i].idHash == hash)
         {
-            if (storm::iEquals(labels[i].id, id))
+            if (rust::string::iEquals(labels[i].id, id))
                 return i;
         }
     }
@@ -537,10 +537,10 @@ bool WdmIslands::LabelsFindLocator(const char *name, CVECTOR &pos) const
         baseModel->geo->GetLabel(i, label);
         if (!label.group_name || !label.group_name[0])
             continue;
-        if (!storm::iEquals(label.group_name, "labels"))
+        if (!rust::string::iEquals(label.group_name, "labels"))
             continue;
         // if(!storm::iEquals(label.group_name, "geometry")) continue;
-        if (storm::iEquals(label.name, name))
+        if (rust::string::iEquals(label.name, name))
         {
             pos = ((CMatrix *)label.m)->Pos();
             return true;
@@ -555,7 +555,7 @@ int32_t WdmIslands::LabelsAddFont(const char *name)
         name = "";
     for (int32_t i = 0; i < fonts.size(); i++)
     {
-        if (storm::iEquals(fonts[i].name, name))
+        if (rust::string::iEquals(fonts[i].name, name))
         {
             return fonts[i].id;
         }
@@ -861,7 +861,7 @@ bool WdmIslands::GetQuestLocator(const char *locName, CVECTOR &p)
     }
     for (int32_t i = 0; i < quests.size(); i++)
     {
-        if (storm::iEquals(quests[i].name, std::string_view(locName)))
+        if (rust::string::iEquals(quests[i].name, std::string_view(locName)))
         {
             p = quests[i].pos;
             return true;

@@ -14,6 +14,7 @@
 #include "core.h"
 #include "entity.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 // ============================================================================================
 // Construction, destruction
@@ -177,7 +178,7 @@ int32_t ModelArray::FindModel(const char *modelName)
     {
         if (model[i].hash == hash)
         {
-            if (storm::iEquals(model[i].name, buf))
+            if (rust::string::iEquals(model[i].name, buf))
             {
                 return i;
             }

@@ -5,7 +5,7 @@
 #include <mutex>
 #include <thread>
 
-#include "storm/fs.h"
+#include "fs.hpp"
 #include "v_file_service.h"
 #include "watermark.hpp"
 #include "logger.hpp"
@@ -34,7 +34,7 @@ auto& getExecutableDir()
 }
 auto &getLogsArchive()
 {
-    static const auto logsArchive = fs::GetLogsPath().replace_extension(".7z");
+    static const auto logsArchive = rust::fs::GetLogsPath().replace_extension(".7z");
     return logsArchive;
 }
 
@@ -42,7 +42,7 @@ auto assembleArchiveCmd()
 {
     constexpr auto archiverBin = "7za.exe";
     return _T("call \"") + (getExecutableDir() / archiverBin).native() + _T("\" a \"\\\\?\\") +
-           getLogsArchive().native() + _T("\" \"\\\\?\\") + fs::GetLogsPath().native() + _T("\"");
+           getLogsArchive().native() + _T("\" \"\\\\?\\") + rust::fs::GetLogsPath().native() + _T("\"");
 }
 
 }
@@ -69,7 +69,7 @@ class LoggingService final
                 terminate_handler();
             });
 
-            create_directories(fs::GetLogsPath());
+            create_directories(rust::fs::GetLogsPath());
 
             std::thread worker{[this] { loggingThread(); }};
             worker.detach();
@@ -147,7 +147,7 @@ LifecycleDiagnosticsService::Guard LifecycleDiagnosticsService::initialize(const
         auto *options = sentry_options_new();
         sentry_options_set_dsn(options, "https://1798a1bcfb654cbd8ce157b381964525@o572138.ingest.sentry.io/5721165");
         sentry_options_set_release(options, STORM_BUILD_WATERMARK_STRING);
-        sentry_options_set_database_path(options, (fs::GetStashPath() / "sentry-db").c_str());
+        sentry_options_set_database_path(options, (rust::fs::GetStashPath() / "sentry-db").c_str());
         sentry_options_set_handler_path(options, (getExecutableDir() / "crashpad_handler.exe").c_str());
         sentry_options_add_attachment(options, getLogsArchive().c_str());
         sentry_options_set_before_send(options, beforeCrash, this);

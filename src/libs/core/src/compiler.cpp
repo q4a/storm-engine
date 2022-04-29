@@ -8,6 +8,7 @@
 #include "s_debug.h"
 #include "script_cache.h"
 #include "storm_assert.h"
+#include "string_compare.hpp"
 
 #include <unordered_map>
 
@@ -589,7 +590,7 @@ void COMPILER::DelEventHandler(const char *event_name, const char *func_name)
             continue;
         if (pM->ProcessTime(0))
             continue; // skip events, possible executed on this frame
-        if (storm::iEquals(pM->pEventName, event_name))
+        if (rust::string::iEquals(pM->pEventName, event_name))
         {
             EventMsg.Del(n);
             n--;
@@ -1314,7 +1315,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
             auto name = std::string_view(Token.GetData());
             auto comparator = [name](const auto &library)
             {
-                return storm::iEquals(library.name, name);
+                return rust::string::iEquals(library.name, name);
             };
 
             if (std::ranges::find_if(LibriaryFuncs, comparator) != LibriaryFuncs.end())
@@ -2937,7 +2938,9 @@ bool COMPILER::CompileBlock(SEGMENT_DESC &Segment, bool &bFunctionBlock, uint32_
                         }
 
                         auto func_name = Token.GetData();
-                        auto cmp = [&func_name](const auto &func) { return storm::iEquals(func.info.name, func_name); };
+                        auto cmp = [&func_name](const auto &func) {
+                            return rust::string::iEquals(func.info.name, func_name);
+                        };
                         auto it = std::ranges::find_if(script_cache_.functions, cmp);
                         if (it != script_cache_.functions.end())
                         {
@@ -7788,7 +7791,7 @@ void COMPILER::FormatDialog(char *file_name)
                 if (Token.GetData())
                 {
                     // node text --------------------------------------------
-                    if (storm::iEquals(Token.GetData(), "text"))
+                    if (rust::string::iEquals(Token.GetData(), "text"))
                     {
                         fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
 
@@ -7859,7 +7862,7 @@ void COMPILER::FormatDialog(char *file_name)
             if (Token.GetData())
             {
                 fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
-                if (storm::iEquals(Token.GetData(), "link"))
+                if (rust::string::iEquals(Token.GetData(), "link"))
                 {
                     Token_type = Token.FormatGet();
                     fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));

@@ -1,6 +1,7 @@
 #include "xi_util.h"
 #include "../inode.h"
 #include <stdio.h>
+#include "string_compare.hpp"
 
 CXI_UTILS *CXI_UTILS::pThis = nullptr;
 
@@ -218,27 +219,27 @@ const char *CXI_UTILS::StringGetTokenString(char *&pcString, char *pcBuffer, int
 
 int32_t CXI_UTILS::StringGetTokenCode(const char *pcTokenID)
 {
-    if (storm::iEquals(pcTokenID, "color"))
+    if (rust::string::iEquals(pcTokenID, "color"))
         return InterfaceToken_color;
-    if (storm::iEquals(pcTokenID, "file"))
+    if (rust::string::iEquals(pcTokenID, "file"))
         return InterfaceToken_file;
-    if (storm::iEquals(pcTokenID, "piclist"))
+    if (rust::string::iEquals(pcTokenID, "piclist"))
         return InterfaceToken_picture_list;
-    if (storm::iEquals(pcTokenID, "picname"))
+    if (rust::string::iEquals(pcTokenID, "picname"))
         return InterfaceToken_picture_name;
-    if (storm::iEquals(pcTokenID, "piccutuv"))
+    if (rust::string::iEquals(pcTokenID, "piccutuv"))
         return InterfaceToken_picture_cut_uv;
-    if (storm::iEquals(pcTokenID, "size"))
+    if (rust::string::iEquals(pcTokenID, "size"))
         return InterfaceToken_size;
-    if (storm::iEquals(pcTokenID, "rectUV"))
+    if (rust::string::iEquals(pcTokenID, "rectUV"))
         return InterfaceToken_rectUV;
-    if (storm::iEquals(pcTokenID, "pos"))
+    if (rust::string::iEquals(pcTokenID, "pos"))
         return InterfaceToken_pos;
-    if (storm::iEquals(pcTokenID, "text"))
+    if (rust::string::iEquals(pcTokenID, "text"))
         return InterfaceToken_text;
-    if (storm::iEquals(pcTokenID, "width"))
+    if (rust::string::iEquals(pcTokenID, "width"))
         return InterfaceToken_width;
-    if (storm::iEquals(pcTokenID, "class"))
+    if (rust::string::iEquals(pcTokenID, "class"))
         return InterfaceToken_class;
 
     return InterfaceToken_unknown;

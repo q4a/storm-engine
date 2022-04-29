@@ -1,5 +1,6 @@
 #include "shared/mast_msg.h"
 #include "ship.h"
+#include "string_compare.hpp"
 
 #define MAST_IDENTIFY "mast"
 #define MAST_FIRST 1
@@ -169,7 +170,7 @@ bool SHIP::BuildMasts()
         }
         const auto *const cNodeName = pNode->GetName();
 
-        if (storm::iStartsWith(cNodeName, MAST_IDENTIFY))
+        if (rust::string::iStartsWith(cNodeName, MAST_IDENTIFY))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 
@@ -245,7 +246,7 @@ bool SHIP::BuildHulls()
         if (!pNode)
             break;
         const auto *const cNodeName = pNode->GetName();
-        if (storm::iStartsWith(cNodeName, HULL_IDENTIFY))
+        if (rust::string::iStartsWith(cNodeName, HULL_IDENTIFY))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 

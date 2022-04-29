@@ -4,6 +4,7 @@
 #include "shared/battle_interface/msg_control.h"
 #include "v_module_api.h"
 #include <exception>
+#include "string_compare.hpp"
 
 ActivePerkShower::ActivePerkShower()
     : m_nIconWidth(0), m_nIconHeight(0), m_nSpaceHorz(0), m_nSpaceVert(0)
@@ -82,9 +83,9 @@ uint64_t ActivePerkShower::ProcessMessage(MESSAGE &message)
     case MSG_ACTIVE_PERK_LIST_REFRESH: {
         const std::string &param = message.String();
         auto *const pA = message.AttributePointer();
-        if (storm::iEquals(param, "add"))
+        if (rust::string::iEquals(param, "add"))
             AddIconToList(pA);
-        else if (storm::iEquals(param, "del"))
+        else if (rust::string::iEquals(param, "del"))
             DelIconFromList(pA);
     }
     break;

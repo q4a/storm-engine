@@ -1,4 +1,5 @@
 #include "xi_scroll_image.h"
+#include "string_compare.hpp"
 
 #define MAXIMAGEQUANTITY 100
 
@@ -1565,7 +1566,7 @@ int CXI_SCROLLIMAGE::FindTexGroupFromOld(char **pGroupList, const char *groupNam
         return -1;
     for (int i = 0; i < listSize; i++)
     {
-        if (pGroupList[i] != nullptr && storm::iEquals(pGroupList[i], groupName))
+        if (pGroupList[i] != nullptr && rust::string::iEquals(pGroupList[i], groupName))
             return i;
     }
     return -1;
