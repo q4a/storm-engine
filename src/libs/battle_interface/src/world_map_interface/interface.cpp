@@ -184,7 +184,7 @@ void WM_INTERFACE::ExecuteCommand(int32_t command)
         break;
 
     default:
-        core.Trace("Warning! Unknown executing command: %d", command);
+        rust::log::warn("Unknown executing command: %d", command);
     }
 }
 

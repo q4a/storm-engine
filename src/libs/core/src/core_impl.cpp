@@ -5,6 +5,7 @@
 #include "steam_api.hpp"
 #include "fs.hpp"
 #include "string_compare.hpp"
+#include "logger.hpp"
 
 #include <fstream>
 
@@ -309,7 +310,7 @@ bool CoreImpl::LoadClassesTable()
 
 void CoreImpl::CheckAutoExceptions(uint32_t = 0) const
 {
-    storm::Logger::default_logger->warn("exception thrown");
+    rust::log::warn("exception thrown");
 }
 
 void CoreImpl::Exit()
@@ -499,17 +500,6 @@ void *CoreImpl::GetService(const char *service_name)
     Services_List.Add(class_code, class_code, service_PTR);
 
     return service_PTR;
-}
-
-void CoreImpl::Trace(const char *format, ...)
-{
-    static char buffer_4k[4096];
-
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer_4k, sizeof(buffer_4k) - 4, format, args);
-    va_end(args);
-    storm::Logger::default_logger->info(buffer_4k);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -944,8 +934,7 @@ void CoreImpl::loadCompatibilitySettings(INIFILE &inifile)
     targetVersion_ = getTargetEngineVersion(target_engine_version);
     if (targetVersion_ == ENGINE_VERSION::UNKNOWN)
     {
-        storm::Logger::default_logger->warn("Unknown target version '{}' in engine compatibility settings",
-                                            target_engine_version);
+        rust::log::warn("Unknown target version '%s' in engine compatibility settings", target_engine_version);
         targetVersion_ = ENGINE_VERSION::LATEST;
     }
 }

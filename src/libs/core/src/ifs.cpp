@@ -416,7 +416,7 @@ bool IFS::LoadFile(const char *_file_name)
     auto fileS = fs->_CreateFile(_file_name, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        storm::Logger::default_logger->trace("Unable to load file: %s", _file_name);
+        rust::log::warn("Unable to load file: %s", _file_name);
         return false;
     }
 
@@ -909,7 +909,7 @@ bool IFS::ReadString(SEARCH_DATA *sd, const char *section_name, const char *key_
         sd->Section = nullptr;
         if (def_string == nullptr)
         {
-            core_internal.Trace("Warning! IniFile Read String: section=%s, key=%s", section_name, key_name);
+            rust::log::warn("IniFile Read String: section=%s, key=%s", section_name, key_name);
             if (buffer)
                 buffer[0] = 0;
             // throw std::runtime_error(string not found);
@@ -951,7 +951,7 @@ bool IFS::ReadStringCS(SEARCH_DATA *sd, const char *section_name, const char *ke
         sd->Section = nullptr;
         if (def_string == nullptr)
         {
-            core_internal.Trace("Warning! IniFile Read String: section=%s, key=%s", section_name, key_name);
+            rust::log::warn("IniFile Read String: section=%s, key=%s", section_name, key_name);
             if (buffer)
                 buffer[0] = 0;
             // throw std::runtime_error(string not found);

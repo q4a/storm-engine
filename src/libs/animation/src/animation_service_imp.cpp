@@ -72,7 +72,8 @@ AnimationServiceImp::~AnimationServiceImp()
     {
         if (animation)
         {
-            core.Trace("No release Animation pnt:0x%x for %s.ani", animation, animation->GetAnimationInfo()->GetName());
+            rust::log::info("No release Animation pnt:0x%x for %s.ani", animation,
+                            animation->GetAnimationInfo()->GetName());
             delete animation;
         }
     }
@@ -170,7 +171,7 @@ void AnimationServiceImp::DeleteAnimation(AnimationImp *ani)
 void AnimationServiceImp::Event(const char *eventName)
 {
     // Sending a message to the system
-    core.Trace("Called function <void AnimationServiceImp::Event(%s)>, please make it.", eventName);
+    rust::log::trace("Called function <void AnimationServiceImp::Event(%s)>, please make it.", eventName);
 }
 
 // load animation
@@ -185,7 +186,7 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
     auto ani = fio->OpenIniFile(path);
     if (!ani)
     {
-        core.Trace("Cannot open animation file %s", path);
+        rust::log::info("Cannot open animation file %s", path);
         return -1;
     }
     // Get the name of the jfa file with the skeleton
@@ -193,7 +194,7 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
     const size_t l = strlen(path);
     if (!ani->ReadString(nullptr, ASKW_JFA_FILE, path + l, MAX_PATH - l - 1, nullptr))
     {
-        core.Trace("Incorrect key \"%s\" in animation file %s.ani", ASKW_JFA_FILE, animationName);
+        rust::log::info("Incorrect key \"%s\" in animation file %s.ani", ASKW_JFA_FILE, animationName);
         return -1;
     }
     // Animation descriptor
@@ -202,7 +203,7 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
     if (!LoadAN(path, info))
     {
         delete info;
-        core.Trace("Animation file %s is damaged!", path);
+        rust::log::warn("Animation file %s is damaged!", path);
         return -1;
     }
     // Global user data
@@ -214,27 +215,27 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
         // Action handling
         if (path[0] == 0 || strlen(path) >= 64)
         {
-            core.Trace("Incorrect name action [%s] of animation file %s.ani", path, animationName);
+            rust::log::info("Incorrect name action [%s] of animation file %s.ani", path, animationName);
             continue;
         }
         // Reading the times
         const auto stime = ani->GetInt(path, ASKW_STIME, -1);
         if (stime < 0)
         {
-            core.Trace("Incorrect %s in action [%s] of animation file %s.ani", ASKW_STIME, path, animationName);
+            rust::log::info("Incorrect %s in action [%s] of animation file %s.ani", ASKW_STIME, path, animationName);
             continue;
         }
         const auto etime = ani->GetInt(path, ASKW_ETIME, -1);
         if (etime < 0)
         {
-            core.Trace("Incorrect %s in action [%s] of animation file %s.ani", ASKW_ETIME, path, animationName);
+            rust::log::info("Incorrect %s in action [%s] of animation file %s.ani", ASKW_ETIME, path, animationName);
             continue;
         }
         // Add an action
         auto *aci = info->AddAction(path, stime, etime);
         if (aci == nullptr)
         {
-            core.Trace("Warning! Action [%s] of animation file %s.ani is repeated, skip it", path, animationName);
+            rust::log::warn("Action [%s] of animation file %s.ani is repeated, skip it", path, animationName);
             continue;
         }
         // Playback speed ratio
@@ -254,8 +255,8 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                 type = at_rpingpong;
             else
             {
-                core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nNo set %s, set type is %s\n",
-                           ASKW_TYPE, path, animationName, key, ASKWAT_NORMAL);
+                rust::log::info("Incorrect %s in action [%s] of animation file %s.ani\nNo set %s, set type is %s\n",
+                                ASKW_TYPE, path, animationName, key, ASKWAT_NORMAL);
             }
         }
         aci->SetAnimationType(type);
@@ -269,9 +270,8 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                 isLoop = false;
             else
             {
-                core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nThis parameter (%s) use is default "
-                           "value %s\n",
-                           ASKW_LOOP, path, animationName, key, ASKWAL_FALSE);
+                rust::log::info("Incorrect %s in action [%s] of animation file %s.ani\nThis parameter (%s) use is default "
+                                "value %s\n", ASKW_LOOP, path, animationName, key, ASKWAL_FALSE);
             }
         }
         aci->SetLoop(isLoop);
@@ -285,8 +285,8 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                 // The beginning of the name
                 if (key[0] != '"')
                 {
-                    core.Trace("Incorrect %s <%s> in action [%s] of animation file %s.ani\nFirst symbol is not '\"'\n",
-                               ASKW_EVENT, key + 257, path, animationName);
+                    rust::log::info("Incorrect %s <%s> in action [%s] of animation file %s.ani\nFirst symbol is not '\"'\n",
+                                    ASKW_EVENT, key + 257, path, animationName);
                     continue;
                 }
                 // End of name
@@ -295,20 +295,21 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                     ;
                 if (!key[p])
                 {
-                    core.Trace(
+                    rust::log::info(
                         "Incorrect %s <%s> in action [%s] of animation file %s.ani\nNot found closed symbol '\"'\n",
                         ASKW_EVENT, key + 257, path, animationName);
                     continue;
                 }
                 if (p == 1)
                 {
-                    core.Trace("Incorrect %s <%s> in action [%s] of animation file %s.ani\nName have zero lenght\n",
-                               ASKW_EVENT, key + 257, path, animationName);
+                    rust::log::info(
+                        "Incorrect %s <%s> in action [%s] of animation file %s.ani\nName have zero lenght\n",
+                        ASKW_EVENT, key + 257, path, animationName);
                     continue;
                 }
                 if (p > 65)
                 {
-                    core.Trace(
+                    rust::log::info(
                         "Incorrect %s <%s> in action [%s] of animation file %s.ani\nName have big length (max 63)\n",
                         ASKW_EVENT, key + 257, path, animationName);
                     continue;
@@ -320,8 +321,9 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                     ;
                 if (!key[p])
                 {
-                    core.Trace("Incorrect %s <%s> in action [%s] of animation file %s.ani\nNo found time\n", ASKW_EVENT,
-                               key + 257, path, animationName);
+                    rust::log::info(
+                        "Incorrect %s <%s> in action [%s] of animation file %s.ani\nNo found time\n", ASKW_EVENT,
+                        key + 257, path, animationName);
                     continue;
                 }
                 auto *em = key + p;
@@ -382,18 +384,18 @@ int32_t AnimationServiceImp::LoadAnimation(const char *animationName)
                     }
                     else
                     {
-                        core.Trace("Warning: Incorrect %s <%s> in action [%s] of animation file %s.ani,\nunknow event "
-                                   "type <%s> -> set is default value\n",
-                                   ASKW_EVENT, key + 257, path, animationName, em);
+                        rust::log::warn(
+                            "Incorrect %s <%s> in action [%s] of animation file %s.ani,\nunknow event "
+                            "type <%s> -> set is default value\n", ASKW_EVENT, key + 257, path, animationName, em);
                     }
                 }
                 // core.Trace("Add event %s, time = %f to action %s", key + 1, (tm - stime)/float(etime - stime), path);
                 // Add an event
                 if (!aci->AddEvent(key + 1, tm, ev))
                 {
-                    core.Trace("Warning: Incorrect %s <%s> in action [%s] of animation file %s.ani,\nvery many events "
-                               "-> ignory it\n",
-                               ASKW_EVENT, key + 257, path, animationName);
+                    rust::log::warn(
+                        "Incorrect %s <%s> in action [%s] of animation file %s.ani,\nvery many events "
+                        "-> ignory it\n", ASKW_EVENT, key + 257, path, animationName);
                 }
             } while (ani->ReadStringNext(path, ASKW_EVENT, key, 256));
         }
@@ -429,11 +431,13 @@ void AnimationServiceImp::LoadUserData(INIFILE *ani, const char *sectionName,
             if (key[0] != '"')
             {
                 if (sectionName)
-                    core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nFirst symbol is not '\"'",
-                               ASKW_DATA, sectionName, animationName);
+                    rust::log::info(
+                        "Incorrect %s in action [%s] of animation file %s.ani\nFirst symbol is not '\"'",
+                        ASKW_DATA, sectionName, animationName);
                 else
-                    core.Trace("Incorrect %s in global data of animation file %s.ani\nFirst symbol is not '\"'",
-                               ASKW_DATA, animationName);
+                    rust::log::info(
+                        "Incorrect %s in global data of animation file %s.ani\nFirst symbol is not '\"'",
+                        ASKW_DATA, animationName);
                 continue;
             }
             // End of name
@@ -443,23 +447,25 @@ void AnimationServiceImp::LoadUserData(INIFILE *ani, const char *sectionName,
             if (!key[p])
             {
                 if (sectionName)
-                    core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nNot found closed symbol '\"' for "
-                               "data name",
-                               ASKW_DATA, sectionName, animationName);
+                    rust::log::info(
+                        "Incorrect %s in action [%s] of animation file %s.ani\nNot found closed symbol '\"' for "
+                        "data name", ASKW_DATA, sectionName, animationName);
                 else
-                    core.Trace("Incorrect %s in global data of animation file %s.ani\nNot found closed symbol '\"' for "
-                               "data name",
-                               ASKW_DATA, animationName);
+                    rust::log::info(
+                        "Incorrect %s in global data of animation file %s.ani\nNot found closed symbol '\"' for "
+                        "data name", ASKW_DATA, animationName);
                 continue;
             }
             if (p == 1)
             {
                 if (sectionName)
-                    core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nName have zero lenght", ASKW_DATA,
-                               sectionName, animationName);
+                    rust::log::info(
+                        "Incorrect %s in action [%s] of animation file %s.ani\nName have zero lenght",
+                        ASKW_DATA, sectionName, animationName);
                 else
-                    core.Trace("Incorrect %s in global data of animation file %s.ani\nName have zero lenght", ASKW_DATA,
-                               animationName);
+                    rust::log::info(
+                        "Incorrect %s in global data of animation file %s.ani\nName have zero lenght", 
+                        ASKW_DATA, animationName);
                 continue;
             }
             key[p++] = 0;
@@ -467,11 +473,13 @@ void AnimationServiceImp::LoadUserData(INIFILE *ani, const char *sectionName,
             if (data.count(key + 1))
             {
                 if (sectionName)
-                    core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nUser data repeated", ASKW_DATA,
-                               sectionName, animationName);
+                    rust::log::info(
+                        "Incorrect %s in action [%s] of animation file %s.ani\nUser data repeated", 
+                        ASKW_DATA, sectionName, animationName);
                 else
-                    core.Trace("Incorrect %s in global data of animation file %s.ani\nUser data repeated", ASKW_DATA,
-                               animationName);
+                    rust::log::info(
+                        "Incorrect %s in global data of animation file %s.ani\nUser data repeated", 
+                        ASKW_DATA, animationName);
 
                 continue;
             }
@@ -481,11 +489,13 @@ void AnimationServiceImp::LoadUserData(INIFILE *ani, const char *sectionName,
             if (!key[p])
             {
                 if (sectionName)
-                    core.Trace("Incorrect %s in action [%s] of animation file %s.ani\nNo data string", ASKW_DATA,
-                               sectionName, animationName);
+                    rust::log::info(
+                        "Incorrect %s in action [%s] of animation file %s.ani\nNo data string", 
+                        ASKW_DATA, sectionName, animationName);
                 else
-                    core.Trace("Incorrect %s in global data of animation file %s.ani\nNo data string", ASKW_DATA,
-                               animationName);
+                    rust::log::info(
+                        "Incorrect %s in global data of animation file %s.ani\nNo data string", 
+                        ASKW_DATA, animationName);
                 continue;
             }
             // Looking for the end of the data string
@@ -509,7 +519,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         fileS = fio->_CreateFile(fname, std::ios::binary | std::ios::in);
         if (!fileS.is_open())
         {
-            core.Trace("Cannot open file: %s", fname);
+            rust::log::warn("Cannot open file: %s", fname);
             return false;
         }
         // Reading the file header
@@ -517,7 +527,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         if (!fio->_ReadFile(fileS, &header, sizeof(ANFILE::HEADER)) || header.nFrames <= 0 || header.nJoints <= 0 ||
             header.framesPerSec < 0.0f || header.framesPerSec > 1000.0f)
         {
-            core.Trace("Incorrect file header in animation file: %s", fname);
+            rust::log::info("Incorrect file header in animation file: %s", fname);
             fio->_CloseFile(fileS);
             return false;
         }
@@ -531,7 +541,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         auto *const prntIndeces = new int32_t[header.nJoints];
         if (!fio->_ReadFile(fileS, prntIndeces, header.nJoints * sizeof(int32_t)))
         {
-            core.Trace("Incorrect parent indeces block in animation file: %s", fname);
+            rust::log::info("Incorrect parent indeces block in animation file: %s", fname);
             delete[] prntIndeces;
             fio->_CloseFile(fileS);
             return false;
@@ -547,7 +557,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         auto *vrt = new CVECTOR[header.nJoints];
         if (!fio->_ReadFile(fileS, vrt, header.nJoints * sizeof(CVECTOR)))
         {
-            core.Trace("Incorrect start joints position block block in animation file: %s", fname);
+            rust::log::info("Incorrect start joints position block block in animation file: %s", fname);
             delete[] vrt;
             fio->_CloseFile(fileS);
             return false;
@@ -562,7 +572,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         vrt = new CVECTOR[header.nFrames];
         if (!fio->_ReadFile(fileS, vrt, header.nFrames * sizeof(CVECTOR)))
         {
-            core.Trace("Incorrect root joint position block block in animation file: %s", fname);
+            rust::log::info("Incorrect root joint position block block in animation file: %s", fname);
             delete[] vrt;
             fio->_CloseFile(fileS);
             return false;
@@ -576,7 +586,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         {
             if (!fio->_ReadFile(fileS, ang, header.nFrames * sizeof(*ang)))
             {
-                core.Trace("Incorrect joint angle block (%i) block in animation file: %s", i, fname);
+                rust::log::info("Incorrect joint angle block (%i) block in animation file: %s", i, fname);
                 fio->_CloseFile(fileS);
                 return false;
             }
@@ -605,7 +615,7 @@ bool AnimationServiceImp::LoadAN(const char *fname, AnimationInfo *info)
         {
             fio->_CloseFile(fileS);
         }
-        core.Trace("Error reading animation file: %s", fname);
+        rust::log::error("Error reading animation file: %s", fname);
         return false;
     }
 }

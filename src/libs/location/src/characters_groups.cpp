@@ -1190,7 +1190,7 @@ void CharactersGroups::SaveData()
     // Root attribute for saving data
     if (!AttributesPointer)
     {
-        core.Trace("CharactersGroups::SaveData -> no attributes");
+        rust::log::info("CharactersGroups::SaveData -> no attributes");
         return;
     }
     auto *saveData = AttributesPointer->FindAClass(AttributesPointer, "savedata");
@@ -1243,7 +1243,7 @@ void CharactersGroups::LoadDataRelations()
     // Root attribute for saving data
     if (!AttributesPointer)
     {
-        core.Trace("CharactersGroups::LoadDataRelations -> no attributes");
+        rust::log::info("CharactersGroups::LoadDataRelations -> no attributes");
         return;
     }
     auto *saveData = AttributesPointer->FindAClass(AttributesPointer, "savedata");
@@ -1286,19 +1286,19 @@ void CharactersGroups::LoadDataRelations()
         int32_t relState = grp->GetAttributeAsDword("relState", r.relState);
         if (curState <= rs_beginvalue || curState >= rs_endvalue)
         {
-            core.Trace("CharactersGroups::LoadDataRelations -> invalide curState value, set this neitral");
+            rust::log::info("CharactersGroups::LoadDataRelations -> invalide curState value, set this neitral");
             curState = rs_neitral;
         }
         r.curState = static_cast<RelState>(curState);
         if (actState <= rs_beginvalue || actState >= rs_endvalue)
         {
-            core.Trace("CharactersGroups::LoadDataRelations -> invalide actState value, set this enemy");
+            rust::log::info("CharactersGroups::LoadDataRelations -> invalide actState value, set this enemy");
             actState = rs_enemy;
         }
         r.actState = static_cast<RelState>(actState);
         if (relState <= rs_beginvalue || relState >= rs_endvalue)
         {
-            core.Trace("CharactersGroups::LoadDataRelations -> invalide relState value, set this neitral");
+            rust::log::info("CharactersGroups::LoadDataRelations -> invalide relState value, set this neitral");
             relState = rs_neitral;
         }
         r.relState = static_cast<RelState>(relState);
@@ -1340,29 +1340,26 @@ void CharactersGroups::DumpRelations()
     {
         for (int32_t j = 0; j < i; j++)
         {
-            core.Trace("\"%s\" <-> \"%s\"", groups[i]->name.name, groups[j]->name.name);
+            rust::log::trace("\"%s\" <-> \"%s\"", groups[i]->name.name, groups[j]->name.name);
             // keep the relationship
             auto &r = FindRelation(i, j);
-            core.Trace("alarm: %f", r.alarm);
-            core.Trace("alarmdown: %f", r.alarmdown);
-            core.Trace("alarmmin: %f", r.alarmmin);
-            core.Trace("alarmmax: %f", r.alarmmax);
-            core.Trace("isActive: %s", r.isActive ? "true" : "false");
-            core.Trace("curState: \"%s\"", GetTextState(r.curState));
-            core.Trace("actState: \"%s\"", GetTextState(r.actState));
-            core.Trace("relState: \"%s\"", GetTextState(r.relState));
-            core.Trace("");
+            rust::log::trace("alarm: %f", r.alarm);
+            rust::log::trace("alarmdown: %f", r.alarmdown);
+            rust::log::trace("alarmmin: %f", r.alarmmin);
+            rust::log::trace("alarmmax: %f", r.alarmmax);
+            rust::log::trace("isActive: %s", r.isActive ? "true" : "false");
+            rust::log::trace("curState: \"%s\"", GetTextState(r.curState));
+            rust::log::trace("actState: \"%s\"", GetTextState(r.actState));
+            rust::log::trace("relState: \"%s\"", GetTextState(r.relState));
         }
     }
-    core.Trace("Groups info:");
-    core.Trace("");
+    rust::log::trace("Groups info:");
     for (int32_t i = 0; i < numGroups; i++)
     {
-        core.Trace("name: \"%s\"", groups[i]->name.name);
-        core.Trace("    look: %f", groups[i]->look);
-        core.Trace("    hear: %f", groups[i]->hear);
-        core.Trace("    say: %f", groups[i]->say);
-        core.Trace("");
+        rust::log::trace("name: \"%s\"", groups[i]->name.name);
+        rust::log::trace("    look: %f", groups[i]->look);
+        rust::log::trace("    hear: %f", groups[i]->hear);
+        rust::log::trace("    say: %f", groups[i]->say);
     }
 }
 

@@ -57,7 +57,7 @@ bool Lights::Init()
     auto ini = fio->OpenIniFile("RESOURCE\\Ini\\lights.ini");
     if (!ini)
     {
-        core.Trace("Location lights not inited -> RESOURCES\\Ini\\lights.ini not found");
+        rust::log::info("Location lights not inited -> RESOURCES\\Ini\\lights.ini not found");
         return false;
     }
     char lName[256];
@@ -70,7 +70,7 @@ bool Lights::Init()
         {
             if (rust::string::iEquals(lName, types[i].name))
             {
-                core.Trace("Location lights redefinition light: %s", lName);
+                rust::log::info("Location lights redefinition light: %s", lName);
                 break;
             }
         }
@@ -134,7 +134,7 @@ bool Lights::Init()
     }
     if (numTypes == 0)
     {
-        core.Trace("Location lights not inited -> 0 light types");
+        rust::log::info("Location lights not inited -> 0 light types");
         return false;
     }
     // start executing

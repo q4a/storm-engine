@@ -1180,7 +1180,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
     auto ini = fio->OpenIniFile(sFileName);
     if (!ini)
     {
-        core.Trace("ini file %s not found!", sFileName);
+        rust::log::warn("ini file %s not found!", sFileName);
         core.PostEvent("exitCancel", 1, nullptr);
         return;
     }
@@ -1319,7 +1319,7 @@ void XINTERFACE::CreateNode(const char *sFileName, const char *sNodeType, const 
         ini = fio->OpenIniFile(sFileName);
         if (!ini)
         {
-            core.Trace("ini file %s not found!", sFileName);
+            rust::log::warn("ini file %s not found!", sFileName);
             return;
         }
     }
@@ -1333,7 +1333,7 @@ void XINTERFACE::SFLB_CreateNode(INIFILE *pOwnerIni, INIFILE *pUserIni, const ch
 {
     if (!sNodeType || !sNodeType[0])
     {
-        core.Trace("Warning! Interface: Can`t create node with null type.");
+        rust::log::warn("Interface: Can`t create node with null type.");
         return;
     }
     /*if( !pOwnerIni->TestSection( sNodeType ) &&
@@ -1536,7 +1536,7 @@ CINODE *XINTERFACE::NewNode(const char *pcNodType)
     else if (rust::string::iEquals(pcNodType, "GLOWCURSOR"))
         m_pGlowCursorNode = pNewNod = new CXI_GLOWCURSOR;
     else
-        core.Trace("Not supported node type:\"%s\"", pcNodType);
+        rust::log::warn("Not supported node type:\"%s\"", pcNodType);
     return pNewNod;
 }
 
@@ -1619,7 +1619,7 @@ void XINTERFACE::SetTooltip(const char *pcHeader, const char *pcText1, uint32_t 
     if (!pNodFrame || !pNodTitleRect || !pNodPic || !pNodTextFrame2 || !pNodTextFrame4 || !pNodTitle || !pNodText1 ||
         !pNodText2 || !pNodText3 || !pNodText4)
     {
-        core.Trace("Warning! Interface::SetTooltip - no precreated node");
+        rust::log::warn("Interface::SetTooltip - no precreated node");
         return;
     }
     // set
@@ -1804,14 +1804,14 @@ void XINTERFACE::AddNodeToWindow(const char *pcNodeName, const char *pcWindowNam
 {
     if (!m_pNodes)
     {
-        core.Trace("Warning! Interface::AddNodeToWindow(%s,%s) : Empty node list", pcNodeName, pcWindowName);
+        rust::log::warn("Interface::AddNodeToWindow(%s,%s) : Empty node list", pcNodeName, pcWindowName);
         return;
     }
 
     CINODE *pNod = m_pNodes->FindNode(pcWindowName);
     if (!pNod || pNod->m_nNodeType != NODETYPE_WINDOW)
     {
-        core.Trace("Warning! Interface::AddNodeToWindow(%s,%s) : Window not found", pcNodeName, pcWindowName);
+        rust::log::warn("Interface::AddNodeToWindow(%s,%s) : Window not found", pcNodeName, pcWindowName);
         return;
     }
 
@@ -2715,7 +2715,7 @@ bool XINTERFACE::SFLB_DoSaveFileData(const char *saveName, const char *saveData)
             pTex->UnlockRect(0);
         }
         else
-            core.Trace("Can`t lock screenshot texture");
+            rust::log::info("Can`t lock screenshot texture");
     }
 
     core.SetSaveData(saveName, pdat, sizeof(SAVE_DATA_HANDLE) + slen + ssize);

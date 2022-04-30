@@ -59,7 +59,7 @@ bool SHIPPOINTER::Init()
     auto *pA = core.Entity_GetAttributeClass(GetId(), "textures");
     if (pA == nullptr)
     {
-        core.Trace("WARNING! object SHIPPOINTER hav`t attribute TEXTURES");
+        rust::log::warn("Object SHIPPOINTER hav`t attribute TEXTURES");
         return false;
     }
 

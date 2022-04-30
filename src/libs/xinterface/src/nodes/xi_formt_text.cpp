@@ -424,7 +424,7 @@ void CXI_FORMATEDTEXT::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -1469,7 +1469,7 @@ void CXI_FORMATEDTEXT::ControlSyncronouseNodes()
             break;
 
         default:
-            core.Trace("Warning! Control %s owned not legal type of control (%s).", m_nodeName, pNode->m_nodeName);
+            rust::log::warn("Control %s owned not legal type of control (%s).", m_nodeName, pNode->m_nodeName);
         }
     }
 }
@@ -1511,7 +1511,7 @@ void CXI_FORMATEDTEXT::ReplaceString(int32_t nGrpNum, const char *pSrcStr)
 
     if (!dscrCur)
     {
-        core.Trace("Can`t find text group %d into control: %s", nGrpNum, m_nodeName);
+        rust::log::info("Can`t find text group %d into control: %s", nGrpNum, m_nodeName);
         return;
     }
 
@@ -1624,7 +1624,7 @@ void CXI_FORMATEDTEXT::ScrollerUpdate()
 
     if (pNode->m_nNodeType != NODETYPE_SCROLLER)
     {
-        core.Trace("Warning! ScrollerUpdate call for not scroller control (%s).", pNode->m_nodeName);
+        rust::log::warn("ScrollerUpdate call for not scroller control (%s).", pNode->m_nodeName);
         return;
     }
     static_cast<CXI_SCROLLER *>(pNode)->LinkNodeChanged(GetCurPos());

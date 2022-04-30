@@ -71,26 +71,26 @@ bool PtcData::Load(const char *path)
     // Loading data
     if (!fio->LoadFile(path, &buf, &size))
     {
-        core.Trace("Ptc(\"%s\") -> file not found", path);
+        rust::log::info("Ptc(\"%s\") -> file not found", path);
         return false;
     }
     // Checking the file for correctness
     if (!buf || size < sizeof(PtcHeader))
     {
-        core.Trace("Ptc(\"%s\") -> invalide file size", path);
+        rust::log::info("Ptc(\"%s\") -> invalide file size", path);
         delete buf;
         return false;
     }
     auto &hdr = *(PtcHeader *)buf;
     if (hdr.id != PTC_ID)
     {
-        core.Trace("Ptc(\"%s\") -> invalide file ID", path);
+        rust::log::info("Ptc(\"%s\") -> invalide file ID", path);
         delete buf;
         return false;
     }
     if (hdr.ver != PTC_VERSION && hdr.ver != PTC_PREVERSION1)
     {
-        core.Trace("Ptc(\"%s\") -> invalide file version", path);
+        rust::log::info("Ptc(\"%s\") -> invalide file version", path);
         delete buf;
         return false;
     }
@@ -105,14 +105,14 @@ bool PtcData::Load(const char *path)
         tsize += sizeof(PtcMaterials);
     if (tsize != size)
     {
-        core.Trace("Ptc(\"%s\") -> invalide file size", path);
+        rust::log::info("Ptc(\"%s\") -> invalide file size", path);
         delete buf;
         return false;
     }
     if (hdr.numTriangles < 1 || hdr.numVerteces < 3 || hdr.numNormals < 1 || hdr.mapL < 1 || hdr.mapW < 1 ||
         hdr.numIndeces < 1 || hdr.lineSize < 1 || hdr.minX >= hdr.maxX || hdr.minY > hdr.maxY || hdr.minZ >= hdr.maxZ)
     {
-        core.Trace("Ptc(\"%s\") -> invalide file header", path);
+        rust::log::info("Ptc(\"%s\") -> invalide file header", path);
         delete buf;
         return false;
     }
@@ -428,7 +428,7 @@ int32_t PtcData::Move(int32_t curNode, const CVECTOR &to, CVECTOR &pos, int32_t 
             if (d == 0.0f)
             {
                 // Abnormal situation
-                core.Trace("Patch have some problem -> triangle edge by zero length");
+                rust::log::info("Patch have some problem -> triangle edge by zero length");
                 // Just stop
                 pos = pnt;
                 return curNode;

@@ -1326,7 +1326,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         {
             if (!VarTab.SetElementsNum(pV->nGlobalVarTableIndex, TempLong1))
             {
-                core_internal.Trace("Unable to set elements num for %u", pV->nGlobalVarTableIndex);
+                rust::log::info("Unable to set elements num for %u", pV->nGlobalVarTableIndex);
             }
         }
 

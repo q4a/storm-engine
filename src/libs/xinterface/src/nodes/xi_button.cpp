@@ -153,7 +153,7 @@ void CXI_BUTTON::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const 
     if (ReadIniString(ini1, name1, ini2, name2, "font", param, sizeof(param), ""))
     {
         if ((m_nFontNum = m_rs->LoadFont(param)) == -1)
-            core.Trace("can not load font:'%s'", param);
+            rust::log::info("can not load font:'%s'", param);
     }
 
     // get face color
@@ -280,7 +280,7 @@ void CXI_BUTTON::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 

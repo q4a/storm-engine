@@ -454,7 +454,7 @@ void Astronomy::STARS::TimeUpdate(ATTRIBUTES *pAP)
     if (iVertexBuffer == -1)
     {
         bEnable = false;
-        core.Trace("Warning! Weather has not stars parameters");
+        rust::log::warn("Weather has not stars parameters");
         return;
     }
 

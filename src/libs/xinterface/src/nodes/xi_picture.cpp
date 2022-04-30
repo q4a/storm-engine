@@ -165,7 +165,7 @@ void CXI_PICTURE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -308,7 +308,7 @@ uint32_t CXI_PICTURE::MessageProc(int32_t msgcode, MESSAGE &message)
         int32_t pTex = -1;
         if (message.GetCurrentFormatType() == 'p') {
             // DEPRECATED
-            core.Trace("Warning! Setting an interface picture by pointer is deprecated. Please use integers instead.");
+            rust::log::warn("Setting an interface picture by pointer is deprecated. Please use integers instead.");
             pTex = message.Pointer();
         }
         else {
@@ -324,7 +324,7 @@ uint32_t CXI_PICTURE::MessageProc(int32_t msgcode, MESSAGE &message)
         auto *pNod = static_cast<CINODE *>(ptrOwner->FindNode(srcNodeName.c_str(), nullptr));
         if (pNod->m_nNodeType != NODETYPE_PICTURE)
         {
-            core.Trace("Warning! XINTERFACE:: node with name %s have not picture type.", srcNodeName.c_str());
+            rust::log::warn("XINTERFACE:: node with name %s have not picture type.", srcNodeName.c_str());
         }
         else
         {

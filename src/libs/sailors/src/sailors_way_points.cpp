@@ -359,7 +359,7 @@ int SailorsPoints::WriteToFile(std::string fileName)
 
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open '%s' for write", fileName.c_str());
+        rust::log::warn("Can`t open '%s' for write", fileName.c_str());
         return 0;
     }
 
@@ -405,7 +405,7 @@ int SailorsPoints::ReadFromFile(std::string fileName)
 
     if (!pIni)
     {
-        core.Trace("Sailors : Can`t open '%s'", fileName.c_str());
+        rust::log::info("Sailors : Can`t open '%s'", fileName.c_str());
         return 0;
     }
 

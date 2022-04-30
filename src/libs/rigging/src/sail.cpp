@@ -727,7 +727,7 @@ uint64_t SAIL::ProcessMessage(MESSAGE &message)
         }
         else
         {
-            core.Trace("WARNING! Can`t model class pointer for ShipModel");
+            rust::log::warn("Can`t model class pointer for ShipModel");
         }
         // Set all getting sails
         SetAllSails(groupQuantity - 1);
@@ -1164,7 +1164,7 @@ void SAIL::SetAllSails(int groupNum)
             else
             {
                 // throw std::runtime_error("SAIL: Null size");
-                core.Trace("SAIL: Can`t init sail");
+                rust::log::info("SAIL: Can`t init sail");
                 STORM_DELETE(slist[i]);
                 sailQuantity--;
                 if (sailQuantity > 0)
@@ -2346,7 +2346,7 @@ void SAIL::DoRandomsSailsDmg(int chrIdx, int gn, float fDmg)
         slist[sn]->ss.hole[holeIdx] = bOldHole;
         if (pvd == nullptr)
         {
-            core.Trace("WARNING!!! Event evntRandomSailDmg not float return!");
+            rust::log::warn("Event evntRandomSailDmg not float return!");
             return;
         }
         float fDoDmg = pvd->GetFloat();

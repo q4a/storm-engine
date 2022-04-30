@@ -18,7 +18,6 @@ namespace
 
 CorePrivate *core_private;
 
-constexpr char defaultLoggerName[] = "system";
 bool isRunning = false;
 bool bActive = true;
 
@@ -161,9 +160,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     create_directories(rust::fs::GetSaveDataPath());
 
     // Init logging
-    storm::Logger::default_logger = storm::Logger::file_logger(defaultLoggerName, LogLevel::Trace);
-    storm::Logger::default_logger->info("Logging system initialized. Running on %s", STORM_BUILD_WATERMARK_STRING);
-    storm::Logger::default_logger->info("mimalloc-redirect status: %s", mi_is_redirected() ? "true" : "false");
+    rust::log::info("Logging system initialized. Running on %s", STORM_BUILD_WATERMARK_STRING);
+    rust::log::info("mimalloc-redirect status: %s", mi_is_redirected() ? "true" : "false");
 
     // Init core
     core_private = static_cast<CorePrivate *>(&core);
@@ -195,7 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     }
     catch (const std::exception &e)
     {
-        storm::Logger::default_logger->error(e.what());
+        rust::log::error(e.what());
         return EXIT_FAILURE;
     }
 

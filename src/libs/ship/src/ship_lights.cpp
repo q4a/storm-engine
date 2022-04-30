@@ -138,7 +138,7 @@ void ShipLights::AddDynamicLights(VAI_OBJBASE *pObject, const CVECTOR &vPos)
     auto *pLT = FindLightType(sLightType);
     if (!pLT)
     {
-        core.Trace("Can find ship light \"%s\"", sLightType.c_str());
+        rust::log::info("Can find ship light \"%s\"", sLightType.c_str());
         return;
     }
 
@@ -358,7 +358,7 @@ void ShipLights::AddLights(VAI_OBJBASE *pObject, MODEL *pModel, bool bLights, bo
     LightType *pLT = FindLightType(sLightType);
     if (!pLT)
     {
-        core.Trace("Can't find ship light \"%s\"", sLightType.c_str());
+        rust::log::info("Can't find ship light \"%s\"", sLightType.c_str());
         return;
     }
 

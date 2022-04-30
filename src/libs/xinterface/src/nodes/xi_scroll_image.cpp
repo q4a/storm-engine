@@ -413,7 +413,7 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
         m_nOneStrScale = GetIniFloat(ini1, name1, ini2, name2, "scale1", 1.f);
         if (ReadIniString(ini1, name1, ini2, name2, "font1", param, sizeof(param), ""))
             if ((m_nOneStrFont = m_rs->LoadFont(param)) == -1)
-                core.Trace("can not load font:'%s'", param);
+                rust::log::info("can not load font:'%s'", param);
         m_lOneStrX = GetIniLong(ini1, name1, ini2, name2, "dwXOffset1", 0);
         if (m_lOneStrX > 0)
             m_nOneStrAlign = PR_ALIGN_RIGHT;
@@ -430,7 +430,7 @@ void CXI_SCROLLIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, c
         m_nTwoStrScale = GetIniFloat(ini1, name1, ini2, name2, "scale2", 1.f);
         if (ReadIniString(ini1, name1, ini2, name2, "font2", param, sizeof(param), ""))
             if ((m_nTwoStrFont = m_rs->LoadFont(param)) == -1)
-                core.Trace("can not load font:'%s'", param);
+                rust::log::info("can not load font:'%s'", param);
         m_lTwoStrX = GetIniLong(ini1, name1, ini2, name2, "dwXOffset2", 0);
         if (m_lTwoStrX > 0)
             m_nTwoStrAlign = PR_ALIGN_RIGHT;
@@ -990,7 +990,7 @@ void CXI_SCROLLIMAGE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 

@@ -45,7 +45,7 @@ bool LocLife::Init(Location *loc)
     auto *gs = static_cast<VGEOMETRY *>(core.GetService("geometry"));
     if (!gs)
     {
-        core.Trace("Can't create geometry service!");
+        rust::log::warn("Can't create geometry service!");
         return false;
     }
     gs->SetTexturePath("Animals\\");

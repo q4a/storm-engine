@@ -202,7 +202,7 @@ sentry_value_t LifecycleDiagnosticsService::beforeCrash(const sentry_value_t eve
     {
         if(const seh_extractor seh(static_cast<EXCEPTION_POINTERS *>(hint)); seh.is_abnormal())
         {
-            static auto logger = storm::Logger::file_logger("exceptions", LogLevel::Trace);
+            static auto logger = rust::log::Logger::file_logger("exceptions", LogLevel::Trace);
             seh.sink([](const char *msg) { logger->trace(msg); });
         }
     }

@@ -1034,7 +1034,7 @@ void Character::SetSignModel()
     {
         if (gs)
             gs->SetTexturePath("");
-        core.Trace("Quest sign model '%s' not loaded", path.c_str());
+        rust::log::info("Quest sign model '%s' not loaded", path.c_str());
         return;
     }
 
@@ -1206,7 +1206,7 @@ bool Character::Teleport(const char *group, const char *locator)
             return Teleport(pnt.x, pnt.y, pnt.z, static_cast<float>(vz));
     }
 
-    core.Trace("Character Teleport Error: Can't find free place near locator: %s, %s", group, locator);
+    rust::log::warn("Character Teleport Error: Can't find free place near locator: %s, %s", group, locator);
     return Teleport(pos.x, pos.y, pos.z, static_cast<float>(vz));
 }
 
@@ -1806,7 +1806,7 @@ bool Character::IsGunLoad() const
     }
     else
     {
-        core.Trace("Event \"Location_CharacterIsFire\" -> return type is not int");
+        rust::log::info("Event \"Location_CharacterIsFire\" -> return type is not int");
         // return false;
         //!!!
         return true;
@@ -2395,7 +2395,7 @@ void Character::Update(float dltTime)
     if (curPos.y < -1000.0f)
     {
         // Assert(false);
-        core.Trace("Character [%s] fall to underworld!!!", characterID ? characterID : "Unknow id");
+        rust::log::warn("Character [%s] fall to underworld!!!", characterID ? characterID : "Unknow id");
         curPos.y = -500.0f;
         vy = 0.0f;
     }
@@ -3084,14 +3084,14 @@ bool Character::zLoadModel(MESSAGE &message)
     {
         if (gs)
             gs->SetTexturePath("");
-        core.Trace("Character model '%s' not loaded", mpath);
+        rust::log::info("Character model '%s' not loaded", mpath);
         return false;
     }
     if (gs)
         gs->SetTexturePath("");
     if (!core.Send_Message(mdl, "ls", MSG_MODEL_LOAD_ANI, ani.c_str()) != 0)
     {
-        core.Trace("Character animation '%s' not loaded", ani.c_str());
+        rust::log::info("Character animation '%s' not loaded", ani.c_str());
         EntityManager::EraseEntity(mdl);
         return false;
     }
@@ -3116,7 +3116,7 @@ bool Character::zLoadModel(MESSAGE &message)
     }
     else
     {
-        core.Trace("Shadow not created!");
+        rust::log::warn("Shadow not created!");
     }
     if (!EntityManager::GetEntityId("waterrings"))
     {
@@ -3912,7 +3912,7 @@ void Character::UpdateAnimation()
             isSetPriorityAction = true;
             if (!SetAction(priorityAction.name, priorityAction.tblend, priorityActionMoveSpd, priorityActionRotSpd))
             {
-                core.Trace("Character animation: not set priority action: \"%s\"", priorityAction.name);
+                rust::log::info("Character animation: not set priority action: \"%s\"", priorityAction.name);
             }
             curMove = nullptr;
             fgtCurType = fgtSetType = fgt_none;
@@ -3923,7 +3923,7 @@ void Character::UpdateAnimation()
     {
         if (!SetAction(swim.name, swim.tblend, swim.speed, swim.turnspd))
         {
-            core.Trace("Character animation: not set priority action: \"%s\"", swim.name);
+            rust::log::info("Character animation: not set priority action: \"%s\"", swim.name);
         }
         curMove = nullptr;
         fgtCurType = fgtSetType = fgt_none;
@@ -3941,7 +3941,7 @@ void Character::UpdateAnimation()
                 if (userIdle.name && (rust::string::iEquals(userIdle.name, "Ground_SitDown") ||
                                       rust::string::iEquals(userIdle.name, "Ground_StandUp")))
                 {
-                    core.Trace("Not int: \"%s\"", userIdle.name);
+                    rust::log::info("Not int: \"%s\"", userIdle.name);
                 }
                 else
                 {
@@ -3949,7 +3949,7 @@ void Character::UpdateAnimation()
                     {
                         curIdleIndex = -1;
                         if (noBlendTime <= 0.0f)
-                            core.Trace("Character animation: not set non fight hit action: \"%s\"", nfhit.name);
+                            rust::log::info("Character animation: not set non fight hit action: \"%s\"", nfhit.name);
                     }
                 }
             }
@@ -3957,7 +3957,7 @@ void Character::UpdateAnimation()
             {
                 if (!SetAction(fall.name, fall.tblend, 0.0f, 0.0f))
                 {
-                    core.Trace("Character animation: not fall action: \"%s\"", fall.name);
+                    rust::log::info("Character animation: not fall action: \"%s\"", fall.name);
                 }
             }
             else if (isMove)
@@ -3976,7 +3976,8 @@ void Character::UpdateAnimation()
                                 curMove = &walk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set walk action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set walk action: \"%s\"",
+                                                    curMove->name);
                                 }
                             }
                         }
@@ -3988,7 +3989,7 @@ void Character::UpdateAnimation()
                                 curMove = &backwalk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back walk action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set back walk action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4003,7 +4004,7 @@ void Character::UpdateAnimation()
                                 curMove = &run;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set run action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4015,7 +4016,7 @@ void Character::UpdateAnimation()
                                 curMove = &backrun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set buck run action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set buck run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4033,7 +4034,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUp;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set stair up action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4041,7 +4042,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDown;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set stair down action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4053,8 +4054,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUpBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back stair up action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4062,8 +4062,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDownBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back stair down action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4079,8 +4078,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUpRun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set run stair up action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set run stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4088,8 +4086,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDownRun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set run stair down action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set run stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4101,8 +4098,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUpRunBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back run stair up action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back run stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4110,8 +4106,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDownRunBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back run stair down action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back run stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4135,12 +4130,12 @@ void Character::UpdateAnimation()
                             {
                                 curIdleIndex = -1;
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set idle action: \"%s\"", an);
+                                    rust::log::info("Character animation: not set idle action: \"%s\"", an);
                             }
                         }
                         else
                         {
-                            core.Trace("Character: No set idle animation!!!");
+                            rust::log::warn("Character: No set idle animation!!!");
                             if (noBlendTime <= 0.0f)
                                 SetAction(nullptr, 0.3f, 0.0f, turnSpeed);
                         }
@@ -4154,7 +4149,7 @@ void Character::UpdateAnimation()
                             if (!SetAction("strafe_left", 0.2f, 0.0f, turnSpeed))
                             {
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set \"strafe_left\" action");
+                                    rust::log::info("Character animation: not set \"strafe_left\" action");
                             }
                         }
                         else
@@ -4163,7 +4158,7 @@ void Character::UpdateAnimation()
                             if (!SetAction("strafe_right", 0.2f, 0.0f, turnSpeed))
                             {
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set \"strafe_right\" action");
+                                    rust::log::info("Character animation: not set \"strafe_right\" action");
                             }
                         }
                     }
@@ -4178,7 +4173,7 @@ void Character::UpdateAnimation()
                         {
                             curIdleIndex = -1;
                             if (noBlendTime <= 0.0f)
-                                core.Trace("Character animation: not set idle action: \"%s\"", an);
+                                rust::log::info("Character animation: not set idle action: \"%s\"", an);
                         }
                     }
                     else
@@ -4186,7 +4181,7 @@ void Character::UpdateAnimation()
                         SetAction(nullptr, curMove->tblend, 0.0f, turnSpeed);
                         curIdleIndex = -1;
                         if (noBlendTime <= 0.0f)
-                            core.Trace("Character: No set idle animation!!!");
+                            rust::log::warn("Character: No set idle animation!!!");
                     }
                     curMove = nullptr;
                 }
@@ -4234,8 +4229,7 @@ void Character::UpdateAnimation()
                 case fgt_attack_fast: // Quick hit
                     if (!(isSet = SetAction(attackFast[fgtSetIndex].name, attackFast[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set fast attack action: \"%s\"",
-                                   attackFast[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set fast attack action: \"%s\"", attackFast[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4256,8 +4250,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackForce[fgtSetIndex].name, attackForce[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set force attack action: \"%s\"",
-                                   attackForce[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set force attack action: \"%s\"", attackForce[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4273,8 +4266,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackRound[fgtSetIndex].name, attackRound[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set round attack action: \"%s\"",
-                                   attackRound[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set round attack action: \"%s\"", attackRound[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4289,8 +4281,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackBreak[fgtSetIndex].name, attackBreak[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set break attack action: \"%s\"",
-                                   attackBreak[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set break attack action: \"%s\"", attackBreak[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4306,7 +4297,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackFeint[fgtSetIndex].name, attackFeint[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set feint action: \"%s\"", attackFeint[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set feint action: \"%s\"", attackFeint[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4320,7 +4311,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackFeintC[fgtSetIndex].name, attackFeintC[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set feint action: \"%s\"", attackFeintC[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set feint action: \"%s\"", attackFeintC[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4360,8 +4351,7 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hit[fgtSetIndex].name, hit[fgtSetIndex].tblend, 0.0f, 1.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight attack hit action: \"%s\"",
-                                   hit[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set fight attack hit action: \"%s\"", hit[fgtSetIndex].name);
                     }
                     break;
                 }
@@ -4369,21 +4359,21 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(blockbreak.name, blockbreak.tblend, 0.0f, 1.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight blockbreak action: \"%s\"", blockbreak.name);
+                        rust::log::info("Character animation: not set fight blockbreak action: \"%s\"", blockbreak.name);
                     }
                     break;
                 case fgt_hit_feint: // The reaction from the feint putting him into the stall
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hitFeint.name, hitFeint.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight feint hit action: \"%s\"", hitFeint.name);
+                        rust::log::info("Character animation: not set fight feint hit action: \"%s\"", hitFeint.name);
                     }
                     break;
                 case fgt_hit_parry: // Parry reaction putting him into stall
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hitParry.name, hitParry.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight parry hit action: \"%s\"", hitParry.name);
+                        rust::log::info("Character animation: not set fight parry hit action: \"%s\"", hitParry.name);
                     }
                     core.Event("ChrFgtActApply", "is", GetId(), "hit_parry");
                     // boal bug fix FGT_ATTACK_PARRY);
@@ -4394,7 +4384,7 @@ void Character::UpdateAnimation()
                     impulse.z -= 3.0f * cosf(ay);
                     if (!(isSet = SetAction(hitRound.name, hitRound.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight round hit action: \"%s\"", hitRound.name);
+                        rust::log::info("Character animation: not set fight round hit action: \"%s\"", hitRound.name);
                     }
                     break;
                 case fgt_hit_fire: { // The reaction from the shot, putting him into stall
@@ -4417,7 +4407,7 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hitFire.name, hitFire.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight fire hit action: \"%s\"", hitFire.name);
+                        rust::log::info("Character animation: not set fight fire hit action: \"%s\"", hitFire.name);
                     }
                     break;
                 }
@@ -4427,14 +4417,14 @@ void Character::UpdateAnimation()
                     {
                         if (!(isSet = SetAction(blockaxe.name, blockaxe.tblend, 0.0f, 5.0f, true)))
                         {
-                            core.Trace("Character animation: not set block action: \"%s\"", blockaxe.name);
+                            rust::log::info("Character animation: not set block action: \"%s\"", blockaxe.name);
                         }
                     }
                     else
                     {
                         if (!(isSet = SetAction(block.name, block.tblend, 0.0f, 5.0f, true)))
                         {
-                            core.Trace("Character animation: not set block action: \"%s\"", block.name);
+                            rust::log::info("Character animation: not set block action: \"%s\"", block.name);
                         }
                     }
                     break;
@@ -4450,14 +4440,14 @@ void Character::UpdateAnimation()
                     {
                         if (!(isSet = SetAction(blockaxehit.name, blockaxehit.tblend, 0.0f, 2.0f, true)))
                         {
-                            core.Trace("Character animation: not set block axe hit action: \"%s\"", blockaxehit.name);
+                            rust::log::info("Character animation: not set block axe hit action: \"%s\"", blockaxehit.name);
                         }
                     }
                     else
                     {
                         if (!(isSet = SetAction(blockhit.name, blockhit.tblend, 0.0f, 2.0f, true)))
                         {
-                            core.Trace("Character animation: not set block hit action: \"%s\"", blockhit.name);
+                            rust::log::info("Character animation: not set block hit action: \"%s\"", blockhit.name);
                         }
                     }
                     break;
@@ -4465,7 +4455,7 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(parry[fgtSetIndex].name, parry[fgtSetIndex].tblend, 0.0f, 5.0f)))
                     {
-                        core.Trace("Character animation: not set block(parry) action: \"%s\"", parry[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set block(parry) action: \"%s\"", parry[fgtSetIndex].name);
                     }
                     break;
                 case fgt_recoil: // Bounce back
@@ -4476,7 +4466,7 @@ void Character::UpdateAnimation()
                     priorityAction.SetName(recoil.name); // to check the end of the animation
                     if (!(isSet = SetAction(recoil.name, recoil.tblend, -3.0f, 0.0f)))
                     {
-                        core.Trace("Character animation: not set recoil action: \"%s\"", recoil.name);
+                        rust::log::info("Character animation: not set recoil action: \"%s\"", recoil.name);
                     }
                     break;
                 case fgt_strafe_l: // Bounce to the left
@@ -4485,7 +4475,7 @@ void Character::UpdateAnimation()
                     impulse += 15.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
                     if (!(isSet = SetAction(strafe_l.name, strafe_l.tblend, 0.0f, 0.0f)))
                     {
-                        core.Trace("Character animation: not set recoil action: \"%s\"", strafe_l.name);
+                        rust::log::info("Character animation: not set recoil action: \"%s\"", strafe_l.name);
                     }
                     break;
                 case fgt_strafe_r: // Bounce to the left
@@ -4494,7 +4484,7 @@ void Character::UpdateAnimation()
                     impulse -= 15.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
                     if (!(isSet = SetAction(strafe_r.name, strafe_r.tblend, 0.0f, 0.0f)))
                     {
-                        core.Trace("Character animation: not set recoil action: \"%s\"", strafe_l.name);
+                        rust::log::info("Character animation: not set recoil action: \"%s\"", strafe_l.name);
                     }
                     break;
                 }
@@ -4524,7 +4514,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightwalk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight walk action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set fight walk action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4536,8 +4526,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightbackwalk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight back walk action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set fight back walk action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4552,7 +4541,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightrun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight run action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set fight run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4564,8 +4553,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightbackrun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight back run action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set fight back run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4586,13 +4574,13 @@ void Character::UpdateAnimation()
                             {
                                 curIdleIndex = -1;
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set fight idle \"%s\" action", an);
+                                    rust::log::info("Character animation: not set fight idle \"%s\" action", an);
                             }
                         }
                         else
                         {
                             if (noBlendTime <= 0.0f)
-                                core.Trace("Character: No set idle animation!!!");
+                                rust::log::info("Character: No set idle animation!!!");
                             SetAction(nullptr, 0.3f, 0.0f, turnSpeed);
                             curIdleIndex = -1;
                         }
@@ -4607,14 +4595,14 @@ void Character::UpdateAnimation()
                             {
                                 curIdleIndex = -1;
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set fight idle \"%s\" action", an);
+                                    rust::log::info("Character animation: not set fight idle \"%s\" action", an);
                             }
                         }
                         else
                         {
                             SetAction(nullptr, curMove->tblend, 0.0f, turnSpeed);
                             if (noBlendTime <= 0.0f)
-                                core.Trace("Character: No set idle animation!!!");
+                                rust::log::info("Character: No set idle animation!!!");
                             curIdleIndex = -1;
                         }
                         curMove = nullptr;

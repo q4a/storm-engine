@@ -10,8 +10,8 @@ inline bool Effects::ErrorHandler(HRESULT hr, const char *file, unsigned line, c
 {
     if (hr != D3D_OK && hr != S_FALSE)
     {
-        core.Trace("[%s:%s:%d] %s: %s (%s) (%.*s)", file, func, line, DXGetErrorString(hr), DXGetErrorDescription(hr),
-                   expr, debugMsg_.size(), debugMsg_.data());
+        rust::log::error("[%s:%s:%d] %s: %s (%s) (%.*s)", file, func, line, DXGetErrorString(hr),
+                         DXGetErrorDescription(hr), expr, debugMsg_.size(), debugMsg_.data());
         return true;
     }
 
@@ -43,7 +43,7 @@ void Effects::compile(const char *fxPath)
 
     if (errors)
     {
-        core.Trace(static_cast<const char *>(errors->GetBufferPointer()));
+        rust::log::error(static_cast<const char *>(errors->GetBufferPointer()));
         return;
     }
 
@@ -64,7 +64,7 @@ void Effects::compile(const char *fxPath)
 
         if (techniques_.count(name_in_lowercase) > 0)
         {
-            core.Trace("Warning: duplicate technique (%s)", desc.Name);
+            rust::log::warn("Duplicate technique (%s)", desc.Name);
         }
         else
         {
@@ -95,7 +95,7 @@ bool Effects::begin(const std::string &techniqueName)
     const auto technique = techniques_.find(name_in_lowercase);
     if (technique == techniques_.end())
     {
-        core.Trace("Warning: technique (%s) not found!", name_in_lowercase.c_str());
+        rust::log::warn("Technique (%s) not found!", name_in_lowercase.c_str());
         return false;
     }
 
@@ -107,7 +107,7 @@ bool Effects::begin(const std::string &techniqueName)
     CHECKD3DERR(fx->Begin(&passes, 0));
     if (passes == 0)
     {
-        core.Trace("Warning: empty technique (%s)!", name_in_lowercase.c_str());
+        rust::log::warn("Empty technique (%s)!", name_in_lowercase.c_str());
         return false;
     }
 

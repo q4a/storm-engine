@@ -157,7 +157,7 @@ void AICharacter::CharacterTeleport()
 {
     currentNode = FindNodeIndex(curPos);
     if (currentNode < 0)
-        core.Trace("Warning: NPCharacter <%s>-> trace node not found", characterID);
+        rust::log::warn("Warning: NPCharacter <%s>-> trace node not found", characterID);
 }
 
 //============================================================================================

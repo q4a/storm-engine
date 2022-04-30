@@ -65,7 +65,7 @@ IDirect3DTexture9 *TextureSequence::Initialize(VDX9RENDER *pRS, const char *cTSf
     auto ini = fio->OpenIniFile(INI_FILENAME);
     if (!ini)
     {
-        core.Trace("ini file %s not found!", INI_FILENAME);
+        rust::log::warn("ini file %s not found!", INI_FILENAME);
         return nullptr;
     }
     m_dwDeltaTime = ini->GetInt((char *)cTSfileName, "timeDelay", 128);
@@ -102,7 +102,7 @@ IDirect3DTexture9 *TextureSequence::Initialize(VDX9RENDER *pRS, const char *cTSf
                                      D3DPOOL_DEFAULT, &m_pTexture))
     {
         m_pTexture = nullptr;
-        core.Trace("Can`t create texture");
+        rust::log::info("Can`t create texture");
         return nullptr;
     }
 

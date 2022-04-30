@@ -115,7 +115,7 @@ bool ParticleManager::OpenProject(const char *FileName)
     auto IniFile = fio->OpenIniFile(pathStr.c_str());
     if (!IniFile)
     {
-        core.Trace("Can't find project '%s'", pathStr.c_str());
+        rust::log::info("Can't find project '%s'", pathStr.c_str());
         return false;
     }
 
@@ -321,7 +321,7 @@ IParticleSystem *ParticleManager::CreateParticleSystemEx(const char *FileName, c
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't loading. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't loading. Reason: Not found in cache", FileName);
         return nullptr;
     }
 
@@ -511,7 +511,7 @@ void ParticleManager::WriteSystemCache(const char *FileName)
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't save. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't save. Reason: Not found in cache", FileName);
         return;
     }
 
@@ -529,7 +529,7 @@ void ParticleManager::WriteSystemCache(const char *FileName)
     */
 
     pMemSave.Close();
-    core.Trace("Particle system '%s' saved.", FileName);
+    rust::log::trace("Particle system '%s' saved.", FileName);
 }
 
 void ParticleManager::WriteSystemCacheAs(const char *FileName, const char *NewName)
@@ -537,7 +537,7 @@ void ParticleManager::WriteSystemCacheAs(const char *FileName, const char *NewNa
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't save. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't save. Reason: Not found in cache", FileName);
         return;
     }
 
@@ -551,7 +551,7 @@ void ParticleManager::WriteSystemCacheAs(const char *FileName, const char *NewNa
     */
 
     pMemSave.Close();
-    core.Trace("Particle system '%s' saved.", NewName);
+    rust::log::trace("Particle system '%s' saved.", NewName);
 }
 
 void ParticleManager::WriteSystemCache(const char *FileName, MemFile *pMemFile)
@@ -559,7 +559,7 @@ void ParticleManager::WriteSystemCache(const char *FileName, MemFile *pMemFile)
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't save. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't save. Reason: Not found in cache", FileName);
         return;
     }
 
@@ -571,7 +571,7 @@ void ParticleManager::LoadSystemCache(const char *FileName, MemFile *pMemFile)
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't load. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't load. Reason: Not found in cache", FileName);
         return;
     }
 

@@ -145,7 +145,7 @@ inline float Bone::Clamp(float v, const char *str)
         isErr = true;
     }
     if (isErr && str)
-        core.Trace(str);
+        rust::log::info(str);
     return v;
 }
 

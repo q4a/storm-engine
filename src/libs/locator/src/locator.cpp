@@ -50,7 +50,7 @@ void LOCATOR::LocateForI_L2(ATTRIBUTES *pA, GEOS *g, GEOS::LABEL &label)
     const auto groupID = g->FindName(label.name);
     if (groupID < 0)
     {
-        core.Trace("?void LOCATOR::LocateForI_L2(...)");
+        rust::log::trace("?void LOCATOR::LocateForI_L2(...)");
         return;
     }
 
@@ -80,18 +80,18 @@ void LOCATOR::LocateForI(VDATA *pData)
 
     if (pData == nullptr)
     {
-        core.Trace("?void LOCATOR::LocateForI(VDATA * pData)");
+        rust::log::trace("?void LOCATOR::LocateForI(VDATA * pData)");
         return;
     }
     pA = pData->GetAClass();
     if (pA == nullptr)
     {
-        core.Trace("?void LOCATOR::LocateForI(VDATA * pData)");
+        rust::log::trace("?void LOCATOR::LocateForI(VDATA * pData)");
         return;
     }
     if (!pA->GetAttribute("locators"))
     {
-        core.Trace("?void LOCATOR::LocateForI(VDATA * pData)");
+        rust::log::trace("?void LOCATOR::LocateForI(VDATA * pData)");
         return;
     }
     char sFileLocators[256];
@@ -102,7 +102,7 @@ void LOCATOR::LocateForI(VDATA *pData)
     rs->SetLoadTextureEnable(true);
     if (!g)
     {
-        core.Trace("?void LOCATOR::LocateForI(VDATA * pData)");
+        rust::log::trace("?void LOCATOR::LocateForI(VDATA * pData)");
         return;
     }
 
@@ -120,7 +120,7 @@ void LOCATOR::LocateForI(VDATA *pData)
                     {
                         if (!pAA->GetAttributeClass(n)->GetAttribute("name"))
                         {
-                            core.Trace("LOCATOR: no name");
+                            rust::log::trace("LOCATOR: no name");
                             continue;
                         }
                         if (rust::string::iEquals(pAA->GetAttributeClass(n)->GetAttribute("name"), label.name))
@@ -144,8 +144,8 @@ void LOCATOR::LocateForI(VDATA *pData)
             auto *pARC = pAA->GetAttributeClass(n);
             if (!pARC->FindAClass(pARC, "x"))
             {
-                core.Trace("LOCATOR: Can't find locator with name: %s, geo: %s", pARC->GetAttribute("name"),
-                           pA->GetAttribute("locators"));
+                rust::log::info("LOCATOR: Can't find locator with name: %s, geo: %s",
+                                pARC->GetAttribute("name"), pA->GetAttribute("locators"));
             }
         }
 

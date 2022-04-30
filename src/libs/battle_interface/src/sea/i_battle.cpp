@@ -154,7 +154,7 @@ void BATTLE_INTERFACE::Realize(uint32_t delta_time)
         return;
     if (m_bNeedIslandSet)
     {
-        core.Trace("Island Set");
+        rust::log::trace("Island Set");
         BattleNavigator.SetIsland();
         m_bNeedIslandSet = false;
     }

@@ -218,7 +218,7 @@ bool HELPCHOOSER::RunChooser(const char *ChooserGroup)
     auto ini = fio->OpenIniFile("resource\\ini\\helpchooser.ini");
     if (!ini)
     {
-        core.Trace("Can`t open INI file \"resource\\ini\\helpchooser.ini\"");
+        rust::log::info("Can`t open INI file \"resource\\ini\\helpchooser.ini\"");
         return false;
     }
 
@@ -309,7 +309,7 @@ bool HELPCHOOSER::RunChooser(const char *ChooserGroup)
     // create a vertex buffer
     m_idVBuf = rs->CreateVertexBuffer(HCHOOSER_FVF, 18 * sizeof(HCHOOSER_VERTEX), D3DUSAGE_WRITEONLY);
     if (m_idVBuf == -1)
-        core.Trace("WARNING! Can`t create vertex buffer for help chooser");
+        rust::log::warn("Can`t create vertex buffer for help chooser");
     else
     {
         auto *pv = static_cast<HCHOOSER_VERTEX *>(rs->LockVertexBuffer(m_idVBuf));
@@ -368,7 +368,7 @@ void HELPCHOOSER::SetRectangle(int32_t newRectNum)
         return;
     if (newRectNum < 0 || newRectNum >= m_nRectQ)
     {
-        core.Trace("WARNING! Wrong rectangle number into HELPCHOOSER");
+        rust::log::warn("Wrong rectangle number into HELPCHOOSER");
         return;
     }
     if (m_idVBuf == -1)

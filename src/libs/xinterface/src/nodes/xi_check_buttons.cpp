@@ -92,7 +92,7 @@ void CXI_CHECKBUTTONS::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     if (ReadIniString(ini1, name1, ini2, name2, "font", param, sizeof(param), ""))
     {
         if ((m_nFontNum = m_rs->LoadFont(param)) == -1)
-            core.Trace("can not load font:'%s'", param);
+            rust::log::info("can not load font:'%s'", param);
     }
     m_fFontScale = GetIniFloat(ini1, name1, ini2, name2, "fontScale", 1.f);
 
@@ -241,7 +241,7 @@ void CXI_CHECKBUTTONS::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -382,7 +382,7 @@ void CXI_CHECKBUTTONS::AddButton(const char *pcText, bool bDisable, bool bSelect
         const auto strNum = pStringService->GetStringNum(pcText);
         if (strNum < 0)
         {
-            storm::Logger::default_logger->error("CXI_CHECKBUTTONS: No string '{:}' found in language files", pcText);
+            rust::log::error("CXI_CHECKBUTTONS: No string '%s' found in language files", pcText);
             delete pBD;
             return;
         }

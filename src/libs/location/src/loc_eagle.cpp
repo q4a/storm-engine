@@ -47,7 +47,7 @@ bool LocEagle::Init()
     auto *gs = static_cast<VGEOMETRY *>(core.GetService("geometry"));
     if (!gs)
     {
-        core.Trace("Can't create geometry service!");
+        rust::log::info("Can't create geometry service!");
         return false;
     }
     // Model

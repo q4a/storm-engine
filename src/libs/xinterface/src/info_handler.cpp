@@ -20,7 +20,7 @@ bool InfoHandler::Init()
     m_rs = static_cast<VDX9RENDER *>(core.GetService("dx9render"));
     if (!m_rs)
     {
-        core.Trace("No service: dx9render");
+        rust::log::warn("No service: dx9render");
         return false;
     }
     if (m_rs->IsInsideScene())
@@ -30,13 +30,13 @@ bool InfoHandler::Init()
 
     if(!DoPreOut())
     {
-        core.Trace("DoPreOut failed");
+        rust::log::info("DoPreOut failed");
         return false;
     }
 
     if (!m_rs->GetRenderTargetAsTexture(&tex))
     {
-        core.Trace("[InfoHandler] GetRenderTargetAsTexture failed");
+        rust::log::info("[InfoHandler] GetRenderTargetAsTexture failed");
         return false;
     }
 

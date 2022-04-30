@@ -365,8 +365,7 @@ void AIGroup::ShipChangeGroup(ATTRIBUTES *pACharacter, const char *pGroupName)
     AIGroup *pGOld = FindGroup(pACharacter);
     if (!pGOld)
     {
-        core.Trace("AIGroup::ShipChangeGroup: Can't find group with character id = %s",
-                   pACharacter->GetAttribute("id"));
+        rust::log::info("AIGroup::ShipChangeGroup: Can't find group with character id = %s", pACharacter->GetAttribute("id"));
         return;
     }
     AIGroup *pGNew = FindOrCreateGroup(pGroupName);

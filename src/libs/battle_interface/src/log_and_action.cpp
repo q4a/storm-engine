@@ -491,7 +491,7 @@ void ILogAndActions::SetAction(const char *actionName)
         return;
     if ((strlen(actionName) + 1) > sizeof(m_sActionName))
     {
-        core.Trace("Action name: %s  - overup size of name");
+        rust::log::info("Action name: %s  - overup size of name");
         return;
     }
     pA = core.Entity_GetAttributeClass(g_ILogAndActions, "ActiveActions");

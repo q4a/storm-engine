@@ -4,7 +4,7 @@ use crate::common::DEFAULT_LOGGER;
 
 /// Case-insensitive search of `pattern`'s position in `s` starting from `start` byte.
 /// Since `start` can point inside UTF-8 code points, we need to find near char boundary first.
-fn find_ignore_case(s: &str, pattern: &str, start: usize) -> Option<usize> {
+pub fn find_ignore_case(s: &str, pattern: &str, start: usize) -> Option<usize> {
     let mut n = start;
     while n < s.len() && !s.is_char_boundary(n) {
         n += 1;
@@ -20,14 +20,14 @@ fn find_ignore_case(s: &str, pattern: &str, start: usize) -> Option<usize> {
 }
 
 /// Case-insensitive check that `s` starts with `pattern`
-fn starts_with_ignore_case(s: &str, pattern: &str) -> bool {
+pub fn starts_with_ignore_case(s: &str, pattern: &str) -> bool {
     let s_lowercase = s.to_lowercase();
     let pattern_lowercase = pattern.to_lowercase();
     s_lowercase.starts_with(&pattern_lowercase)
 }
 
 /// Case-insensitive comparison of `s1` and `s2`
-fn compare_ignore_case(s1: &str, s2: &str) -> Ordering {
+pub fn compare_ignore_case(s1: &str, s2: &str) -> Ordering {
     let s1_lowercase = s1.to_lowercase();
     let s2_lowercase = s2.to_lowercase();
 
@@ -35,22 +35,22 @@ fn compare_ignore_case(s1: &str, s2: &str) -> Ordering {
 }
 
 /// Case-insensitive check that `s1` is equal to `s2`
-fn equal_ignore_case(s1: &str, s2: &str) -> bool {
+pub fn equal_ignore_case(s1: &str, s2: &str) -> bool {
     matches!(compare_ignore_case(s1, s2), Ordering::Equal)
 }
 
 /// Case-insensitive check that `s1` is less than `s2`
-fn less_ignore_case(s1: &str, s2: &str) -> bool {
+pub fn less_ignore_case(s1: &str, s2: &str) -> bool {
     matches!(compare_ignore_case(s1, s2), Ordering::Less)
 }
 
 /// Case-insensitive check that `s1` is less than or equal to `s2`
-fn less_or_equal_ignore_case(s1: &str, s2: &str) -> bool {
+pub fn less_or_equal_ignore_case(s1: &str, s2: &str) -> bool {
     !matches!(compare_ignore_case(s1, s2), Ordering::Greater)
 }
 
 /// Case-insensitive check that `s1` is equal to `pattern` glob
-fn glob_ignore_case(s: &str, pattern: &str) -> bool {
+pub fn glob_ignore_case(s: &str, pattern: &str) -> bool {
     let s_lowercase = s.to_lowercase();
     let pattern_lowercase = pattern.to_lowercase();
     let matcher = match globset::Glob::new(&pattern_lowercase) {

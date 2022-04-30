@@ -40,7 +40,7 @@ void DataCache::CacheSystem(const char *FileName)
 
     if (!sysFile.is_open())
     {
-        core.Trace("Particles: '%s' File not found !!!", pathStr.c_str());
+        rust::log::error("Particles: '%s' File not found !!!", pathStr.c_str());
         return;
     }
 

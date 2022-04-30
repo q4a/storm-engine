@@ -45,19 +45,19 @@ bool PathTracks::Load(const char *fileName)
     uint32_t size = 0;
     if (fio->LoadFile(fileName, &data, &size) == FALSE || !data)
     {
-        core.Trace("Camera tracks file %s not loaded...", fileName);
+        rust::log::info("Camera tracks file %s not loaded...", fileName);
         return false;
     }
     // Checking the title
     if (((AntFileHeader *)data)->id != ANTFILE_ID)
     {
-        core.Trace("Camera tracks file %s is invalidate...", fileName);
+        rust::log::info("Camera tracks file %s is invalidate...", fileName);
         delete data;
         return false;
     }
     if (((AntFileHeader *)data)->ver != ANTFILE_VER)
     {
-        core.Trace("Camera tracks file %s have incorrect version...", fileName);
+        rust::log::info("Camera tracks file %s have incorrect version...", fileName);
         delete data;
         return false;
     }
@@ -68,7 +68,7 @@ bool PathTracks::Load(const char *fileName)
     if (size < sizeof(AntFileHeader) + sizeof(char) * nStringSize + sizeof(AntFileBone) * nBoneCount +
                    sizeof(AntFileTrackElement) * nPoints)
     {
-        core.Trace("Camera tracks file %s is invalidate...", fileName);
+        rust::log::info("Camera tracks file %s is invalidate...", fileName);
         delete data;
         return false;
     }

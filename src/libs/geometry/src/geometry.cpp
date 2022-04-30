@@ -58,7 +58,7 @@ bool GEOMETRY::Init()
     RenderService = static_cast<VDX9RENDER *>(core.GetService(RenderServiceName));
     if (!RenderService)
     {
-        core.Trace("No service: %s", RenderServiceName);
+        rust::log::warn("No service: %s", RenderServiceName);
     }
     GSR.SetRenderService(RenderService);
 
@@ -129,12 +129,12 @@ GEOS *GEOMETRY::CreateGeometry(const char *file_name, const char *light_file_nam
     }
     catch (const std::exception &e)
     {
-        core.Trace("%s: %s", fnt, e.what());
+        rust::log::error("%s: %s", fnt, e.what());
         return nullptr;
     }
     catch (...)
     {
-        core.Trace("Invalid model: %s", fnt);
+        rust::log::error("Invalid model: %s", fnt);
         return nullptr;
     }
 

@@ -65,8 +65,6 @@ class CoreImpl : public CorePrivate
     HINSTANCE GetAppInstance();
     // set time scale; affect on std entity functions DeltaTime parameter
     void SetTimeScale(float _scale) override;
-    // write message to system log file
-    void Trace(const char *Format, ...) override;
 
     // return service object pointer;
     void *GetService(const char *service_name) override;

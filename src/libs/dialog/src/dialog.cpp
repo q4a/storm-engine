@@ -668,7 +668,7 @@ void DIALOG::LoadFromIni()
     auto pIni = fio->OpenIniFile("resource\\ini\\dialog.ini");
     if (!pIni)
     {
-        core.Trace("Warning! DIALOG: Can`t open ini file %s", "resource\\ini\\dialog.ini");
+        rust::log::error("DIALOG: Can`t open ini file %s", "resource\\ini\\dialog.ini");
         return;
     }
 
@@ -1154,7 +1154,7 @@ void DIALOG::EmergencyExit()
     if (forceEmergencyClose)
         return;
     forceEmergencyClose = true;
-    core.Trace("DIALOG: Invalid links, emergency exit! (last link = %s)", selectedLinkName);
+    rust::log::warn("DIALOG: Invalid links, emergency exit! (last link = %s)", selectedLinkName);
     core.Event("EmergencyDialogExit");
 }
 

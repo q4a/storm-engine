@@ -9,6 +9,14 @@
 #include <ostream>
 #include <new>
 
+enum class LogLevel {
+  Error,
+  Warn,
+  Info,
+  Debug,
+  Trace,
+};
+
 struct ArrayWchar {
   wchar_t *ptr;
   size_t len;
@@ -42,6 +50,30 @@ ArrayWchar *ffi_save_directory();
 ArrayWchar *ffi_screenshot_directory();
 
 ArrayCchar *ffi_screenshot_filename();
+
+void ffi_new_file_logger(const char *name, LogLevel level);
+
+void ffi_new_console_logger(const char *name, LogLevel level);
+
+void ffi_error(const char *logger, const char *message);
+
+void ffi_error_default(const char *message);
+
+void ffi_warn(const char *logger, const char *message);
+
+void ffi_warn_default(const char *message);
+
+void ffi_info(const char *logger, const char *message);
+
+void ffi_info_default(const char *message);
+
+void ffi_debug(const char *logger, const char *message);
+
+void ffi_debug_default(const char *message);
+
+void ffi_trace(const char *logger, const char *message);
+
+void ffi_trace_default(const char *message);
 
 int ffi_find_ignore_case(const char *s, const char *pattern, size_t start);
 

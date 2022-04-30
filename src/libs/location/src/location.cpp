@@ -532,8 +532,8 @@ int32_t Location::LoadStaticModel(const char *modelName, const char *tech, int32
             for (int32_t me = 0; me < 16; me++)
                 if (isnan(mtxx.matrix[me]))
                 {
-                    core.Trace("Location: locator %s::%s in position have NaN value, reset it!", label.group_name,
-                               label.name);
+                    rust::log::info("Location: locator %s::%s in position have NaN value, reset it!", 
+                                    label.group_name, label.name);
                     mtxx.SetIdentity();
                     break;
                 }
@@ -561,7 +561,7 @@ bool Location::LoadCharacterPatch(const char *ptcName)
     // load the patch
     const auto result = ptc.Load(path);
     if (!result)
-        core.Trace("Can't loaded patch data file %s.ptc for npc.", ptcName);
+        rust::log::info("Can't loaded patch data file %s.ptc for npc.", ptcName);
     return result;
 }
 
@@ -595,7 +595,7 @@ bool Location::LoadGrass(const char *modelName, const char *texture)
     int32_t ll = strlen(nm);
     if (grs->LoadData(nm))
         return true;
-    core.Trace("Can't load grass data file: %s", nm);
+    rust::log::info("Can't load grass data file: %s", nm);
     EntityManager::EraseEntity(grass);
     return false;
 }
@@ -781,8 +781,8 @@ void Location::UpdateLocators()
                         }
                         else
                         {
-                            core.Trace("Location: Can't create attribute 'locators.%s.%s.vz'!", groupName,
-                                       locators[i]->Name(j));
+                            rust::log::warn("Location: Can't create attribute 'locators.%s.%s.vz'!", 
+                                            groupName, locators[i]->Name(j));
                         }
                         // vy
                         a->CreateSubAClass(a, "vy");
@@ -795,8 +795,8 @@ void Location::UpdateLocators()
                         }
                         else
                         {
-                            core.Trace("Location: Can't create attribute 'locators.%s.%s.vy'!", groupName,
-                                       locators[i]->Name(j));
+                            rust::log::warn("Location: Can't create attribute 'locators.%s.%s.vy'!",
+                                            groupName, locators[i]->Name(j));
                         }
                         // vx
                         a->CreateSubAClass(a, "vx");
@@ -809,26 +809,26 @@ void Location::UpdateLocators()
                         }
                         else
                         {
-                            core.Trace("Location: Can't create attribute 'locators.%s.%s.vx'!", groupName,
-                                       locators[i]->Name(j));
+                            rust::log::warn("Location: Can't create attribute 'locators.%s.%s.vx'!",
+                                            groupName, locators[i]->Name(j));
                         }
                     }
                     else
                     {
-                        core.Trace("Location: Can't create attribute 'locators.%s.%s'!", groupName,
-                                   locators[i]->Name(j));
+                        rust::log::warn("Location: Can't create attribute 'locators.%s.%s'!", 
+                                        groupName, locators[i]->Name(j));
                     }
                 }
             }
             else
             {
-                core.Trace("Location: Can't create attribute 'locators.%s'!", groupName);
+                rust::log::warn("Location: Can't create attribute 'locators.%s'!", groupName);
             }
         }
     }
     else
     {
-        core.Trace("Location: Can't create attribute 'locators'!");
+        rust::log::warn("Location: Can't create attribute 'locators'!");
     }
 }
 

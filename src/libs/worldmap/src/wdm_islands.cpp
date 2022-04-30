@@ -138,7 +138,7 @@ WdmIslands::WdmIslands()
                 wdmObjects->wm->CreateModel(new WdmRenderModel(), name.c_str(), false, false, false, 3));
             if (!isl.area)
             {
-                core.Trace("World map: can't load model of island's area: %s", name.c_str());
+                rust::log::info("World map: can't load model of island's area: %s", name.c_str());
             }
             // Palm trees
             name = "islands\\";
@@ -160,7 +160,7 @@ WdmIslands::WdmIslands()
         }
         else
         {
-            core.Trace("World map: can't load model of island: %s", name.c_str());
+            rust::log::info("World map: can't load model of island: %s", name.c_str());
         }
     }
     // Loading the patch
@@ -382,7 +382,7 @@ void WdmIslands::SetIslandsData(ATTRIBUTES *apnt, bool isChange)
         // Check for sufficiency
         if (!id || !text || !locator || !locator[0])
         {
-            core.Trace("World map: label \"%s\" will be skipping...", apnt->GetAttributeName(i));
+            rust::log::info("World map: label \"%s\" will be skipping...", apnt->GetAttributeName(i));
             continue;
         }
         // looking for a label among existing
@@ -392,8 +392,7 @@ void WdmIslands::SetIslandsData(ATTRIBUTES *apnt, bool isChange)
         {
             if (!LabelsFindLocator(locator, pos))
             {
-                core.Trace("World map: locator \"%s\" in label \"%s\" not found...", locator,
-                           apnt->GetAttributeName(i));
+                rust::log::info("World map: locator \"%s\" in label \"%s\" not found...", locator, apnt->GetAttributeName(i));
                 continue;
             }
             // Adding a new label

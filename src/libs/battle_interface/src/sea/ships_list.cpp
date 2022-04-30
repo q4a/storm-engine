@@ -55,7 +55,7 @@ void TMP_LONG_STACK::Push(int32_t data)
     {
         if (sizeIncr <= 0)
         {
-            core.Trace("WARNING! push for TMP_LONG_STACK impossible - array grid <= 0");
+            rust::log::warn("Oush for TMP_LONG_STACK impossible - array grid <= 0");
             return;
         }
         auto *const pold = ldat;
@@ -78,7 +78,7 @@ int32_t TMP_LONG_STACK::GetFore()
 {
     if (ldat == nullptr || curidx <= 0)
     {
-        core.Trace("WARNING! GetFore from TMP_LONG_STACK is empty");
+        rust::log::warn("GetFore from TMP_LONG_STACK is empty");
         return defReturn;
     }
     const auto retVal = ldat[0];
@@ -99,7 +99,7 @@ int32_t TMP_LONG_STACK::Pop()
 {
     if (ldat == nullptr || curidx <= 0)
     {
-        core.Trace("WARNING! pop from TMP_LONG_STACK is empty");
+        rust::log::warn("Pop from TMP_LONG_STACK is empty");
         return defReturn;
     }
     const auto retVal = ldat[--curidx];

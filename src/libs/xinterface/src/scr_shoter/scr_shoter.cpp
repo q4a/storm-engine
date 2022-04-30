@@ -67,7 +67,7 @@ void SCRSHOTER::Realize(uint32_t Delta_Time)
     if (texture_ == nullptr)
         if (!MakeScreenShot())
         {
-            core.Trace("ERROR!!! screen shot create error");
+            rust::log::error("screen shot create error");
             core.Event("makescrshot");
         }
         else
@@ -85,13 +85,13 @@ bool SCRSHOTER::MakeScreenShot()
     hr = rs->EndScene();
     if (hr != D3D_OK)
     {
-        core.Trace("ERROR!!! Can`t EndScene");
+        rust::log::error("Can`t EndScene");
         return false;
     }
     hr = rs->BeginScene();
     if (hr != D3D_OK)
     {
-        core.Trace("ERROR!!! Can`t BeginScene");
+        rust::log::error("Can`t BeginScene");
         return false;
     }
 

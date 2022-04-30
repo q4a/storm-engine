@@ -120,7 +120,7 @@ void DataSource::Load(MemFile *pMemFile)
     pMemFile->Read(Id, 4);
     if (strcmp(Id, HEADER) != 0)
     {
-        core.Trace("Particles: Incorrect file type");
+        rust::log::info("Particles: Incorrect file type");
         return;
     }
 

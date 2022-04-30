@@ -147,7 +147,7 @@ uint64_t SEA_AI::ProcessMessage(MESSAGE &message)
         auto *pAIShip = AIShip::FindShip(pCharacter);
         if (!pAIShip)
         {
-            core.Trace("SeaAI err: SetSailState, can't find ship for character = %s", pCharacter->GetAttribute("id"));
+            rust::log::warn("SeaAI err: SetSailState, can't find ship for character = %s", pCharacter->GetAttribute("id"));
             return 0;
         }
         core.Send_Message(pAIShip->GetShipEID(), "lf", MSG_SHIP_SET_SAIL_STATE, fSailState);

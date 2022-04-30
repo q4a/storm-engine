@@ -155,12 +155,14 @@ void BLADE::BLADE_INFO::DrawBlade(VDX9RENDER *rs, unsigned int blendValue, MODEL
             }
             else
             {
-                core.Trace("BLADE::Realize -> no find locator \"%s\", model \"%s\"", bladeEnd, bladeNode->GetName());
+                rust::log::info("BLADE::Realize -> no find locator \"%s\", model \"%s\"", 
+                                bladeEnd, bladeNode->GetName());
             }
         }
         else
         {
-            core.Trace("BLADE::Realize -> no find locator \"%s\", model \"%s\"", bladeStart, bladeNode->GetName());
+            rust::log::info("BLADE::Realize -> no find locator \"%s\", model \"%s\"", 
+                            bladeStart, bladeNode->GetName());
         }
     }
 }
@@ -419,7 +421,7 @@ void BLADE::GunFire()
                               rp.z, resm.Vz().x, resm.Vz().y, resm.Vz().z, 0);
         }
         else
-            core.Trace("MSG_BLADE_GUNFIRE Can't find gun_fire locator");
+            rust::log::info("MSG_BLADE_GUNFIRE Can't find gun_fire locator");
     }
 }
 
@@ -530,8 +532,8 @@ void BLADE::AddTieItem(MESSAGE &message)
     auto n = FindTieItemByIndex(nItemIdx);
     if (n >= 0)
     {
-        core.Trace("Warning! BLADE::AddTieItem(%d,%s,%s) already set that item", nItemIdx, mdlName.c_str(),
-                   locName.c_str());
+        rust::log::info("BLADE::AddTieItem(%d,%s,%s) already set that item", 
+                        nItemIdx, mdlName.c_str(), locName.c_str());
     }
     else
     {
@@ -545,8 +547,8 @@ void BLADE::AddTieItem(MESSAGE &message)
         }
         else
         {
-            core.Trace("Warning! BLADE::AddTieItem(%d,%s,%s) very mach items already set", nItemIdx, mdlName.c_str(),
-                       locName.c_str());
+            rust::log::warn("BLADE::AddTieItem(%d,%s,%s) very mach items already set",
+                            nItemIdx, mdlName.c_str(), locName.c_str());
         }
     }
 }

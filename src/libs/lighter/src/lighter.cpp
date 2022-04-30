@@ -212,7 +212,7 @@ void Lighter::MsgAddModel(MESSAGE &message)
     const std::string &name = message.String();
     if (name.empty())
     {
-        core.Trace("Location lighter: no model name, skip it!");
+        rust::log::info("Location lighter: no model name, skip it!");
         return;
     }
     const auto model = message.EntityID();

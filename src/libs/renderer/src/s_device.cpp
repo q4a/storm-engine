@@ -374,7 +374,8 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
-        core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
+        rust::log::error("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr),
+                         DXGetErrorDescriptionA(hr), expr);
         return true;
     }
 
@@ -563,7 +564,7 @@ bool DX9RENDER::Init()
         // get start ini file for fonts
         if (!ini->ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
         {
-            core.Trace("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
+            rust::log::info("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
             sprintf_s(str, "resource\\ini\\fonts.ini");
         }
         const auto len = strlen(str) + 1;
@@ -573,11 +574,11 @@ bool DX9RENDER::Init()
         // get start font quantity
         if (!ini->ReadString(nullptr, "font", str, sizeof(str) - 1, ""))
         {
-            core.Trace("Start font not defined");
+            rust::log::info("Start font not defined");
             sprintf_s(str, "normal");
         }
         if (LoadFont(str) == -1L)
-            core.Trace("can not init start font: %s", str);
+            rust::log::info("can not init start font: %s", str);
         idFontCurrent = 0L;
 
         // Progress image parameters
@@ -697,12 +698,12 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
     bWindow = windowed;
 
     hwnd = _hwnd;
-    core.Trace("Initializing DirectX 9");
+    rust::log::info("Initializing DirectX 9");
     d3d = Direct3DCreate9(D3D_SDK_VERSION);
     if (d3d == nullptr)
     {
         // MessageBox(hwnd, "Direct3DCreate9 error", "InitDevice::Direct3DCreate9", MB_OK);
-        core.Trace("Direct3DCreate9 error : InitDevice::Direct3DCreate9");
+        rust::log::error("Direct3DCreate9 error : InitDevice::Direct3DCreate9");
         return false;
     }
 
@@ -772,7 +773,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
     if (videoAdapterIndex > adapters_num - 1)
         videoAdapterIndex = 0U;
 
-    storm::Logger::default_logger->info("Querying available DirectX 9 adapters... detected %u:", adapters_num);
+    rust::log::info("Querying available DirectX 9 adapters... detected %u:", adapters_num);
     for (UINT i = 0; i != adapters_num; ++i)
     {
         D3DCAPS9 caps;
@@ -781,12 +782,10 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
         {
             D3DADAPTER_IDENTIFIER9 id;
             d3d->GetAdapterIdentifier(i, 0, &id);
-            storm::Logger::default_logger->info("%u: %s (%s) ", i, id.Description, id.DeviceName);
+            rust::log::info("%u: %s (%s) ", i, id.Description, id.DeviceName);
         }
     }
-    storm::Logger::default_logger->info(
-        "Using adapter with index %u (configurable by setting adapter=<index> inside engine.ini)",
-             videoAdapterIndex);
+    rust::log::info("Using adapter with index %u (configurable by setting adapter=<index> inside engine.ini)", videoAdapterIndex);
 
     // Create device
     if (CHECKD3DERR(d3d->CreateDevice(videoAdapterIndex, D3DDEVTYPE_HAL, hwnd, D3DCREATE_HARDWARE_VERTEXPROCESSING,
@@ -1322,7 +1321,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
 
     if (fname == nullptr)
     {
-        core.Trace("Can't create texture with null name");
+        rust::log::warn("Can't create texture with null name");
         return -1L;
     }
 
@@ -1476,7 +1475,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
         }
         if (bTrace)
         {
-            core.Trace("Can't load texture %s", fn);
+            rust::log::warn("Can't load texture %s", fn);
         }
         delete Textures[t].name;
         Textures[t].name = nullptr;
@@ -1488,7 +1487,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
     {
         if (bTrace)
         {
-            core.Trace("Can't load texture %s", fn);
+            rust::log::warn("Can't load texture %s", fn);
         }
         delete Textures[t].name;
         Textures[t].name = nullptr;
@@ -1509,7 +1508,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
     {
         if (bTrace)
         {
-            core.Trace("Invalidate texture format %s, not loading it.", fn);
+            rust::log::warn("Invalidate texture format %s, not loading it.", fn);
         }
         delete Textures[t].name;
         Textures[t].name = nullptr;
@@ -1550,7 +1549,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
         {
             if (bTrace)
             {
-                core.Trace(
+                rust::log::warn(
                     "Texture %s is not created (width: %i, height: %i, num mips: %i, format: %s), not loading it.", fn,
                     head.width, head.height, head.nmips, formatTxt);
             }
@@ -1586,7 +1585,8 @@ bool DX9RENDER::TextureLoad(int32_t t)
             {
                 if (bTrace)
                 {
-                    core.Trace("Can't loading mip %i, texture %s is not created (width: %i, height: %i, num mips: %i, "
+                    rust::log::warn(
+                        "Can't loading mip %i, texture %s is not created (width: %i, height: %i, num mips: %i, "
                                "format: %s), not loading it.",
                                m, fn, head.width, head.height, head.nmips, formatTxt);
                 }
@@ -1611,7 +1611,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
         {
             if (bTrace)
             {
-                core.Trace("Cube map texture can't has not squared sides %s, not loading it.", fn);
+                rust::log::warn("Cube map texture can't has not squared sides %s, not loading it.", fn);
             }
             delete Textures[t].name;
             Textures[t].name = nullptr;
@@ -1624,7 +1624,8 @@ bool DX9RENDER::TextureLoad(int32_t t)
         {
             if (bTrace)
             {
-                core.Trace("Cube map texture %s is not created (size: %i, num mips: %i, format: %s), not loading it.",
+                rust::log::warn(
+                    "Cube map texture %s is not created (size: %i, num mips: %i, format: %s), not loading it.",
                            fn, head.width, head.nmips, formatTxt);
             }
             delete Textures[t].name;
@@ -1644,7 +1645,8 @@ bool DX9RENDER::TextureLoad(int32_t t)
         {
             if (bTrace)
             {
-                core.Trace("Cube map texture %s is not created (size: %i, num mips: %i, format: %s), not loading it.",
+                rust::log::warn(
+                    "Cube map texture %s is not created (size: %i, num mips: %i, format: %s), not loading it.",
                            fn, head.width, head.nmips, formatTxt);
             }
             delete Textures[t].name;
@@ -1740,7 +1742,8 @@ bool DX9RENDER::TextureLoad(int32_t t)
         {
             if (bTrace)
             {
-                core.Trace("Cube map texture %s can't loading (size: %i, num mips: %i, format: %s), not loading it.",
+                rust::log::warn(
+                    "Cube map texture %s can't loading (size: %i, num mips: %i, format: %s), not loading it.",
                            fn, head.width, head.nmips, formatTxt);
             }
             delete Textures[t].name;
@@ -1839,7 +1842,7 @@ uint32_t DX9RENDER::LoadCubmapSide(std::fstream &fileS, IDirect3DCubeTexture9 *t
         {
             if (bTrace)
             {
-                core.Trace("Can't loading cubemap mip %i (side: %i), not loading it.", m, face);
+                rust::log::warn("Can't loading cubemap mip %i (side: %i), not loading it.", m, face);
             }
             return 0;
         }
@@ -2962,7 +2965,7 @@ int32_t DX9RENDER::LoadFont(const char *fontName)
         if (!FontList[i].font->Init(fontName, fontIniFileName, d3d9, this))
         {
             delete FontList[i].font;
-            core.Trace("Can't init font %s", fontName);
+            rust::log::warn("Can't init font %s", fontName);
             return -1L;
         }
         FontList[i].hash = hashVal;
@@ -2996,7 +2999,7 @@ bool DX9RENDER::UnloadFont(const char *fontName)
     for (int i = 0; i < nFontQuantity; i++)
         if (FontList[i].hash == hashVal && rust::string::iEquals(FontList[i].name, fontName))
             return UnloadFont(i);
-    core.Trace("Font name \"%s\" is not containing", fontName);
+    rust::log::info("Font name \"%s\" is not containing", fontName);
     return false;
 }
 
@@ -3052,7 +3055,7 @@ bool DX9RENDER::SetCurFont(const char *fontName)
             idFontCurrent = i;
             return true;
         }
-    core.Trace("Font name \"%s\" is not containing", fontName);
+    rust::log::info("Font name \"%s\" is not containing", fontName);
     return false;
 }
 
@@ -3251,7 +3254,7 @@ void DX9RENDER::MakeScreenShot()
     IDirect3DSurface9 *renderTarget;
     if (FAILED(GetRenderTarget(&renderTarget)))
     {
-        core.Trace("Failed to make screenshot");
+        rust::log::error("Failed to make screenshot");
         return;
     }
 
@@ -3259,7 +3262,7 @@ void DX9RENDER::MakeScreenShot()
     if (FAILED(CreateOffscreenPlainSurface(screen_size.x, screen_size.y, D3DFMT_X8R8G8B8, &surface)))
     {
         renderTarget->Release();
-        core.Trace("Failed to make screenshot");
+        rust::log::error("Failed to make screenshot");
         return;
     }
 
@@ -3267,7 +3270,7 @@ void DX9RENDER::MakeScreenShot()
     {
         surface->Release();
         renderTarget->Release();
-        core.Trace("Failed to make screenshot");
+        rust::log::warn("Failed to make screenshot");
         return;
     }
 
@@ -3945,7 +3948,7 @@ void DX9RENDER::PlayToTexture()
         }
         else
         {
-            core.Trace("ERROR: void DX9RENDER::PlayToTexture()");
+            rust::log::error("ERROR: void DX9RENDER::PlayToTexture()");
             delete cur->name;
             VideoTextureEntity *pcur = cur;
             cur = cur->next;
@@ -4110,7 +4113,7 @@ void DX9RENDER::StartProgressView()
         isInPViewProcess = false;
         if (t < 0)
         {
-            core.Trace("Progress error!");
+            rust::log::error("Progress error!");
             return;
         }
         progressTexture = t;
@@ -4470,7 +4473,7 @@ bool DX9RENDER::PopRenderTarget()
 {
     if (stRenderTarget.empty())
     {
-        core.Trace("DX9Error: Try to pop RenderTarget, but RenderTarget stack is empty");
+        rust::log::error("DX9Error: Try to pop RenderTarget, but RenderTarget stack is empty");
         return false;
     }
 

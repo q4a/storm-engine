@@ -33,7 +33,7 @@ bool AIShipCameraController::Init()
         Colors[RELATION_NEUTRAL] = pAColors->GetAttributeAsDword("neutral");
     }
     else
-        core.Trace("AIShipCameraController:: Attributes Crosshair.Colors not found!");
+        rust::log::info("AIShipCameraController:: Attributes Crosshair.Colors not found!");
     return true;
 }
 
