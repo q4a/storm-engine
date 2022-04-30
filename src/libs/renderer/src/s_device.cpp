@@ -2579,7 +2579,7 @@ void DX9RENDER::LostRender()
 #ifdef _WIN32 // FIX_LINUX __debugbreak
                 __debugbreak();
 #else
-                do { __asm__ volatile ("int $3"); } while(0);
+                throw std::runtime_error("LostRender(): VertexBuffers[b].buff->Release() > 0");
 #endif
         }
         if (IndexBuffers[b].buff)
@@ -2588,7 +2588,7 @@ void DX9RENDER::LostRender()
 #ifdef _WIN32 // FIX_LINUX __debugbreak
                 __debugbreak();
 #else
-                do { __asm__ volatile ("int $3"); } while(0);
+                throw std::runtime_error("LostRender(): IndexBuffers[b].buff->Release() > 0");
 #endif
         }
     }

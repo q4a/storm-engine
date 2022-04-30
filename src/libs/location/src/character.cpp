@@ -5079,7 +5079,7 @@ void Character::FindNearCharacters(MESSAGE &message)
     // Find the surrounding characters
     auto *const location = GetLocation();
     auto fndCharacter = location->supervisor.FindCharacters(this, rad, viewAng, planeDist, ax, isSort);
-    auto n = fndCharacter.size();
+    int32_t n = fndCharacter.size();
     if (fndCharacter.empty())
     {
         num->Set(0);

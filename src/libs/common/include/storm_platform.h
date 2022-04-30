@@ -1,4 +1,17 @@
 #pragma once
+
+#if defined(_M_IX86) || defined(__i386__) || defined(_X86_)
+#define ARCH_X86
+#elif defined(_M_X64) || defined(__amd64__) || defined(__x86_64__)
+#define ARCH_X64
+#elif defined(_M_ARM) || defined(__arm__)
+#define ARCH_ARM
+#elif defined (_M_ARM64) || defined(__aarch64__)
+#define ARCH_ARM64
+#else
+#error Unsupported architecture
+#endif
+
 #ifdef _WIN32
 
 #define PATH_SEP '\\'

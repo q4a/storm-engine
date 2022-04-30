@@ -108,8 +108,9 @@ inline void tolwr(char *str)
         x = li.QuadPart - x;                                                                                           \
     }
 #else
-#define RDTSC_B(x)    { x = __rdtsc(); }
-#define RDTSC_E(x)    { x = __rdtsc() - x; }
+#include <SDL2/SDL.h>
+#define RDTSC_B(x)    { x = SDL_GetPerformanceCounter(); }
+#define RDTSC_E(x)    { x = SDL_GetPerformanceCounter() - x; }
 #endif
 
 // Defines
