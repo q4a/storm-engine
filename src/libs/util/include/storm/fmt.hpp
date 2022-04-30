@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace fmt
+namespace storm::fmt
 {
 // https://stackoverflow.com/a/49812356
 static const std::string format(const char *const format, va_list vaArgs)
