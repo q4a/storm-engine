@@ -79,6 +79,8 @@ int ffi_find_ignore_case(const char *s, const char *pattern, size_t start);
 
 bool ffi_starts_with_ignore_case(const char *s, const char *pattern);
 
+bool ffi_ends_with_ignore_case(const char *s, const char *pattern);
+
 bool ffi_equal_ignore_case(const char *first, const char *second);
 
 bool ffi_win1251_equal_ignore_case(const char *first, const char *second);

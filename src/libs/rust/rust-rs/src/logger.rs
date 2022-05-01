@@ -193,6 +193,7 @@ impl TryFrom<GlobalConfig> for Config {
     }
 }
 
+/// Create default logger with an output to `Documents/My Games/Sea Dogs/Logs/system.log`
 fn init_default_logger(level: LevelFilter) -> Result<Mutex<(Handle, GlobalConfig)>, LoggerError> {
     let logger_config = LoggerConfig::file_config(DEFAULT_LOGGER, level)?;
 
@@ -209,6 +210,7 @@ fn init_default_logger(level: LevelFilter) -> Result<Mutex<(Handle, GlobalConfig
     Ok(Mutex::new((handle, global_config)))
 }
 
+/// Create new logger from `logger_config` configuration
 fn new_logger(name: &str, logger_config: LoggerConfig) -> Result<(), LoggerError> {
     match LOGGER_HANDLE.lock() {
         Ok(ref mut guard) => {
@@ -228,11 +230,13 @@ fn new_logger(name: &str, logger_config: LoggerConfig) -> Result<(), LoggerError
     }
 }
 
+/// Register new file logger with an output to `Documents/My Games/Sea Dogs/Logs/<name>.log`
 pub fn new_file_logger(name: &str, level: LevelFilter) -> Result<(), LoggerError> {
     let logger_config = LoggerConfig::file_config(name, level)?;
     new_logger(name, logger_config)
 }
 
+/// Register new console logger
 pub fn new_console_logger(name: &str, level: LevelFilter) -> Result<(), LoggerError> {
     let logger_config = LoggerConfig::console_config(name, level);
     new_logger(name, logger_config)

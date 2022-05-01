@@ -26,6 +26,13 @@ pub fn starts_with_ignore_case(s: &str, pattern: &str) -> bool {
     s_lowercase.starts_with(&pattern_lowercase)
 }
 
+/// Case-insensitive check that `s` ends with `pattern`
+pub fn ends_with_ignore_case(s: &str, pattern: &str) -> bool {
+    let s_lowercase = s.to_lowercase();
+    let pattern_lowercase = pattern.to_lowercase();
+    s_lowercase.ends_with(&pattern_lowercase)
+}
+
 /// Case-insensitive comparison of `s1` and `s2`
 pub fn compare_ignore_case(s1: &str, s2: &str) -> Ordering {
     let s1_lowercase = s1.to_lowercase();
@@ -78,8 +85,8 @@ mod export {
     use crate::common::{c_char_to_str, size_t, win1251_char_to_str};
 
     use super::{
-        equal_ignore_case, find_ignore_case, glob_ignore_case, less_ignore_case,
-        less_or_equal_ignore_case, starts_with_ignore_case,
+        ends_with_ignore_case, equal_ignore_case, find_ignore_case, glob_ignore_case,
+        less_ignore_case, less_or_equal_ignore_case, starts_with_ignore_case,
     };
 
     #[no_mangle]
@@ -104,6 +111,17 @@ mod export {
         let pattern = c_char_to_str(pattern);
 
         starts_with_ignore_case(s, pattern)
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_ends_with_ignore_case(
+        s: *const c_char,
+        pattern: *const c_char,
+    ) -> bool {
+        let s = c_char_to_str(s);
+        let pattern = c_char_to_str(pattern);
+
+        ends_with_ignore_case(s, pattern)
     }
 
     #[no_mangle]
@@ -178,7 +196,8 @@ mod tests {
     };
 
     use crate::string_compare::{
-        find_ignore_case, glob_ignore_case, less_ignore_case, starts_with_ignore_case,
+        ends_with_ignore_case, find_ignore_case, glob_ignore_case, less_ignore_case,
+        starts_with_ignore_case,
     };
 
     #[test]
@@ -233,6 +252,7 @@ mod tests {
     fn ignore_case_starts_with_test() {
         let datatest = vec![
             (r"ships\Fleut1\Fleut1", "mast", false),
+            ("", "mast", false),
             ("mast4", "mast", true),
             ("editsection:nation", "editsection:", true),
             (
@@ -244,6 +264,23 @@ mod tests {
 
         for (s, pat, expected) in datatest {
             let result = starts_with_ignore_case(s, pat);
+            assert_eq!(result, expected);
+        }
+    }
+
+    #[test]
+    fn ignore_case_ends_with_test() {
+        let datatest = vec![
+            (r"WEATHER\SUN\GLOW\SUN.TGA.TX", ".tx", true),
+            (r"WEATHER\SUN\GLOW\SUN.TGA.tx", ".tx", true),
+            (r"WEATHER\SUN\GLOW\SUN.TGA.tx", ".TX", true),
+            (r"WEATHER\SUN\GLOW\SUN.TGA.TX", ".TX", true),
+            ("", ".tx", false),
+            ("BLOT.TGA", ".tx", false),
+        ];
+
+        for (s, pat, expected) in datatest {
+            let result = ends_with_ignore_case(s, pat);
             assert_eq!(result, expected);
         }
     }
