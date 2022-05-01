@@ -17,6 +17,8 @@ enum class LogLevel {
   Trace,
 };
 
+struct IniData;
+
 struct ArrayWchar {
   wchar_t *ptr;
   size_t len;
@@ -50,6 +52,10 @@ ArrayWchar *ffi_save_directory();
 ArrayWchar *ffi_screenshot_directory();
 
 ArrayCchar *ffi_screenshot_filename();
+
+IniData *load_ini_data(const char *path);
+
+void free_ini_data(IniData *ptr);
 
 void ffi_new_file_logger(const char *name, LogLevel level);
 

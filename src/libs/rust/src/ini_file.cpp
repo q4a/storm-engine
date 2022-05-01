@@ -1,4 +1,4 @@
-#include "IniFile.hpp"
+#include "ini_file.hpp"
 
 namespace storm::ini
 {
@@ -11,10 +11,10 @@ IniFile::~IniFile()
     Unload();
 }
 
-bool IniFile::Load(const char *logger, std::string path)
+bool IniFile::Load(std::string path)
 {
     Unload();
-    iniData = load_ini_data(logger, path.data());
+    iniData = load_ini_data(path.data());
     if (iniData != nullptr)
     {
         this->path = path;
