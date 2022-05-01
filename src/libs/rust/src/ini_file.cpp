@@ -1,9 +1,11 @@
 #include "ini_file.hpp"
 
-namespace storm::ini
+namespace rust::ini
 {
 IniFile::IniFile()
 {
+    iniData = nullptr;
+    path.clear();
 }
 
 IniFile::~IniFile()

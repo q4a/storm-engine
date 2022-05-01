@@ -3,7 +3,7 @@
 #include "rust_rs.h"
 #include <string>
 
-namespace storm::ini
+namespace rust::ini
 {
 class IniFile
 {
