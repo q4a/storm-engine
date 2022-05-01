@@ -24,6 +24,15 @@ bool iStartsWith(const Range1T &first, const Range2T &second)
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
+bool iEndsWith(const Range1T &first, const Range2T &second)
+{
+    const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
+    const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
+
+    return ffi_ends_with_ignore_case(first_normalized.data(), second_normalized.data());
+}
+
+template <typename Range1T, typename Range2T = Range1T> 
 bool iEquals(const Range1T &first, const Range2T &second)
 {
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
