@@ -125,7 +125,7 @@ void CXI_SCROLLBAR::Draw(bool bSelected, uint32_t Delta_Time)
             pA = pA->GetAttributeClass(m_nodeName);
             if (pA)
             {
-                auto *const pcStr = pA->GetAttribute("str");
+                const char *pcStr = pA->GetAttribute("str");
                 if (pcStr)
                 {
                     m_rs->ExtPrint(m_nFontID, m_dwFontColor, 0, PR_ALIGN_CENTER, true, m_fFontScale, m_screenSize.x,
@@ -154,7 +154,7 @@ void CXI_SCROLLBAR::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
     m_nFontID = -1;
     if (ReadIniString(ini1, name1, ini2, name2, "fontID", param, sizeof(param), ""))
         if ((m_nFontID = m_rs->LoadFont(param)) == -1)
-            core.Trace("can not load font:'%s'", param);
+            rust::log::info("can not load font:'%s'", param);
     // get font color
     m_dwFontColor = GetIniARGB(ini1, name1, ini2, name2, "fontColor", 0xFFFFFFFF);
     // get font scale
@@ -370,7 +370,7 @@ void CXI_SCROLLBAR::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 

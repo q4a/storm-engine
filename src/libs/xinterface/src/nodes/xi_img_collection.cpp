@@ -1,4 +1,5 @@
 #include "xi_img_collection.h"
+#include "string_compare.hpp"
 
 CXI_IMGCOLLECTION::CXI_IMGCOLLECTION()
     : m_bRelativeRect(false)
@@ -108,7 +109,7 @@ void CXI_IMGCOLLECTION::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2,
     if (ini1->ReadString(name1, "picture", param, sizeof(param) - 1, ""))
         do
         {
-            if (!storm::iStartsWith(param, "editsection:"))
+            if (!rust::string::iStartsWith(param, "editsection:"))
                 imgQuantity++;
         } while (ini1->ReadStringNext(name1, "picture", param, sizeof(param) - 1));
 
@@ -136,7 +137,7 @@ void CXI_IMGCOLLECTION::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2,
             ini1->ReadString(name1, "picture", param, sizeof(param) - 1, "");
             for (auto i = 0; i < imgQuantity; i++)
             {
-                if (!storm::iStartsWith(param, "editsection:"))
+                if (!rust::string::iStartsWith(param, "editsection:"))
                 {
                     auto dwColor = ARGB(255, 128, 128, 128);
                     char param2[256];
@@ -174,7 +175,7 @@ void CXI_IMGCOLLECTION::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2,
                 }
                 else
                 {
-                    if (storm::iEquals(&param[12], "end"))
+                    if (rust::string::iEquals(&param[12], "end"))
                     {
                         n = m_aSections.size() - 1;
                         if (n >= 0)
@@ -332,7 +333,7 @@ void CXI_IMGCOLLECTION::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -405,7 +406,7 @@ uint32_t CXI_IMGCOLLECTION::MessageProc(int32_t msgcode, MESSAGE &message)
     {
         const std::string &param = message.String();
 
-        if (!sGroupName || !storm::iEquals(sGroupName, param))
+        if (!sGroupName || !rust::string::iEquals(sGroupName, param))
         {
             STORM_DELETE(sGroupName);
             PICTURE_TEXTURE_RELEASE(pPictureService, sGroupName, texl);

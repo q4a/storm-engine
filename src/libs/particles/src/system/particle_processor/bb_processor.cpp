@@ -10,6 +10,7 @@
 #include "../particle_system/particle_system.h"
 #include "defines.h"
 #include "physic.h"
+#include "string_compare.hpp"
 
 // How many billboards can there be
 #define MAX_BILLBOARDS 4096
@@ -179,7 +180,7 @@ void BillBoardProcessor::AddParticle(ParticleSystem *pSystem, const Vector &velo
     pData->KTrackZ = FRAND(1.0f);
 
     const auto *const pEmitterName = pFields->GetString(ATTACHEDEMITTER_NAME);
-    if (storm::iEquals(pEmitterName, "none"))
+    if (rust::string::iEquals(pEmitterName, "none"))
     {
         pData->AttachedEmitter = nullptr;
     }

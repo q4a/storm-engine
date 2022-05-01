@@ -1,5 +1,6 @@
 #include "s_dbg_breaktable.h"
 #include "file_service.h"
+#include "string_compare.hpp"
 
 #define SECTION_NAME "breakpoints"
 
@@ -131,7 +132,7 @@ void BREAKPOINTS_TABLE::AddBreakPoint(const char *filename, uint32_t line)
     {
         if (pTable[n].nLineNumber != line)
             continue;
-        if (!storm::iEquals(pTable[n].pFileName, filename))
+        if (!rust::string::iEquals(pTable[n].pFileName, filename))
             continue;
         return; // already in list
     }
@@ -163,7 +164,7 @@ void BREAKPOINTS_TABLE::DelBreakPoint(const char *filename, uint32_t line)
     {
         if (pTable[n].nLineNumber != line)
             continue;
-        if (!storm::iEquals(pTable[n].pFileName, filename))
+        if (!rust::string::iEquals(pTable[n].pFileName, filename))
             continue;
 
         delete[] pTable[n].pFileName;
@@ -188,7 +189,7 @@ bool BREAKPOINTS_TABLE::Find(const char *filename, uint32_t line)
     {
         if (pTable[n].nLineNumber != line)
             continue;
-        if (!storm::iEquals(pTable[n].pFileName, filename))
+        if (!rust::string::iEquals(pTable[n].pFileName, filename))
             continue;
 
         return true;

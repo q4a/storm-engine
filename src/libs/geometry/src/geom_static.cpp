@@ -13,7 +13,7 @@ Import library main file
 #include <cstring>
 #include <vector>
 
-#include "../../util/include/storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 namespace
 {
@@ -431,7 +431,7 @@ auto unbelievable_workaround(void *ptr)
 int32_t GEOM::FindName(const char *name) const
 {
     for (int32_t n = 0; n < rhead.names; n++)
-        if (storm::iEqualsWin1251(&globname[names[n]], name))
+        if (rust::string::iEqualsWin1251(&globname[names[n]], name))
             return unbelievable_workaround(&globname[names[n]]);
     return -1;
 }

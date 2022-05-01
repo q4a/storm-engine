@@ -83,7 +83,7 @@ void CXI_TITLE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -109,7 +109,7 @@ void CXI_TITLE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const c
     // get font number
     if (ReadIniString(ini1, name1, ini2, name2, "font", param, sizeof(param), ""))
         if ((m_fontID = m_rs->LoadFont(param)) == -1)
-            core.Trace("can not load font:'%s'", param);
+            rust::log::info("can not load font:'%s'", param);
 
     // get font scale
     m_fontScale = GetIniFloat(ini1, name1, ini2, name2, "fontScale", 1.f);

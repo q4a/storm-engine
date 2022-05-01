@@ -1,5 +1,5 @@
 #include "xi_v_img_scroll.h"
-
+#include "string_compare.hpp"
 #include "core.h"
 
 #define MAXIMAGEQUANTITY 100
@@ -401,7 +401,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
         sprintf_s(param1, sizeof(param1), "font%d", i + 1);
         if (ReadIniString(ini1, name1, ini2, name2, param1, param, sizeof(param), ""))
             if ((m_pStrParam[i].m_nFont = m_rs->LoadFont(param)) == -1)
-                core.Trace("can not load font:'%s'", param);
+                rust::log::info("can not load font:'%s'", param);
         sprintf_s(param1, sizeof(param1), "dwXOffset%d", i + 1);
         m_pStrParam[i].m_nStrX = GetIniLong(ini1, name1, ini2, name2, param1, 0);
         if (m_pStrParam[i].m_nStrX > 0)
@@ -413,14 +413,14 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
         sprintf_s(param1, sizeof(param1), "align%d", i + 1);
         if (ReadIniString(ini1, name1, ini2, name2, param1, param, sizeof(param), ""))
         {
-            if (storm::iEquals(param, "left"))
+            if (rust::string::iEquals(param, "left"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_LEFT;
-            else if (storm::iEquals(param, "right"))
+            else if (rust::string::iEquals(param, "right"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_RIGHT;
-            else if (storm::iEquals(param, "center"))
+            else if (rust::string::iEquals(param, "center"))
                 m_pStrParam[i].m_nAlign = PR_ALIGN_CENTER;
             else
-                core.Trace("Warning! unknown align: %s", param);
+                rust::log::warn("unknown align: %s", param);
         }
         sprintf_s(param1, sizeof(param1), "dwYOffset%d", i + 1);
         m_pStrParam[i].m_nStrY = GetIniLong(ini1, name1, ini2, name2, param1, 0);
@@ -435,7 +435,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     {
         // get special technique name and color
         m_dwSpecTechniqueARGB = pAttribute->GetAttributeAsDword("SpecTechniqueColor");
-        auto *const sTechnique = pAttribute->GetAttribute("SpecTechniqueName");
+        const char *sTechnique = pAttribute->GetAttribute("SpecTechniqueName");
         if (sTechnique != nullptr)
         {
             const auto len = strlen(sTechnique) + 1;
@@ -476,7 +476,7 @@ void CXI_VIMAGESCROLL::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
                 }
                 for (i = 0; i < m_nGroupQuantity; i++)
                 {
-                    auto *const stmp = pA->GetAttribute(i);
+                    const char *stmp = pA->GetAttribute(i);
                     if (stmp == nullptr)
                         continue;
                     const auto len = strlen(stmp) + 1;
@@ -1027,7 +1027,7 @@ void CXI_VIMAGESCROLL::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -1641,7 +1641,7 @@ int CXI_VIMAGESCROLL::FindTexGroupFromOld(char **pGroupList, const char *groupNa
         return -1;
     for (int i = 0; i < listSize; i++)
     {
-        if (pGroupList[i] != nullptr && storm::iEquals(pGroupList[i], groupName))
+        if (pGroupList[i] != nullptr && rust::string::iEquals(pGroupList[i], groupName))
             return i;
     }
     return -1;

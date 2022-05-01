@@ -276,7 +276,7 @@ void Player::Update(float dltTime)
                     }
                     else
                     {
-                        core.Trace("Incorrect character index! Dialog not activated...");
+                        rust::log::warn("Incorrect character index! Dialog not activated...");
                     }
                 }
             }

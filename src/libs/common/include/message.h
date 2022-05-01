@@ -5,7 +5,7 @@
 #include <variant>
 #include <cassert>
 
-#include "fmt.hpp"
+#include "storm/fmt.hpp"
 #include "c_vector.h"
 #include "entity.h"
 

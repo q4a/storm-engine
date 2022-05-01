@@ -193,7 +193,7 @@ bool FONT::Init(const char *font_name, const char *iniName, IDirect3DDevice9 *_d
     TextureID = RenderService->TextureCreate(textureName);
     if (TextureID < 0)
     {
-        core.Trace("Not Found Texture: %s", textureName);
+        rust::log::info("Not Found Texture: %s", textureName);
         return false;
     }
 

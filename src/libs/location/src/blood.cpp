@@ -269,7 +269,7 @@ void Blood::BuildBloodDataByCollision(const CVECTOR &cpos)
     }
     else
     {
-        core.Trace("Blood::BuildData() : can`t blood add - insufficient buffer space");
+        rust::log::info("Blood::BuildData() : can`t blood add - insufficient buffer space");
         return;
     }
     nUsedTQ += nClipTQ;

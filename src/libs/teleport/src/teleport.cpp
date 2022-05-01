@@ -5,6 +5,7 @@
 #include "defines.h"
 #include "pcs_controls.h"
 #include "v_file_service.h"
+#include "string_compare.hpp"
 
 CREATE_CLASS(TMPTELEPORT)
 
@@ -228,7 +229,7 @@ void TMPTELEPORT::SetShowData(ATTRIBUTES *pA)
 
     for (auto i = 0; i < m_nStrQuantity; i++)
     {
-        auto *const tmpStr = pA->GetAttribute(i);
+        const char *tmpStr = pA->GetAttribute(i);
         m_descrArray[i].name = nullptr;
         m_descrArray[i].num = i;
         if (tmpStr == nullptr)
@@ -286,8 +287,8 @@ bool FINDFILESINTODIRECTORY::Init()
 {
     if (AttributesPointer)
     {
-        auto *const dirName = AttributesPointer->GetAttribute("dir");
-        auto *const maskName = AttributesPointer->GetAttribute("mask");
+        const char *dirName = AttributesPointer->GetAttribute("dir");
+        const char *maskName = AttributesPointer->GetAttribute("mask");
         const char *curMask;
         if (maskName)
         {
@@ -309,7 +310,7 @@ bool FINDFILESINTODIRECTORY::Init()
         }
         return true;
     }
-    core.Trace("Attributes Pointer into class FINDFILESINTODIRECTORY = NULL");
+    rust::log::info("Attributes Pointer into class FINDFILESINTODIRECTORY = NULL");
     return false;
 }
 
@@ -317,21 +318,21 @@ bool FINDDIALOGNODES::Init()
 {
     if (AttributesPointer)
     {
-        auto *const fileName = AttributesPointer->GetAttribute("file");
+        const char *fileName = AttributesPointer->GetAttribute("file");
         auto *pA = AttributesPointer->CreateSubAClass(AttributesPointer, "nodelist");
         if (fileName && pA)
         {
             auto fileS = fio->_CreateFile(fileName, std::ios::binary | std::ios::in);
             if (!fileS.is_open())
             {
-                core.Trace("WARNING! Can`t dialog file %s", fileName);
+                rust::log::warn("Can`t dialog file %s", fileName);
                 return false;
             }
 
             const int32_t filesize = fio->_GetFileSize(fileName);
             if (filesize == 0)
             {
-                core.Trace("Empty dialog file %s", fileName);
+                rust::log::info("Empty dialog file %s", fileName);
                 fio->_CloseFile(fileS);
                 return false;
             }
@@ -339,14 +340,14 @@ bool FINDDIALOGNODES::Init()
             auto *const fileBuf = new char[filesize + 1];
             if (fileBuf == nullptr)
             {
-                core.Trace("Can`t create buffer for read dialog file %s", fileName);
+                rust::log::info("Can`t create buffer for read dialog file %s", fileName);
                 fio->_CloseFile(fileS);
                 return false;
             }
 
             if (!fio->_ReadFile(fileS, fileBuf, filesize))
             {
-                core.Trace("Can`t read dialog file: %s", fileName);
+                rust::log::info("Can`t read dialog file: %s", fileName);
                 fio->_CloseFile(fileS);
                 delete[] fileBuf;
                 return false;
@@ -361,7 +362,7 @@ bool FINDDIALOGNODES::Init()
             auto nodIdx = 0;
             while (GetStringLine(pStr, param, sizeof(param) - 1))
             {
-                if (strlen(param) < 5 || !storm::iStartsWith(param, "case"))
+                if (strlen(param) < 5 || !rust::string::iStartsWith(param, "case"))
                     continue;
                 char param2[512];
                 GetQuotedString(param, param2, sizeof(param2) - 1);
@@ -377,6 +378,6 @@ bool FINDDIALOGNODES::Init()
             return true;
         }
     }
-    core.Trace("Attributes Pointer into class FINDDIALOGNODES = NULL");
+    rust::log::info("Attributes Pointer into class FINDDIALOGNODES = NULL");
     return false;
 }

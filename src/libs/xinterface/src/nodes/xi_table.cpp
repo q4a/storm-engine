@@ -2,6 +2,7 @@
 #include "str_utils.h"
 #include "xi_scroller.h"
 #include "xi_util.h"
+#include "string_compare.hpp"
 #include <stdio.h>
 
 #define ALIGN_BOTTOM 16
@@ -230,21 +231,21 @@ void XI_TableCellDescribe::SetData(int32_t nColIndex, ATTRIBUTES *pAttr, bool bH
     pcTmpStr = pAttr->GetAttribute("align");
     if (pcTmpStr)
     {
-        if (storm::iEquals(pcTmpStr, "left"))
+        if (rust::string::iEquals(pcTmpStr, "left"))
             m_nAlignment = PR_ALIGN_LEFT;
-        if (storm::iEquals(pcTmpStr, "center"))
+        if (rust::string::iEquals(pcTmpStr, "center"))
             m_nAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(pcTmpStr, "right"))
+        if (rust::string::iEquals(pcTmpStr, "right"))
             m_nAlignment = PR_ALIGN_RIGHT;
     }
     pcTmpStr = pAttr->GetAttribute("valign");
     if (pcTmpStr)
     {
-        if (storm::iEquals(pcTmpStr, "top"))
+        if (rust::string::iEquals(pcTmpStr, "top"))
             m_nVAlignment = ALIGN_TOP;
-        if (storm::iEquals(pcTmpStr, "center"))
+        if (rust::string::iEquals(pcTmpStr, "center"))
             m_nVAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(pcTmpStr, "bottom"))
+        if (rust::string::iEquals(pcTmpStr, "bottom"))
             m_nVAlignment = ALIGN_BOTTOM;
     }
 
@@ -340,9 +341,9 @@ void XI_TableCellDescribe::LoadImageParam(ImgDescribe *pImg, ATTRIBUTES *pA) con
     if ((pcStr = pA->GetAttribute("valign")) != nullptr)
     {
         nImgAlign = ALIGN_TOP;
-        if (storm::iEquals(pcStr, "center"))
+        if (rust::string::iEquals(pcStr, "center"))
             nImgAlign = PR_ALIGN_CENTER;
-        else if (storm::iEquals(pcStr, "bottom"))
+        else if (rust::string::iEquals(pcStr, "bottom"))
             nImgAlign = ALIGN_BOTTOM;
         if (nImgAlign != ALIGN_TOP)
         {
@@ -681,7 +682,7 @@ void CXI_TABLE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -747,7 +748,7 @@ void CXI_TABLE::SetInternalName(std::string &sName)
     else
     {
         m_EditData.bAllEditable = false;
-        m_EditData.bColsEditable = (storm::iStartsWith(sName.c_str(), "col"));
+        m_EditData.bColsEditable = (rust::string::iStartsWith(sName.c_str(), "col"));
         m_EditData.nEditableIndex = atoi(&sName.c_str()[3]) - 1;
     }
 }
@@ -795,16 +796,16 @@ void CXI_TABLE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const c
     m_nFontCellVAlignment = ALIGN_TOP;
     if (ReadIniString(ini1, name1, ini2, name2, "fontcellalignment", param, sizeof(param), ""))
     {
-        if (storm::iEquals(param, "center"))
+        if (rust::string::iEquals(param, "center"))
             m_nFontCellAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(param, "right"))
+        if (rust::string::iEquals(param, "right"))
             m_nFontCellAlignment = PR_ALIGN_RIGHT;
     }
     if (ReadIniString(ini1, name1, ini2, name2, "fontcellvalignment", param, sizeof(param), ""))
     {
-        if (storm::iEquals(param, "center"))
+        if (rust::string::iEquals(param, "center"))
             m_nFontCellVAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(param, "bottom"))
+        if (rust::string::iEquals(param, "bottom"))
             m_nFontCellVAlignment = ALIGN_BOTTOM;
     }
 
@@ -817,16 +818,16 @@ void CXI_TABLE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const c
     m_nFontTitleVAlignment = ALIGN_TOP;
     if (ReadIniString(ini1, name1, ini2, name2, "fonttitlealignment", param, sizeof(param), ""))
     {
-        if (storm::iEquals(param, "center"))
+        if (rust::string::iEquals(param, "center"))
             m_nFontTitleAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(param, "right"))
+        if (rust::string::iEquals(param, "right"))
             m_nFontTitleAlignment = PR_ALIGN_RIGHT;
     }
     if (ReadIniString(ini1, name1, ini2, name2, "fonttitlevalignment", param, sizeof(param), ""))
     {
-        if (storm::iEquals(param, "center"))
+        if (rust::string::iEquals(param, "center"))
             m_nFontTitleVAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(param, "bottom"))
+        if (rust::string::iEquals(param, "bottom"))
             m_nFontTitleVAlignment = ALIGN_BOTTOM;
     }
 

@@ -4,6 +4,7 @@
 
 #include "image/img_render.h"
 #include "v_module_api.h"
+#include "string_compare.hpp"
 
 // extern data
 entid_t BIUtils::idBattleInterface;
@@ -66,7 +67,7 @@ int32_t BIUtils::GetTextureFromAttr(VDX9RENDER *rs, ATTRIBUTES *pA, const char *
 {
     if (!rs || !pA)
         return -1;
-    auto *const sname = pA->GetAttribute(sAttrName);
+    const char *sname = pA->GetAttribute(sAttrName);
     if (!sname || sname[0] == 0)
         return -1;
     return rs->TextureCreate(sname);
@@ -77,7 +78,7 @@ bool BIUtils::ReadRectFromAttr(ATTRIBUTES *pA, const char *name, FRECT &rOut, FR
     rOut = rDefault;
     if (pA && name)
     {
-        auto *const pcStr = pA->GetAttribute(name);
+        const char *pcStr = pA->GetAttribute(name);
         if (pcStr)
         {
             sscanf(pcStr, "%f,%f,%f,%f", &rOut.left, &rOut.top, &rOut.right, &rOut.bottom);
@@ -92,7 +93,7 @@ bool BIUtils::ReadRectFromAttr(ATTRIBUTES *pA, const char *name, RECT &rOut, REC
     rOut = rDefault;
     if (pA && name)
     {
-        auto *const pcStr = pA->GetAttribute(name);
+        const char *pcStr = pA->GetAttribute(name);
         if (pcStr)
         {
             sscanf(pcStr, "%d,%d,%d,%d", &rOut.left, &rOut.top, &rOut.right, &rOut.bottom);
@@ -108,7 +109,7 @@ bool BIUtils::ReadPosFromAttr(ATTRIBUTES *pA, const char *name, float &fX, float
     fY = fYDef;
     if (pA && name)
     {
-        auto *const pcStr = pA->GetAttribute(name);
+        const char *pcStr = pA->GetAttribute(name);
         if (pcStr)
         {
             sscanf(pcStr, "%f,%f", &fX, &fY);
@@ -141,11 +142,11 @@ int32_t BIUtils::GetAlignmentFromAttr(ATTRIBUTES *pA, const char *name, int32_t 
         const char *pcTmp = pA->GetAttribute(name);
         if (pcTmp)
         {
-            if (storm::iEquals(pcTmp, "left"))
+            if (rust::string::iEquals(pcTmp, "left"))
                 return PR_ALIGN_LEFT;
-            if (storm::iEquals(pcTmp, "center"))
+            if (rust::string::iEquals(pcTmp, "center"))
                 return PR_ALIGN_CENTER;
-            if (storm::iEquals(pcTmp, "right"))
+            if (rust::string::iEquals(pcTmp, "right"))
                 return PR_ALIGN_RIGHT;
         }
     }

@@ -19,7 +19,6 @@ STORM_SETUP(
     diagnostics
     util
     window
-    logger
 
     # external
     mimalloc

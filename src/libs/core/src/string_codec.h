@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defines.h"
+#include "string_compare.hpp"
 #define HASH_TABLE_SIZE 512 // must be power of 2
 
 struct HTSUBELEMENT
@@ -94,7 +95,7 @@ class STRING_CODEC : public VSTRING_CODEC
 
         for (n = 0; n < pE->nStringsNum; n++)
         {
-            if (pE->pElements[n].dwHashCode == nHash && storm::iEquals(pString, pE->pElements[n].pStr))
+            if (pE->pElements[n].dwHashCode == nHash && rust::string::iEquals(pString, pE->pElements[n].pStr))
             {
                 nStringCode = (nTableIndex << 16) | (n & 0xffff);
                 bNew = false;

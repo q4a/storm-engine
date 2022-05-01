@@ -8,6 +8,7 @@
 #include "core.h"
 #include "shared/bimanager/messages.h"
 #include "v_module_api.h"
+#include "string_compare.hpp"
 
 BI_InterfaceManager::BI_InterfaceManager()
 {
@@ -140,7 +141,7 @@ int32_t BI_InterfaceManager::MsgLoadSheet(MESSAGE &message)
     STORM_DELETE(m_pInterfaceSheet);
 
     const std::string &param = message.String();
-    if (storm::iEquals(param, "sea"))
+    if (rust::string::iEquals(param, "sea"))
     {
         // loading sea interface
         m_pInterfaceSheet = new BI_SeaGroup(this);
@@ -149,7 +150,7 @@ int32_t BI_InterfaceManager::MsgLoadSheet(MESSAGE &message)
             m_pInterfaceSheet->Init();
         }
     }
-    else if (storm::iEquals(param, "land"))
+    else if (rust::string::iEquals(param, "land"))
     {
         // loading the land interface
     }

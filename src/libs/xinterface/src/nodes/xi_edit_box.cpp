@@ -160,7 +160,7 @@ int CXI_EDITBOX::CommandExecute(int wActCode)
                 break;
             char param[256];
             param[0] = 0;
-            auto *const tmpstr = pA->GetAttribute("strdata");
+            const char *tmpstr = pA->GetAttribute("strdata");
             switch (m_alpha[m_bUpChrRegistrOffset + m_nCurAlphaNum])
             {
             case '*':
@@ -348,7 +348,7 @@ void CXI_EDITBOX::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -368,10 +368,10 @@ void CXI_EDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const
     // get font number
     if (ReadIniString(ini1, name1, ini2, name2, "chrFont", param, sizeof(param), ""))
         if ((m_nChrFontNum = m_rs->LoadFont(param)) == -1)
-            core.Trace("can`t load font:'%s'", param);
+            rust::log::info("can`t load font:'%s'", param);
     if (ReadIniString(ini1, name1, ini2, name2, "strFont", param, sizeof(param), ""))
         if ((m_nStrFontNum = m_rs->LoadFont(param)) == -1)
-            core.Trace("can`t load font:'%s'", param);
+            rust::log::info("can`t load font:'%s'", param);
 
     // Get font scale
     m_fChrScale = GetIniFloat(ini1, name1, ini2, name2, "chrScale", 1.f);
@@ -383,7 +383,7 @@ void CXI_EDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const
     // get texture
     if (ReadIniString(ini1, name1, ini2, name2, "chrTexture", param, sizeof(param), ""))
         if ((m_idBtnTex = m_rs->TextureCreate(param)) == -1)
-            core.Trace("can`t load texture:'%s'", param);
+            rust::log::info("can`t load texture:'%s'", param);
 
     // Get rectangle color
     m_dwEditBoxColor = GetIniARGB(ini1, name1, ini2, name2, "argbBoxColor", 0);
@@ -422,7 +422,7 @@ void CXI_EDITBOX::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const
 
         if (static_cast<size_t>(m_nAlphaQuantity) != strlen(&m_alpha[sizeof(m_alpha) / 2]))
         {
-            core.Trace("WARNING!!! parameters alphabet & alphabetUP is different");
+            rust::log::warn("parameters alphabet & alphabetUP is different");
         }
     }
 

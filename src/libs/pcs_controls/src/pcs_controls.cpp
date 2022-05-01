@@ -3,7 +3,7 @@
 #include "core.h"
 
 #include "v_file_service.h"
-
+#include "string_compare.hpp"
 #include <input.hpp>
 
 CREATE_SERVICE(PCS_CONTROLS)
@@ -127,7 +127,7 @@ int32_t PCS_CONTROLS::CreateControl(const char *control_name)
         return INVALID_CONTROL_CODE;
     for (n = 0; n < nControlsNum; n++)
     {
-        if (storm::iEquals(control_name, pUserControls[n].name))
+        if (rust::string::iEquals(control_name, pUserControls[n].name))
             return n;
     }
     n = nControlsNum;
@@ -227,7 +227,7 @@ bool PCS_CONTROLS::GetControlState(const char *control_name, CONTROL_STATE &_sta
         return false;
     for (n = 0; n < nControlsNum; n++)
     {
-        if (storm::iEquals(control_name, pUserControls[n].name))
+        if (rust::string::iEquals(control_name, pUserControls[n].name))
         {
             if (pUserControls[n].bLocked)
             {
@@ -522,7 +522,7 @@ bool PCS_CONTROLS::SetControlState(const char *control_name, CONTROL_STATE &_sta
         return false;
     for (n = 0; n < nControlsNum; n++)
     {
-        if (storm::iEquals(control_name, pUserControls[n].name))
+        if (rust::string::iEquals(control_name, pUserControls[n].name))
             return SetControlState(n, _state_struct);
     }
     return false;
@@ -556,7 +556,7 @@ void PCS_CONTROLS::LockControl(const char *control_name, bool mode)
     }
     for (n = 0; n < nControlsNum; n++)
     {
-        if (storm::iEquals(control_name, pUserControls[n].name))
+        if (rust::string::iEquals(control_name, pUserControls[n].name))
         {
             pUserControls[n].bLocked = mode;
             pUserControls[n].state = FORCE_DWORD;

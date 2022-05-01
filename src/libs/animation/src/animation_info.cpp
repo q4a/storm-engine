@@ -10,7 +10,7 @@
 
 #include "animation_info.h"
 
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 // ============================================================================================
 // Construction, destruction
@@ -62,7 +62,7 @@ ActionInfo *AnimationInfo::AddAction(const char *anctionName, int32_t startframe
 // Compare with current name
 bool AnimationInfo::operator==(const char *animationName)
 {
-    return storm::iEquals(animationName, name);
+    return rust::string::iEquals(animationName, name);
 }
 
 // Find action by name

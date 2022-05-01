@@ -8,7 +8,7 @@
 #include "data_string.h"
 #include "data_uv.h"
 #include "defines.h"
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 FieldList::FieldList()
 {
@@ -301,7 +301,7 @@ DataColor *FieldList::FindColor(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataColor *>(Fields[n].pPointer);
                 }
@@ -321,7 +321,7 @@ DataBool *FieldList::FindBool(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataBool *>(Fields[n].pPointer);
                 }
@@ -341,7 +341,7 @@ DataFloat *FieldList::FindFloat(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataFloat *>(Fields[n].pPointer);
                 }
@@ -362,7 +362,7 @@ DataGraph *FieldList::FindGraph(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataGraph *>(Fields[n].pPointer);
                 }
@@ -383,7 +383,7 @@ DataString *FieldList::FindString(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataString *>(Fields[n].pPointer);
                 }
@@ -404,7 +404,7 @@ DataPosition *FieldList::FindPosition(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataPosition *>(Fields[n].pPointer);
                 }
@@ -425,7 +425,7 @@ DataUV *FieldList::FindUV(const char *AttrName)
         {
             if (SearchHash == Fields[n].HashValue)
             {
-                if (storm::iEquals(Fields[n].Name, AttrName))
+                if (rust::string::iEquals(Fields[n].Name, AttrName))
                 {
                     return static_cast<DataUV *>(Fields[n].pPointer);
                 }
@@ -443,7 +443,7 @@ FieldList::FieldDesc *FieldList::FindField(const char *Name)
     {
         if (SearchHash == Fields[n].HashValue)
         {
-            if (storm::iEquals(Fields[n].Name, Name))
+            if (rust::string::iEquals(Fields[n].Name, Name))
             {
                 return &Fields[n];
             }

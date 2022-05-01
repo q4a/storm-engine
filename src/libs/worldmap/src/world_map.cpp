@@ -28,6 +28,7 @@
 #include "wdm_wind_ui.h"
 #include "defines.h"
 #include "entity.h"
+#include "string_compare.hpp"
 
 #ifdef GetObject
 #undef GetObject
@@ -225,8 +226,8 @@ bool WorldMap::Init()
         wdmObjects->stormBrnDistMax =
             AttributesPointer->GetAttributeAsFloat("stormBrnDistMax", wdmObjects->stormBrnDistMax);
         wdmObjects->stormZone = AttributesPointer->GetAttributeAsFloat("stormZone", wdmObjects->stormZone);
-        auto *const s = AttributesPointer->GetAttribute("debug");
-        wdmObjects->isDebug = s && (storm::iEquals(s, "true"));
+        const char *s = AttributesPointer->GetAttribute("debug");
+        wdmObjects->isDebug = s && (rust::string::iEquals(s, "true"));
         saveData = AttributesPointer->CreateSubAClass(AttributesPointer, "encounters");
         wdmObjects->resizeRatio = AttributesPointer->GetAttributeAsFloat("resizeRatio", wdmObjects->resizeRatio);
     }
@@ -317,41 +318,41 @@ bool WorldMap::Init()
                 saveData->DeleteAttributeClassX(a);
                 continue;
             }
-            if (storm::iEquals(type, "Merchant") && modelName && modelName[0])
+            if (rust::string::iEquals(type, "Merchant") && modelName && modelName[0])
             {
                 if (!CreateMerchantShip(modelName, nullptr, nullptr, 1.0f, -1.0f, a))
                 {
-                    core.Trace("WoldMap: not loaded merchant encounter.");
+                    rust::log::info("WoldMap: not loaded merchant encounter.");
                 }
                 continue;
             }
-            if (storm::iEquals(type, "Follow") && modelName && modelName[0])
+            if (rust::string::iEquals(type, "Follow") && modelName && modelName[0])
             {
                 if (!CreateFollowShip(modelName, 1.0f, -1.0f, a))
                 {
-                    core.Trace("WoldMap: not loaded follow encounter.");
+                    rust::log::info("WoldMap: not loaded follow encounter.");
                 }
                 continue;
             }
-            if (storm::iEquals(type, "Warring") && modelName && modelName[0])
+            if (rust::string::iEquals(type, "Warring") && modelName && modelName[0])
             {
-                auto *const attacked = a->GetAttribute("attacked");
+                const char *attacked = a->GetAttribute("attacked");
                 if (attacked)
                 {
                     auto *a1 = saveData->FindAClass(saveData, attacked);
                     if (a1)
                     {
-                        auto *const modelName1 = a1->GetAttribute("modelName");
+                        const char *modelName1 = a1->GetAttribute("modelName");
                         if (modelName1 && modelName1[0])
                         {
                             if (!CreateWarringShips(modelName, modelName1, -1.0f, a, a1))
                             {
-                                core.Trace("WoldMap: not loaded warring encounter.");
+                                rust::log::info("WoldMap: not loaded warring encounter.");
                             }
                         }
                         else
                         {
-                            core.Trace("WoldMap: not loaded warring encounter.");
+                            rust::log::info("WoldMap: not loaded warring encounter.");
                             saveData->DeleteAttributeClassX(a);
                             saveData->DeleteAttributeClassX(a1);
                         }
@@ -359,16 +360,16 @@ bool WorldMap::Init()
                 }
                 continue;
             }
-            if (storm::iEquals(type, "Attacked"))
+            if (rust::string::iEquals(type, "Attacked"))
             {
                 continue;
             }
-            if (storm::iEquals(type, "Storm"))
+            if (rust::string::iEquals(type, "Storm"))
             {
                 const auto isTornado = (a->GetAttributeAsDword("isTornado", 0) != 0);
                 if (!CreateStorm(isTornado, -1.0f, a))
                 {
-                    core.Trace("WoldMap: not loaded storm encounter.");
+                    rust::log::info("WoldMap: not loaded storm encounter.");
                 }
                 continue;
             }
@@ -474,7 +475,7 @@ void WorldMap::Realize(uint32_t delta_time)
 #endif
     }
     //
-    auto *tmp = aDate->GetAttribute("sec");
+    const char *tmp = aDate->GetAttribute("sec");
     if (tmp)
         strcpy_s(wdmObjects->attrSec, tmp);
     tmp = aDate->GetAttribute("min");
@@ -645,7 +646,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
     float x, z, ay;
     if (!apnt || !AttributesPointer)
         return 0;
-    if (storm::iEquals(apnt->GetThisName(), "deleteUpdate"))
+    if (rust::string::iEquals(apnt->GetThisName(), "deleteUpdate"))
     {
         for (int32_t i = 0; i < wdmObjects->ships.size(); i++)
         {
@@ -658,7 +659,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             wdmObjects->storms[i]->DeleteUpdate();
         }
     }
-    else if (storm::iEquals(apnt->GetThisName(), "playerShipUpdate"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "playerShipUpdate"))
     {
         if (wdmObjects->playerShip)
         {
@@ -669,7 +670,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             AttributesPointer->SetAttributeUseFloat("playerShipAY", ay);
         }
     }
-    else if (storm::iEquals(apnt->GetThisName(), "cur"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "cur"))
     {
         auto *pa = apnt->GetParent();
         if (pa == aStorm)
@@ -743,7 +744,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
             }
         }
     }
-    else if (storm::iEquals(apnt->GetThisName(), "updateinfo"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "updateinfo"))
     {
         auto *pa = apnt->GetParent();
         if (pa == aInfo)
@@ -755,7 +756,7 @@ uint32_t WorldMap::AttributeChanged(ATTRIBUTES *apnt)
     {
         for (auto *pa = apnt; pa; pa = pa->GetParent())
         {
-            if (storm::iEquals(pa->GetThisName(), "labels"))
+            if (rust::string::iEquals(pa->GetThisName(), "labels"))
             {
                 wdmObjects->islands->SetIslandsData(AttributesPointer, true);
                 return 0;
@@ -967,7 +968,7 @@ bool WorldMap::CreateMerchantShip(const char *modelName, const char *locNameStar
     // Looking for a place to sail
     if (!wdmObjects->islands)
     {
-        core.Trace("World map: Islands not found");
+        rust::log::info("World map: Islands not found");
     }
     CVECTOR gpos;
     if (!locNameEnd || !locNameEnd[0])
@@ -976,7 +977,7 @@ bool WorldMap::CreateMerchantShip(const char *modelName, const char *locNameStar
         {
             if (!wdmObjects->islands->GetRandomMerchantPoint(gpos))
             {
-                core.Trace("World map: Locators <Merchants:...> not found");
+                rust::log::info("World map: Locators <Merchants:...> not found");
             }
         }
     }
@@ -986,7 +987,7 @@ bool WorldMap::CreateMerchantShip(const char *modelName, const char *locNameStar
         {
             if (!wdmObjects->islands->GetQuestLocator(locNameEnd, gpos))
             {
-                core.Trace("World map: Quest locator <Quests:%s> for merchant not found", locNameEnd);
+                rust::log::info("World map: Quest locator <Quests:%s> for merchant not found", locNameEnd);
             }
         }
     }
@@ -1002,7 +1003,7 @@ bool WorldMap::CreateMerchantShip(const char *modelName, const char *locNameStar
             }
             else
             {
-                core.Trace("World map: Quest locator <Quests:%s> for merchant not found", locNameStart); // boal fix
+                rust::log::info("World map: Quest locator <Quests:%s> for merchant not found", locNameStart); // boal fix
             }
         }
     }
@@ -1043,7 +1044,7 @@ bool WorldMap::CreateMerchantShipXZ(const char *modelName, float x1, float z1, f
     // Looking for a place to sail
     if (!wdmObjects->islands)
     {
-        core.Trace("World map: Islands not found");
+        rust::log::info("World map: Islands not found");
     }
 
     static_cast<WdmMerchantShip *>(ship)->Goto(x2, z2, 2.0f); // where

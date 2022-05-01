@@ -255,7 +255,7 @@ void CXI_TWOPICTURE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::info("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 

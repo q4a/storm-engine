@@ -11,6 +11,7 @@
 #include "shared/sea_ai/script_defines.h"
 #include "ship_base.h"
 #include "v_file_service.h"
+#include "string_compare.hpp"
 
 #define WIND_SPEED_MAX 12.f
 
@@ -726,7 +727,7 @@ uint64_t SAIL::ProcessMessage(MESSAGE &message)
         }
         else
         {
-            core.Trace("WARNING! Can`t model class pointer for ShipModel");
+            rust::log::warn("Can`t model class pointer for ShipModel");
         }
         // Set all getting sails
         SetAllSails(groupQuantity - 1);
@@ -1163,7 +1164,7 @@ void SAIL::SetAllSails(int groupNum)
             else
             {
                 // throw std::runtime_error("SAIL: Null size");
-                core.Trace("SAIL: Can`t init sail");
+                rust::log::info("SAIL: Can`t init sail");
                 STORM_DELETE(slist[i]);
                 sailQuantity--;
                 if (sailQuantity > 0)
@@ -2269,7 +2270,7 @@ uint32_t SAIL::ScriptProcessing(const char *name, MESSAGE &message)
     if (name == nullptr)
         return 0;
 
-    if (storm::iEquals(name, "RandomSailsDmg"))
+    if (rust::string::iEquals(name, "RandomSailsDmg"))
     {
         const int32_t chrIdx = message.Long();
         const float fDmg = message.Float();
@@ -2278,7 +2279,7 @@ uint32_t SAIL::ScriptProcessing(const char *name, MESSAGE &message)
             DoRandomsSailsDmg(chrIdx, gn, fDmg);
     }
 
-    if (storm::iEquals(name, "SailRollSpeed"))
+    if (rust::string::iEquals(name, "SailRollSpeed"))
     {
         const int32_t chrIdx = message.Long();
         const float fSpeed = message.Float();
@@ -2287,7 +2288,7 @@ uint32_t SAIL::ScriptProcessing(const char *name, MESSAGE &message)
             gdata[gn].fRollingSpeed = fSpeed * ROLLINGSPEED;
     }
 
-    if (storm::iEquals(name, "GetSailStatus"))
+    if (rust::string::iEquals(name, "GetSailStatus"))
     {
         int32_t chrIdx = message.Long();
         int gn = FindGroupForCharacter(chrIdx);
@@ -2345,7 +2346,7 @@ void SAIL::DoRandomsSailsDmg(int chrIdx, int gn, float fDmg)
         slist[sn]->ss.hole[holeIdx] = bOldHole;
         if (pvd == nullptr)
         {
-            core.Trace("WARNING!!! Event evntRandomSailDmg not float return!");
+            rust::log::warn("Event evntRandomSailDmg not float return!");
             return;
         }
         float fDoDmg = pvd->GetFloat();

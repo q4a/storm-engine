@@ -362,7 +362,7 @@ uint64_t LocationCamera::ProcessMessage(MESSAGE &message)
         chr = message.EntityID();
         if (EntityManager::GetEntityPointer(chr) == nullptr)
         {
-            core.Trace("LocationCamera -> MSG_CAMERA_SETTARGET -> invalidate character id");
+            rust::log::info("LocationCamera -> MSG_CAMERA_SETTARGET -> invalidate character id");
             return 0;
         }
         return 1;

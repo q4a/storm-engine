@@ -2,12 +2,12 @@
 
 #include "compiler.h"
 #include "controls.h"
-#include "storm/fs.h"
 #include "steam_api.hpp"
+#include "fs.hpp"
+#include "string_compare.hpp"
+#include "logger.hpp"
 
 #include <fstream>
-
-#include "storm/string_compare.hpp"
 
 Core& core = core_internal;
 
@@ -19,27 +19,27 @@ ENGINE_VERSION getTargetEngineVersion(const std::string_view &version)
 {
     using namespace std::string_view_literals;
 
-    if (iEquals(version, "sd"sv))
+    if (rust::string::iEquals(version, "sd"sv))
     {
         return ENGINE_VERSION::SEA_DOGS;
     }
-    else if (iEquals(version, "potc"sv))
+    else if (rust::string::iEquals(version, "potc"sv))
     {
         return ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN;
     }
-    else if (iEquals(version, "ct"sv))
+    else if (rust::string::iEquals(version, "ct"sv))
     {
         return ENGINE_VERSION::CARIBBEAN_TALES;
     }
-    else if (iEquals(version, "coas"sv))
+    else if (rust::string::iEquals(version, "coas"sv))
     {
         return ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS;
     }
-    else if (iEquals(version, "teho"sv))
+    else if (rust::string::iEquals(version, "teho"sv))
     {
         return ENGINE_VERSION::TO_EACH_HIS_OWN;
     }
-    else if (iEquals(version, "latest"sv))
+    else if (rust::string::iEquals(version, "latest"sv))
     {
         return ENGINE_VERSION::LATEST;
     }
@@ -244,7 +244,7 @@ void CoreImpl::ProcessEngineIniFile()
 
     bEngineIniProcessed = true;
 
-    auto engine_ini = fio->OpenIniFile(fs::ENGINE_INI_FILE_NAME);
+    auto engine_ini = fio->OpenIniFile(rust::fs::ENGINE_INI_FILE_NAME);
     if (!engine_ini)
         throw std::runtime_error("no 'engine.ini' file");
 
@@ -310,7 +310,7 @@ bool CoreImpl::LoadClassesTable()
 
 void CoreImpl::CheckAutoExceptions(uint32_t = 0) const
 {
-    storm::Logger::default_logger->warn("exception thrown");
+    rust::log::warn("exception thrown");
 }
 
 void CoreImpl::Exit()
@@ -437,7 +437,7 @@ void *CoreImpl::MakeClass(const char *class_name)
 {
     const int32_t hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
-        if (c->GetHash() == hash && storm::iEquals(class_name, c->GetName()))
+        if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c->CreateClass();
 
     return nullptr;
@@ -456,7 +456,7 @@ VMA *CoreImpl::FindVMA(const char *class_name)
 {
     const int32_t hash = MakeHashValue(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
-        if (c->GetHash() == hash && storm::iEquals(class_name, c->GetName()))
+        if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c;
 
     return nullptr;
@@ -500,17 +500,6 @@ void *CoreImpl::GetService(const char *service_name)
     Services_List.Add(class_code, class_code, service_PTR);
 
     return service_PTR;
-}
-
-void CoreImpl::Trace(const char *format, ...)
-{
-    static char buffer_4k[4096];
-
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer_4k, sizeof(buffer_4k) - 4, format, args);
-    va_end(args);
-    storm::Logger::default_logger->info(buffer_4k);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -881,7 +870,7 @@ uint32_t CoreImpl::SetScriptFunction(IFUNCINFO *pFuncInfo)
 
 const char *CoreImpl::EngineIniFileName()
 {
-    return fs::ENGINE_INI_FILE_NAME;
+    return rust::fs::ENGINE_INI_FILE_NAME;
 }
 
 void *CoreImpl::GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex)
@@ -945,8 +934,7 @@ void CoreImpl::loadCompatibilitySettings(INIFILE &inifile)
     targetVersion_ = getTargetEngineVersion(target_engine_version);
     if (targetVersion_ == ENGINE_VERSION::UNKNOWN)
     {
-        storm::Logger::default_logger->warn("Unknown target version '{}' in engine compatibility settings",
-                                            target_engine_version);
+        rust::log::warn("Unknown target version '%s' in engine compatibility settings", target_engine_version);
         targetVersion_ = ENGINE_VERSION::LATEST;
     }
 }

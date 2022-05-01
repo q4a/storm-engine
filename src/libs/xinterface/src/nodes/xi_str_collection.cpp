@@ -1,4 +1,5 @@
 #include "xi_str_collection.h"
+#include "string_compare.hpp"
 #include <stdio.h>
 
 CXI_STRCOLLECTION::CXI_STRCOLLECTION()
@@ -207,7 +208,7 @@ void CXI_STRCOLLECTION::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -373,7 +374,7 @@ CXI_STRCOLLECTION::STRINGDESCR *CXI_STRCOLLECTION::CreateNewDinamicString(const 
     int i;
     for (i = 0; i < m_nStr; i++)
     {
-        if (m_pStrDescr[i].strID != nullptr && storm::iEquals(m_pStrDescr[i].strID, strID))
+        if (m_pStrDescr[i].strID != nullptr && rust::string::iEquals(m_pStrDescr[i].strID, strID))
             break;
     }
     if (i < m_nStr)

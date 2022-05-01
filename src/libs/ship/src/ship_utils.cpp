@@ -1,5 +1,6 @@
 #include "shared/mast_msg.h"
 #include "ship.h"
+#include "string_compare.hpp"
 
 #define MAST_IDENTIFY "mast"
 #define MAST_FIRST 1
@@ -41,7 +42,7 @@ BOOL SHIP::BuildContour(CVECTOR *vContour, int32_t &iNumVContour)
     }
     else
     {
-        core.Trace("SHIP: Up trace error, ship %s", GetAShip()->GetAttribute("Name"));
+        rust::log::info("SHIP: Up trace error, ship %s", static_cast<const char*>(GetAShip()->GetAttribute("Name")));
         bDefaultContour = true;
         Beep(1000, 200);
     }
@@ -55,7 +56,7 @@ BOOL SHIP::BuildContour(CVECTOR *vContour, int32_t &iNumVContour)
         vP2 = vSrc + fRes * (vDst - vSrc);
     else
     {
-        core.Trace("SHIP: Down trace error, ship %s", GetAShip()->GetAttribute("Name"));
+        rust::log::info("SHIP: Down trace error, ship %s", static_cast<const char*>(GetAShip()->GetAttribute("Name")));
         bDefaultContour = true;
         Beep(1000, 200);
     }
@@ -169,7 +170,7 @@ bool SHIP::BuildMasts()
         }
         const auto *const cNodeName = pNode->GetName();
 
-        if (storm::iStartsWith(cNodeName, MAST_IDENTIFY))
+        if (rust::string::iStartsWith(cNodeName, MAST_IDENTIFY))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 
@@ -245,7 +246,7 @@ bool SHIP::BuildHulls()
         if (!pNode)
             break;
         const auto *const cNodeName = pNode->GetName();
-        if (storm::iStartsWith(cNodeName, HULL_IDENTIFY))
+        if (rust::string::iStartsWith(cNodeName, HULL_IDENTIFY))
         {
             CVECTOR vBSize, vBCenter, vUp, vDown, vTemp;
 

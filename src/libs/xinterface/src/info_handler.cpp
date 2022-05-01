@@ -20,7 +20,7 @@ bool InfoHandler::Init()
     m_rs = static_cast<VDX9RENDER *>(core.GetService("dx9render"));
     if (!m_rs)
     {
-        core.Trace("No service: dx9render");
+        rust::log::warn("No service: dx9render");
         return false;
     }
     if (m_rs->IsInsideScene())
@@ -30,13 +30,13 @@ bool InfoHandler::Init()
 
     if(!DoPreOut())
     {
-        core.Trace("DoPreOut failed");
+        rust::log::info("DoPreOut failed");
         return false;
     }
 
     if (!m_rs->GetRenderTargetAsTexture(&tex))
     {
-        core.Trace("[InfoHandler] GetRenderTargetAsTexture failed");
+        rust::log::info("[InfoHandler] GetRenderTargetAsTexture failed");
         return false;
     }
 
@@ -138,8 +138,8 @@ bool InfoHandler::DoPreOut()
         nOutOffset = AttributesPointer->GetAttributeAsDword("offset", m_rs->CharHeight(0));
     }
 
-    auto *const picTexureFile = AttributesPointer->GetAttribute("picfilename");
-    auto *const picBackTexureFile = AttributesPointer->GetAttribute("picbackfilename");
+    const char *picTexureFile = AttributesPointer->GetAttribute("picfilename");
+    const char *picBackTexureFile = AttributesPointer->GetAttribute("picbackfilename");
     const uint32_t TMP_VERTEX_FORMAT = (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEXTUREFORMAT2);
     struct TMP_VERTEX
     {

@@ -2,6 +2,7 @@
 
 #include "defines.h"
 #include "s_debug.h"
+#include "string_compare.hpp"
 
 #include <windows.h>
 
@@ -214,7 +215,7 @@ void TM_LIST::SelectItem(const char *name)
     for (int32_t n = 0; n < items; n++)
     {
         GetItemText(n, 0, SearchName, sizeof(SearchName));
-        if (storm::iEquals(SearchName, name))
+        if (rust::string::iEquals(SearchName, name))
         {
             ListView_SetItemState(GetWindowHandle(), n, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
             return;

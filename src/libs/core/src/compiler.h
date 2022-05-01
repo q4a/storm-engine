@@ -356,9 +356,9 @@ private:
     ATTRIBUTES *rAP;
 
     // loggers
-    std::shared_ptr<storm::Logger> logTrace_;
-    std::shared_ptr<storm::Logger> logError_;
-    std::shared_ptr<storm::Logger> logStack_;
+    std::shared_ptr<rust::log::Logger> logTrace_;
+    std::shared_ptr<rust::log::Logger> logError_;
+    std::shared_ptr<rust::log::Logger> logStack_;
 
     // backtrace stack
     // NB: pointers are safe as long as we pop elements before they expire

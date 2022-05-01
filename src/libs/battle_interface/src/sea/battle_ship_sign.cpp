@@ -414,7 +414,7 @@ void BIShipIcon::ExecuteCommand(CommandType command)
         break;
 
     default:
-        core.Trace("Warning! Unknown executing command: %d", command);
+        rust::log::warn("Unknown executing command: %d", command);
     }
 }
 

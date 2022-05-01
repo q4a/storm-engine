@@ -11,7 +11,7 @@
 #include "wdm_objects.h"
 
 #include <chrono>
-
+#include "string_compare.hpp"
 #include "defines.h"
 #include "geometry.h"
 
@@ -150,7 +150,7 @@ GEOS *WdmObjects::CreateGeometry(const char *path)
     {
         if (models[i].hash == hash)
         {
-            if (storm::iEquals(models[i].path, path))
+            if (rust::string::iEquals(models[i].path, path))
             {
                 return models[i].geo;
             }

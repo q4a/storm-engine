@@ -25,8 +25,6 @@ class Core
     virtual void* GetAppHWND() = 0;
     // set time scale; affect on std entity functions DeltaTime parameter
     virtual void SetTimeScale(float _scale) = 0;
-    // write message to system log file
-    virtual void Trace(const char *Format, ...) = 0;
     // return service object pointer;
     virtual void *GetService(const char *service_name) = 0;
 

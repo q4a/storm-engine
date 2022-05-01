@@ -204,7 +204,7 @@ uint64_t ROPE::ProcessMessage(MESSAGE &message)
         auto *mdl = static_cast<MODEL *>(EntityManager::GetEntityPointer(tmp_modelEI));
         if (mdl == nullptr)
         {
-            core.Trace("WARNING!!! Missing INIT message to ROPE - bad ship model");
+            rust::log::warn("Missing INIT message to ROPE - bad ship model");
             return 0;
         }
 
@@ -568,7 +568,7 @@ void ROPE::AddLabel(GEOS::LABEL &lbl, NODE *nod, bool bDontSage)
         NODE *pTmpRootNod = nod;
         while (pTmpRootNod->parent)
             pTmpRootNod = pTmpRootNod->parent;
-        core.Trace("Warning! Found rope with number 0: (model = %s) (label = %s)", pTmpRootNod->GetName(), lbl.name);
+        rust::log::warn("Found rope with number 0: (model = %s) (label = %s)", pTmpRootNod->GetName(), lbl.name);
     }
     if (bDontSage)
         ropeNum += 1000;
@@ -651,7 +651,7 @@ void ROPE::AddLabel(GEOS::LABEL &lbl, NODE *nod, bool bDontSage)
 
         if (rd->len < .1f || rd->len > 200.f)
         {
-            core.Trace("Bad rope length = %f for rope num %d", rd->len, rd->ropeNum);
+            rust::log::info("Bad rope length = %f for rope num %d", rd->len, rd->ropeNum);
             delete rd;
             if (ropeQuantity == 1)
             {
@@ -912,7 +912,7 @@ void ROPE::FirstRun()
                 SetIndex();
             }
             else
-                core.Trace("Can`t create index or vertex buffer (index = %d, vertex = %d)", nIndx, nVert);
+                rust::log::info("Can`t create index or vertex buffer (index = %d, vertex = %d)", nIndx, nVert);
         }
         nIndx /= 3; // translate index quantity to triangle quantity
         bUse = true;
@@ -968,9 +968,9 @@ void ROPE::SetAdd(int firstNum)
             if (pMdl && pMdl->GetNode(0))
                 pcModlName = pMdl->GetNode(0)->GetName();
 
-            core.Trace("Bad rope data for rope: (model=%s) (rope num = %d) (begin group=%d, end group=%d)", pcModlName,
-                       rlist[rn]->ropeNum, rlist[rn]->bgnum, rlist[rn]->egnum);
-            core.Trace("Begin pointer = %d? end pointer = %d", rlist[rn]->bMatWorld, rlist[rn]->eMatWorld);
+            rust::log::info("Bad rope data for rope: (model=%s) (rope num = %d) (begin group=%d, end group=%d)", 
+                            pcModlName, rlist[rn]->ropeNum, rlist[rn]->bgnum, rlist[rn]->egnum);
+            rust::log::info("Begin pointer = %d? end pointer = %d", rlist[rn]->bMatWorld, rlist[rn]->eMatWorld);
             // throw std::runtime_error("Rope error: Not label");
             delete rlist[rn];
             ropeQuantity--;

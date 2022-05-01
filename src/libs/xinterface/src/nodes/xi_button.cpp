@@ -1,4 +1,5 @@
 #include "xi_button.h"
+#include "string_compare.hpp"
 
 CXI_BUTTON::CXI_BUTTON()
 {
@@ -152,7 +153,7 @@ void CXI_BUTTON::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, const 
     if (ReadIniString(ini1, name1, ini2, name2, "font", param, sizeof(param), ""))
     {
         if ((m_nFontNum = m_rs->LoadFont(param)) == -1)
-            core.Trace("can not load font:'%s'", param);
+            rust::log::info("can not load font:'%s'", param);
     }
 
     // get face color
@@ -279,7 +280,7 @@ void CXI_BUTTON::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -320,7 +321,7 @@ uint32_t CXI_BUTTON::MessageProc(int32_t msgcode, MESSAGE &message)
         if (len == 1)
             break;
 
-        if (m_sGroupName == nullptr || !storm::iEquals(m_sGroupName, param))
+        if (m_sGroupName == nullptr || !rust::string::iEquals(m_sGroupName, param))
         {
             PICTURE_TEXTURE_RELEASE(pPictureService, m_sGroupName, m_idTex);
             STORM_DELETE(m_sGroupName);

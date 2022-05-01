@@ -1393,13 +1393,14 @@ bool SHIP::Mount(ATTRIBUTES *_pAShip)
 
     EntityManager::AddToLayer(SHIP_CANNON_TRACE, GetId(), iShipPriorityExecute);
 
-    auto *const pName = GetAShip()->GetAttribute("Name");
+    const char *pName = GetAShip()->GetAttribute("Name");
     if (!pName)
     {
-        core.Trace("SHIP::Mount : Can't find attribute name in ShipsTypes %d, char: %d, %s, %s, %s",
+        rust::log::info(
+            "SHIP::Mount : Can't find attribute name in ShipsTypes %d, char: %d, %s, %s, %s",
                    GetAShip()->GetAttributeAsDword("index"), GetACharacter()->GetAttributeAsDword("index"),
-                   GetACharacter()->GetAttribute("name"), GetACharacter()->GetAttribute("lastname"),
-                   GetACharacter()->GetAttribute("id"));
+                   static_cast<const char*>(GetACharacter()->GetAttribute("name")), static_cast<const char*>(GetACharacter()->GetAttribute("lastname")),
+                   static_cast<const char*>(GetACharacter()->GetAttribute("id")));
         // GetACharacter()->Dump(GetACharacter(), 0);
         bMounted = false;
         return false;
@@ -1539,7 +1540,7 @@ bool SHIP::Mount(ATTRIBUTES *_pAShip)
         pShipsLights->ProcessStage(Stage::execute, 0);
     }
     else {
-        storm::Logger::default_logger->warn("Mounted ship with no active ShipsLights");
+        rust::log::info("Mounted ship with no active ShipsLights");
     }
 
     NODE *pFDay = pModel->FindNode("fonar_day");
@@ -1680,7 +1681,7 @@ void SHIP::ScanShipForFirePlaces()
     }
     if (aFirePlaces.size() == 0)
     {
-        core.Trace("Ship %s doesn't have fire places", cShipIniName);
+        rust::log::info("Ship %s doesn't have fire places", cShipIniName);
     }
 }
 
@@ -1769,7 +1770,7 @@ float SHIP::Cannon_Trace(int32_t iBallOwner, const CVECTOR &vSrc, const CVECTOR 
                     }
                     else
                     {
-                        storm::Logger::default_logger->warn("no answer from SHIP_HULL_DAMAGE evt");
+                        rust::log::info("no answer from SHIP_HULL_DAMAGE evt");
                     }
                 }
             }

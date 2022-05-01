@@ -13,6 +13,7 @@
 #include "core.h"
 #include "geometry.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 CREATE_CLASS(Sharks)
 
@@ -87,21 +88,21 @@ bool Sharks::Shark::Init(float vp_x, float vp_z, bool isLoadModel)
     auto *gs = static_cast<VGEOMETRY *>(core.GetService("geometry"));
     if (!gs)
     {
-        core.Trace("Can't create geometry service!");
+        rust::log::warn("Can't create geometry service!");
         return false;
     }
     gs->SetTexturePath("Animals\\");
     if (!core.Send_Message(model, "ls", MSG_MODEL_LOAD_GEO, "Animals\\shark"))
     {
         gs->SetTexturePath("");
-        core.Trace("Shark model 'shark' not loaded");
+        rust::log::info("Shark model 'shark' not loaded");
         EntityManager::EraseEntity(model);
         return false;
     }
     gs->SetTexturePath("");
     if (!core.Send_Message(model, "ls", MSG_MODEL_LOAD_ANI, "shark"))
     {
-        core.Trace("Shark animation 'shark' not loaded");
+        rust::log::info("Shark animation 'shark' not loaded");
         EntityManager::EraseEntity(model);
         return false;
     }
@@ -416,7 +417,7 @@ void Sharks::Shark::Event(Animation *animation, int32_t index, int32_t eventID, 
         animation->Player(0).SetAction(actSwim);
         aniTime = 3.0f + rand() * 3.0f / RAND_MAX;
     }
-    if (storm::iEquals(act, actSwim) || (rnd & 1))
+    if (rust::string::iEquals(act, actSwim) || (rnd & 1))
     {
         animation->Player(0).SetAction(actStand);
         aniTime = 3.0f + rand() * 3.0f / RAND_MAX;

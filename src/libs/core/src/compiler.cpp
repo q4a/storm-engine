@@ -8,6 +8,7 @@
 #include "s_debug.h"
 #include "script_cache.h"
 #include "storm_assert.h"
+#include "string_compare.hpp"
 
 #include <unordered_map>
 
@@ -69,9 +70,9 @@ COMPILER::COMPILER()
 
     // bScriptTrace = false;
 
-    logTrace_ = storm::Logger::file_logger("compile", LogLevel::Trace);
-    logError_ = storm::Logger::file_logger("error", LogLevel::Trace);
-    logStack_ = storm::Logger::file_logger("script_stack", LogLevel::Trace);
+    logTrace_ = rust::log::Logger::file_logger("compile", LogLevel::Trace);
+    logError_ = rust::log::Logger::file_logger("error", LogLevel::Trace);
+    logStack_ = rust::log::Logger::file_logger("script_stack", LogLevel::Trace);
 }
 
 COMPILER::~COMPILER()
@@ -589,7 +590,7 @@ void COMPILER::DelEventHandler(const char *event_name, const char *func_name)
             continue;
         if (pM->ProcessTime(0))
             continue; // skip events, possible executed on this frame
-        if (storm::iEquals(pM->pEventName, event_name))
+        if (rust::string::iEquals(pM->pEventName, event_name))
         {
             EventMsg.Del(n);
             n--;
@@ -664,7 +665,7 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
             {
                 if (!FuncTab.AddTime(ei.pFuncInfo[n].func_code, nTicks))
                 {
-                    core_internal.Trace("Invalid func_code = %u for AddTime", ei.pFuncInfo[n].func_code);
+                    rust::log::info("Invalid func_code = %u for AddTime", ei.pFuncInfo[n].func_code);
                 }
             }
         }
@@ -701,7 +702,7 @@ VDATA *COMPILER::ProcessEvent(const char *event_name)
     // VANO CHANGES - remove in release
     if (core_internal.Controls->GetDebugAsyncKeyState('5') < 0 && core_internal.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0)
     {
-        core_internal.Trace("evnt: %d, %s", dwRDTSC, event_name);
+        rust::log::trace("evnt: %d, %s", dwRDTSC, event_name);
     }
 
     return pVD;
@@ -1314,7 +1315,7 @@ bool COMPILER::Compile(SEGMENT_DESC &Segment, char *pInternalCode, uint32_t pInt
             auto name = std::string_view(Token.GetData());
             auto comparator = [name](const auto &library)
             {
-                return storm::iEquals(library.name, name);
+                return rust::string::iEquals(library.name, name);
             };
 
             if (std::ranges::find_if(LibriaryFuncs, comparator) != LibriaryFuncs.end())
@@ -2937,7 +2938,9 @@ bool COMPILER::CompileBlock(SEGMENT_DESC &Segment, bool &bFunctionBlock, uint32_
                         }
 
                         auto func_name = Token.GetData();
-                        auto cmp = [&func_name](const auto &func) { return storm::iEquals(func.info.name, func_name); };
+                        auto cmp = [&func_name](const auto &func) {
+                            return rust::string::iEquals(func.info.name, func_name);
+                        };
                         auto it = std::ranges::find_if(script_cache_.functions, cmp);
                         if (it != script_cache_.functions.end())
                         {
@@ -3626,7 +3629,7 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
         {
             if (!FuncTab.AddCall(func_code))
             {
-                core_internal.Trace("Invalid func_code = %u for AddCall", func_code);
+                rust::log::warn("Invalid func_code = %u for AddCall", func_code);
             }
         }
 
@@ -3637,7 +3640,7 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
 
         if (!FuncTab.AddTime(func_code, nTicks))
         {
-            core_internal.Trace("Invalid func_code = %u for AddTime", func_code);
+            rust::log::warn("Invalid func_code = %u for AddTime", func_code);
         }
     }
     else if (call_fi.segment_id == IMPORTED_SEGMENT_ID)
@@ -3655,7 +3658,7 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
         RDTSC_E(nTicks);
         if (!FuncTab.AddTime(func_code, nTicks))
         {
-            core_internal.Trace("Invalid func_code = %u for AddTime", func_code);
+            rust::log::warn("Invalid func_code = %u for AddTime", func_code);
         }
     }
     else
@@ -3666,7 +3669,7 @@ bool COMPILER::BC_CallFunction(uint32_t func_code, uint32_t &ip, DATA *&pVResult
         RDTSC_E(nTicks);
         if (!FuncTab.AddTime(func_code, nTicks))
         {
-            core_internal.Trace("Invalid func_code = %u for AddTime", func_code);
+            rust::log::warn("Invalid func_code = %u for AddTime", func_code);
         }
     }
     if (nDebugEnterMode == TMODE_MAKESTEP)
@@ -3761,7 +3764,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
     {
         if (!FuncTab.AddCall(function_code))
         {
-            core_internal.Trace("Invalid function_code = %u for AddCall", function_code);
+            rust::log::warn("Invalid function_code = %u for AddCall", function_code);
         }
     }
 
@@ -5387,7 +5390,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                     pV->Set("error");
                     break; /*return false;*/
                 }
-                pV->Set(rAP->GetThisAttr());
+                pV->Set(to_string(rAP->GetThisAttr()));
                 break;
             default:
                 SetError("invalid argument for STACK_PUSH");
@@ -6129,7 +6132,7 @@ char *COMPILER::ReadString()
     ReadData(pBuffer, n);
     if (!utf8::IsValidUtf8(pBuffer))
     {
-        storm::Logger::default_logger->warn("Deserializing invalid utf8 string: {}", pBuffer);
+        rust::log::warn("Deserializing invalid utf8 string: %s", pBuffer);
     }
     return pBuffer;
 }
@@ -6195,7 +6198,7 @@ bool COMPILER::ReadVariable(char *name, /* DWORD code,*/ bool bDim, uint32_t a_i
                 real_var->value->SetElementsNum(nElementsNum);
                 if (!VarTab.SetElementsNum(var_code, nElementsNum))
                 {
-                    core_internal.Trace("Unable to set elements num for %s", real_var->name.c_str());
+                    rust::log::warn("Unable to set elements num for %s", real_var->name.c_str());
                 }
             }
     }
@@ -7788,7 +7791,7 @@ void COMPILER::FormatDialog(char *file_name)
                 if (Token.GetData())
                 {
                     // node text --------------------------------------------
-                    if (storm::iEquals(Token.GetData(), "text"))
+                    if (rust::string::iEquals(Token.GetData(), "text"))
                     {
                         fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
 
@@ -7859,7 +7862,7 @@ void COMPILER::FormatDialog(char *file_name)
             if (Token.GetData())
             {
                 fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));
-                if (storm::iEquals(Token.GetData(), "link"))
+                if (rust::string::iEquals(Token.GetData(), "link"))
                 {
                     Token_type = Token.FormatGet();
                     fio->_WriteFile(fileS, Token.GetData(), strlen(Token.GetData()));

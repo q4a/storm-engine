@@ -4,6 +4,7 @@
 
 #include "model.h"
 #include "shared/battle_interface/msg_control.h"
+#include "string_compare.hpp"
 
 ISLAND_DESCRIBER::ISLAND_DESCRIBER() : m_lastFindIdx(0), m_nFindType(0)
 {
@@ -224,8 +225,8 @@ ISLAND_DESCRIBER::LOCATOR_DESCR *ISLAND_DESCRIBER::FindLocatorByName(char *name)
     {
         if (m_pLocators[i].pA == nullptr)
             continue;
-        auto *const curName = m_pLocators[i].pA->GetAttribute("name");
-        if (curName != nullptr && storm::iEquals(name, curName))
+        const char* curName = m_pLocators[i].pA->GetAttribute("name");
+        if (curName != nullptr && rust::string::iEquals(name, curName))
             return &m_pLocators[i];
     }
     return nullptr;

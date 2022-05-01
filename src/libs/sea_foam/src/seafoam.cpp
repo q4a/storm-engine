@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "core.h"
 #include "defines.h"
+#include "string_compare.hpp"
 
 CREATE_CLASS(SEAFOAM)
 
@@ -561,7 +562,7 @@ uint32_t SEAFOAM::AttributeChanged(ATTRIBUTES *pA)
 {
     const auto *const nm = pA->GetThisName();
 
-    if (storm::iEquals(nm, "storm"))
+    if (rust::string::iEquals(nm, "storm"))
     {
         if (!strcmp(pA->GetThisAttr(), "true"))
             isStorm = true;

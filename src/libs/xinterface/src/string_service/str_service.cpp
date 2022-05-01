@@ -5,7 +5,7 @@
 #include "../xinterface.h"
 #include "s_import_func.h"
 #include "v_s_stack.h"
-
+#include "string_compare.hpp"
 #include <filesystem>
 
 #define USER_BLOCK_BEGINER '{'
@@ -24,7 +24,7 @@ bool GetStringDescribe(char *inStr, char *strName, char *outStr)
         outStr[0] = 0;
     if (strName == nullptr || outStr == nullptr || inStr == nullptr)
     {
-        core.Trace("Waring: Invalid parameters %s for ini string parser", inStr);
+        rust::log::warn("Invalid parameters %s for ini string parser", inStr);
         return false;
     }
 
@@ -53,7 +53,7 @@ bool GetStringDescribe(char *inStr, char *strName, char *outStr)
 
     if (strLenght <= 0)
     {
-        core.Trace("Waring: Invalid name parameter for string: %s", inStr);
+        rust::log::warn("Invalid name parameter for string: %s", inStr);
         return false;
     }
     strName[strLenght] = 0;
@@ -187,19 +187,19 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
 
     if (sLanguage == nullptr)
     {
-        core.Trace("WARNING! Attempt set empty language");
+        rust::log::warn("Attempt set empty language");
         return;
     }
 
     // This language is already set
-    if (m_sLanguage != nullptr && storm::iEquals(sLanguage, m_sLanguage))
+    if (m_sLanguage != nullptr && rust::string::iEquals(sLanguage, m_sLanguage))
         return;
 
     // initialize ini file
     auto langIni = fio->OpenIniFile(sLanguageFile);
     if (!langIni)
     {
-        core.Trace("ini file %s not found!", sLanguageFile);
+        rust::log::info("ini file %s not found!", sLanguageFile);
         return;
     }
 
@@ -229,7 +229,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             memcpy(m_sLanguageDir, param, len);
         }
         else
-            core.Trace("WARNING! Not found directory record for language %s", sLanguage);
+            rust::log::warn("Not found directory record for language %s", sLanguage);
 
         // get the name of the ini file with common strings for this language
         if (langIni->ReadString("COMMON", "strings", param, sizeof(param) - 1, ""))
@@ -242,7 +242,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             memcpy(m_sIniFileName, param, len);
         }
         else
-            core.Trace("WARNING! Not found common strings file record");
+            rust::log::warn("Not found common strings file record");
 
         if (m_sLanguageDir != nullptr && m_sIniFileName != nullptr)
             break;
@@ -250,10 +250,9 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         // compare the current language with the default
         if (langIni->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
         {
-            if (storm::iEquals(m_sLanguage, param))
+            if (rust::string::iEquals(m_sLanguage, param))
                 break;
-            core.Trace("WARNING! Language %s not exist some ini parameters. Language set to default %s", m_sLanguage,
-                       param);
+            rust::log::warn("Language %s not exist some ini parameters. Language set to default %s", m_sLanguage, param);
             STORM_DELETE(m_sLanguage);
             const auto len = strlen(param) + 1;
             m_sLanguage = new char[len];
@@ -279,7 +278,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         }
         else
         {
-            core.Trace("Warning: Not found font record for language %s", m_sLanguage);
+            rust::log::warn("Not found font record for language %s", m_sLanguage);
             sprintf_s(fullIniPath, "resource\\ini\\fonts.ini");
         }
         RenderService->SetFontIniFileName(fullIniPath);
@@ -311,7 +310,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
     auto ini = fio->OpenIniFile(param);
     if (!ini)
     {
-        core.Trace("WARNING! ini file \"%s\" not found!", param);
+        rust::log::warn("ini file \"%s\" not found!", param);
         return;
     }
 
@@ -325,7 +324,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
 
     // check to right of ini files
     if (newSize != m_nStringQuantity && m_nStringQuantity != 0)
-        core.Trace("WARNING: language %s ini file has different size", sLanguage);
+        rust::log::warn("language %s ini file has different size", sLanguage);
     m_nStringQuantity = newSize;
 
     // create strings & string names arreys
@@ -396,7 +395,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
                 break;
         if (pUTmp == nullptr)
         {
-            core.Trace("Error: Can`t reinit user language file %s", pUSB->fileName);
+            rust::log::error("Can`t reinit user language file %s", pUSB->fileName);
             continue;
         }
 
@@ -404,8 +403,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         pUTmp->nref = pUSB->nref;
         if (pUTmp->nStringsQuantity != pUSB->nStringsQuantity)
         {
-            core.Trace("Warning: user strings file %s have different size for new language %s", pUTmp->fileName,
-                       m_sLanguage);
+            rust::log::warn("user strings file %s have different size for new language %s", pUTmp->fileName, m_sLanguage);
             int itmp1, itmp2;
             for (itmp1 = 0; itmp1 < pUTmp->nStringsQuantity; itmp1++)
             {
@@ -415,11 +413,11 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
                 {
                     if (pUSB->psStrName[itmp2] == nullptr)
                         continue;
-                    if (storm::iEquals(pUSB->psStrName[itmp2], pUTmp->psStrName[itmp1]))
+                    if (rust::string::iEquals(pUSB->psStrName[itmp2], pUTmp->psStrName[itmp1]))
                         break;
                 }
                 if (itmp2 >= pUSB->nStringsQuantity)
-                    core.Trace(">>> string <%s> not found into strings file", pUTmp->psStrName[itmp1]);
+                    rust::log::info(">>> string <%s> not found into strings file", pUTmp->psStrName[itmp1]);
             }
 
             for (itmp1 = 0; itmp1 < pUSB->nStringsQuantity; itmp1++)
@@ -430,11 +428,11 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
                 {
                     if (pUTmp->psStrName[itmp2] == nullptr)
                         continue;
-                    if (storm::iEquals(pUTmp->psStrName[itmp2], pUSB->psStrName[itmp1]))
+                    if (rust::string::iEquals(pUTmp->psStrName[itmp2], pUSB->psStrName[itmp1]))
                         break;
                 }
                 if (itmp2 >= pUTmp->nStringsQuantity)
-                    core.Trace(">>> string <%s> is new into strings file", pUSB->psStrName[itmp1]);
+                    rust::log::info(">>> string <%s> is new into strings file", pUSB->psStrName[itmp1]);
             }
         }
     }
@@ -465,7 +463,7 @@ char *STRSERVICE::GetString(const char *stringName, char *sBuffer, size_t buffer
 
     if (stringName != nullptr)
         for (int i = 0; i < m_nStringQuantity; i++)
-            if (storm::iEquals(m_psStrName[i], stringName))
+            if (rust::string::iEquals(m_psStrName[i], stringName))
             {
                 auto len = strlen(m_psString[i]) + 1;
                 if (sBuffer == nullptr)
@@ -499,7 +497,7 @@ void STRSERVICE::LoadIni()
     auto ini = fio->OpenIniFile(sLanguageFile);
     if (!ini)
     {
-        core.Trace("Error: Language ini file not found!");
+        rust::log::error("Language ini file not found!");
         return;
     }
 
@@ -507,13 +505,13 @@ void STRSERVICE::LoadIni()
     if (!ini->ReadString("COMMON", "GlobalFile", sGlobalUserFileName, sizeof(sGlobalUserFileName) - 1, ""))
     {
         sGlobalUserFileName[0] = 0;
-        core.Trace("WARNING! Language ini file have not global file name");
+        rust::log::warn("Language ini file have not global file name");
     }
 
     // Get default language name
     if (!ini->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
     {
-        core.Trace("WARNING! Language ini file have not default language.");
+        rust::log::warn("Language ini file have not default language.");
         strcpy_s(param, "English");
     }
 
@@ -534,7 +532,7 @@ int32_t STRSERVICE::GetStringNum(const char *stringName)
 
     if (stringName != nullptr)
         for (int32_t i = 0; i < m_nStringQuantity; i++)
-            if (storm::iEquals(m_psStrName[i], stringName))
+            if (rust::string::iEquals(m_psStrName[i], stringName))
                 return i;
     return -1L;
 
@@ -575,7 +573,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
     UsersStringBlock *itUSB;
     for (itUSB = m_pUsersBlocks; itUSB != nullptr; itUSB = itUSB->next)
     {
-        if (itUSB->fileName != nullptr && storm::iEquals(itUSB->fileName, fileName))
+        if (itUSB->fileName != nullptr && rust::string::iEquals(itUSB->fileName, fileName))
         {
             break;
         }
@@ -595,7 +593,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
     auto fileS = fio->_CreateFile(param, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        storm::Logger::default_logger->warn("WARNING! Strings file \"{}\" does not exist", fileName);
+        rust::log::warn("Strings file \"%s\" does not exist", fileName);
         return -1;
     }
 
@@ -603,7 +601,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
 
     if (filesize <= 0)
     {
-        storm::Logger::default_logger->warn("WARNING! Strings file \"{}\" has zero size", fileName);
+        rust::log::warn("Strings file \"%s\" has zero size", fileName);
         return -1;
     }
 
@@ -615,7 +613,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
 
     if (!fio->_ReadFile(fileS, fileBuf, filesize))
     {
-        core.Trace("Can`t read strings file: %s", fileName);
+        rust::log::info("Can`t read strings file: %s", fileName);
         fio->_CloseFile(fileS);
         STORM_DELETE(fileBuf);
         return -1;
@@ -645,7 +643,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
     }
     if (pUSB->nStringsQuantity == 0)
     {
-        core.Trace("WARNING! Strings file \"%s\" not contain strings", fileName);
+        rust::log::warn("Strings file \"%s\" not contain strings", fileName);
     }
     else
     {
@@ -739,7 +737,7 @@ char *STRSERVICE::TranslateFromUsers(int32_t id, const char *inStr)
         return nullptr;
 
     for (i = 0; i < pUSB->nStringsQuantity; i++)
-        if (pUSB->psStrName[i] != nullptr && storm::iEquals(pUSB->psStrName[i], inStr))
+        if (pUSB->psStrName[i] != nullptr && rust::string::iEquals(pUSB->psStrName[i], inStr))
             break;
     if (i < pUSB->nStringsQuantity)
         return pUSB->psString[i];
@@ -1480,15 +1478,15 @@ uint32_t _IsKeyPressed(VS_STACK *pS)
     bool bIsPressed = false;
     if (strKeyName)
     {
-        if (storm::iEquals(strKeyName, "shift"))
+        if (rust::string::iEquals(strKeyName, "shift"))
         {
             bIsPressed = (GetAsyncKeyState(VK_SHIFT) < 0);
         }
-        else if (storm::iEquals(strKeyName, "control"))
+        else if (rust::string::iEquals(strKeyName, "control"))
         {
             bIsPressed = (GetAsyncKeyState(VK_CONTROL) < 0);
         }
-        else if (storm::iEquals(strKeyName, "alt"))
+        else if (rust::string::iEquals(strKeyName, "alt"))
         {
             bIsPressed = (GetAsyncKeyState(VK_MENU) < 0);
         }

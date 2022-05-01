@@ -1,6 +1,6 @@
 #include "xdefines.h"
 #include <defines.h>
-
+#include "string_compare.hpp"
 #include "storm_assert.h"
 
 //////////////////////////////////////////////
@@ -23,7 +23,7 @@ int FindCommand(const char *comName)
 {
     int i;
     for (i = 0; i < COMMAND_QUANTITY; i++)
-        if (storm::iEquals(comName, pCommandsList[i].sName))
+        if (rust::string::iEquals(comName, pCommandsList[i].sName))
             break;
     if (i == COMMAND_QUANTITY)
         return -1;

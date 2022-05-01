@@ -2,6 +2,7 @@
 #include "ai_fort.h"
 #include "inlines.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 
 AIBalls *AIBalls::pAIBalls = nullptr;
@@ -110,12 +111,12 @@ void AIBalls::FireBallFromCamera()
 
 void AIBalls::AddBall(ATTRIBUTES *pABall)
 {
-    auto *const pBallName = pABall->GetAttribute("Type");
+    const char *pBallName = pABall->GetAttribute("Type");
     Assert(pBallName);
 
     uint32_t i;
     for (i = 0; i < aBallTypes.size(); i++)
-        if (storm::iEquals(aBallTypes[i].sName, pBallName))
+        if (rust::string::iEquals(aBallTypes[i].sName, pBallName))
             break;
     if (i == aBallTypes.size())
         return;
@@ -143,7 +144,7 @@ void AIBalls::AddBall(ATTRIBUTES *pABall)
     pBall->fDirZ = sinf(fDir);
     pBall->pParticle = nullptr;
 
-    pBall->sBallEvent = pABall->GetAttribute("Event");
+    pBall->sBallEvent = to_string(pABall->GetAttribute("Event"));
     
     if (aBallTypes[i].sParticleName.size())
     {
@@ -364,7 +365,7 @@ uint32_t AIBalls::AttributeChanged(ATTRIBUTES *pAttributeChanged)
         fBallFlySoundDistance = AttributesPointer->GetAttributeAsFloat("BallFlySoundDistance");
         fBallFlySoundStereoMultiplier = AttributesPointer->GetAttributeAsFloat("BallFlySoundStereoMultiplyer");
         fDeltaTimeMultiplier = AttributesPointer->GetAttributeAsFloat("SpeedMultiply");
-        sTextureName = AttributesPointer->GetAttribute("Texture");
+        sTextureName = to_string(AttributesPointer->GetAttribute("Texture"));
         dwSubTexX = AttributesPointer->GetAttributeAsDword("SubTexX");
         dwSubTexY = AttributesPointer->GetAttributeAsDword("SubTexY");
 
@@ -390,7 +391,7 @@ uint32_t AIBalls::AttributeChanged(ATTRIBUTES *pAttributeChanged)
             ballType.fWeight = pAP->GetAttributeAsFloat("Weight");
 
             if (pAP->GetAttribute("Particle"))
-                ballType.sParticleName = pAP->GetAttribute("Particle");
+                ballType.sParticleName = to_string(pAP->GetAttribute("Particle"));
 
             aBallTypes.push_back(ballType);
 
