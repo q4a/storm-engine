@@ -1,7 +1,7 @@
 #include "file_service.h"
 #include "core_impl.h"
 #include "storm_assert.h"
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 
 #include <SDL2/SDL.h>
 #include <exception>
@@ -79,7 +79,7 @@ bool FILE_SERVICE::_WriteFile(std::fstream &fileS, const void *s, std::streamsiz
     }
     catch (const std::fstream::failure &e)
     {
-        storm::Logger::default_logger->error("Failed to WriteFile: {}", e.what());
+        rust::log::error("Failed to WriteFile: %s", e.what());
         return false;
     }
 }
@@ -94,7 +94,7 @@ bool FILE_SERVICE::_ReadFile(std::fstream &fileS, void *s, std::streamsize count
     }
     catch (const std::fstream::failure &e)
     {
-        storm::Logger::default_logger->error("Failed to ReadFile: {}", e.what());
+        rust::log::error("Failed to ReadFile: %s", e.what());
         return false;
     }
 }
@@ -106,7 +106,7 @@ bool FILE_SERVICE::_FileOrDirectoryExists(const char *p)
     bool result = std::filesystem::exists(path, ec);
     if (ec)
     {
-        storm::Logger::default_logger->error("Failed to to check if {} exists: {}", p, ec.message());
+        rust::log::error("Failed to to check if %s exists: %s", p, ec.message());
         return false;
     }
 
@@ -148,7 +148,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
     auto it = std::filesystem::directory_iterator(srcPath, ec);
     if (ec)
     {
-        storm::Logger::default_logger->warn("Failed to open save folder: {}", ec.message());
+        rust::log::warn("Failed to open save folder: %s", ec.message());
         return result;
     }
 
@@ -160,7 +160,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
             continue;
         }
         curPath = dirEntry.path();
-        if (mask == nullptr || storm::wildicmp(mask, curPath.filename().u8string().c_str()))
+        if (mask == nullptr || rust::string::wildicmp(mask, curPath.filename().u8string().c_str()))
         {
             if (getPaths)
             {
@@ -248,7 +248,7 @@ std::unique_ptr<INIFILE> FILE_SERVICE::CreateIniFile(const char *file_name, bool
     fileS = _CreateFile(file_name, std::ios::binary | std::ios::out);
     if (!fileS.is_open())
     {
-        storm::Logger::default_logger->error("Can't create ini file: {}", file_name);
+        rust::log::error("Can't create ini file: %s", file_name);
         return nullptr;
     }
     _CloseFile(fileS);
@@ -261,7 +261,7 @@ std::unique_ptr<INIFILE> FILE_SERVICE::OpenIniFile(const char *file_name)
     {
         if (OpenFiles[n] == nullptr || OpenFiles[n]->GetFileName() == nullptr)
             continue;
-        if (storm::iEquals(OpenFiles[n]->GetFileName(), file_name))
+        if (rust::string::iEquals(OpenFiles[n]->GetFileName(), file_name))
         {
             OpenFiles[n]->IncReference();
 
@@ -345,7 +345,7 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
     auto fileS = fio->_CreateFile(file_name, std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        storm::Logger::default_logger->trace("Can't load file: {}", file_name);
+        rust::log::warn("Can't load file: %s", file_name);
         return false;
     }
     const auto dwLowSize = _GetFileSize(file_name);
@@ -377,7 +377,7 @@ INIFILE_T::~INIFILE_T()
         }
         catch (const std::exception &e)
         {
-            storm::Logger::default_logger->error(e.what());
+            rust::log::error(e.what());
         }
     }
 }

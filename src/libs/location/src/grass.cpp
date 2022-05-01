@@ -252,7 +252,7 @@ bool Grass::LoadData(const char *patchName)
     }
     catch (const std::exception &e)
     {
-        core.Trace("Grass: incorrect grs file %s (%s)", patchName, e.what());
+        rust::log::info("Grass: incorrect grs file %s (%s)", patchName, e.what());
         delete miniMap;
         miniMap = nullptr;
         delete block;

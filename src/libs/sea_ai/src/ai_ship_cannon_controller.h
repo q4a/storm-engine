@@ -1,5 +1,7 @@
 #pragma once
 
+#include "string_compare.hpp"
+
 #define INVALID_BORT_INDEX 0xFFFFFFFF
 
 class AIShip;
@@ -67,7 +69,7 @@ class AIShipCannonController
         int operator==(const char *pStr) const
         {
             Assert(pStr && pStr[0]);
-            return (storm::iEquals(sName, pStr));
+            return (rust::string::iEquals(sName, pStr));
         }
     };
 

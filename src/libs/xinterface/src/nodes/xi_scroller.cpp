@@ -187,7 +187,7 @@ void CXI_SCROLLER::MakeOwnedControl()
             break;
 
         default:
-            core.Trace("Warning! Control %s owned not legal type of control (%s).", m_nodeName, pNode->m_nodeName);
+            rust::log::warn("Control %s owned not legal type of control (%s).", m_nodeName, pNode->m_nodeName);
         }
     }
 }
@@ -242,7 +242,7 @@ float CXI_SCROLLER::GetOwnedStep()
         break;
 
     default:
-        core.Trace("Warning! Control %s owned not legal type of control (%s).", m_nodeName, pNode->m_nodeName);
+        rust::log::warn("Control %s owned not legal type of control (%s).", m_nodeName, pNode->m_nodeName);
     }
     return 0.f;
 }
@@ -280,7 +280,7 @@ void CXI_SCROLLER::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 

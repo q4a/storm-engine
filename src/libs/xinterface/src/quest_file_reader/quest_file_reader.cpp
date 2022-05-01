@@ -109,7 +109,7 @@ std::pair<std::string_view, std::string_view::const_iterator> ReadUserDataID(con
 
     if (textEnd == str.cend())
     {
-        storm::Logger::default_logger->error("Quest log file parse error: the end of pattern is not found");
+        rust::log::info("Quest log file parse error: the end of pattern is not found");
         return {"", patternStart};
     }
 
@@ -138,7 +138,7 @@ bool QuestFileReader::GetQuestTitle(const std::string_view &questId, const std::
     const auto n = FindQuestByID(questId);
     if (!n.has_value())
     {
-        storm::Logger::default_logger->warn("Can`t find title whith ID = %s", questId);
+        rust::log::info("Can`t find title whith ID = %s", questId);
         return false;
     }
 
@@ -265,7 +265,7 @@ void QuestFileReader::SetQuestTextFileName(const std::string_view &fileName)
     auto fileS = fio->_CreateFile(fileName.data(), std::ios::binary | std::ios::in);
     if (!fileS.is_open())
     {
-        core.Trace("WARNING! Can`t open quest log file %s", std::string(fileName).c_str());
+        rust::log::warn("Can`t open quest log file %s", std::string(fileName).c_str());
         return;
     }
 
@@ -273,7 +273,7 @@ void QuestFileReader::SetQuestTextFileName(const std::string_view &fileName)
     const uint32_t filesize = fio->_GetFileSize(fileName.data());
     if (filesize == 0)
     {
-        core.Trace("Empty quest log file %s", std::string(fileName).c_str());
+        rust::log::info("Empty quest log file %s", std::string(fileName).c_str());
         fio->_CloseFile(fileS);
         return;
     }
@@ -285,7 +285,7 @@ void QuestFileReader::SetQuestTextFileName(const std::string_view &fileName)
     // Read file content into buffer
     if (!fio->_ReadFile(fileS, buffer.data(), filesize))
     {
-        core.Trace("Can`t read quest log file: %s", std::string(fileName).c_str());
+        rust::log::info("Can`t read quest log file: %s", std::string(fileName).c_str());
     }
     fio->_CloseFile(fileS);
 
@@ -328,7 +328,7 @@ void QuestFileReader::AddQuestToList(const std::string_view &questID, const std:
     }
     else
     {
-        storm::Logger::default_logger->warn("Quest with id \"%s\" is already in list", questID);
+        rust::log::info("Quest with id \"%s\" is already in list", questID);
     }
 }
 
@@ -341,7 +341,7 @@ void QuestFileReader::AddTextToQuest(const std::string_view &questID, const std:
     auto q = FindQuestByID(questID);
     if (!q.has_value())
     {
-        storm::Logger::default_logger->warn("Quest with id \"%s\" is not found in list", questID);
+        rust::log::info("Quest with id \"%s\" is not found in list", questID);
         return;
     }
 

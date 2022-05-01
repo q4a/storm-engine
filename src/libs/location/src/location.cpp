@@ -16,7 +16,7 @@
 #include "character.h"
 #include "grass.h"
 #include "lights.h"
-
+#include "string_compare.hpp"
 #include "c_vector4.h"
 #include "defines.h"
 #include "shared/messages.h"
@@ -532,8 +532,8 @@ int32_t Location::LoadStaticModel(const char *modelName, const char *tech, int32
             for (int32_t me = 0; me < 16; me++)
                 if (isnan(mtxx.matrix[me]))
                 {
-                    core.Trace("Location: locator %s::%s in position have NaN value, reset it!", label.group_name,
-                               label.name);
+                    rust::log::info("Location: locator %s::%s in position have NaN value, reset it!", 
+                                    label.group_name, label.name);
                     mtxx.SetIdentity();
                     break;
                 }
@@ -561,7 +561,7 @@ bool Location::LoadCharacterPatch(const char *ptcName)
     // load the patch
     const auto result = ptc.Load(path);
     if (!result)
-        core.Trace("Can't loaded patch data file %s.ptc for npc.", ptcName);
+        rust::log::info("Can't loaded patch data file %s.ptc for npc.", ptcName);
     return result;
 }
 
@@ -595,18 +595,18 @@ bool Location::LoadGrass(const char *modelName, const char *texture)
     int32_t ll = strlen(nm);
     if (grs->LoadData(nm))
         return true;
-    core.Trace("Can't load grass data file: %s", nm);
+    rust::log::info("Can't load grass data file: %s", nm);
     EntityManager::EraseEntity(grass);
     return false;
 }
 
 bool Location::MessageEx(const char *name, MESSAGE &message)
 {
-    if (storm::iEquals(name, "DelAllLights"))
+    if (rust::string::iEquals(name, "DelAllLights"))
     {
         lights->DelAllLights();
     }
-    else if (storm::iEquals(name, "AddFlys"))
+    else if (rust::string::iEquals(name, "AddFlys"))
     {
         const auto effects = EntityManager::GetEntityId("LocationEffects");
         const auto x = message.Float();
@@ -615,13 +615,13 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
         core.Send_Message(effects, "sfff", "AddFly", x, y, z);
         return true;
     }
-    else if (storm::iEquals(name, "DelFlys"))
+    else if (rust::string::iEquals(name, "DelFlys"))
     {
         const auto effects = EntityManager::GetEntityId("LocationEffects");
         core.Send_Message(effects, "s", "DelFlys");
         return true;
     }
-    else if (storm::iEquals(name, "GetPatchMiddlePos"))
+    else if (rust::string::iEquals(name, "GetPatchMiddlePos"))
     {
         VDATA *vx = message.ScriptVariablePointer();
         if (!vx)
@@ -637,17 +637,17 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
         vz->Set(ptc.middle.z);
         return true;
     }
-    else if (storm::iEquals(name, "AddEagle"))
+    else if (rust::string::iEquals(name, "AddEagle"))
     {
         eagle = EntityManager::CreateEntity("LocEagle");
         return true;
     }
-    else if (storm::iEquals(name, "AddLizards"))
+    else if (rust::string::iEquals(name, "AddLizards"))
     {
         lizards = EntityManager::CreateEntity("Lizards");
         return true;
     }
-    else if (storm::iEquals(name, "AddRats"))
+    else if (rust::string::iEquals(name, "AddRats"))
     {
         rats = EntityManager::CreateEntity("LocRats");
         if (!core.Send_Message(rats, "l", message.Long()))
@@ -657,7 +657,7 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
         }
         return true;
     }
-    else if (storm::iEquals(name, "AddCrabs"))
+    else if (rust::string::iEquals(name, "AddCrabs"))
     {
         crabs = EntityManager::CreateEntity("LocCrabs");
         if (!core.Send_Message(crabs, "l", message.Long()))
@@ -668,7 +668,7 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
 
         return true;
     }
-    else if (storm::iEquals(name, "AddBlood"))
+    else if (rust::string::iEquals(name, "AddBlood"))
     {
         if (!EntityManager::GetEntityPointer(blood))
         {
@@ -683,12 +683,12 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
         core.Send_Message(blood, "lfff", 2, vPos.x, vPos.y, vPos.z);
         return true;
     }
-    else if (storm::iEquals(name, "TestLocatorsGroup"))
+    else if (rust::string::iEquals(name, "TestLocatorsGroup"))
     {
         TestLocatorsInPatch(message);
         return true;
     }
-    else if (storm::iEquals(name, "DeleteLocationModel"))
+    else if (rust::string::iEquals(name, "DeleteLocationModel"))
     {
         const std::string &modelname = message.String();
         const int32_t n = model.FindModel(modelname.c_str());
@@ -696,7 +696,7 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
             model.DeleteModel(n);
         return true;
     }
-    else if (storm::iEquals(name, "HideLocationModel"))
+    else if (rust::string::iEquals(name, "HideLocationModel"))
     {
         const std::string &modelname = message.String();
         const int32_t n = model.FindModel(modelname.c_str());
@@ -704,7 +704,7 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
             // core.LayerDel("realize", model.RealizerID(n));
             core.Send_Message(model.RealizerID(n), "ll", 2, 0);
     }
-    else if (storm::iEquals(name, "ShowLocationModel"))
+    else if (rust::string::iEquals(name, "ShowLocationModel"))
     {
         const std::string &modelname = message.String();
         int32_t layer = message.Long();
@@ -713,7 +713,7 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
             // EntityManager::AddToLayer(realize, model.RealizerID(n), layer);
             core.Send_Message(model.RealizerID(n), "ll", 2, 1);
     }
-    else if (storm::iEquals(name, "SetGrassParams"))
+    else if (rust::string::iEquals(name, "SetGrassParams"))
     {
         const float fScale = message.Float();
         const float fMaxWidth = message.Float();
@@ -724,11 +724,11 @@ bool Location::MessageEx(const char *name, MESSAGE &message)
         core.Send_Message(grass, "lffffff", MSG_GRASS_SET_PARAM, fScale, fMaxWidth, fMaxHeight, fMinVisibleDist,
                           fMaxVisibleDist, fMinGrassLod);
     }
-    else if (storm::iEquals(name, "LoadCaustic"))
+    else if (rust::string::iEquals(name, "LoadCaustic"))
     {
         LoadCaustic();
     }
-    else if (storm::iEquals(name, "EnableCaustic"))
+    else if (rust::string::iEquals(name, "EnableCaustic"))
     {
         bCausticEnable = message.Long() != 0;
     }
@@ -781,8 +781,8 @@ void Location::UpdateLocators()
                         }
                         else
                         {
-                            core.Trace("Location: Can't create attribute 'locators.%s.%s.vz'!", groupName,
-                                       locators[i]->Name(j));
+                            rust::log::warn("Location: Can't create attribute 'locators.%s.%s.vz'!", 
+                                            groupName, locators[i]->Name(j));
                         }
                         // vy
                         a->CreateSubAClass(a, "vy");
@@ -795,8 +795,8 @@ void Location::UpdateLocators()
                         }
                         else
                         {
-                            core.Trace("Location: Can't create attribute 'locators.%s.%s.vy'!", groupName,
-                                       locators[i]->Name(j));
+                            rust::log::warn("Location: Can't create attribute 'locators.%s.%s.vy'!",
+                                            groupName, locators[i]->Name(j));
                         }
                         // vx
                         a->CreateSubAClass(a, "vx");
@@ -809,26 +809,26 @@ void Location::UpdateLocators()
                         }
                         else
                         {
-                            core.Trace("Location: Can't create attribute 'locators.%s.%s.vx'!", groupName,
-                                       locators[i]->Name(j));
+                            rust::log::warn("Location: Can't create attribute 'locators.%s.%s.vx'!",
+                                            groupName, locators[i]->Name(j));
                         }
                     }
                     else
                     {
-                        core.Trace("Location: Can't create attribute 'locators.%s.%s'!", groupName,
-                                   locators[i]->Name(j));
+                        rust::log::warn("Location: Can't create attribute 'locators.%s.%s'!", 
+                                        groupName, locators[i]->Name(j));
                     }
                 }
             }
             else
             {
-                core.Trace("Location: Can't create attribute 'locators.%s'!", groupName);
+                rust::log::warn("Location: Can't create attribute 'locators.%s'!", groupName);
             }
         }
     }
     else
     {
-        core.Trace("Location: Can't create attribute 'locators'!");
+        rust::log::warn("Location: Can't create attribute 'locators'!");
     }
 }
 

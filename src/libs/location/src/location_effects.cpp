@@ -105,14 +105,14 @@ uint64_t LocationEffects::ProcessMessage(MESSAGE &message)
 {
     const std::string &buf = message.String();
     CVECTOR pos, dir;
-    if (storm::iEquals(buf, "Splashes"))
+    if (rust::string::iEquals(buf, "Splashes"))
     {
         pos.x = message.Float();
         pos.y = message.Float();
         pos.z = message.Float();
         CreateSplash(pos, message.Float());
     }
-    else if (storm::iEquals(buf, "SGFireParticles"))
+    else if (rust::string::iEquals(buf, "SGFireParticles"))
     {
         pos.x = message.Float();
         pos.y = message.Float();
@@ -122,7 +122,7 @@ uint64_t LocationEffects::ProcessMessage(MESSAGE &message)
         dir.z = message.Float();
         SGFirePrt(pos, dir);
     }
-    else if (storm::iEquals(buf, "SGBloodParticles"))
+    else if (rust::string::iEquals(buf, "SGBloodParticles"))
     {
         pos.x = message.Float();
         pos.y = message.Float();
@@ -132,7 +132,7 @@ uint64_t LocationEffects::ProcessMessage(MESSAGE &message)
         dir.z = message.Float();
         SGBldPrt(pos, dir);
     }
-    else if (storm::iEquals(buf, "SGEnvParticles"))
+    else if (rust::string::iEquals(buf, "SGEnvParticles"))
     {
         pos.x = message.Float();
         pos.y = message.Float();
@@ -142,22 +142,22 @@ uint64_t LocationEffects::ProcessMessage(MESSAGE &message)
         dir.z = message.Float();
         SGEnvPrt(pos, dir);
     }
-    else if (storm::iEquals(buf, "SGInited"))
+    else if (rust::string::iEquals(buf, "SGInited"))
     {
         SGInited();
     }
-    else if (storm::iEquals(buf, "SGRelease"))
+    else if (rust::string::iEquals(buf, "SGRelease"))
     {
         SGRelease();
     }
-    else if (storm::iEquals(buf, "AddFly"))
+    else if (rust::string::iEquals(buf, "AddFly"))
     {
         pos.x = message.Float();
         pos.y = message.Float();
         pos.z = message.Float();
         AddLampFlys(pos);
     }
-    else if (storm::iEquals(buf, "DelFlys"))
+    else if (rust::string::iEquals(buf, "DelFlys"))
     {
         numFlys = 0;
         numFly = 0;

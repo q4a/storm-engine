@@ -3,6 +3,7 @@
 #include "core.h"
 #include "message.h"
 #include "shared/battle_interface/msg_control.h"
+#include "string_compare.hpp"
 
 BATTLE_LAND_INTERFACE::BATTLE_LAND_INTERFACE() : m_bShowCommandos(false)
 {
@@ -104,7 +105,7 @@ uint64_t BATTLE_LAND_INTERFACE::ProcessMessage(MESSAGE &message)
 
     case MSG_BATTLE_LAND_MAKE_COMMAND: {
         const std::string &param = message.String();
-        if (storm::iEquals(param, "cancel"))
+        if (rust::string::iEquals(param, "cancel"))
         {
             if (m_pManSign)
                 m_pManSign->ExecuteCommand(BI_MSG_COMMAND_DEACTIVATE);

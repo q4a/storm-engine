@@ -154,7 +154,7 @@ uint64_t FLAG::ProcessMessage(MESSAGE &message)
         MODEL *host_mdl = static_cast<MODEL *>(EntityManager::GetEntityPointer(eidModel));
         if (host_mdl == nullptr)
         {
-            core.Trace("Missing INIT message to FLAG: bad MODEL");
+            rust::log::info("Missing INIT message to FLAG: bad MODEL");
             return 0;
         }
 
@@ -221,7 +221,7 @@ uint64_t FLAG::ProcessMessage(MESSAGE &message)
         host_mdl = (MODEL *)EntityManager::GetEntityPointer(eidModel);
         if (host_mdl == nullptr)
         {
-            core.Trace("Missing INIT message to FLAG: bad MODEL");
+            rust::log::info("Missing INIT message to FLAG: bad MODEL");
         }
 
         if (groupQuantity == 0)

@@ -403,7 +403,7 @@ uint64_t MODELR::ProcessMessage(MESSAGE &message)
         }
         else
         {
-            storm::Logger::default_logger->trace("MODELR: Cannot substitute geometry node {}", geometry_node);
+            rust::log::info("MODELR: Cannot substitute geometry node {}", geometry_node);
         }
         break;
     }

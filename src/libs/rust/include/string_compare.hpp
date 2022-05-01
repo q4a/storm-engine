@@ -1,10 +1,9 @@
 #pragma once
 
 #include <algorithm>
+#include "rust_rs.h"
 
-#include "../util_rs.h"
-
-namespace storm
+namespace rust::string
 {
 template <typename Range1T, typename Range2T = Range1T>
 int32_t iFind(const Range1T &first, const Range2T &second, const size_t start)
@@ -12,7 +11,7 @@ int32_t iFind(const Range1T &first, const Range2T &second, const size_t start)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return ignore_case_find(first_normalized.data(), second_normalized.data(), start);
+    return ffi_find_ignore_case(first_normalized.data(), second_normalized.data(), start);
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -21,7 +20,7 @@ bool iStartsWith(const Range1T &first, const Range2T &second)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return ignore_case_starts_with(first_normalized.data(), second_normalized.data());
+    return ffi_starts_with_ignore_case(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -30,7 +29,7 @@ bool iEquals(const Range1T &first, const Range2T &second)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return ignore_case_equal(first_normalized.data(), second_normalized.data());
+    return ffi_equal_ignore_case(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -39,7 +38,7 @@ bool Equals(const Range1T &first, const Range2T &second)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return equal(first_normalized.data(), second_normalized.data());
+    return ffi_equal(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -48,7 +47,7 @@ bool iEqualsWin1251(const Range1T &first, const Range2T &second)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range1T>::value ? std::string_view(second) : second;
 
-    return ignore_case_equal_win1251(first_normalized.data(), second_normalized.data());
+    return ffi_win1251_equal_ignore_case(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -57,7 +56,7 @@ bool iLess(const Range1T &first, const Range2T &second)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return ignore_case_less(first_normalized.data(), second_normalized.data());
+    return ffi_less_ignore_case(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -66,7 +65,7 @@ bool iLessOrEqual(const Range1T &first, const Range2T &second)
     const auto &first_normalized = std::is_pointer<Range1T>::value ? std::string_view(first) : first;
     const auto &second_normalized = std::is_pointer<Range2T>::value ? std::string_view(second) : second;
 
-    return ignore_case_less_or_equal(first_normalized.data(), second_normalized.data());
+    return ffi_less_or_equal_ignore_case(first_normalized.data(), second_normalized.data());
 }
 
 template <typename Range1T, typename Range2T = Range1T> 
@@ -83,7 +82,7 @@ bool iGreaterOrEqual(const Range1T &first, const Range2T &second)
 
 inline bool wildicmp(const char *wild, const char8_t *string)
 {
-    return ignore_case_glob(reinterpret_cast<const char *>(string), wild);
+    return ffi_glob_ignore_case(reinterpret_cast<const char *>(string), wild);
 }
 
 class iStrHasher

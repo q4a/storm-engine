@@ -11,7 +11,7 @@
 #include "lighter.h"
 
 #include "core.h"
-
+#include "string_compare.hpp"
 #include "entity.h"
 // ============================================================================================
 // Construction, destruction
@@ -180,25 +180,25 @@ void Lighter::Realize(uint32_t delta_time)
 uint64_t Lighter::ProcessMessage(MESSAGE &message)
 {
     const std::string &command = message.String();
-    if (storm::iEquals(command, "AddModel"))
+    if (rust::string::iEquals(command, "AddModel"))
     {
         // Adding the model
         MsgAddModel(message);
         return true;
     }
-    if (storm::iEquals(command, "ModelsPath"))
+    if (rust::string::iEquals(command, "ModelsPath"))
     {
         // Adding the model
         MsgModelsPath(message);
         return true;
     }
-    if (storm::iEquals(command, "LightPath"))
+    if (rust::string::iEquals(command, "LightPath"))
     {
         // Adding the model
         MsgLightPath(message);
         return true;
     }
-    if (storm::iEquals(command, "AddLight"))
+    if (rust::string::iEquals(command, "AddLight"))
     {
         // Adding the model
         MsgAddLight(message);
@@ -212,7 +212,7 @@ void Lighter::MsgAddModel(MESSAGE &message)
     const std::string &name = message.String();
     if (name.empty())
     {
-        core.Trace("Location lighter: no model name, skip it!");
+        rust::log::info("Location lighter: no model name, skip it!");
         return;
     }
     const auto model = message.EntityID();

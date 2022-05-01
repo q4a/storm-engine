@@ -149,7 +149,7 @@ void SailorsEditor::LoadFromIni(std::string fileName)
 
     if (!pIni)
     {
-        core.Trace("Sailors : Can`t open '%s'", fileName.c_str());
+        rust::log::info("Sailors : Can`t open '%s'", fileName.c_str());
         return;
     }
 

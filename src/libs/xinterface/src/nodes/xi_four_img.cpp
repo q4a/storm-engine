@@ -247,7 +247,7 @@ void CXI_FOURIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
         m_oneStrFont = -1;
         if (GetMidStr(param, param1, sizeof(param1), "font:", ","))
             if ((m_oneStrFont = m_rs->LoadFont(param1)) == -1)
-                core.Trace("can not load font:'%s'", param1);
+                rust::log::info("can not load font:'%s'", param1);
 
         m_xOneOffset = m_nOneStrOffset = 0;
         if (GetMidStr(param, param1, sizeof(param1), "off:(", ")"))
@@ -280,7 +280,7 @@ void CXI_FOURIMAGE::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, con
         m_twoStrFont = -1;
         if (GetMidStr(param, param1, sizeof(param1), "font:", ","))
             if ((m_twoStrFont = m_rs->LoadFont(param1)) == -1)
-                core.Trace("can not load font:'%s'", param1);
+                rust::log::info("can not load font:'%s'", param1);
 
         m_xTwoOffset = m_nTwoStrOffset = 0;
         if (GetMidStr(param, param1, sizeof(param1), "off:(", ")"))
@@ -687,7 +687,7 @@ void CXI_FOURIMAGE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 

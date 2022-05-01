@@ -4,6 +4,7 @@
 #include "defines.h"
 #include "resource.h"
 #include "s_debug.h"
+#include "string_compare.hpp"
 #include <algorithm>
 
 extern S_DEBUG * CDebug;
@@ -522,7 +523,7 @@ bool SOURCE_VIEW::OpenSourceFile(const char *_filename)
 {
     ShowWindow(hMain, SW_NORMAL);
 
-    if (storm::iEquals(SourceFileName, _filename))
+    if (rust::string::iEquals(SourceFileName, _filename))
     {
         return true;
     }

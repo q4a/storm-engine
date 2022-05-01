@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "core_impl.h"
+#include "string_compare.hpp"
 
 #include <execution>
 
@@ -1159,7 +1160,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
             return pV;
         }
 
-        n = storm::iFind(pChar, pChar2, TempLong1);
+        n = rust::string::iFind(pChar, pChar2, TempLong1);
         pV = SStack.Push();
         pV->Set(static_cast<int32_t>(n));
         pVResult = pV;
@@ -1325,7 +1326,7 @@ DATA *COMPILER::BC_CallIntFunction(uint32_t func_code, DATA *&pVResult, uint32_t
         {
             if (!VarTab.SetElementsNum(pV->nGlobalVarTableIndex, TempLong1))
             {
-                core_internal.Trace("Unable to set elements num for %u", pV->nGlobalVarTableIndex);
+                rust::log::info("Unable to set elements num for %u", pV->nGlobalVarTableIndex);
             }
         }
 

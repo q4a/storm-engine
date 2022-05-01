@@ -14,6 +14,7 @@
 #include "core.h"
 #include "entity.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 // ============================================================================================
 // Construction, destruction
@@ -46,7 +47,7 @@ int32_t ModelArray::CreateModel(const char *modelName, const char *technique, in
     auto *gs = static_cast<VGEOMETRY *>(core.GetService("geometry"));
     if (!gs)
     {
-        core.Trace("Can't create geometry service!");
+        rust::log::warn("Can't create geometry service!");
         return -1;
     }
     gs->SetTexturePath(texturespath.c_str());
@@ -99,7 +100,7 @@ int32_t ModelArray::CreateModel(const char *modelName, const char *technique, in
     }
     else
     {
-        core.Trace("Model name %s is very int32_t", maxModels);
+        rust::log::info("Model name %s is very int32_t", maxModels);
         memcpy(model[numModels].name, modelName, MA_MAX_NAME_LENGTH);
         model[numModels].name[MA_MAX_NAME_LENGTH - 1] = 0;
     }
@@ -177,7 +178,7 @@ int32_t ModelArray::FindModel(const char *modelName)
     {
         if (model[i].hash == hash)
         {
-            if (storm::iEquals(model[i].name, buf))
+            if (rust::string::iEquals(model[i].name, buf))
             {
                 return i;
             }
@@ -239,7 +240,7 @@ void ModelArray::SetUVSlide(int32_t modelIndex, float u0, float v0, float u1, fl
     if (mdl)
         mdl->SetRenderTuner(sl);
     else
-        core.Trace("Location: Can't get model pointer for set RenderTuner");
+        rust::log::info("Location: Can't get model pointer for set RenderTuner");
 }
 
 // Set a rotation animation to the model
@@ -269,7 +270,7 @@ void ModelArray::SetReflection(int32_t modelIndex, float scale)
     if (mdl)
         mdl->SetRenderTuner(model[modelIndex].reflection);
     else
-        core.Trace("Location: Can't get model pointer for set RenderTuner");
+        rust::log::info("Location: Can't get model pointer for set RenderTuner");
 }
 
 // Animate texture coordinates

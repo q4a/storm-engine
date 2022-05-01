@@ -17,6 +17,7 @@
 #include "sea_base.h"
 #include "shared/messages.h"
 #include "v_sound_service.h"
+#include "string_compare.hpp"
 
 #include "core.h"
 #include "v_data.h"
@@ -834,15 +835,15 @@ uint32_t Character::AttributeChanged(ATTRIBUTES *apnt)
         return 0;
     if (!apnt || !apnt->GetThisName())
         return 0;
-    if (storm::iEquals(apnt->GetThisName(), "model"))
+    if (rust::string::iEquals(apnt->GetThisName(), "model"))
     {
         SetSignModel();
     }
-    else if (storm::iEquals(apnt->GetThisName(), "technique"))
+    else if (rust::string::iEquals(apnt->GetThisName(), "technique"))
     {
         SetSignTechnique();
     }
-    else if (storm::iEquals(apnt->GetThisName(), "id") && apnt->GetParent() && !apnt->GetParent()->GetParent())
+    else if (rust::string::iEquals(apnt->GetThisName(), "id") && apnt->GetParent() && !apnt->GetParent()->GetParent())
     {
         const char *id = apnt->GetThisAttr();
         if (!id)
@@ -852,7 +853,8 @@ uint32_t Character::AttributeChanged(ATTRIBUTES *apnt)
         characterID = new char[len];
         strcpy_s(characterID, len, id);
     }
-    else if (storm::iEquals(apnt->GetThisName(), "actions") && apnt->GetParent() && !apnt->GetParent()->GetParent())
+    else if (rust::string::iEquals(apnt->GetThisName(), "actions") && apnt->GetParent() &&
+             !apnt->GetParent()->GetParent())
     {
         // Reading move actions
         // Simple
@@ -1032,7 +1034,7 @@ void Character::SetSignModel()
     {
         if (gs)
             gs->SetTexturePath("");
-        core.Trace("Quest sign model '%s' not loaded", path.c_str());
+        rust::log::info("Quest sign model '%s' not loaded", path.c_str());
         return;
     }
 
@@ -1204,7 +1206,7 @@ bool Character::Teleport(const char *group, const char *locator)
             return Teleport(pnt.x, pnt.y, pnt.z, static_cast<float>(vz));
     }
 
-    core.Trace("Character Teleport Error: Can't find free place near locator: %s, %s", group, locator);
+    rust::log::warn("Character Teleport Error: Can't find free place near locator: %s, %s", group, locator);
     return Teleport(pos.x, pos.y, pos.z, static_cast<float>(vz));
 }
 
@@ -1232,7 +1234,7 @@ void Character::DelSavePosition(bool isTeleport)
     if (aPosLocator)
     {
         const char *pcLocGroupName = aPosLocator->GetAttribute("group");
-        if (pcLocGroupName && storm::iEquals(pcLocGroupName, "sit"))
+        if (pcLocGroupName && rust::string::iEquals(pcLocGroupName, "sit"))
             isTeleport = false;
     }
 
@@ -1407,7 +1409,7 @@ bool Character::IsFireFindTarget() const
 {
     if (!priorityAction.name || !shot.name)
         return false;
-    if (storm::iEquals(priorityAction.name, shot.name))
+    if (rust::string::iEquals(priorityAction.name, shot.name))
         return !isFired;
     return false;
 }
@@ -1804,7 +1806,7 @@ bool Character::IsGunLoad() const
     }
     else
     {
-        core.Trace("Event \"Location_CharacterIsFire\" -> return type is not int");
+        rust::log::info("Event \"Location_CharacterIsFire\" -> return type is not int");
         // return false;
         //!!!
         return true;
@@ -2315,7 +2317,7 @@ void Character::Update(float dltTime)
     PtcData &ptc = location->GetPtcData();
     if (deadName)
     {
-        if (!priorityAction.name || !storm::iEquals(priorityAction.name, deadName))
+        if (!priorityAction.name || !rust::string::iEquals(priorityAction.name, deadName))
         {
             priorityAction.SetName(deadName);
             isSetPriorityAction = false;
@@ -2393,7 +2395,7 @@ void Character::Update(float dltTime)
     if (curPos.y < -1000.0f)
     {
         // Assert(false);
-        core.Trace("Character [%s] fall to underworld!!!", characterID ? characterID : "Unknow id");
+        rust::log::warn("Character [%s] fall to underworld!!!", characterID ? characterID : "Unknow id");
         curPos.y = -500.0f;
         vy = 0.0f;
     }
@@ -2591,9 +2593,9 @@ void Character::ActionEvent(const char *actionName, Animation *animation, int32_
     if (fgtCurType != fgt_block)
         fgtCurType = fgt_none;
     isTurnLock = false;
-    if (priorityAction.name && storm::iEquals(actionName, priorityAction.name))
+    if (priorityAction.name && rust::string::iEquals(actionName, priorityAction.name))
     {
-        if (storm::iEquals(priorityAction.name, CHARACTER_NORM_TO_FIGHT))
+        if (rust::string::iEquals(priorityAction.name, CHARACTER_NORM_TO_FIGHT))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 1);
@@ -2604,7 +2606,7 @@ void Character::ActionEvent(const char *actionName, Animation *animation, int32_
                 animation->Player(0).SetPosition(1.0f);
             }
         }
-        else if (storm::iEquals(priorityAction.name, CHARACTER_FIGHT_TO_NORM))
+        else if (rust::string::iEquals(priorityAction.name, CHARACTER_FIGHT_TO_NORM))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 1);
@@ -2615,7 +2617,7 @@ void Character::ActionEvent(const char *actionName, Animation *animation, int32_
                 animation->Player(0).SetPosition(1.0f);
             }
         }
-        else if (shot.name && storm::iEquals(priorityAction.name, shot.name))
+        else if (shot.name && rust::string::iEquals(priorityAction.name, shot.name))
         {
             core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
             if (event == ae_end)
@@ -2630,13 +2632,13 @@ void Character::ActionEvent(const char *actionName, Animation *animation, int32_
                 }
             }
         }
-        else if (recoil.name && storm::iEquals(priorityAction.name, recoil.name))
+        else if (recoil.name && rust::string::iEquals(priorityAction.name, recoil.name))
         {
             if (rand() % 10 > 7)
                 recoilLook = true; // able to play the teaser
             priorityAction.SetName(nullptr);
         }
-        else if (deadName && storm::iEquals(priorityAction.name, deadName))
+        else if (deadName && rust::string::iEquals(priorityAction.name, deadName))
         {
             animation->Player(0).Pause();
             animation->Player(0).SetPosition(1.0f);
@@ -2660,8 +2662,8 @@ void Character::ActionEvent(const char *actionName, Animation *animation, int32_
             else
                 SetPriorityAction(fall_land.name);
         }
-        else if (storm::iEquals(priorityAction.name, fall_land.name) ||
-                 storm::iEquals(priorityAction.name, fall_water.name))
+        else if (rust::string::iEquals(priorityAction.name, fall_land.name) ||
+                 rust::string::iEquals(priorityAction.name, fall_water.name))
         {
             priorityAction.SetName(nullptr);
             animation->Player(0).Pause();
@@ -2670,7 +2672,7 @@ void Character::ActionEvent(const char *actionName, Animation *animation, int32_
     }
     else if (userIdle.name)
     {
-        if (!storm::iEquals(actionName, userIdle.name))
+        if (!rust::string::iEquals(actionName, userIdle.name))
             return;
         core.Event("Location_Character_EndAction", "i", GetId());
     }
@@ -2684,15 +2686,15 @@ void Character::ActionEvent(Animation *animation, int32_t playerIndex, const cha
     const char *alliace = nullptr;
     if (!actionName)
         return;
-    if (storm::iEquals(eventName, "LStep"))
+    if (rust::string::iEquals(eventName, "LStep"))
     {
         soundStep = true;
     }
-    else if (storm::iEquals(eventName, "RStep"))
+    else if (rust::string::iEquals(eventName, "RStep"))
     {
         soundStep = true;
     }
-    else if (storm::iEquals(eventName, "swim"))
+    else if (rust::string::iEquals(eventName, "swim"))
     {
         PlaySound("swiming");
     }
@@ -2730,31 +2732,31 @@ void Character::ActionEvent(Animation *animation, int32_t playerIndex, const cha
         {
           PlaySound("sword_wind_feintend");
         }else*/
-        if (storm::iEquals(eventName, "Resact"))
+        if (rust::string::iEquals(eventName, "Resact"))
     {
         fgtSetType = fgt_none;
         fgtSetIndex = -1;
     }
-    else if (storm::iEquals(eventName, "Attack"))
+    else if (rust::string::iEquals(eventName, "Attack"))
     {
         CheckAttackHit();
     }
-    else if (storm::iEquals(eventName, "Parry start"))
+    else if (rust::string::iEquals(eventName, "Parry start"))
     {
         isParryState = true;
         isFeintState = false;
     }
-    else if (storm::iEquals(eventName, "Parry end"))
+    else if (rust::string::iEquals(eventName, "Parry end"))
     {
         isParryState = false;
         isFeintState = false;
     }
-    else if (storm::iEquals(eventName, "Feint start"))
+    else if (rust::string::iEquals(eventName, "Feint start"))
     {
         isParryState = false;
         isFeintState = true;
     }
-    else if (storm::iEquals(eventName, "Feint end"))
+    else if (rust::string::iEquals(eventName, "Feint end"))
     {
         isParryState = false;
         isFeintState = false;
@@ -2780,7 +2782,7 @@ if(storm::iEquals(eventName, "Blade to belt"))
         if(pos < 0.99f) PlaySound("sword_out");
     }
 }else */
-        if (storm::iEquals(eventName, "Death sound"))
+        if (rust::string::iEquals(eventName, "Death sound"))
     {
         core.Event("Event_ChrSnd_Body", "i", GetId());
     }
@@ -2788,13 +2790,13 @@ if(storm::iEquals(eventName, "Blade to belt"))
     {
         const char *pcActionName = nullptr;
         int32_t nIdx = -1;
-        if (storm::iStartsWith(alliace, "set"))
+        if (rust::string::iStartsWith(alliace, "set"))
         {
             pcActionName = "set";
             if (alliace[3] >= '0' && alliace[3] <= '9')
                 nIdx = atoi(&alliace[3]);
         }
-        else if (storm::iStartsWith(alliace, "reset"))
+        else if (rust::string::iStartsWith(alliace, "reset"))
         {
             pcActionName = "reset";
             if (alliace[5] >= '0' && alliace[5] <= '9')
@@ -2803,31 +2805,31 @@ if(storm::iEquals(eventName, "Blade to belt"))
         if (pcActionName)
             core.Event("Location_CharacterItemAction", "isl", GetId(), pcActionName, nIdx);
     }
-    else if (priorityAction.name && storm::iEquals(actionName, priorityAction.name))
+    else if (priorityAction.name && rust::string::iEquals(actionName, priorityAction.name))
     {
-        if (storm::iEquals(priorityAction.name, CHARACTER_NORM_TO_FIGHT))
+        if (rust::string::iEquals(priorityAction.name, CHARACTER_NORM_TO_FIGHT))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_HAND, 1);
         }
-        else if (storm::iEquals(priorityAction.name, CHARACTER_FIGHT_TO_NORM))
+        else if (rust::string::iEquals(priorityAction.name, CHARACTER_FIGHT_TO_NORM))
         {
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 0);
             core.Send_Message(blade, "ll", MSG_BLADE_BELT, 1);
         }
-        else if (shot.name && storm::iEquals(priorityAction.name, shot.name))
+        else if (shot.name && rust::string::iEquals(priorityAction.name, shot.name))
         {
             if (eventName)
             {
-                if (storm::iEquals(eventName, CHARACTER_FIGHT_GUNBELT))
+                if (rust::string::iEquals(eventName, CHARACTER_FIGHT_GUNBELT))
                 {
                     core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
                 }
-                else if (storm::iEquals(eventName, CHARACTER_FIGHT_GUNHAND))
+                else if (rust::string::iEquals(eventName, CHARACTER_FIGHT_GUNHAND))
                 {
                     core.Send_Message(blade, "l", MSG_BLADE_GUNHAND);
                 }
-                else if (storm::iEquals(eventName, CHARACTER_FIGHT_GUNFIRE))
+                else if (rust::string::iEquals(eventName, CHARACTER_FIGHT_GUNFIRE))
                 {
                     core.Send_Message(blade, "l", MSG_BLADE_GUNFIRE);
                     // PlaySound("pistol_shot");
@@ -2846,7 +2848,7 @@ if(storm::iEquals(eventName, "Blade to belt"))
         }
         else if (isJump && PriorityActionIsJump())
         {
-            if (eventName && storm::iEquals("Jump pause", eventName))
+            if (eventName && rust::string::iEquals("Jump pause", eventName))
             {
                 animation->Player(playerIndex).Pause();
             }
@@ -2854,21 +2856,21 @@ if(storm::iEquals(eventName, "Blade to belt"))
     }
     else if (userIdle.name)
     {
-        if (storm::iEquals(actionName, userIdle.name))
+        if (rust::string::iEquals(actionName, userIdle.name))
         {
-            if (shot.name && storm::iEquals(actionName, shot.name))
+            if (shot.name && rust::string::iEquals(actionName, shot.name))
             {
                 if (eventName)
                 {
-                    if (storm::iEquals(eventName, CHARACTER_FIGHT_GUNBELT))
+                    if (rust::string::iEquals(eventName, CHARACTER_FIGHT_GUNBELT))
                     {
                         core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
                     }
-                    else if (storm::iEquals(eventName, CHARACTER_FIGHT_GUNHAND))
+                    else if (rust::string::iEquals(eventName, CHARACTER_FIGHT_GUNHAND))
                     {
                         core.Send_Message(blade, "l", MSG_BLADE_GUNHAND);
                     }
-                    else if (storm::iEquals(eventName, CHARACTER_FIGHT_GUNFIRE))
+                    else if (rust::string::iEquals(eventName, CHARACTER_FIGHT_GUNFIRE))
                     {
                         core.Send_Message(blade, "l", MSG_BLADE_GUNFIRE);
                         core.Event("ActorMakeShot", "i", GetId());
@@ -2916,39 +2918,39 @@ void Character::PlayStep()
             const char *mtl = location->GetPtcData().GetMaterial(currentNode);
             if (mtl)
             {
-                if (storm::iEquals(mtl, "run_grass"))
+                if (rust::string::iEquals(mtl, "run_grass"))
                 {
                     defSnd = "run_grass";
                 }
-                else if (storm::iEquals(mtl, "snd_wood"))
+                else if (rust::string::iEquals(mtl, "snd_wood"))
                 {
                     defSnd = "run_wood";
                 }
-                else if (storm::iEquals(mtl, "snd_ground"))
+                else if (rust::string::iEquals(mtl, "snd_ground"))
                 {
                     defSnd = "run_ground";
                 }
-                else if (storm::iEquals(mtl, "snd_sand"))
+                else if (rust::string::iEquals(mtl, "snd_sand"))
                 {
                     defSnd = "run_sand";
                 }
-                else if (storm::iEquals(mtl, "snd_stone"))
+                else if (rust::string::iEquals(mtl, "snd_stone"))
                 {
                     defSnd = "run_stone";
                 }
-                else if (storm::iEquals(mtl, "snd_stairway"))
+                else if (rust::string::iEquals(mtl, "snd_stairway"))
                 {
                     defSnd = "run_stairway";
                 }
-                else if (storm::iEquals(mtl, "snd_carpet"))
+                else if (rust::string::iEquals(mtl, "snd_carpet"))
                 {
                     defSnd = "run_carpet";
                 }
-                else if (storm::iEquals(mtl, "snd_church"))
+                else if (rust::string::iEquals(mtl, "snd_church"))
                 {
                     defSnd = "run_church";
                 }
-                else if (storm::iEquals(mtl, "snd_echo"))
+                else if (rust::string::iEquals(mtl, "snd_echo"))
                 {
                     defSnd = "run_echo";
                 }
@@ -2973,43 +2975,43 @@ void Character::PlayStep()
             const char *mtl = location->GetPtcData().GetMaterial(currentNode);
             if (mtl)
             {
-                if (storm::iEquals(mtl, "snd_grass"))
+                if (rust::string::iEquals(mtl, "snd_grass"))
                 {
                     defSnd = "step_grass";
                 }
-                else if (storm::iEquals(mtl, "snd_wood"))
+                else if (rust::string::iEquals(mtl, "snd_wood"))
                 {
                     defSnd = "step_wood";
                 }
-                else if (storm::iEquals(mtl, "snd_ground"))
+                else if (rust::string::iEquals(mtl, "snd_ground"))
                 {
                     defSnd = "step_ground";
                 }
-                else if (storm::iEquals(mtl, "snd_sand"))
+                else if (rust::string::iEquals(mtl, "snd_sand"))
                 {
                     defSnd = "step_sand";
                 }
-                else if (storm::iEquals(mtl, "snd_stone"))
+                else if (rust::string::iEquals(mtl, "snd_stone"))
                 {
                     defSnd = "step_stone";
                 }
-                else if (storm::iEquals(mtl, "snd_stairway"))
+                else if (rust::string::iEquals(mtl, "snd_stairway"))
                 {
                     defSnd = "step_stairway";
                 }
-                else if (storm::iEquals(mtl, "snd_carpet"))
+                else if (rust::string::iEquals(mtl, "snd_carpet"))
                 {
                     defSnd = "step_carpet";
                 }
-                else if (storm::iEquals(mtl, "snd_church"))
+                else if (rust::string::iEquals(mtl, "snd_church"))
                 {
                     defSnd = "step_church";
                 }
-                else if (storm::iEquals(mtl, "snd_echo"))
+                else if (rust::string::iEquals(mtl, "snd_echo"))
                 {
                     defSnd = "step_echo";
                 }
-                else if (storm::iEquals(mtl, "snd_iron"))
+                else if (rust::string::iEquals(mtl, "snd_iron"))
                 {
                     defSnd = "step_iron";
                 }
@@ -3082,14 +3084,14 @@ bool Character::zLoadModel(MESSAGE &message)
     {
         if (gs)
             gs->SetTexturePath("");
-        core.Trace("Character model '%s' not loaded", mpath);
+        rust::log::info("Character model '%s' not loaded", mpath);
         return false;
     }
     if (gs)
         gs->SetTexturePath("");
     if (!core.Send_Message(mdl, "ls", MSG_MODEL_LOAD_ANI, ani.c_str()) != 0)
     {
-        core.Trace("Character animation '%s' not loaded", ani.c_str());
+        rust::log::info("Character animation '%s' not loaded", ani.c_str());
         EntityManager::EraseEntity(mdl);
         return false;
     }
@@ -3114,7 +3116,7 @@ bool Character::zLoadModel(MESSAGE &message)
     }
     else
     {
-        core.Trace("Shadow not created!");
+        rust::log::warn("Shadow not created!");
     }
     if (!EntityManager::GetEntityId("waterrings"))
     {
@@ -3151,7 +3153,7 @@ bool Character::zAddDetector(MESSAGE &message)
     // Checking for creation
     for (int32_t i = 0; i < numDetectors; i++)
     {
-        if (storm::iEquals(detector[i]->la->GetGroupName(), group))
+        if (rust::string::iEquals(detector[i]->la->GetGroupName(), group))
             return false;
     }
     // Looking for a group
@@ -3168,7 +3170,7 @@ bool Character::zDelDetector(MESSAGE &message)
     const std::string &group = message.String();
     for (int32_t i = 0; i < numDetectors; i++)
     {
-        if (storm::iEquals(detector[i]->la->GetGroupName(), group))
+        if (rust::string::iEquals(detector[i]->la->GetGroupName(), group))
         {
             detector[i]->Exit(this);
             delete detector[i];
@@ -3325,7 +3327,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
     int32_t i;
     VDATA *v;
     CVECTOR pos;
-    if (storm::iEquals(msg, "TieItem"))
+    if (rust::string::iEquals(msg, "TieItem"))
     {
         i = message.Long();
         const std::string &modelName = message.String();
@@ -3339,14 +3341,14 @@ uint32_t Character::zExMessage(MESSAGE &message)
         core.Send_Message(blade, "lilss", 1001, mdl, i, modelName.c_str(), locatorName.c_str());
         return 1;
     }
-    if (storm::iEquals(msg, "UntieItem"))
+    if (rust::string::iEquals(msg, "UntieItem"))
     {
         i = message.Long();
         core.Send_Message(blade, "ll", 1002, i);
         return 1;
     }
     auto *const location = GetLocation();
-    if (storm::iEquals(msg, "HandLightOn"))
+    if (rust::string::iEquals(msg, "HandLightOn"))
     {
         // remove the old source
         if (m_nHandLightID >= 0)
@@ -3356,33 +3358,33 @@ uint32_t Character::zExMessage(MESSAGE &message)
         m_nHandLightID = location->GetLights()->AddMovingLight(secondMsg.c_str(), GetHandLightPos());
         return 1;
     }
-    if (storm::iEquals(msg, "HandLightOff"))
+    if (rust::string::iEquals(msg, "HandLightOff"))
     {
         if (m_nHandLightID >= 0)
             location->GetLights()->DelMovingLight(m_nHandLightID);
         m_nHandLightID = -1;
         return 1;
     }
-    if (storm::iEquals(msg, "PlaySound"))
+    if (rust::string::iEquals(msg, "PlaySound"))
     {
         const std::string &secondMsg = message.String();
         return PlaySound(secondMsg.c_str()) != SOUND_INVALID_ID;
     }
-    if (storm::iEquals(msg, "IsFightMode"))
+    if (rust::string::iEquals(msg, "IsFightMode"))
     {
         return IsFight();
     }
-    if (storm::iEquals(msg, "IsSetBalde"))
+    if (rust::string::iEquals(msg, "IsSetBalde"))
     {
         return IsSetBlade();
     }
-    if (storm::iEquals(msg, "IsDead"))
+    if (rust::string::iEquals(msg, "IsDead"))
     {
         return deadName != nullptr;
     }
     if (!deadName)
     {
-        if (storm::iEquals(msg, "FindDialogCharacter"))
+        if (rust::string::iEquals(msg, "FindDialogCharacter"))
         {
             Character *chr = FindDialogCharacter();
             if (chr && chr->AttributesPointer)
@@ -3391,15 +3393,15 @@ uint32_t Character::zExMessage(MESSAGE &message)
             }
             return -1;
         }
-        if (storm::iEquals(msg, "SetFightMode"))
+        if (rust::string::iEquals(msg, "SetFightMode"))
         {
             return SetFightMode(message.Long() != 0, false);
         }
-        if (storm::iEquals(msg, "ChangeFightMode"))
+        if (rust::string::iEquals(msg, "ChangeFightMode"))
         {
             return SetFightMode(message.Long() != 0, true);
         }
-        if (storm::iEquals(msg, "FindForvardLocator"))
+        if (rust::string::iEquals(msg, "FindForvardLocator"))
         {
             // Group name
             const std::string &grp = message.String();
@@ -3416,7 +3418,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
             v->Set((char *)la->LocatorName(i));
             return 1;
         }
-        if (storm::iEquals(msg, "DistToLocator"))
+        if (rust::string::iEquals(msg, "DistToLocator"))
         {
             // Group name
             const std::string &grp = message.String();
@@ -3436,36 +3438,36 @@ uint32_t Character::zExMessage(MESSAGE &message)
             v->Set(sqrtf(~(pos - curPos)));
             return 1;
         }
-        if (storm::iEquals(msg, "InDialog"))
+        if (rust::string::iEquals(msg, "InDialog"))
         {
             isDialog = message.Long() != 0;
             return 1;
         }
-        if (storm::iEquals(msg, "SetSex"))
+        if (rust::string::iEquals(msg, "SetSex"))
         {
             isMale = message.Long() != 0;
             return 1;
         }
-        if (storm::iEquals(msg, "SetFightWOWeapon"))
+        if (rust::string::iEquals(msg, "SetFightWOWeapon"))
         {
             isFightWOWps = message.Long() != 0;
             UpdateWeapons();
             return 1;
         }
-        if (storm::iEquals(msg, "LockFightMode"))
+        if (rust::string::iEquals(msg, "LockFightMode"))
         {
             lockFightMode = message.Long() != 0;
             return 1;
         }
-        if (storm::iEquals(msg, "CheckFightMode"))
+        if (rust::string::iEquals(msg, "CheckFightMode"))
         {
             return isFight;
         }
-        if (storm::iEquals(msg, "IsActive"))
+        if (rust::string::iEquals(msg, "IsActive"))
         {
             return isActiveState;
         }
-        if (storm::iEquals(msg, "CheckID"))
+        if (rust::string::iEquals(msg, "CheckID"))
         {
 #ifdef _DEBUG
             const std::string &msg = message.String();
@@ -3485,7 +3487,7 @@ uint32_t Character::zExMessage(MESSAGE &message)
 #endif
             return 1;
         }
-        if (storm::iEquals(msg, "GunBelt"))
+        if (rust::string::iEquals(msg, "GunBelt"))
         {
             if (message.Long() != 0)
                 core.Send_Message(blade, "l", MSG_BLADE_GUNBELT);
@@ -3829,7 +3831,7 @@ bool Character::SetAction(const char *actionName, float tblend, float movespeed,
     if (a->Player(0).IsPlaying() && !a->Player(0).IsPause())
     {
         curAction = a->Player(0).GetAction();
-        if (!forceStart && curAction && actionName && storm::iEquals(curAction, actionName))
+        if (!forceStart && curAction && actionName && rust::string::iEquals(curAction, actionName))
             return true;
     }
     if (noBlendTime > 0.0f)
@@ -3910,7 +3912,7 @@ void Character::UpdateAnimation()
             isSetPriorityAction = true;
             if (!SetAction(priorityAction.name, priorityAction.tblend, priorityActionMoveSpd, priorityActionRotSpd))
             {
-                core.Trace("Character animation: not set priority action: \"%s\"", priorityAction.name);
+                rust::log::info("Character animation: not set priority action: \"%s\"", priorityAction.name);
             }
             curMove = nullptr;
             fgtCurType = fgtSetType = fgt_none;
@@ -3921,7 +3923,7 @@ void Character::UpdateAnimation()
     {
         if (!SetAction(swim.name, swim.tblend, swim.speed, swim.turnspd))
         {
-            core.Trace("Character animation: not set priority action: \"%s\"", swim.name);
+            rust::log::info("Character animation: not set priority action: \"%s\"", swim.name);
         }
         curMove = nullptr;
         fgtCurType = fgtSetType = fgt_none;
@@ -3936,10 +3938,10 @@ void Character::UpdateAnimation()
             {
                 isNFHit = false;
                 curMove = nullptr;
-                if (userIdle.name && (storm::iEquals(userIdle.name, "Ground_SitDown") ||
-                                      storm::iEquals(userIdle.name, "Ground_StandUp")))
+                if (userIdle.name && (rust::string::iEquals(userIdle.name, "Ground_SitDown") ||
+                                      rust::string::iEquals(userIdle.name, "Ground_StandUp")))
                 {
-                    core.Trace("Not int: \"%s\"", userIdle.name);
+                    rust::log::info("Not int: \"%s\"", userIdle.name);
                 }
                 else
                 {
@@ -3947,7 +3949,7 @@ void Character::UpdateAnimation()
                     {
                         curIdleIndex = -1;
                         if (noBlendTime <= 0.0f)
-                            core.Trace("Character animation: not set non fight hit action: \"%s\"", nfhit.name);
+                            rust::log::info("Character animation: not set non fight hit action: \"%s\"", nfhit.name);
                     }
                 }
             }
@@ -3955,7 +3957,7 @@ void Character::UpdateAnimation()
             {
                 if (!SetAction(fall.name, fall.tblend, 0.0f, 0.0f))
                 {
-                    core.Trace("Character animation: not fall action: \"%s\"", fall.name);
+                    rust::log::info("Character animation: not fall action: \"%s\"", fall.name);
                 }
             }
             else if (isMove)
@@ -3974,7 +3976,8 @@ void Character::UpdateAnimation()
                                 curMove = &walk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set walk action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set walk action: \"%s\"",
+                                                    curMove->name);
                                 }
                             }
                         }
@@ -3986,7 +3989,7 @@ void Character::UpdateAnimation()
                                 curMove = &backwalk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back walk action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set back walk action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4001,7 +4004,7 @@ void Character::UpdateAnimation()
                                 curMove = &run;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set run action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4013,7 +4016,7 @@ void Character::UpdateAnimation()
                                 curMove = &backrun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set buck run action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set buck run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4031,7 +4034,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUp;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set stair up action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4039,7 +4042,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDown;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set stair down action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4051,8 +4054,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUpBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back stair up action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4060,8 +4062,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDownBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back stair down action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4077,8 +4078,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUpRun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set run stair up action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set run stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4086,8 +4086,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDownRun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set run stair down action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set run stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4099,8 +4098,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsUpRunBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back run stair up action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back run stair up action: \"%s\"", curMove->name);
                                 }
                             }
                             else
@@ -4108,8 +4106,7 @@ void Character::UpdateAnimation()
                                 curMove = &stsDownRunBack;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set back run stair down action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set back run stair down action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4133,12 +4130,12 @@ void Character::UpdateAnimation()
                             {
                                 curIdleIndex = -1;
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set idle action: \"%s\"", an);
+                                    rust::log::info("Character animation: not set idle action: \"%s\"", an);
                             }
                         }
                         else
                         {
-                            core.Trace("Character: No set idle animation!!!");
+                            rust::log::warn("Character: No set idle animation!!!");
                             if (noBlendTime <= 0.0f)
                                 SetAction(nullptr, 0.3f, 0.0f, turnSpeed);
                         }
@@ -4152,7 +4149,7 @@ void Character::UpdateAnimation()
                             if (!SetAction("strafe_left", 0.2f, 0.0f, turnSpeed))
                             {
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set \"strafe_left\" action");
+                                    rust::log::info("Character animation: not set \"strafe_left\" action");
                             }
                         }
                         else
@@ -4161,7 +4158,7 @@ void Character::UpdateAnimation()
                             if (!SetAction("strafe_right", 0.2f, 0.0f, turnSpeed))
                             {
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set \"strafe_right\" action");
+                                    rust::log::info("Character animation: not set \"strafe_right\" action");
                             }
                         }
                     }
@@ -4176,7 +4173,7 @@ void Character::UpdateAnimation()
                         {
                             curIdleIndex = -1;
                             if (noBlendTime <= 0.0f)
-                                core.Trace("Character animation: not set idle action: \"%s\"", an);
+                                rust::log::info("Character animation: not set idle action: \"%s\"", an);
                         }
                     }
                     else
@@ -4184,7 +4181,7 @@ void Character::UpdateAnimation()
                         SetAction(nullptr, curMove->tblend, 0.0f, turnSpeed);
                         curIdleIndex = -1;
                         if (noBlendTime <= 0.0f)
-                            core.Trace("Character: No set idle animation!!!");
+                            rust::log::warn("Character: No set idle animation!!!");
                     }
                     curMove = nullptr;
                 }
@@ -4232,8 +4229,7 @@ void Character::UpdateAnimation()
                 case fgt_attack_fast: // Quick hit
                     if (!(isSet = SetAction(attackFast[fgtSetIndex].name, attackFast[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set fast attack action: \"%s\"",
-                                   attackFast[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set fast attack action: \"%s\"", attackFast[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4246,7 +4242,7 @@ void Character::UpdateAnimation()
                     }
                     break;
                 case fgt_attack_force: // Slash and lunge with a slashing blow
-                    if (storm::iEquals(pWeaponID, "topor") && fgtSetIndex == 3)
+                    if (rust::string::iEquals(pWeaponID, "topor") && fgtSetIndex == 3)
                     {
                         // if with an ax, then the lunge is changed to a chopping blow
                         fgtSetIndex = rand() % 2;
@@ -4254,8 +4250,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackForce[fgtSetIndex].name, attackForce[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set force attack action: \"%s\"",
-                                   attackForce[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set force attack action: \"%s\"", attackForce[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4271,8 +4266,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackRound[fgtSetIndex].name, attackRound[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set round attack action: \"%s\"",
-                                   attackRound[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set round attack action: \"%s\"", attackRound[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4287,8 +4281,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackBreak[fgtSetIndex].name, attackBreak[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set break attack action: \"%s\"",
-                                   attackBreak[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set break attack action: \"%s\"", attackBreak[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4304,7 +4297,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackFeint[fgtSetIndex].name, attackFeint[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set feint action: \"%s\"", attackFeint[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set feint action: \"%s\"", attackFeint[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4318,7 +4311,7 @@ void Character::UpdateAnimation()
                     if (!(isSet =
                               SetAction(attackFeintC[fgtSetIndex].name, attackFeintC[fgtSetIndex].tblend, 0.0f, 4.0f)))
                     {
-                        core.Trace("Character animation: not set feint action: \"%s\"", attackFeintC[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set feint action: \"%s\"", attackFeintC[fgtSetIndex].name);
                     }
                     else
                     {
@@ -4358,8 +4351,7 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hit[fgtSetIndex].name, hit[fgtSetIndex].tblend, 0.0f, 1.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight attack hit action: \"%s\"",
-                                   hit[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set fight attack hit action: \"%s\"", hit[fgtSetIndex].name);
                     }
                     break;
                 }
@@ -4367,21 +4359,21 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(blockbreak.name, blockbreak.tblend, 0.0f, 1.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight blockbreak action: \"%s\"", blockbreak.name);
+                        rust::log::info("Character animation: not set fight blockbreak action: \"%s\"", blockbreak.name);
                     }
                     break;
                 case fgt_hit_feint: // The reaction from the feint putting him into the stall
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hitFeint.name, hitFeint.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight feint hit action: \"%s\"", hitFeint.name);
+                        rust::log::info("Character animation: not set fight feint hit action: \"%s\"", hitFeint.name);
                     }
                     break;
                 case fgt_hit_parry: // Parry reaction putting him into stall
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hitParry.name, hitParry.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight parry hit action: \"%s\"", hitParry.name);
+                        rust::log::info("Character animation: not set fight parry hit action: \"%s\"", hitParry.name);
                     }
                     core.Event("ChrFgtActApply", "is", GetId(), "hit_parry");
                     // boal bug fix FGT_ATTACK_PARRY);
@@ -4392,7 +4384,7 @@ void Character::UpdateAnimation()
                     impulse.z -= 3.0f * cosf(ay);
                     if (!(isSet = SetAction(hitRound.name, hitRound.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight round hit action: \"%s\"", hitRound.name);
+                        rust::log::info("Character animation: not set fight round hit action: \"%s\"", hitRound.name);
                     }
                     break;
                 case fgt_hit_fire: { // The reaction from the shot, putting him into stall
@@ -4415,47 +4407,47 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(hitFire.name, hitFire.tblend, 0.0f, 0.0f, true)))
                     {
-                        core.Trace("Character animation: not set fight fire hit action: \"%s\"", hitFire.name);
+                        rust::log::info("Character animation: not set fight fire hit action: \"%s\"", hitFire.name);
                     }
                     break;
                 }
                 case fgt_block: // Saber protection
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
-                    if (storm::iEquals(pWeaponID, "topor"))
+                    if (rust::string::iEquals(pWeaponID, "topor"))
                     {
                         if (!(isSet = SetAction(blockaxe.name, blockaxe.tblend, 0.0f, 5.0f, true)))
                         {
-                            core.Trace("Character animation: not set block action: \"%s\"", blockaxe.name);
+                            rust::log::info("Character animation: not set block action: \"%s\"", blockaxe.name);
                         }
                     }
                     else
                     {
                         if (!(isSet = SetAction(block.name, block.tblend, 0.0f, 5.0f, true)))
                         {
-                            core.Trace("Character animation: not set block action: \"%s\"", block.name);
+                            rust::log::info("Character animation: not set block action: \"%s\"", block.name);
                         }
                     }
                     break;
                 case fgt_blockhit: // Saber protection
-                    if (storm::iEquals(characterID, "Blaze"))
+                    if (rust::string::iEquals(characterID, "Blaze"))
                     // boal did not find a better one, but ours always has this ID, it will work
                     {
                         if (rand() % 100 >= 65)
                             break; // boal doesn't always break into animation
                     }
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
-                    if (storm::iEquals(pWeaponID, "topor"))
+                    if (rust::string::iEquals(pWeaponID, "topor"))
                     {
                         if (!(isSet = SetAction(blockaxehit.name, blockaxehit.tblend, 0.0f, 2.0f, true)))
                         {
-                            core.Trace("Character animation: not set block axe hit action: \"%s\"", blockaxehit.name);
+                            rust::log::info("Character animation: not set block axe hit action: \"%s\"", blockaxehit.name);
                         }
                     }
                     else
                     {
                         if (!(isSet = SetAction(blockhit.name, blockhit.tblend, 0.0f, 2.0f, true)))
                         {
-                            core.Trace("Character animation: not set block hit action: \"%s\"", blockhit.name);
+                            rust::log::info("Character animation: not set block hit action: \"%s\"", blockhit.name);
                         }
                     }
                     break;
@@ -4463,7 +4455,7 @@ void Character::UpdateAnimation()
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     if (!(isSet = SetAction(parry[fgtSetIndex].name, parry[fgtSetIndex].tblend, 0.0f, 5.0f)))
                     {
-                        core.Trace("Character animation: not set block(parry) action: \"%s\"", parry[fgtSetIndex].name);
+                        rust::log::info("Character animation: not set block(parry) action: \"%s\"", parry[fgtSetIndex].name);
                     }
                     break;
                 case fgt_recoil: // Bounce back
@@ -4474,7 +4466,7 @@ void Character::UpdateAnimation()
                     priorityAction.SetName(recoil.name); // to check the end of the animation
                     if (!(isSet = SetAction(recoil.name, recoil.tblend, -3.0f, 0.0f)))
                     {
-                        core.Trace("Character animation: not set recoil action: \"%s\"", recoil.name);
+                        rust::log::info("Character animation: not set recoil action: \"%s\"", recoil.name);
                     }
                     break;
                 case fgt_strafe_l: // Bounce to the left
@@ -4483,7 +4475,7 @@ void Character::UpdateAnimation()
                     impulse += 15.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
                     if (!(isSet = SetAction(strafe_l.name, strafe_l.tblend, 0.0f, 0.0f)))
                     {
-                        core.Trace("Character animation: not set recoil action: \"%s\"", strafe_l.name);
+                        rust::log::info("Character animation: not set recoil action: \"%s\"", strafe_l.name);
                     }
                     break;
                 case fgt_strafe_r: // Bounce to the left
@@ -4492,7 +4484,7 @@ void Character::UpdateAnimation()
                     impulse -= 15.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
                     if (!(isSet = SetAction(strafe_r.name, strafe_r.tblend, 0.0f, 0.0f)))
                     {
-                        core.Trace("Character animation: not set recoil action: \"%s\"", strafe_l.name);
+                        rust::log::info("Character animation: not set recoil action: \"%s\"", strafe_l.name);
                     }
                     break;
                 }
@@ -4522,7 +4514,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightwalk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight walk action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set fight walk action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4534,8 +4526,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightbackwalk;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight back walk action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set fight back walk action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4550,7 +4541,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightrun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight run action: \"%s\"", curMove->name);
+                                    rust::log::info("Character animation: not set fight run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4562,8 +4553,7 @@ void Character::UpdateAnimation()
                                 curMove = &fightbackrun;
                                 if (!SetAction(curMove->name, curMove->tblend, curMove->speed, curMove->turnspd))
                                 {
-                                    core.Trace("Character animation: not set fight back run action: \"%s\"",
-                                               curMove->name);
+                                    rust::log::info("Character animation: not set fight back run action: \"%s\"", curMove->name);
                                 }
                             }
                         }
@@ -4584,13 +4574,13 @@ void Character::UpdateAnimation()
                             {
                                 curIdleIndex = -1;
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set fight idle \"%s\" action", an);
+                                    rust::log::info("Character animation: not set fight idle \"%s\" action", an);
                             }
                         }
                         else
                         {
                             if (noBlendTime <= 0.0f)
-                                core.Trace("Character: No set idle animation!!!");
+                                rust::log::info("Character: No set idle animation!!!");
                             SetAction(nullptr, 0.3f, 0.0f, turnSpeed);
                             curIdleIndex = -1;
                         }
@@ -4605,14 +4595,14 @@ void Character::UpdateAnimation()
                             {
                                 curIdleIndex = -1;
                                 if (noBlendTime <= 0.0f)
-                                    core.Trace("Character animation: not set fight idle \"%s\" action", an);
+                                    rust::log::info("Character animation: not set fight idle \"%s\" action", an);
                             }
                         }
                         else
                         {
                             SetAction(nullptr, curMove->tblend, 0.0f, turnSpeed);
                             if (noBlendTime <= 0.0f)
-                                core.Trace("Character: No set idle animation!!!");
+                                rust::log::info("Character: No set idle animation!!!");
                             curIdleIndex = -1;
                         }
                         curMove = nullptr;

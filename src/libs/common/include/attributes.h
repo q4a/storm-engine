@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "storm_assert.h"
-#include "storm/string_compare.hpp"
 
 class VSTRING_CODEC
 {

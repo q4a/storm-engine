@@ -30,7 +30,7 @@ FMOD_RESULT ErrorHandler(const FMOD_RESULT result, const char *file, unsigned li
 {
     if (result != FMOD_OK)
     {
-        core.Trace("[%s:%s:%d] %s (%s)", file, func, line, FMOD_ErrorString(result), expr);
+        rust::log::info("[%s:%s:%d] %s (%s)", file, func, line, FMOD_ErrorString(result), expr);
     }
     return result;
 }
@@ -87,10 +87,10 @@ bool SoundService::Init()
 
     if (version < FMOD_VERSION)
     {
-        core.Trace("Error : You are using old FMOD version %08x !\n", version);
+        rust::log::error("You are using old FMOD version %08x !\n", version);
         return false;
     }
-    core.Trace("Using FMOD %08x", FMOD_VERSION);
+    rust::log::info("Using FMOD %08x", FMOD_VERSION);
     CHECKFMODERR(system->setSoftwareChannels(64));
     CHECKFMODERR(system->setOutput(FMOD_OUTPUTTYPE_AUTODETECT));
     CHECKFMODERR(system->init(MAX_SOUNDS_SLOTS, FMOD_INIT_NORMAL, nullptr));
@@ -215,8 +215,8 @@ void SoundService::RunStart()
         if (status != FMOD_OK)
         {
             if constexpr (TRACE_INFORMATION)
-                core.Trace("PlayingSounds[%d].channel 0x%08X %s paused %d status %d", i, PlayingSounds[i].channel,
-                           PlayingSounds[i].Name.c_str(), paused, status);
+                rust::log::info("PlayingSounds[%d].channel 0x%08X %s paused %d status %d", i,
+                                PlayingSounds[i].channel, PlayingSounds[i].Name.c_str(), paused, status);
             FreeSound(i);
             --i;
 
@@ -263,7 +263,7 @@ TSD_ID SoundService::FindEmptySlot()
 {
     if (SoundsActive > MAX_SOUNDS_SLOTS)
     {
-        core.Trace("SoundService::FindEmptySlot(): no empty slots");
+        rust::log::info("SoundService::FindEmptySlot(): no empty slots");
         return -1;
     }
 
@@ -330,7 +330,7 @@ TSD_ID SoundService::SoundPlay(const char *_name, eSoundType _type, eVolumeType 
             // play sound from the alias ...
             FileName = GetRandomName(&Aliases[AliasIdx]);
             if constexpr (TRACE_INFORMATION)
-                core.Trace("Play sound from alias %s", FileName.c_str());
+                rust::log::info("Play sound from alias %s", FileName.c_str());
 
             _minDistance = Aliases[AliasIdx].fMinDistance;
             _maxDistance = Aliases[AliasIdx].fMaxDistance;
@@ -361,13 +361,13 @@ TSD_ID SoundService::SoundPlay(const char *_name, eSoundType _type, eVolumeType 
                 system->createStream(SoundName.c_str(), FMOD_CREATESAMPLE | FMOD_2D | dwMode, nullptr, &sound));
             if (status != FMOD_OK)
             {
-                core.Trace("system->createStream(%s, FMOD_HARDWARE | FMOD_2D | dwMode, 0, &sound)", SoundName.c_str());
+                rust::log::info("system->createStream(%s, FMOD_HARDWARE | FMOD_2D | dwMode, 0, &sound)", SoundName.c_str());
                 return 0;
             }
         }
         catch (...)
         {
-            core.Trace("Internal FMOD error, when create stream. File '%s'", SoundName.c_str());
+            rust::log::error("Internal FMOD error, when create stream. File '%s'", SoundName.c_str());
             return 0;
         }
 
@@ -403,7 +403,7 @@ TSD_ID SoundService::SoundPlay(const char *_name, eSoundType _type, eVolumeType 
         SoundIdx = FindEmptySlot();
         if (SoundIdx < 0)
         {
-            core.Trace("Can't find empty slots for sound !!!!");
+            rust::log::warn("Can't find empty slots for sound !!!!");
             return 0;
         }
         sound = SoundCache[CacheIdx].sound;
@@ -419,7 +419,7 @@ TSD_ID SoundService::SoundPlay(const char *_name, eSoundType _type, eVolumeType 
     const auto status = CHECKFMODERR(system->playSound(sound, nullptr, true, &PlayingSounds[SoundIdx].channel));
     if (status != FMOD_OK)
     {
-        core.Trace("system->playSound(FMOD_CHANNEL_FREE, sound, true, &PlayingSounds[%d].channel)", SoundIdx);
+        rust::log::info("system->playSound(FMOD_CHANNEL_FREE, sound, true, &PlayingSounds[%d].channel)", SoundIdx);
     }
 
     if (SoundIdx <= 1)
@@ -571,7 +571,7 @@ void SoundService::SoundRestart(TSD_ID _id)
         return;
     _id--;
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Sound restart !");
+        rust::log::warn("Sound restart !");
 }
 
 void SoundService::SoundRelease(TSD_ID _id)
@@ -580,7 +580,7 @@ void SoundService::SoundRelease(TSD_ID _id)
         return;
     _id--;
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Sound release !");
+        rust::log::info("Sound release !");
 }
 
 void SoundService::SoundSetVolume(TSD_ID _id, float _volume)
@@ -625,7 +625,7 @@ void SoundService::SoundSetVolume(TSD_ID _id, float _volume)
 
     _id--;
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Sound set volume !");
+        rust::log::info("Sound set volume !");
     if (_id <= 1)
     {
         if (fabsf(PlayingSounds[_id].fFaderCurrentVolume - PlayingSounds[_id].fFaderNeedVolume) > 0.001f)
@@ -684,7 +684,7 @@ void SoundService::SoundResume(TSD_ID _id, int32_t _time /* = 0*/)
     _id--;
     if (IsFree(_id))
     {
-        core.Trace("Can't sound resume %d !!!! Sound is not playing !!!!", _id);
+        rust::log::warn("Can't sound resume %d !!!! Sound is not playing !!!!", _id);
         return;
     }
     CHECKFMODERR(PlayingSounds[_id].channel->setPaused(false));
@@ -784,7 +784,7 @@ void SoundService::SetMasterVolume(float _fxVolume, float _musicVolume, float _s
         }
     }
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Set master volume");
+        rust::log::info("Set master volume");
 }
 
 void SoundService::GetMasterVolume(float *_fxVolume, float *_musicVolume, float *_speechVolume)
@@ -793,7 +793,7 @@ void SoundService::GetMasterVolume(float *_fxVolume, float *_musicVolume, float 
     *_musicVolume = fMusicVolume;
     *_speechVolume = fSpeechVolume;
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Get master volume");
+        rust::log::info("Get master volume");
 }
 
 void SoundService::SetPitch(float _pitch)
@@ -816,20 +816,20 @@ void SoundService::SetPitch(float _pitch)
     }
 
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Set pitch");
+        rust::log::info("Set pitch");
 }
 
 float SoundService::GetPitch()
 {
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Get pitch");
+        rust::log::info("Get pitch");
     return fPitch;
 }
 
 TSD_ID SoundService::SoundDuplicate(TSD_ID _sourceID)
 {
     _sourceID--;
-    core.Trace("Sound duplicate");
+    rust::log::info("Sound duplicate");
     return 0;
 }
 
@@ -952,8 +952,8 @@ void SoundService::SoundStop(TSD_ID _id, int32_t _time)
             if (!is_playing || status != FMOD_OK) // boal fix
             {
                 if constexpr (TRACE_INFORMATION)
-                    core.Trace("PlayingSounds[%d].channel 0x%08X %s status %d", i, PlayingSounds[i].channel,
-                               PlayingSounds[i].Name.c_str(), status);
+                    rust::log::info("PlayingSounds[%d].channel 0x%08X %s status %d", i,
+                                    PlayingSounds[i].channel, PlayingSounds[i].Name.c_str(), status);
 
                 FreeSound(i);
                 --i;
@@ -1049,7 +1049,7 @@ void SoundService::AnalyseNameStringAndAddToAlias(tAlias *_alias, const char *in
         snd.FileName = tempString2;
 
         if constexpr (TRACE_INFORMATION)
-            core.Trace("  -> sound %s", snd.FileName.c_str());
+            rust::log::info("  -> sound %s", snd.FileName.c_str());
         _alias->SoundFiles.push_back(snd);
 
         return;
@@ -1066,7 +1066,7 @@ void SoundService::AnalyseNameStringAndAddToAlias(tAlias *_alias, const char *in
     *(--col) = 0; // truncate at first ','
     snd.FileName = tempString2;
     if constexpr (TRACE_INFORMATION)
-        core.Trace("  -> sound %s, %f", snd.FileName.c_str(), snd.fProbability);
+        rust::log::info("  -> sound %s, %f", snd.FileName.c_str(), snd.fProbability);
     _alias->SoundFiles.push_back(snd);
 }
 
@@ -1077,7 +1077,7 @@ void SoundService::AddAlias(INIFILE &_iniFile, char *_sectionName)
         return;
 
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Add sound alias %s", _sectionName);
+        rust::log::info("Add sound alias %s", _sectionName);
     Aliases.push_back(tAlias{});
     tAlias &alias = Aliases.back();
     alias.Name = _sectionName;
@@ -1105,7 +1105,7 @@ void SoundService::LoadAliasFile(const char *_filename)
     iniName += _filename;
 
     if constexpr (TRACE_INFORMATION)
-        core.Trace("Find sound alias file %s", iniName.c_str());
+        rust::log::info("Find sound alias file %s", iniName.c_str());
     auto aliasIni = fio->OpenIniFile(iniName.c_str());
     if (!aliasIni)
         return;
@@ -1324,7 +1324,7 @@ int SoundService::GetFromCache(const char *szName, eSoundType _type)
 
     if (Cache.sound == nullptr)
     {
-        core.Trace("Problem with sound loading !!! '%s'", szName);
+        rust::log::warn("Problem with sound loading !!! '%s'", szName);
         return -1;
     }
     Cache.type = _type;

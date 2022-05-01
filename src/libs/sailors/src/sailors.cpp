@@ -813,7 +813,7 @@ bool ShipWalk::Init(entid_t _shipID, int editorMode, const char *shipType)
 
         if (mastsAttr == nullptr)
         {
-            storm::Logger::default_logger->error("Cannot initialize ShipWalk: Ship.Masts is empty");
+            rust::log::info("Cannot initialize ShipWalk: Ship.Masts is empty");
             return false;
         }
 
@@ -1181,7 +1181,7 @@ uint64_t Sailors::ProcessMessage(MESSAGE &message)
                     !shipWalk[shipsCount - 1].sailorsPoints.links.count)
                 {
                     DeleteShip(shipsCount - 1);
-                    core.Trace("Sailors: sailors ship %s deleted", &c[0]);
+                    rust::log::info("Sailors: sailors ship %s deleted", &c[0]);
                     return 0;
                 }
         }

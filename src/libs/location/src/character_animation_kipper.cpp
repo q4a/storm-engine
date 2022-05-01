@@ -50,7 +50,7 @@ bool CharacterAnimationKipper::Init()
         if (EntityManager::GetEntityPointer(eid) == this)
             continue;
 
-        core.Trace("CharacterAnimationKipper::Init() -> CharacterAnimationKipper already created");
+        rust::log::info("CharacterAnimationKipper::Init() -> CharacterAnimationKipper already created");
         return false;
     }
 

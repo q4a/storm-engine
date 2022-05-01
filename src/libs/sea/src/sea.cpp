@@ -230,7 +230,7 @@ bool SEA::Init()
         fio->LoadFile(str, &pFBuffer, &dwSize);
         if (!pFBuffer)
         {
-            core.Trace("Sea: Can't load %s", str);
+            rust::log::info("Sea: Can't load %s", str);
             return false;
         }
 

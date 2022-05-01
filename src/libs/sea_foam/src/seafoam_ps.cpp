@@ -191,7 +191,7 @@ bool SEAFOAM_PS::Init(INIFILE *ini, const char *psname)
 
     if (!ini->ReadString(psname, PSKEY_TECHNIQUE, string, sizeof(string), ""))
     {
-        core.Trace("Particle system: %s", psname);
+        rust::log::warn("Particle system: %s", psname);
         throw std::runtime_error("no technique for particle system");
     }
     const auto len = strlen(string) + 1;

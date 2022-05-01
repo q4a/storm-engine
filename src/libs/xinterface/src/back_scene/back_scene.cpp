@@ -4,6 +4,7 @@
 #include "math3d/matrix.h"
 #include "model.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 InterfaceBackScene::LightParam::~LightParam()
 {
@@ -32,7 +33,7 @@ void InterfaceBackScene::LightParam::UpdateParams(float fTime)
         jjj++;
         if (jjj > 10000)
         {
-            core.Trace("jjj: %f, %f", fColorTimer, fColorPeriod);
+            rust::log::info("jjj: %f, %f", fColorTimer, fColorPeriod);
             __debugbreak();
         }
     }
@@ -102,7 +103,7 @@ void InterfaceBackScene::MenuDescr::Set(CMatrix *pMtx, const char *pcActiveName,
         }
         else
         {
-            core.Trace("Warning! Interface Back Scene: invalid menu model %s or transform matrix", pcActiveName);
+            rust::log::warn("Interface Back Scene: invalid menu model %s or transform matrix", pcActiveName);
         }
     }
     // create passive model
@@ -120,7 +121,7 @@ void InterfaceBackScene::MenuDescr::Set(CMatrix *pMtx, const char *pcActiveName,
         }
         else
         {
-            core.Trace("Warning! Interface Back Scene: invalid menu model %s or transform matrix", pcPassiveName);
+            rust::log::warn("Interface Back Scene: invalid menu model %s or transform matrix", pcPassiveName);
         }
     }
     if (pGeo)
@@ -484,7 +485,7 @@ bool InterfaceBackScene::FindLocator(const char *pcLocName, CMatrix *pMtx, CVECT
         for (int32_t l = 0; l < ginf.nlabels; l++)
         {
             pNod->geo->GetLabel(l, lbl);
-            if (lbl.name && storm::iEquals(pcLocName, lbl.name))
+            if (lbl.name && rust::string::iEquals(pcLocName, lbl.name))
             {
                 if (pMtx)
                 {
@@ -523,7 +524,7 @@ void InterfaceBackScene::SetLocatorPosition(MODEL *pModel, const char *pcLocName
             for (int32_t l = 0; l < ginf.nlabels; l++)
             {
                 pNod->geo->GetLabel(l, lbl);
-                if (lbl.name && storm::iEquals(pcLocName, lbl.name))
+                if (lbl.name && rust::string::iEquals(pcLocName, lbl.name))
                 {
                     pos.x = lbl.m[3][0];
                     pos.y = lbl.m[3][1];
@@ -560,7 +561,7 @@ void InterfaceBackScene::CreateMenuList(int32_t nStartIndex, ATTRIBUTES *pAMenu)
             continue;
         if (!FindLocator(pA->GetAttribute("locname"), &mtx, nullptr, nullptr))
         {
-            core.Trace("Warning! Interface Back scene: Can`t find locator %s", pA->GetAttribute("locname"));
+            rust::log::warn("Interface Back scene: Can`t find locator %s", pA->GetAttribute("locname"));
         }
         auto *pMD = new MenuDescr;
         Assert(pMD);
@@ -739,7 +740,7 @@ void InterfaceBackScene::InitLight(ATTRIBUTES *pAParam)
         }
         else
         {
-            core.Trace("Warning! Interface Back Scene: invalid torchlight model %s", pcFonarModel);
+            rust::log::warn("Interface Back Scene: invalid torchlight model %s", pcFonarModel);
         }
     }
 }
@@ -891,7 +892,7 @@ void InterfaceBackScene::InitAniModel(ATTRIBUTES *pAParam)
     const char *pcAniActionName = pAParam->GetAttribute("aniaction");
     if (!pcMdlName)
     {
-        core.Trace("Warning! Bad model name parameter for ani model into InterfaceBackScene.");
+        rust::log::warn("Bad model name parameter for ani model into InterfaceBackScene.");
         return;
     }
 
@@ -942,7 +943,7 @@ void InterfaceBackScene::InitStaticModel(ATTRIBUTES *pAParam)
     const char *pcTechniqueName = pAParam->GetAttribute("technique");
     if (!pcMdlName)
     {
-        core.Trace("Warning! Bad model name parameter for static model into InterfaceBackScene.");
+        rust::log::warn("Bad model name parameter for static model into InterfaceBackScene.");
         return;
     }
 

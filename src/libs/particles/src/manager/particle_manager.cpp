@@ -11,6 +11,7 @@
 #include "../i_common/names.h"
 #include "../system/data_source/data_string.h"
 #include "defines.h"
+#include "string_compare.hpp"
 
 #include <filesystem>
 
@@ -104,7 +105,7 @@ bool ParticleManager::OpenProject(const char *FileName)
     // std::string LongFileName = "resource\\particles\\";
     auto path = std::filesystem::path() / "resource" / "particles" / FileName;
     auto pathStr = path.extension().string();
-    if (!storm::iEquals(pathStr, ".prj"))
+    if (!rust::string::iEquals(pathStr, ".prj"))
         path += ".prj";
     pathStr = path.string();
     // MessageBoxA(NULL, (LPCSTR)path.c_str(), "", MB_OK); //~!~
@@ -114,7 +115,7 @@ bool ParticleManager::OpenProject(const char *FileName)
     auto IniFile = fio->OpenIniFile(pathStr.c_str());
     if (!IniFile)
     {
-        core.Trace("Can't find project '%s'", pathStr.c_str());
+        rust::log::info("Can't find project '%s'", pathStr.c_str());
         return false;
     }
 
@@ -320,7 +321,7 @@ IParticleSystem *ParticleManager::CreateParticleSystemEx(const char *FileName, c
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't loading. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't loading. Reason: Not found in cache", FileName);
         return nullptr;
     }
 
@@ -480,7 +481,7 @@ bool ParticleManager::FindInEnumUsedGeom(const char *GeomName)
     for (uint32_t n = 0; n < EnumUsedGeom.size(); n++)
     {
         const char *StoredGeomName = EnumUsedGeom[n].c_str();
-        if (storm::iEquals(StoredGeomName, GeomName))
+        if (rust::string::iEquals(StoredGeomName, GeomName))
             return true;
     }
     return false;
@@ -510,7 +511,7 @@ void ParticleManager::WriteSystemCache(const char *FileName)
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't save. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't save. Reason: Not found in cache", FileName);
         return;
     }
 
@@ -528,7 +529,7 @@ void ParticleManager::WriteSystemCache(const char *FileName)
     */
 
     pMemSave.Close();
-    core.Trace("Particle system '%s' saved.", FileName);
+    rust::log::trace("Particle system '%s' saved.", FileName);
 }
 
 void ParticleManager::WriteSystemCacheAs(const char *FileName, const char *NewName)
@@ -536,7 +537,7 @@ void ParticleManager::WriteSystemCacheAs(const char *FileName, const char *NewNa
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't save. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't save. Reason: Not found in cache", FileName);
         return;
     }
 
@@ -550,7 +551,7 @@ void ParticleManager::WriteSystemCacheAs(const char *FileName, const char *NewNa
     */
 
     pMemSave.Close();
-    core.Trace("Particle system '%s' saved.", NewName);
+    rust::log::trace("Particle system '%s' saved.", NewName);
 }
 
 void ParticleManager::WriteSystemCache(const char *FileName, MemFile *pMemFile)
@@ -558,7 +559,7 @@ void ParticleManager::WriteSystemCache(const char *FileName, MemFile *pMemFile)
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't save. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't save. Reason: Not found in cache", FileName);
         return;
     }
 
@@ -570,7 +571,7 @@ void ParticleManager::LoadSystemCache(const char *FileName, MemFile *pMemFile)
     DataSource *pDataSource = pDataCache->GetParticleSystemDataSource(FileName);
     if (!pDataSource)
     {
-        core.Trace("Particle system '%s' can't load. Reason: Not found in cache", FileName);
+        rust::log::info("Particle system '%s' can't load. Reason: Not found in cache", FileName);
         return;
     }
 

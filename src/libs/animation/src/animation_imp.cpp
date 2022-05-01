@@ -373,7 +373,7 @@ void AnimationImp::BuildAnimationMatrices()
         }
         else
         {
-            core.Trace("AnimationImp::BuildAnimationMatrices -> Not support mode");
+            rust::log::info("AnimationImp::BuildAnimationMatrices -> Not support mode");
             __debugbreak();
             /*_asm int 3;*/
             //    float frame = 0.0f;

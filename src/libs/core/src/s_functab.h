@@ -2,7 +2,7 @@
 
 #include "s_import_func.h"
 #include "s_vartab.h"
-#include "storm/string_compare.hpp"
+#include "string_compare.hpp"
 #include <unordered_map>
 #include <vector>
 
@@ -96,6 +96,6 @@ class FuncTable
 
   private:
     std::vector<FuncInfo> funcs_;
-    storm::iStrHasher hasher_;
-    std::unordered_map<std::string, size_t, storm::iStrHasher, storm::iStrComparator> hash_table_;
+    rust::string::iStrHasher hasher_;
+    std::unordered_map<std::string, size_t, rust::string::iStrHasher, rust::string::iStrComparator> hash_table_;
 };

@@ -624,14 +624,14 @@ bool ISLAND::CreateHeightMap(const std::string_view &pDir, const std::string_vie
         sscanf(str_tmp, "%f,%f,%f", &vTmpBoxSize.x, &vTmpBoxSize.y, &vTmpBoxSize.z);
         if (~(vTmpBoxCenter - vBoxCenter) > 0.1f)
         {
-            core.Trace("Island: vBoxCenter not equal, foam error: %s, distance = %.3f", iniName.c_str(),
-                       sqrtf(~(vTmpBoxCenter - vBoxCenter)));
-            core.Trace("vBoxCenter = %f,%f,%f", vBoxCenter.x, vBoxCenter.y, vBoxCenter.z);
+            rust::log::trace("Island: vBoxCenter not equal, foam error: %s, distance = %.3f",
+                             iniName.c_str(), sqrtf(~(vTmpBoxCenter - vBoxCenter)));
+            rust::log::trace("vBoxCenter = %f,%f,%f", vBoxCenter.x, vBoxCenter.y, vBoxCenter.z);
         }
         if (~(vTmpBoxSize - vBoxSize) > 0.1f)
         {
-            core.Trace("Island: vBoxSize not equal, foam error: %s", iniName.c_str());
-            core.Trace("vBoxSize = %f,%f,%f", vBoxSize.x, vBoxSize.y, vBoxSize.z);
+            rust::log::trace("Island: vBoxSize not equal, foam error: %s", iniName.c_str());
+            rust::log::trace("vBoxSize = %f,%f,%f", vBoxSize.x, vBoxSize.y, vBoxSize.z);
         }
 
         AIPath.Load(*pI);
@@ -640,7 +640,7 @@ bool ISLAND::CreateHeightMap(const std::string_view &pDir, const std::string_vie
         return true;
     }
 
-    core.Trace("WARN: FOAM: Can't find foam: %s", fileName.c_str());
+    rust::log::warn("FOAM: Can't find foam: %s", fileName.c_str());
 
     int32_t iTestSize = static_cast<int32_t>(vBoxSize.x / 1.5f);
     // fixed maximum depth map to 1024 size!!!!!!!
@@ -662,7 +662,7 @@ bool ISLAND::CreateHeightMap(const std::string_view &pDir, const std::string_vie
     for (fZ = 0; fZ < static_cast<float>(iDMapSize); fZ += 1.0f)
     {
         if ((static_cast<int32_t>(fZ) & 127) == 127)
-            core.Trace("Z = %.0f", fZ);
+            rust::log::trace("Z = %.0f", fZ);
         for (fX = 0; fX < static_cast<float>(iDMapSize); fX += 1.0f)
         {
             int32_t iIdx = static_cast<int32_t>(fX) + static_cast<int32_t>(fZ) * iDMapSize;
@@ -745,7 +745,7 @@ bool ISLAND::SaveTga8(char *fname, uint8_t *pBuffer, uint32_t dwSizeX, uint32_t 
     auto fileS = fio->_CreateFile(fname, std::ios::binary | std::ios::out);
     if (!fileS.is_open())
     {
-        core.Trace("Island: Can't create island file! %s", fname);
+        rust::log::info("Island: Can't create island file! %s", fname);
         return false;
     }
     fio->_WriteFile(fileS, &tga_head, sizeof(tga_head));
@@ -784,7 +784,7 @@ bool ISLAND::Mount(const std::string_view &fname, const std::string_view &fdir, 
     if (pNode)
         seabed_id = pNode->Unlink2Model();
     else
-        core.Trace("Island: island %s has no sea bed, check me!", std::string(fname).c_str());
+        rust::log::info("Island: island %s has no sea bed, check me!", std::string(fname).c_str());
 
     EntityManager::AddToLayer(ISLAND_TRACE, model_id, 10);
     EntityManager::AddToLayer(ISLAND_TRACE, seabed_id, 10);

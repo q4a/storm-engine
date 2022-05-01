@@ -56,7 +56,7 @@ void CXI_WINDOW::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -117,7 +117,7 @@ void CXI_WINDOW::AddNode(const char *pcNodeName)
     auto *pNod = ptrOwner->FindNode(pcNodeName, nullptr);
     if (!pNod)
     {
-        core.Trace("Warning! CXI_WINDOW::AddNode(%s) : Node not found", pcNodeName);
+        rust::log::warn("CXI_WINDOW::AddNode(%s) : Node not found", pcNodeName);
         return;
     }
     m_aNodeNameList.push_back(pcNodeName);

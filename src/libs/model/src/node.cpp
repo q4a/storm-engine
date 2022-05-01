@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "core.h"
 #include "modelr.h"
+#include "string_compare.hpp"
 
 VGEOMETRY *NODER::gs = nullptr;
 VDX9RENDER *NODER::rs = nullptr;
@@ -447,7 +448,7 @@ void NODER::Draw()
 //----------------------------------------------------------
 NODER *NODER::FindNode(const char *cNodeName)
 {
-    if (storm::iEquals(cNodeName, name))
+    if (rust::string::iEquals(cNodeName, name))
         return this;
     for (int32_t i = 0; i < nnext; i++)
     {

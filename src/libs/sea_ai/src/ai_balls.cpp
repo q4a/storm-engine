@@ -2,6 +2,7 @@
 #include "ai_fort.h"
 #include "inlines.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 
 AIBalls *AIBalls::pAIBalls = nullptr;
@@ -115,7 +116,7 @@ void AIBalls::AddBall(ATTRIBUTES *pABall)
 
     uint32_t i;
     for (i = 0; i < aBallTypes.size(); i++)
-        if (storm::iEquals(aBallTypes[i].sName, pBallName))
+        if (rust::string::iEquals(aBallTypes[i].sName, pBallName))
             break;
     if (i == aBallTypes.size())
         return;

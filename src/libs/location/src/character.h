@@ -14,6 +14,7 @@
 #include "model.h"
 #include "v_module_api.h"
 #include <string>
+#include "string_compare.hpp"
 
 class Location;
 class MODEL;
@@ -851,6 +852,6 @@ inline bool Character::IsSetBlade() const
 
 inline bool Character::PriorityActionIsJump() const
 {
-    return (priorityAction.name &&
-            (storm::iEquals(priorityAction.name, jump.name) || storm::iEquals(priorityAction.name, fall.name)));
+    return (priorityAction.name && (rust::string::iEquals(priorityAction.name, jump.name) ||
+                                    rust::string::iEquals(priorityAction.name, fall.name)));
 }

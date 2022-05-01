@@ -23,11 +23,11 @@ ParticleService::~ParticleService()
 
     if (!CreatedManagers.empty())
     {
-        core.Trace("Unreleased particles managers found !\n");
+        rust::log::warn("Unreleased particles managers found !\n");
     }
     for (auto n = 0; n < CreatedManagers.size(); n++)
     {
-        core.Trace("Manager created in %s, Line %d\n", CreatedManagers[n].FileName.c_str(), CreatedManagers[n].Line);
+        rust::log::info("Manager created in %s, Line %d\n", CreatedManagers[n].FileName.c_str(), CreatedManagers[n].Line);
         CreatedManagers[n].pManager->Release();
     }
 }

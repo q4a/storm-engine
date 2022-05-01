@@ -235,7 +235,7 @@ void CXI_QUESTTITLE::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -328,7 +328,7 @@ void CXI_QUESTTITLE::SetNewTopQuest(ATTRIBUTES *pA, int topNum)
     const int32_t aq = pA->GetAttributesNum();
     if (topNum < 0 || topNum >= aq)
     {
-        core.Trace("quest number out of range");
+        rust::log::info("quest number out of range");
         return;
     }
     m_nCommonQuantity = aq;

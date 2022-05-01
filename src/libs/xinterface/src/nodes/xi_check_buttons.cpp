@@ -1,6 +1,7 @@
 #include "xi_check_buttons.h"
 #include "xi_util.h"
 #include <stdio.h>
+#include "string_compare.hpp"
 
 #define PicName(bDisable, bSelect)                                                                                     \
     ((bDisable && !m_sDisablePicture.empty()) ? m_sDisablePicture : ((bSelect) ? m_sSelectPicture : m_sNormalPicture))
@@ -91,7 +92,7 @@ void CXI_CHECKBUTTONS::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     if (ReadIniString(ini1, name1, ini2, name2, "font", param, sizeof(param), ""))
     {
         if ((m_nFontNum = m_rs->LoadFont(param)) == -1)
-            core.Trace("can not load font:'%s'", param);
+            rust::log::info("can not load font:'%s'", param);
     }
     m_fFontScale = GetIniFloat(ini1, name1, ini2, name2, "fontScale", 1.f);
 
@@ -167,9 +168,9 @@ void CXI_CHECKBUTTONS::LoadIni(INIFILE *ini1, const char *name1, INIFILE *ini2, 
     m_nFontAlignment = PR_ALIGN_LEFT;
     if (ReadIniString(ini1, name1, ini2, name2, "alignment", param, sizeof(param), ""))
     {
-        if (storm::iEquals(param, "center"))
+        if (rust::string::iEquals(param, "center"))
             m_nFontAlignment = PR_ALIGN_CENTER;
-        if (storm::iEquals(param, "right"))
+        if (rust::string::iEquals(param, "right"))
             m_nFontAlignment = PR_ALIGN_RIGHT;
     }
 
@@ -240,7 +241,7 @@ void CXI_CHECKBUTTONS::SaveParametersToIni()
     auto pIni = fio->OpenIniFile(ptrOwner->m_sDialogFileName.c_str());
     if (!pIni)
     {
-        core.Trace("Warning! Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
+        rust::log::warn("Can`t open ini file name %s", ptrOwner->m_sDialogFileName.c_str());
         return;
     }
 
@@ -359,7 +360,7 @@ void CXI_CHECKBUTTONS::SetInternalName(std::string &sName)
     else
     {
         m_nEditableSectionIndex = -1;
-        if (storm::iStartsWith(sName.c_str(), "btn"))
+        if (rust::string::iStartsWith(sName.c_str(), "btn"))
         {
             m_nEditableSectionIndex = atoi(&sName.c_str()[3]) - 1;
         }
@@ -381,7 +382,7 @@ void CXI_CHECKBUTTONS::AddButton(const char *pcText, bool bDisable, bool bSelect
         const auto strNum = pStringService->GetStringNum(pcText);
         if (strNum < 0)
         {
-            storm::Logger::default_logger->error("CXI_CHECKBUTTONS: No string '{:}' found in language files", pcText);
+            rust::log::error("CXI_CHECKBUTTONS: No string '%s' found in language files", pcText);
             delete pBD;
             return;
         }

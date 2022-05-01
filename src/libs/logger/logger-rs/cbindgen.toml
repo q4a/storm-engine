@@ -1,5 +1,0 @@
-include_guard = "rust_logger_h"
-pragma_once = true
-
-[export]
-exclude = ["wchar_t"]

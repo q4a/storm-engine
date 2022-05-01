@@ -63,7 +63,7 @@ bool Fader::Init()
 
         if (fadeIn == static_cast<Fader *>(EntityManager::GetEntityPointer(eid))->fadeIn)
         {
-            core.Trace("Fader::Init() -> Fader already created, %s", fadeIn ? "fade in phase" : "fade out phase");
+            rust::log::info("Fader::Init() -> Fader already created, %s", fadeIn ? "fade in phase" : "fade out phase");
         }
         //!!!
         // return false;
@@ -312,7 +312,7 @@ void Fader::Realize(uint32_t delta_time)
             {
                 if (!rs->GetRenderTargetAsTexture(&tex))
                 {
-                    core.Trace("Fader: GetRenderTargetAsTexture failed");
+                    rust::log::info("Fader: GetRenderTargetAsTexture failed");
                 }
             }
             else {

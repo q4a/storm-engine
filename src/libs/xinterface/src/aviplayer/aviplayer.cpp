@@ -188,27 +188,27 @@ bool CAviPlayer::PlayMedia(const char *fileName)
     hr = pAMStream->OpenFile(wPath, 0);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!!(0x%8x) Can`t load video file = %s", hr, fileName);
+        rust::log::error("Video Error!!!(0x%8x) Can`t load video file = %s", hr, fileName);
         return false;
     }
 
     hr = pAMStream->GetMediaStream(MSPID_PrimaryVideo, &pPrimaryVidStream);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t get media stream");
+        rust::log::error("Video Error!!! Can`t get media stream");
         return false;
     }
     hr = pPrimaryVidStream->QueryInterface(IID_IDirectDrawMediaStream, (void **)&pDDStream);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t query interface DirectDrawMediaStream");
+        rust::log::error("Video Error!!! Can`t query interface DirectDrawMediaStream");
         return false;
     }
     ddsd.dwSize = sizeof(ddsd);
     hr = pDDStream->GetFormat(&ddsd, nullptr, nullptr, nullptr);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t get stream format");
+        rust::log::error("Video Error!!! Can`t get stream format");
         return false;
     }
     int32_t srcWidth = ddsd.dwWidth;
@@ -216,7 +216,7 @@ bool CAviPlayer::PlayMedia(const char *fileName)
     hr = pDD->CreateSurface(&ddsd, &pVideoSurface, nullptr);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t create surface for video imaging");
+        rust::log::error("Video Error!!! Can`t create surface for video imaging");
         return false;
     }
 
@@ -228,7 +228,7 @@ bool CAviPlayer::PlayMedia(const char *fileName)
     hr = pDDStream->CreateSample(static_cast<IDirectDrawSurface *>(pVideoSurface), nullptr, 0, &pSample);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t create sample for this video");
+        rust::log::error("Video Error!!! Can`t create sample for this video");
         return false;
     }
 
@@ -264,7 +264,7 @@ bool CAviPlayer::PlayMedia(const char *fileName)
                            D3DPOOL_MANAGED, &pTex);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t create texture for this video");
+        rust::log::error("Video Error!!! Can`t create texture for this video");
         return false;
     }
 
@@ -292,7 +292,7 @@ bool CAviPlayer::PlayMedia(const char *fileName)
     hr = pAMStream->SetState(STREAMSTATE_RUN);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t run media stream");
+        rust::log::error("Video Error!!! Can`t run media stream");
         return false;
     }
 
@@ -311,39 +311,39 @@ bool CAviPlayer::GetInterfaces()
     hr = DirectDrawCreate(nullptr, &pDD, nullptr);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t create DirectDraw interface");
+        rust::log::error("Video Error!!! Can`t create DirectDraw interface");
         return false;
     }
     hr = pDD->SetCooperativeLevel(static_cast<HWND>(core.GetAppHWND()), DDSCL_NORMAL);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t SetCooperativeLevel for DirectDraw");
+        rust::log::error("Video Error!!! Can`t SetCooperativeLevel for DirectDraw");
         return false;
     }
     hr = CoCreateInstance(CLSID_AMMultiMediaStream, nullptr, CLSCTX_INPROC_SERVER, IID_IAMMultiMediaStream,
                           (void **)&pAMStream);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t create interface AMMultiMediaStream");
+        rust::log::error("Video Error!!! Can`t create interface AMMultiMediaStream");
         return false;
     }
 
     hr = pAMStream->Initialize(STREAMTYPE_READ, AMMSF_NOGRAPHTHREAD, nullptr);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t initialize interface AMMultiMediaStream");
+        rust::log::error("Video Error!!! Can`t initialize interface AMMultiMediaStream");
         return false;
     }
     hr = pAMStream->AddMediaStream(pDD, &MSPID_PrimaryVideo, 0, nullptr);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t add video stream");
+        rust::log::error("Video Error!!! Can`t add video stream");
         return false;
     }
     hr = pAMStream->AddMediaStream(nullptr, &MSPID_PrimaryAudio, AMMSF_ADDDEFAULTRENDERER, nullptr);
     if (FAILED(hr))
     {
-        core.Trace("Video Error!!! Can`t add audio stream");
+        rust::log::error("Video Error!!! Can`t add audio stream");
         return false;
     }
 

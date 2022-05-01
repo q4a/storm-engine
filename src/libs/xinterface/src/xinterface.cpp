@@ -9,7 +9,7 @@
 #include "string_service/str_service.h"
 #include "xservice.h"
 #include <cstdio>
-
+#include "string_compare.hpp"
 #include <direct.h>
 
 #define CHECK_FILE_NAME "PiratesReadme.txt"
@@ -543,7 +543,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
     case MSG_INTERFACE_ENABLE_STRING: {
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
-            if (m_stringes[i].sStringName != nullptr && storm::iEquals(param, m_stringes[i].sStringName))
+            if (m_stringes[i].sStringName != nullptr && rust::string::iEquals(param, m_stringes[i].sStringName))
             {
                 m_stringes[i].bUsed = true;
                 break;
@@ -554,7 +554,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
     case MSG_INTERFACE_DISABLE_STRING: {
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
-            if (m_stringes[i].sStringName != nullptr && storm::iEquals(param, m_stringes[i].sStringName))
+            if (m_stringes[i].sStringName != nullptr && rust::string::iEquals(param, m_stringes[i].sStringName))
             {
                 m_stringes[i].bUsed = false;
                 break;
@@ -605,7 +605,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         int l;
         for (l = 0; l < m_nStringQuantity; l++)
         {
-            if (m_stringes[l].sStringName != nullptr && storm::iEquals(m_stringes[l].sStringName, param))
+            if (m_stringes[l].sStringName != nullptr && rust::string::iEquals(m_stringes[l].sStringName, param))
                 break;
         }
         if (l == m_nStringQuantity)
@@ -650,7 +650,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
         {
-            if (m_stringes[i].sStringName != nullptr && storm::iEquals(m_stringes[i].sStringName, param))
+            if (m_stringes[i].sStringName != nullptr && rust::string::iEquals(m_stringes[i].sStringName, param))
             {
                 STORM_DELETE(m_stringes[i].sStringName);
                 FONT_RELEASE(pRenderService, m_stringes[i].fontNum);
@@ -666,7 +666,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         const std::string &param = message.String();
         for (int i = 0; i < m_nStringQuantity; i++)
         {
-            if (m_stringes[i].sStringName != nullptr && storm::iEquals(m_stringes[i].sStringName, param))
+            if (m_stringes[i].sStringName != nullptr && rust::string::iEquals(m_stringes[i].sStringName, param))
             {
                 m_stringes[i].dwColor = message.Long();
                 break;
@@ -680,7 +680,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         IMAGE_Entity *pImg = m_imgLists;
         while (pImg != nullptr)
         {
-            if (pImg->sImageName != nullptr && storm::iEquals(pImg->sImageName, param))
+            if (pImg->sImageName != nullptr && rust::string::iEquals(pImg->sImageName, param))
                 break;
             pImg = pImg->next;
         }
@@ -794,7 +794,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
             subText[0] = 0;
             sscanf(pCur, "%[^,]", subText);
             int subSize = strlen(subText);
-            if (storm::iEquals(subText, param))
+            if (rust::string::iEquals(subText, param))
                 return 1;
             pCur += subSize;
             if (*pCur == ',')
@@ -889,7 +889,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         IMAGE_Entity *pImg = m_imgLists;
         while (pImg != nullptr)
         {
-            if (pImg->sImageName != nullptr && storm::iEquals(pImg->sImageName, param))
+            if (pImg->sImageName != nullptr && rust::string::iEquals(pImg->sImageName, param))
                 break;
             pImg = pImg->next;
         }
@@ -1180,7 +1180,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
     auto ini = fio->OpenIniFile(sFileName);
     if (!ini)
     {
-        core.Trace("ini file %s not found!", sFileName);
+        rust::log::warn("ini file %s not found!", sFileName);
         core.PostEvent("exitCancel", 1, nullptr);
         return;
     }
@@ -1204,27 +1204,28 @@ void XINTERFACE::LoadDialog(const char *sFileName)
                 tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
             else
                 priority = 80;
-            if (storm::iEquals(param, "PC") || storm::iEquals(param, "XBOX") || storm::iEquals(param, "LANG"))
+            if (rust::string::iEquals(param, "PC") || rust::string::iEquals(param, "XBOX") ||
+                rust::string::iEquals(param, "LANG"))
             {
                 const bool bThisXBOX = false;
-                if (storm::iEquals(param, "PC"))
+                if (rust::string::iEquals(param, "PC"))
                 {
                     if (bThisXBOX)
                         param[0] = 0;
                     tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
                 }
-                else if (storm::iEquals(param, "XBOX"))
+                else if (rust::string::iEquals(param, "XBOX"))
                 {
                     if constexpr (!bThisXBOX)
                         param[0] = 0;
                     else
                         tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
                 }
-                else if (storm::iEquals(param, "LANG"))
+                else if (rust::string::iEquals(param, "LANG"))
                 {
                     tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
                     char *strLangName = pStringService->GetLanguage();
-                    if (strLangName == nullptr || !storm::iEquals(param, strLangName))
+                    if (strLangName == nullptr || !rust::string::iEquals(param, strLangName))
                         param[0] = 0;
                     else
                         tmpStr = XI_ParseStr(tmpStr, param, sizeof(param));
@@ -1235,7 +1236,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
                 SFLB_CreateNode(ownerIni.get(), ini.get(), param, nodeName, priority);
 
             i = 0;
-            if (findName && storm::iEquals(findName, "item"))
+            if (findName && rust::string::iEquals(findName, "item"))
             {
                 ini->ReadString(section, findName, skey, sizeof(skey) - 1);
                 for (; i < keyNum; i++)
@@ -1246,7 +1247,7 @@ void XINTERFACE::LoadDialog(const char *sFileName)
             if (i < keyNum)
             {
                 // not more items
-                if (findName && storm::iEquals(findName, "item"))
+                if (findName && rust::string::iEquals(findName, "item"))
                 {
                     findName = "glow";
                     if (m_pGlowCursorNode == nullptr)
@@ -1318,7 +1319,7 @@ void XINTERFACE::CreateNode(const char *sFileName, const char *sNodeType, const 
         ini = fio->OpenIniFile(sFileName);
         if (!ini)
         {
-            core.Trace("ini file %s not found!", sFileName);
+            rust::log::warn("ini file %s not found!", sFileName);
             return;
         }
     }
@@ -1332,7 +1333,7 @@ void XINTERFACE::SFLB_CreateNode(INIFILE *pOwnerIni, INIFILE *pUserIni, const ch
 {
     if (!sNodeType || !sNodeType[0])
     {
-        core.Trace("Warning! Interface: Can`t create node with null type.");
+        rust::log::warn("Interface: Can`t create node with null type.");
         return;
     }
     /*if( !pOwnerIni->TestSection( sNodeType ) &&
@@ -1462,80 +1463,80 @@ CINODE *XINTERFACE::NewNode(const char *pcNodType)
     if (!pcNodType)
         return nullptr;
     CINODE *pNewNod = nullptr;
-    if (storm::iEquals(pcNodType, "BUTTON"))
+    if (rust::string::iEquals(pcNodType, "BUTTON"))
         pNewNod = new CXI_BUTTON;
-    else if (storm::iEquals(pcNodType, "VIDEO"))
+    else if (rust::string::iEquals(pcNodType, "VIDEO"))
         pNewNod = new CXI_VIDEO;
-    else if (storm::iEquals(pcNodType, "SCROLLIMAGE"))
+    else if (rust::string::iEquals(pcNodType, "SCROLLIMAGE"))
         pNewNod = new CXI_SCROLLIMAGE;
-    else if (storm::iEquals(pcNodType, "IMAGECOLLECTION"))
+    else if (rust::string::iEquals(pcNodType, "IMAGECOLLECTION"))
         pNewNod = new CXI_IMGCOLLECTION;
-    else if (storm::iEquals(pcNodType, "STRINGCOLLECTION"))
+    else if (rust::string::iEquals(pcNodType, "STRINGCOLLECTION"))
         pNewNod = new CXI_STRCOLLECTION;
-    else if (storm::iEquals(pcNodType, "FOURIMAGES"))
+    else if (rust::string::iEquals(pcNodType, "FOURIMAGES"))
         pNewNod = new CXI_FOURIMAGE;
-    else if (storm::iEquals(pcNodType, "RECTANGLE"))
+    else if (rust::string::iEquals(pcNodType, "RECTANGLE"))
         pNewNod = new CXI_RECTANGLE;
-    else if (storm::iEquals(pcNodType, "BOUNDER"))
+    else if (rust::string::iEquals(pcNodType, "BOUNDER"))
         pNewNod = new CXI_BOUNDER;
-    else if (storm::iEquals(pcNodType, "TITLE"))
+    else if (rust::string::iEquals(pcNodType, "TITLE"))
         pNewNod = new CXI_TITLE;
-    else if (storm::iEquals(pcNodType, "TEXTBUTTON"))
+    else if (rust::string::iEquals(pcNodType, "TEXTBUTTON"))
         pNewNod = new CXI_TEXTBUTTON;
-    else if (storm::iEquals(pcNodType, "SCROLLBAR"))
+    else if (rust::string::iEquals(pcNodType, "SCROLLBAR"))
         pNewNod = new CXI_SCROLLBAR;
-    else if (storm::iEquals(pcNodType, "LINECOLLECTION"))
+    else if (rust::string::iEquals(pcNodType, "LINECOLLECTION"))
         pNewNod = new CXI_LINECOLLECTION;
-    else if (storm::iEquals(pcNodType, "STATUSLINE"))
+    else if (rust::string::iEquals(pcNodType, "STATUSLINE"))
         pNewNod = new CXI_STATUSLINE;
-    else if (storm::iEquals(pcNodType, "CHANGER"))
+    else if (rust::string::iEquals(pcNodType, "CHANGER"))
         pNewNod = new CXI_CHANGER;
-    else if (storm::iEquals(pcNodType, "PICTURE"))
+    else if (rust::string::iEquals(pcNodType, "PICTURE"))
         pNewNod = new CXI_PICTURE;
-    else if (storm::iEquals(pcNodType, "GLOWS"))
+    else if (rust::string::iEquals(pcNodType, "GLOWS"))
         pNewNod = new CXI_GLOWER;
-    else if (storm::iEquals(pcNodType, "LRCHANGER"))
+    else if (rust::string::iEquals(pcNodType, "LRCHANGER"))
         pNewNod = new CXI_LRCHANGER;
-    else if (storm::iEquals(pcNodType, "TWO_PICTURE"))
+    else if (rust::string::iEquals(pcNodType, "TWO_PICTURE"))
         pNewNod = new CXI_TWOPICTURE;
-    else if (storm::iEquals(pcNodType, "SCROLLER"))
+    else if (rust::string::iEquals(pcNodType, "SCROLLER"))
         pNewNod = new CXI_SCROLLER;
-    else if (storm::iEquals(pcNodType, "QUESTTITLE"))
+    else if (rust::string::iEquals(pcNodType, "QUESTTITLE"))
         pNewNod = new CXI_QUESTTITLE;
-    else if (storm::iEquals(pcNodType, "QUESTTEXT"))
+    else if (rust::string::iEquals(pcNodType, "QUESTTEXT"))
         pNewNod = new CXI_QUESTTEXTS;
-    else if (storm::iEquals(pcNodType, "SLIDEPICTURE"))
+    else if (rust::string::iEquals(pcNodType, "SLIDEPICTURE"))
         pNewNod = new CXI_SLIDEPICTURE;
-    else if (storm::iEquals(pcNodType, "FORMATEDTEXT"))
+    else if (rust::string::iEquals(pcNodType, "FORMATEDTEXT"))
         pNewNod = new CXI_FORMATEDTEXT;
-    else if (storm::iEquals(pcNodType, "EDITBOX"))
+    else if (rust::string::iEquals(pcNodType, "EDITBOX"))
         pNewNod = new CXI_EDITBOX;
-    else if (storm::iEquals(pcNodType, "SLIDER"))
+    else if (rust::string::iEquals(pcNodType, "SLIDER"))
         pNewNod = new CXI_SLIDELINE;
-    else if (storm::iEquals(pcNodType, "KEYCHOOSER"))
+    else if (rust::string::iEquals(pcNodType, "KEYCHOOSER"))
         pNewNod = new CXI_KEYCHANGER;
-    else if (storm::iEquals(pcNodType, "VIDEORECTANGLE"))
+    else if (rust::string::iEquals(pcNodType, "VIDEORECTANGLE"))
         pNewNod = new CXI_VIDEORECT;
-    else if (storm::iEquals(pcNodType, "VIMAGESCROLL"))
+    else if (rust::string::iEquals(pcNodType, "VIMAGESCROLL"))
         pNewNod = new CXI_VIMAGESCROLL;
-    else if (storm::iEquals(pcNodType, "PCEDITBOX"))
+    else if (rust::string::iEquals(pcNodType, "PCEDITBOX"))
         pNewNod = new CXI_PCEDITBOX;
-    else if (storm::iEquals(pcNodType, "SCROLLEDPICTURE"))
+    else if (rust::string::iEquals(pcNodType, "SCROLLEDPICTURE"))
         pNewNod = new CXI_SCROLLEDPICTURE;
-    else if (storm::iEquals(pcNodType, "WINDOW"))
+    else if (rust::string::iEquals(pcNodType, "WINDOW"))
         pNewNod = new CXI_WINDOW;
-    else if (storm::iEquals(pcNodType, "CHECKBUTTON"))
+    else if (rust::string::iEquals(pcNodType, "CHECKBUTTON"))
         pNewNod = new CXI_CHECKBUTTONS;
-    else if (storm::iEquals(pcNodType, "TABLE"))
+    else if (rust::string::iEquals(pcNodType, "TABLE"))
         pNewNod = new CXI_TABLE;
-    else if (storm::iEquals(pcNodType, "FRAME"))
+    else if (rust::string::iEquals(pcNodType, "FRAME"))
         pNewNod = new CXI_BORDER;
-    else if (storm::iEquals(pcNodType, "CONTEXTHELP"))
+    else if (rust::string::iEquals(pcNodType, "CONTEXTHELP"))
         m_pContHelp = pNewNod = new CXI_CONTEXTHELP;
-    else if (storm::iEquals(pcNodType, "GLOWCURSOR"))
+    else if (rust::string::iEquals(pcNodType, "GLOWCURSOR"))
         m_pGlowCursorNode = pNewNod = new CXI_GLOWCURSOR;
     else
-        core.Trace("Not supported node type:\"%s\"", pcNodType);
+        rust::log::warn("Not supported node type:\"%s\"", pcNodType);
     return pNewNod;
 }
 
@@ -1548,7 +1549,7 @@ void XINTERFACE::DeleteNode(const char *pcNodeName)
     CINODE *pNod;
     for (pNod = m_pNodes; pNod; pNod = pNod->m_next)
     {
-        if (pNod->m_nodeName && storm::iEquals(pNod->m_nodeName, pcNodeName))
+        if (pNod->m_nodeName && rust::string::iEquals(pNod->m_nodeName, pcNodeName))
             break;
         pPrevNod = pNod;
     }
@@ -1618,7 +1619,7 @@ void XINTERFACE::SetTooltip(const char *pcHeader, const char *pcText1, uint32_t 
     if (!pNodFrame || !pNodTitleRect || !pNodPic || !pNodTextFrame2 || !pNodTextFrame4 || !pNodTitle || !pNodText1 ||
         !pNodText2 || !pNodText3 || !pNodText4)
     {
-        core.Trace("Warning! Interface::SetTooltip - no precreated node");
+        rust::log::warn("Interface::SetTooltip - no precreated node");
         return;
     }
     // set
@@ -1803,14 +1804,14 @@ void XINTERFACE::AddNodeToWindow(const char *pcNodeName, const char *pcWindowNam
 {
     if (!m_pNodes)
     {
-        core.Trace("Warning! Interface::AddNodeToWindow(%s,%s) : Empty node list", pcNodeName, pcWindowName);
+        rust::log::warn("Interface::AddNodeToWindow(%s,%s) : Empty node list", pcNodeName, pcWindowName);
         return;
     }
 
     CINODE *pNod = m_pNodes->FindNode(pcWindowName);
     if (!pNod || pNod->m_nNodeType != NODETYPE_WINDOW)
     {
-        core.Trace("Warning! Interface::AddNodeToWindow(%s,%s) : Window not found", pcNodeName, pcWindowName);
+        rust::log::warn("Interface::AddNodeToWindow(%s,%s) : Window not found", pcNodeName, pcWindowName);
         return;
     }
 
@@ -2598,7 +2599,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
     if (patr != nullptr && patr->GetParent() != nullptr && patr->GetParent()->GetParent() != nullptr)
     {
         const char *sParentName = patr->GetParent()->GetParent()->GetThisName();
-        if (sParentName == nullptr || !storm::iEquals(sParentName, "pictures"))
+        if (sParentName == nullptr || !rust::string::iEquals(sParentName, "pictures"))
             return 0;
         const char *sImageName = patr->GetParent()->GetThisName();
         if (sImageName == nullptr)
@@ -2607,7 +2608,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
         IMAGE_Entity *pImList = m_imgLists;
         while (pImList != nullptr)
         {
-            if (pImList->sImageName != nullptr && storm::iEquals(pImList->sImageName, sImageName))
+            if (pImList->sImageName != nullptr && rust::string::iEquals(pImList->sImageName, sImageName))
                 break;
             pImList = pImList->next;
         }
@@ -2633,7 +2634,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
         if (patr->GetThisName() == nullptr)
             return 0;
         // set picture
-        if (storm::iEquals(patr->GetThisName(), "pic"))
+        if (rust::string::iEquals(patr->GetThisName(), "pic"))
         {
             STORM_DELETE(pImList->sPicture);
             if (patr->GetThisAttr() != nullptr)
@@ -2650,7 +2651,7 @@ uint32_t XINTERFACE::AttributeChanged(ATTRIBUTES *patr)
             pImList->imageID = pPictureService->GetImageNum(pImList->sImageListName, pImList->sPicture);
         }
         // set texture
-        if (storm::iEquals(patr->GetThisName(), "tex"))
+        if (rust::string::iEquals(patr->GetThisName(), "tex"))
         {
             if (pImList->sImageListName != nullptr)
                 pPictureService->ReleaseTextureID(pImList->sImageListName);
@@ -2714,7 +2715,7 @@ bool XINTERFACE::SFLB_DoSaveFileData(const char *saveName, const char *saveData)
             pTex->UnlockRect(0);
         }
         else
-            core.Trace("Can`t lock screenshot texture");
+            rust::log::info("Can`t lock screenshot texture");
     }
 
     core.SetSaveData(saveName, pdat, sizeof(SAVE_DATA_HANDLE) + slen + ssize);
@@ -2969,7 +2970,7 @@ void XINTERFACE::ReleaseDinamicPic(const char *sPicName)
     IMAGE_Entity *findImg;
     for (findImg = m_imgLists; findImg != nullptr; findImg = findImg->next)
     {
-        if (findImg->sImageName != nullptr && storm::iEquals(findImg->sImageName, sPicName))
+        if (findImg->sImageName != nullptr && rust::string::iEquals(findImg->sImageName, sPicName))
             break;
         prevImg = findImg;
     }
@@ -3370,7 +3371,7 @@ int XINTERFACE::LoadIsExist()
             {
                 i++;
             }
-            if (storm::iEquals(sCurLngName, &datBuf[i]))
+            if (rust::string::iEquals(sCurLngName, &datBuf[i]))
             {
                 bFindFile = true;
                 break;
@@ -3594,7 +3595,7 @@ CONTROLS_CONTAINER::CONTEINER_DESCR *CONTROLS_CONTAINER::FindContainer(const cha
         return nullptr;
     CONTEINER_DESCR *pCont = pContainers;
     while (pCont)
-        if (pCont->resultName != nullptr && storm::iEquals(pCont->resultName, sContainer))
+        if (pCont->resultName != nullptr && rust::string::iEquals(pCont->resultName, sContainer))
             return pCont;
     return nullptr;
 }
@@ -3608,7 +3609,7 @@ CONTROLS_CONTAINER::CONTEINER_DESCR::CONTROL_DESCR *CONTROLS_CONTAINER::CONTEINE
     CONTROL_DESCR *pCtrl = pControls;
     while (pCtrl)
     {
-        if (pCtrl->controlName && storm::iEquals(pCtrl->controlName, cntrlName))
+        if (pCtrl->controlName && rust::string::iEquals(pCtrl->controlName, cntrlName))
             return pCtrl;
         pCtrl = pCtrl->next;
     }

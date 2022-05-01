@@ -405,7 +405,7 @@ void DECK_CAMERA::SetStartPos()
         }
         else
         {
-            core.Trace("WARNING! Bad camera locator on ship %s", pModel->GetNode(0)->GetName());
+            rust::log::warn("Bad camera locator on ship %s", pModel->GetNode(0)->GetName());
         }
 
         // SetCursorPos(lock_x,lock_y);

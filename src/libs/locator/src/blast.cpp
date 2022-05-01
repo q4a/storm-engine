@@ -35,7 +35,7 @@ bool BLAST::Init()
     auto ini = fio->OpenIniFile("resource\\ini\\particles\\particles.ini");
     if (!ini)
     {
-        core.Trace("not found: resource\\ini\\particles\\particles.ini");
+        rust::log::info("not found: resource\\ini\\particles\\particles.ini");
         return false;
     }
 

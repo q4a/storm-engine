@@ -7,6 +7,7 @@
 #include "particles/i_particle_system.h"
 #include "p_system.h"
 #include "shared/messages.h"
+#include "string_compare.hpp"
 
 PARTICLES::PARTICLES()
 {
@@ -192,7 +193,7 @@ PARTICLE_SYSTEM *PARTICLES::CreateSystem(const char *pFileName, uint32_t LifeTim
     //__debugbreak(); //~!~
     auto path = std::filesystem::path() / "resource" / "particles" / pFileName;
     std::string pathStr = path.extension().string();
-    if (!storm::iEquals(pathStr, ".xps"))
+    if (!rust::string::iEquals(pathStr, ".xps"))
         path += ".xps";
     pathStr = path.string();
     // MessageBoxA(NULL, (LPCSTR)path.c_str(), "", MB_OK); //~!~

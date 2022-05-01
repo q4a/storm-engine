@@ -9,7 +9,7 @@
 #include "os_window.hpp"
 #include "steam_api.hpp"
 #include "v_sound_service.h"
-#include "storm/fs.h"
+#include "fs.hpp"
 #include "logger.hpp"
 #include "watermark.hpp"
 
@@ -18,7 +18,6 @@ namespace
 
 CorePrivate *core_private;
 
-constexpr char defaultLoggerName[] = "system";
 bool isRunning = false;
 bool bActive = true;
 
@@ -59,7 +58,7 @@ void mimalloc_fun(const char *msg, void *arg)
     static std::filesystem::path mimalloc_log_path;
     if (mimalloc_log_path.empty())
     {
-        mimalloc_log_path = fs::GetLogsPath() / "mimalloc.log";
+        mimalloc_log_path = rust::fs::GetLogsPath() / "mimalloc.log";
         std::error_code ec;
         remove(mimalloc_log_path, ec);
     }
@@ -158,19 +157,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     }
 
     // Init stash
-    create_directories(fs::GetSaveDataPath());
+    create_directories(rust::fs::GetSaveDataPath());
 
     // Init logging
-    storm::Logger::default_logger = storm::Logger::file_logger(defaultLoggerName, LogLevel::Trace);
-    storm::Logger::default_logger->info("Logging system initialized. Running on %s", STORM_BUILD_WATERMARK_STRING);
-    storm::Logger::default_logger->info("mimalloc-redirect status: %s", mi_is_redirected() ? "true" : "false");
+    rust::log::info("Logging system initialized. Running on %s", STORM_BUILD_WATERMARK_STRING);
+    rust::log::info("mimalloc-redirect status: %s", mi_is_redirected() ? "true" : "false");
 
     // Init core
     core_private = static_cast<CorePrivate *>(&core);
     core_private->Init();
 
     // Read config
-    auto ini = fio->OpenIniFile(fs::ENGINE_INI_FILE_NAME);
+    auto ini = fio->OpenIniFile(rust::fs::ENGINE_INI_FILE_NAME);
 
     uint32_t dwMaxFPS = 0;
     bool bSteam = false;
@@ -195,7 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     }
     catch (const std::exception &e)
     {
-        storm::Logger::default_logger->error(e.what());
+        rust::log::error(e.what());
         return EXIT_FAILURE;
     }
 

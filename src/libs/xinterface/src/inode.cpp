@@ -2,6 +2,7 @@
 #include <cstdarg>
 
 #include "core.h"
+#include "string_compare.hpp"
 
 CINODE::CINODE()
 {
@@ -167,7 +168,7 @@ CINODE *CINODE::FindNode(CINODE *pNod, const char *sNodName)
         return nullptr;
     while (pNod)
     {
-        if (pNod->m_nodeName && storm::iEquals(sNodName, pNod->m_nodeName))
+        if (pNod->m_nodeName && rust::string::iEquals(sNodName, pNod->m_nodeName))
             break;
         if (pNod->m_list)
         {
@@ -333,7 +334,7 @@ bool CINODE::GetMidStr(const char *inStr, char *buf, size_t bufSize, const char 
     const int lenEnd = strlen(endStr);
 
     int i;
-    auto fcn = storm::iFind(inStr, begStr, 0);
+    auto fcn = rust::string::iFind(inStr, begStr, 0);
     if (fcn < 0)
     {
         buf[0] = 0;
@@ -341,7 +342,7 @@ bool CINODE::GetMidStr(const char *inStr, char *buf, size_t bufSize, const char 
     }
     fcn += lenBeg;
 
-    auto lcn = storm::iFind(inStr, endStr, fcn);
+    auto lcn = rust::string::iFind(inStr, endStr, fcn);
     if (lcn <= fcn)
     {
         buf[0] = 0;

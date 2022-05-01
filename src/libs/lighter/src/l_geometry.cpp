@@ -96,7 +96,7 @@ void LGeometry::AddObject(const char *name, entid_t model)
     object[numObjects].m = static_cast<MODEL *>(EntityManager::GetEntityPointer(model));
     if (!object[numObjects].m)
     {
-        core.Trace("Location lighter: can't get pointer to model %s", name);
+        rust::log::info("Location lighter: can't get pointer to model %s", name);
     }
     else
         numObjects++;
@@ -114,12 +114,12 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
         // Check
         if (object[i].m != static_cast<MODEL *>(EntityManager::GetEntityPointer(object[i].model)))
         {
-            core.Trace("Location lighter: lost model!!!");
+            rust::log::warn("Location lighter: lost model!!!");
             return false;
         }
         if (object[i].m->GetNode(1))
         {
-            core.Trace("Location lighter: incorrent model %s (nodes above 1)", object[i].nameReal);
+            rust::log::warn("Location lighter: incorrent model %s (nodes above 1)", object[i].nameReal);
             return false;
         }
         // Recalculate matrices
@@ -129,7 +129,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
         auto *g = node->geo;
         if (!g)
         {
-            core.Trace("Location lighter: incorrent model %s (node not include geos)", object[i].nameReal);
+            rust::log::warn("Location lighter: incorrent model %s (node not include geos)", object[i].nameReal);
             return false;
         }
         // Geometry information
@@ -137,7 +137,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
         g->GetInfo(info);
         if (info.nvrtbuffs <= 0)
         {
-            core.Trace("Location lighter: incorrent model %s (not vertex buffers), skip it", object[i].nameReal);
+            rust::log::warn("Location lighter: incorrent model %s (not vertex buffers), skip it", object[i].nameReal);
             object[i].lBufSize = 0;
             continue;
         }
@@ -158,7 +158,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
             D3DVERTEXBUFFER_DESC desc;
             if (!vbuf || vbuf->GetDesc(&desc) != D3D_OK)
             {
-                core.Trace("Location lighter: vertex buffer error, model %s, vbID %i", object[i].nameReal, vbID);
+                rust::log::warn("Location lighter: vertex buffer error, model %s, vbID %i", object[i].nameReal, vbID);
                 return false;
             }
             // Analyzing the type
@@ -169,8 +169,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
             isEnabledType &= ((desc.FVF & D3DFVF_PSIZE) == 0);
             if (!isEnabledType)
             {
-                core.Trace("Location lighter: incorrect fvf of vertex buffer, model %s, vbID %i", object[i].nameReal,
-                           vbID);
+                rust::log::warn("Location lighter: incorrect fvf of vertex buffer, model %s, vbID %i", object[i].nameReal, vbID);
                 return false;
             }
             // Vertex size
@@ -182,8 +181,8 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
             auto num = desc.Size / stride;
             if (num <= 0)
             {
-                core.Trace("Location lighter: incorrect number of verteces in vertex buffer, model %s, vbID %i",
-                           object[i].nameReal, vbID);
+                rust::log::warn("Location lighter: incorrect number of verteces in vertex buffer, model %s, vbID %i",
+                                object[i].nameReal, vbID);
                 return false;
             }
             // reserve a place
@@ -196,7 +195,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
             uint8_t *pnt = nullptr;
             if (vbuf->Lock(0, desc.Size, (VOID **)&pnt, 0) != D3D_OK)
             {
-                core.Trace("Location lighter: vertex buffer no locked, model %s, vbID %i", object[i].nameReal, vbID);
+                rust::log::warn("Location lighter: vertex buffer no locked, model %s, vbID %i", object[i].nameReal, vbID);
                 return false;
             }
             for (int32_t v = 0; v < num; v++)
@@ -214,8 +213,8 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
                 }
                 else
                 {
-                    core.Trace("Location lighter: model %s, vbID %i, vrt: %i : normal have zero length",
-                               object[i].nameReal, vbID, v);
+                    rust::log::warn("Location lighter: model %s, vbID %i, vrt: %i : normal have zero length",
+                                    object[i].nameReal, vbID, v);
                 }
                 vrt[numVrt].c = 0.0f;
                 vrt[numVrt].bc = 0.0f;
@@ -244,7 +243,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
         auto *idx = static_cast<uint16_t *>(rs->LockIndexBuffer(ibID));
         if (!idx)
         {
-            core.Trace("Location lighter: index buffer no locked, model %s", object[i].nameReal);
+            rust::log::warn("Location lighter: index buffer no locked, model %s", object[i].nameReal);
             return false;
         }
         GEOS::OBJECT obj;
@@ -258,8 +257,7 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
                     break;
             if (vb >= numVBuffers)
             {
-                core.Trace("Location lighter: vertex buffer %i not found, model %s", obj.vertex_buff,
-                           object[i].nameReal);
+                rust::log::warn("Location lighter: vertex buffer %i not found, model %s", obj.vertex_buff, object[i].nameReal);
                 return false;
             }
             vb = vbuffer[vb].start + obj.start_vertex;
@@ -273,8 +271,8 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
                 int32_t i3 = triangles[t * 3 + 2];
                 if (i1 >= obj.num_vertices || i2 >= obj.num_vertices || i3 >= obj.num_vertices)
                 {
-                    core.Trace("Location lighter: model %s have incorrect vertex index, (obj: %i, trg: %i)",
-                               object[i].nameReal, n, t);
+                    rust::log::warn("Location lighter: model %s have incorrect vertex index, (obj: %i, trg: %i)",
+                                    object[i].nameReal, n, t);
                     return false;
                 }
                 // Absolute indices
@@ -290,8 +288,8 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
                 // skip the empty triangle
                 if (sq <= 0.0f)
                 {
-                    core.Trace("Location lighter: model %s have zero triangle, (obj: %i, trg: %i)", object[i].nameReal,
-                               n, t);
+                    rust::log::warn("Location lighter: model %s have zero triangle, (obj: %i, trg: %i)",
+                                    object[i].nameReal, n, t);
                     continue;
                 }
                 // Add a triangle
@@ -313,8 +311,8 @@ bool LGeometry::Process(VDX9RENDER *rs, int32_t numLights)
                     {
                         if (((vr.flags & Vertex::f_inv) != 0) != isInv)
                         {
-                            core.Trace("Location lighter: model %s have bug normals, (obj: %i, trg: %i)",
-                                       object[i].nameReal, n, t);
+                            rust::log::warn("Location lighter: model %s have bug normals, (obj: %i, trg: %i)",
+                                            object[i].nameReal, n, t);
                             vr.flags |= Vertex::f_bug;
                         }
                     }
@@ -405,7 +403,7 @@ void LGeometry::UpdateColors(VDX9RENDER *rs)
             pnt = static_cast<uint8_t *>(rs->LockVertexBuffer(vrt[i].vbid));
             if (!pnt)
             {
-                core.Trace("Location lighter: no lock vertex buffer for update color");
+                rust::log::info("Location lighter: no lock vertex buffer for update color");
                 continue;
             }
             lockedVB = vrt[i].vbid;

@@ -4,15 +4,20 @@
 #include <memory>
 #include <mutex>
 
-#include "logger_rs.h"
+#include "rust_rs.h"
+#include "storm/fmt.hpp"
 
-namespace storm
+namespace rust::log
 {
+void error(const char *const format, ...);
+void warn(const char *const format, ...);
+void info(const char *const format, ...);
+void debug(const char *const format, ...);
+void trace(const char *const format, ...);
+
 class Logger
 {
   public:
-    static std::shared_ptr<Logger> default_logger;
-
     static std::shared_ptr<Logger> file_logger(const std::string &name, LogLevel level);
     static std::shared_ptr<Logger> console_logger(const std::string &name, LogLevel level);
 

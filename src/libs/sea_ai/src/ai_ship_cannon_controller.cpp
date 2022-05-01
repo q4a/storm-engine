@@ -1,6 +1,7 @@
 #include "ai_balls.h"
 #include "ai_ship.h"
 #include "inlines.h"
+#include "string_compare.hpp"
 
 float AIShipCannonController::fMaxCannonDamageDistance = 1.0f;
 float AIShipCannonController::fMaxCannonDamageRadiusPoint = 1.0f;
@@ -750,7 +751,7 @@ bool AIShipCannonController::ScanShipForCannons()
             pNode->geo->GetLabel(i, label);
             for (auto &bort : aShipBorts)
                 //       if (aShipBorts[j] == label.group_name) {
-                if (storm::iEquals(bort.sName, label.group_name))
+                if (rust::string::iEquals(bort.sName, label.group_name))
                 {
                     bort.aCannons.emplace_back();
                     AICannon *pCannon = &bort.aCannons.back();

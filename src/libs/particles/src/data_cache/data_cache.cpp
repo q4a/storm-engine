@@ -4,6 +4,7 @@
 
 #include "v_file_service.h"
 #include "v_module_api.h"
+#include "string_compare.hpp"
 
 bool ReadingAlreadyComplete;
 
@@ -29,7 +30,7 @@ void DataCache::CacheSystem(const char *FileName)
     // LongFileName.AddExtention(".xps");
     auto path = std::filesystem::path() / "resource" / "particles" / FileName;
     auto pathStr = path.extension().string();
-    if (!storm::iEquals(pathStr, ".xps"))
+    if (!rust::string::iEquals(pathStr, ".xps"))
         path += ".xps";
     pathStr = path.string();
     std::transform(pathStr.begin(), pathStr.end(), pathStr.begin(), tolower);
@@ -39,7 +40,7 @@ void DataCache::CacheSystem(const char *FileName)
 
     if (!sysFile.is_open())
     {
-        core.Trace("Particles: '%s' File not found !!!", pathStr.c_str());
+        rust::log::error("Particles: '%s' File not found !!!", pathStr.c_str());
         return;
     }
 
@@ -76,7 +77,7 @@ DataSource *DataCache::GetParticleSystemDataSource(const char *FileName)
     // NameWithExt.Lower();
     std::filesystem::path path = FileName;
     auto pathStr = path.extension().string();
-    if (!storm::iEquals(pathStr, ".xps"))
+    if (!rust::string::iEquals(pathStr, ".xps"))
         path += ".xps";
     pathStr = path.string();
     std::transform(pathStr.begin(), pathStr.end(), pathStr.begin(), tolower);

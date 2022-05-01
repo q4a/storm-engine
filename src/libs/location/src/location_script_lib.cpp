@@ -7,6 +7,7 @@
 #include "core.h"
 #include "s_import_func.h"
 #include "v_s_stack.h"
+#include "string_compare.hpp"
 
 //============================================================================================
 
@@ -30,7 +31,7 @@ struct LocationFindCacheElement
     {
         if (v.size != size)
             return false;
-        if (storm::iEquals(v.name, name))
+        if (rust::string::iEquals(v.name, name))
             return true;
         return false;
     };
@@ -72,7 +73,7 @@ inline bool CheckID(VDATA *vd, const char *id, bool &res)
     if (!a->HasValue()) {
         return true;
     }
-    res = storm::iEquals(a->GetThisAttr(), id);
+    res = rust::string::iEquals(a->GetThisAttr(), id);
     return true;
 }
 
