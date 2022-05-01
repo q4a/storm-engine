@@ -36,12 +36,12 @@ extern "C" {
 /// # Safety
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
-void free_array_wchar(ArrayWchar *ptr);
+void ffi_free_array_wchar(ArrayWchar *ptr);
 
 /// # Safety
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
-void free_array_cchar(ArrayCchar *ptr);
+void ffi_free_array_cchar(ArrayCchar *ptr);
 
 ArrayWchar *ffi_home_directory();
 
@@ -53,9 +53,11 @@ ArrayWchar *ffi_screenshot_directory();
 
 ArrayCchar *ffi_screenshot_filename();
 
-IniData *load_ini_data(const char *path);
+IniData *ffi_load_ini_data(const char *path);
 
-void free_ini_data(IniData *ptr);
+void ffi_free_ini_data(IniData *ptr);
+
+ArrayCchar *ffi_get_string(IniData *ptr, const char *section, const char *key);
 
 void ffi_new_file_logger(const char *name, LogLevel level);
 

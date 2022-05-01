@@ -33,7 +33,7 @@ pub struct ArrayCchar {
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
 #[no_mangle]
-pub unsafe extern "C" fn free_array_wchar(ptr: *mut ArrayWchar) {
+pub unsafe extern "C" fn ffi_free_array_wchar(ptr: *mut ArrayWchar) {
     if ptr.is_null() {
         return;
     }
@@ -45,7 +45,7 @@ pub unsafe extern "C" fn free_array_wchar(ptr: *mut ArrayWchar) {
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
 #[no_mangle]
-pub unsafe extern "C" fn free_array_cchar(ptr: *mut ArrayCchar) {
+pub unsafe extern "C" fn ffi_free_array_cchar(ptr: *mut ArrayCchar) {
     if ptr.is_null() {
         return;
     }
@@ -117,7 +117,7 @@ impl From<String> for Box<ArrayCchar> {
 mod tests {
     use std::path::PathBuf;
 
-    use super::{free_array_cchar, free_array_wchar, ArrayCchar, ArrayWchar};
+    use super::{ffi_free_array_cchar, ffi_free_array_wchar, ArrayCchar, ArrayWchar};
 
     /// Testing correct allocation and deallocation using miri
     #[test]
@@ -125,7 +125,7 @@ mod tests {
         let path = PathBuf::from("C:\\Users\\UserName\\Documents\\My Games\\Sea Dogs\\Logs");
         let array: Box<ArrayWchar> = path.into();
         let ptr = Box::into_raw(array);
-        unsafe { free_array_wchar(ptr) };
+        unsafe { ffi_free_array_wchar(ptr) };
     }
 
     /// Testing correct allocation and deallocation using miri
@@ -134,6 +134,6 @@ mod tests {
         let path = "Test String".to_string();
         let array: Box<ArrayCchar> = path.into();
         let ptr = Box::into_raw(array);
-        unsafe { free_array_cchar(ptr) };
+        unsafe { ffi_free_array_cchar(ptr) };
     }
 }

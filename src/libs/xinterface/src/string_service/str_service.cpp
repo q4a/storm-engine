@@ -7,6 +7,7 @@
 #include "v_s_stack.h"
 #include "string_compare.hpp"
 #include <filesystem>
+#include "ini_file.hpp"
 
 #define USER_BLOCK_BEGINER '{'
 #define USER_BLOCK_ENDING '}'
@@ -229,7 +230,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             memcpy(m_sLanguageDir, param, len);
         }
         else
-            rust::log::warn("Not found directory record for language %s", sLanguage);
+            rust::log::warn("Not found directory record for language %s", m_sLanguage);
 
         // get the name of the ini file with common strings for this language
         if (langIni->ReadString("COMMON", "strings", param, sizeof(param) - 1, ""))
@@ -324,7 +325,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
 
     // check to right of ini files
     if (newSize != m_nStringQuantity && m_nStringQuantity != 0)
-        rust::log::warn("language %s ini file has different size", sLanguage);
+        rust::log::warn("language %s ini file has different size", m_sLanguage);
     m_nStringQuantity = newSize;
 
     // create strings & string names arreys
@@ -494,24 +495,22 @@ void STRSERVICE::LoadIni()
     char param[256];
 
     // initialize ini file
-    auto ini = fio->OpenIniFile(sLanguageFile);
-    if (!ini)
+    auto rust_ini = rust::ini::IniFile();
+    if (!rust_ini.Load(sLanguageFile))
     {
         rust::log::error("Language ini file not found!");
         return;
     }
 
     char sGlobalUserFileName[256];
-    if (!ini->ReadString("COMMON", "GlobalFile", sGlobalUserFileName, sizeof(sGlobalUserFileName) - 1, ""))
+    if (!rust_ini.ReadString("COMMON", "GlobalFile", sGlobalUserFileName, sizeof(sGlobalUserFileName) - 1, ""))
     {
         sGlobalUserFileName[0] = 0;
-        rust::log::warn("Language ini file have not global file name");
     }
 
     // Get default language name
-    if (!ini->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
+    if (!rust_ini.ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
     {
-        rust::log::warn("Language ini file have not default language.");
         strcpy_s(param, "English");
     }
 
