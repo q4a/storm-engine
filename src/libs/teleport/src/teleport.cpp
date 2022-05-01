@@ -229,7 +229,7 @@ void TMPTELEPORT::SetShowData(ATTRIBUTES *pA)
 
     for (auto i = 0; i < m_nStrQuantity; i++)
     {
-        auto *const tmpStr = pA->GetAttribute(i);
+        const char *tmpStr = pA->GetAttribute(i);
         m_descrArray[i].name = nullptr;
         m_descrArray[i].num = i;
         if (tmpStr == nullptr)
@@ -287,8 +287,8 @@ bool FINDFILESINTODIRECTORY::Init()
 {
     if (AttributesPointer)
     {
-        auto *const dirName = AttributesPointer->GetAttribute("dir");
-        auto *const maskName = AttributesPointer->GetAttribute("mask");
+        const char *dirName = AttributesPointer->GetAttribute("dir");
+        const char *maskName = AttributesPointer->GetAttribute("mask");
         const char *curMask;
         if (maskName)
         {
@@ -318,7 +318,7 @@ bool FINDDIALOGNODES::Init()
 {
     if (AttributesPointer)
     {
-        auto *const fileName = AttributesPointer->GetAttribute("file");
+        const char *fileName = AttributesPointer->GetAttribute("file");
         auto *pA = AttributesPointer->CreateSubAClass(AttributesPointer, "nodelist");
         if (fileName && pA)
         {

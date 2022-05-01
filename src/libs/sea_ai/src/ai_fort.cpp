@@ -185,11 +185,11 @@ bool AIFort::AddFort(ATTRIBUTES *pIslandAP, ATTRIBUTES *pFortLabelAP, ATTRIBUTES
     auto *const pModelsDirAP = pIslandAP->FindAClass(pIslandAP, "filespath.models");
     Assert(pModelsDirAP);
 
-    auto *const pModelName = pModelAP->GetThisAttr();
+    const char *pModelName = pModelAP->GetThisAttr();
     Assert(pModelName);
-    auto *const pLocatorsName = pLocatorsAP->GetThisAttr();
+    const char *pLocatorsName = pLocatorsAP->GetThisAttr();
     Assert(pLocatorsName);
-    auto *const pModelsDir = pModelsDirAP->GetThisAttr();
+    const char *pModelsDir = pModelsDirAP->GetThisAttr();
     Assert(pModelsDir);
 
     auto *pFort = new AI_FORT(pFortLabelAP);

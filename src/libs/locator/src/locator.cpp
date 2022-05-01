@@ -95,8 +95,8 @@ void LOCATOR::LocateForI(VDATA *pData)
         return;
     }
     char sFileLocators[256];
-    auto *const pAFilesPath = pA->FindAClass(pA, "filespath.models");
-    sprintf_s(sFileLocators, "%s\\%s", (pAFilesPath) ? pAFilesPath->GetThisAttr() : "", pA->GetAttribute("locators"));
+    const auto *pAFilesPath = pA->FindAClass(pA, "filespath.models");
+    sprintf_s(sFileLocators, "%s\\%s", (pAFilesPath) ? static_cast<const char*>(pAFilesPath->GetThisAttr()) : "", static_cast<const char*>(pA->GetAttribute("locators")));
     rs->SetLoadTextureEnable(false);
     g = gs->CreateGeometry(sFileLocators, "", 0);
     rs->SetLoadTextureEnable(true);
@@ -123,7 +123,7 @@ void LOCATOR::LocateForI(VDATA *pData)
                             rust::log::trace("LOCATOR: no name");
                             continue;
                         }
-                        if (rust::string::iEquals(pAA->GetAttributeClass(n)->GetAttribute("name"), label.name))
+                        if (rust::string::iEquals(to_string(pAA->GetAttributeClass(n)->GetAttribute("name")), label.name))
                         {
                             pAA->GetAttributeClass(n)->SetAttributeUseFloat("x", label.m[3][0]);
                             pAA->GetAttributeClass(n)->SetAttributeUseFloat("y", label.m[3][1]);
@@ -144,8 +144,9 @@ void LOCATOR::LocateForI(VDATA *pData)
             auto *pARC = pAA->GetAttributeClass(n);
             if (!pARC->FindAClass(pARC, "x"))
             {
-                rust::log::info("LOCATOR: Can't find locator with name: %s, geo: %s",
-                                pARC->GetAttribute("name"), pA->GetAttribute("locators"));
+                rust::log::info("LOCATOR: Can't find locator with name: %s, geo: %s", 
+                    static_cast<const char*>(pARC->GetAttribute("name")),
+                    static_cast<const char*>(pA->GetAttribute("locators")));
             }
         }
 

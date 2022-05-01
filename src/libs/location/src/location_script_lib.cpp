@@ -73,7 +73,7 @@ inline bool CheckID(VDATA *vd, const char *id, bool &res)
     if (!a->HasValue()) {
         return true;
     }
-    res = rust::string::iEquals(a->GetThisAttr(), id);
+    res = rust::string::iEquals(to_string(a->GetThisAttr()), id);
     return true;
 }
 
