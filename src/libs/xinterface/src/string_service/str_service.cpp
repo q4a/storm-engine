@@ -492,13 +492,10 @@ void STRSERVICE::LoadIni()
 {
     // GUARD(void STRSERVICE::LoadIni())
 
-    char param[256];
-
     // initialize ini file
     auto rust_ini = rust::ini::IniFile();
     if (!rust_ini.Load(sLanguageFile))
     {
-        rust::log::error("Language ini file not found!");
         return;
     }
 
@@ -509,6 +506,7 @@ void STRSERVICE::LoadIni()
     }
 
     // Get default language name
+    char param[256];
     if (!rust_ini.ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
     {
         strcpy_s(param, "English");
