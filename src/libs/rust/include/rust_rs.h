@@ -17,16 +17,26 @@ enum class LogLevel {
   Trace,
 };
 
+/// Parser for ini-configurations to be used with the storm-engine.
+/// Supports comments, sections and values without sections (`default` section will be used in such cases).
+/// This parser also supports multiple values for the same `key` (values will be merged in a single `Vec`).
+/// Comments at the end of value are NOT supported
 struct IniData;
 
-struct ArrayWchar {
+struct WCharArray {
   wchar_t *ptr;
   size_t len;
   size_t capacity;
 };
 
-struct ArrayCchar {
+struct CCharArray {
   char *ptr;
+  size_t len;
+  size_t capacity;
+};
+
+struct ArrayOfCCharArrays {
+  CCharArray *ptr;
   size_t len;
   size_t capacity;
 };
@@ -36,28 +46,35 @@ extern "C" {
 /// # Safety
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
-void ffi_free_array_wchar(ArrayWchar *ptr);
+void ffi_free_wchar_array(WCharArray *ptr);
 
 /// # Safety
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
-void ffi_free_array_cchar(ArrayCchar *ptr);
+void ffi_free_cchar_array(CCharArray *ptr);
 
-ArrayWchar *ffi_home_directory();
+/// # Safety
+///
+/// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
+void ffi_free_array_of_cchar_arrays(ArrayOfCCharArrays *ptr);
 
-ArrayWchar *ffi_logs_directory();
+WCharArray *ffi_home_directory();
 
-ArrayWchar *ffi_save_directory();
+WCharArray *ffi_logs_directory();
 
-ArrayWchar *ffi_screenshot_directory();
+WCharArray *ffi_save_directory();
 
-ArrayCchar *ffi_screenshot_filename();
+WCharArray *ffi_screenshot_directory();
+
+CCharArray *ffi_screenshot_filename();
 
 IniData *ffi_load_ini_data(const char *path);
 
 void ffi_free_ini_data(IniData *ptr);
 
-ArrayCchar *ffi_get_string(IniData *ptr, const char *section, const char *key);
+CCharArray *ffi_get_string(IniData *ptr, const char *section, const char *key);
+
+ArrayOfCCharArrays *ffi_get_multiple_strings(IniData *ptr, const char *section, const char *key);
 
 void ffi_new_file_logger(const char *name, LogLevel level);
 

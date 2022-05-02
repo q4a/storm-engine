@@ -40,7 +40,7 @@ bool IniFile::ReadString(const char *section, const char *key, char *buffer, siz
     }
 
     strcpy_s(buffer, buffer_size, value->ptr);
-    ffi_free_array_cchar(value);
+    ffi_free_cchar_array(value);
     return true;
 }
 
