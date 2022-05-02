@@ -93,7 +93,7 @@ impl IniData {
         Self::parse(&mut reader)
     }
 
-    /// Get single string value by it's `section_name` and `key`. 
+    /// Get single string value by it's `section_name` and `key`.
     /// If `section_name` is `None`, then `default` section is used.
     pub fn get_string(&self, section_name: Option<&str>, key: &str) -> Option<&str> {
         let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
@@ -123,7 +123,7 @@ mod export {
 
     use log::error;
 
-    use crate::common::{c_char_to_str, ArrayCchar, DEFAULT_LOGGER};
+    use crate::common::{c_char_to_str, ArrayOfCCharArrays, CCharArray, DEFAULT_LOGGER};
 
     use super::IniData;
 
@@ -158,24 +158,50 @@ mod export {
         ptr: *mut IniData,
         section: *const c_char,
         key: *const c_char,
-    ) -> *mut ArrayCchar {
+    ) -> *mut CCharArray {
         match ptr.as_ref() {
             Some(ini) => {
-                let section = if ptr.is_null() {
-                    None
-                } else {
-                    Some(c_char_to_str(section))
-                };
+                let section = get_section_name(section);
                 let key = c_char_to_str(key);
                 match ini.get_string(section, key) {
                     Some(val) => {
-                        let val: Box<ArrayCchar> = val.to_string().into();
-                        Box::into_raw(val)
+                        let array: CCharArray = val.to_string().into();
+                        array.into_raw()
                     }
                     None => std::ptr::null_mut(),
                 }
             }
             None => std::ptr::null_mut(),
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_get_multiple_strings(
+        ptr: *mut IniData,
+        section: *const c_char,
+        key: *const c_char,
+    ) -> *mut ArrayOfCCharArrays {
+        match ptr.as_ref() {
+            Some(ini) => {
+                let section = get_section_name(section);
+                let key = c_char_to_str(key);
+                match ini.get_multiple_strings(section, key) {
+                    Some(val) => {
+                        let array: ArrayOfCCharArrays = val.to_owned().into();
+                        array.into_raw()
+                    }
+                    None => std::ptr::null_mut(),
+                }
+            }
+            None => std::ptr::null_mut(),
+        }
+    }
+
+    unsafe fn get_section_name<'a>(section: *const c_char) -> Option<&'a str> {
+        if section.is_null() {
+            None
+        } else {
+            Some(c_char_to_str(section))
         }
     }
 }

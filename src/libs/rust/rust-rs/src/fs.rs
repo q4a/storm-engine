@@ -38,39 +38,39 @@ pub fn screenshot_filename() -> String {
 }
 
 mod export {
-    use crate::common::{ArrayCchar, ArrayWchar};
+    use crate::common::{CCharArray, WCharArray};
 
     use super::{
         home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename,
     };
 
     #[no_mangle]
-    pub extern "C" fn ffi_home_directory() -> *mut ArrayWchar {
-        let array: Box<ArrayWchar> = home_directory().into();
-        Box::into_raw(array)
+    pub extern "C" fn ffi_home_directory() -> *mut WCharArray {
+        let array: WCharArray = home_directory().into();
+        array.into_raw()
     }
 
     #[no_mangle]
-    pub extern "C" fn ffi_logs_directory() -> *mut ArrayWchar {
-        let array: Box<ArrayWchar> = logs_directory().into();
-        Box::into_raw(array)
+    pub extern "C" fn ffi_logs_directory() -> *mut WCharArray {
+        let array: WCharArray = logs_directory().into();
+        array.into_raw()
     }
 
     #[no_mangle]
-    pub extern "C" fn ffi_save_directory() -> *mut ArrayWchar {
-        let array: Box<ArrayWchar> = save_directory().into();
-        Box::into_raw(array)
+    pub extern "C" fn ffi_save_directory() -> *mut WCharArray {
+        let array: WCharArray = save_directory().into();
+        array.into_raw()
     }
 
     #[no_mangle]
-    pub extern "C" fn ffi_screenshot_directory() -> *mut ArrayWchar {
-        let array: Box<ArrayWchar> = screenshot_directory().into();
-        Box::into_raw(array)
+    pub extern "C" fn ffi_screenshot_directory() -> *mut WCharArray {
+        let array: WCharArray = screenshot_directory().into();
+        array.into_raw()
     }
 
     #[no_mangle]
-    pub extern "C" fn ffi_screenshot_filename() -> *mut ArrayCchar {
-        let filename: Box<ArrayCchar> = screenshot_filename().into();
-        Box::into_raw(filename)
+    pub extern "C" fn ffi_screenshot_filename() -> *mut CCharArray {
+        let filename: CCharArray = screenshot_filename().into();
+        filename.into_raw()
     }
 }
