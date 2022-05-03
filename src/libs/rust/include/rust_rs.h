@@ -82,6 +82,12 @@ ArrayOfCCharArrays *ffi_get_multiple_strings(IniData *ptr, const char *section, 
 
 size_t ffi_get_amount_of_values(IniData *ptr, const char *section, const char *key);
 
+int ffi_get_int(IniData *ptr, const char *section, const char *key, int default_value);
+
+double ffi_get_double(IniData *ptr, const char *section, const char *key, double default_value);
+
+float ffi_get_float(IniData *ptr, const char *section, const char *key, float default_value);
+
 void ffi_new_file_logger(const char *name, LogLevel level);
 
 void ffi_new_console_logger(const char *name, LogLevel level);

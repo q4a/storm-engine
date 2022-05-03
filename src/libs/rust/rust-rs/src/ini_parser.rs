@@ -1,10 +1,14 @@
+use log::error;
 use std::{
     collections::HashMap,
     fs::File,
     io::{BufRead, BufReader},
     path::Path,
+    str::FromStr,
 };
 use thiserror::Error;
+
+use crate::common::DEFAULT_LOGGER;
 
 const DEFAULT_SECTION: &str = "default";
 
@@ -76,6 +80,11 @@ impl IniData {
                         .entry(key.trim().to_lowercase())
                         .or_insert_with(Vec::new);
 
+                    let new_value = if let Some(comment) = new_value.find(';') {
+                        &new_value[..comment]
+                    } else {
+                        new_value
+                    };
                     key_data.push(new_value.trim().to_string());
                 }
                 None => return Err(IniParserError::NoKey(original_line)),
@@ -124,12 +133,28 @@ impl IniData {
 
         section.get(&key.to_lowercase()).map_or(0, |v| v.len())
     }
+
+    /// Try to get the value and parse it as an integer
+    pub fn get_value<T: FromStr>(&self, section: Option<&str>, key: &str) -> Option<T> {
+        let value = self.get_string(section, key)?;
+        match value.parse::<T>() {
+            Ok(v) => Some(v),
+            Err(_) => {
+                error!(target: DEFAULT_LOGGER, "Couldn't parse <{}> value", value);
+                None
+            }
+        }
+    }
 }
 
 mod export {
-    use std::{os::raw::c_char, path::Path};
+    use std::{
+        os::raw::{c_char, c_double, c_float, c_int},
+        path::Path,
+        str::FromStr,
+    };
 
-    use log::error;
+    use log::{error, warn};
 
     use crate::common::{
         c_char_to_str, copy_to_c_char, size_t, ArrayOfCCharArrays, DEFAULT_LOGGER,
@@ -180,7 +205,13 @@ mod export {
         let key = c_char_to_str(key);
         match ini_data.get_string(section, key) {
             Some(val) => copy_to_c_char(val, buffer, buffer_size),
-            None => return false,
+            None => {
+                warn!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't find the key <{}> in the <{:?}> section", key, section
+                );
+                return false;
+            }
         };
 
         true
@@ -224,11 +255,66 @@ mod export {
         }
     }
 
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_get_int(
+        ptr: *mut IniData,
+        section: *const c_char,
+        key: *const c_char,
+        default_value: c_int,
+    ) -> c_int {
+        get_value(ptr, section, key, default_value)
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_get_double(
+        ptr: *mut IniData,
+        section: *const c_char,
+        key: *const c_char,
+        default_value: c_double,
+    ) -> c_double {
+        get_value(ptr, section, key, default_value)
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_get_float(
+        ptr: *mut IniData,
+        section: *const c_char,
+        key: *const c_char,
+        default_value: c_float,
+    ) -> c_float {
+        get_value(ptr, section, key, default_value)
+    }
+
     unsafe fn get_section_name<'a>(section: *const c_char) -> Option<&'a str> {
         if section.is_null() {
             None
         } else {
             Some(c_char_to_str(section))
+        }
+    }
+
+    unsafe fn get_value<T: FromStr>(
+        ptr: *mut IniData,
+        section: *const c_char,
+        key: *const c_char,
+        default_value: T,
+    ) -> T {
+        match ptr.as_ref() {
+            Some(ini) => {
+                let section = get_section_name(section);
+                let key = c_char_to_str(key);
+                match ini.get_value(section, key) {
+                    Some(v) => v,
+                    None => {
+                        warn!(
+                            target: DEFAULT_LOGGER,
+                            "Couldn't find the key <{}> in the <{:?}> section", key, section
+                        );
+                        default_value
+                    }
+                }
+            }
+            None => default_value,
         }
     }
 }
@@ -332,6 +418,26 @@ model	= resource\land
 ;this is a comment
 [models]
 model	= resource\land
+        "
+        .as_bytes();
+
+        let result = IniData::parse(&mut data);
+        assert!(result.is_ok());
+
+        let result = result.unwrap();
+        assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model"), 1);
+        assert_eq!(
+            result.get_string(Some("models"), "model"),
+            Some(r"resource\land")
+        );
+    }
+
+    #[test]
+    fn value_with_comment_test() {
+        let mut data = r"
+[models]
+model	= resource\land ;this is a comment
         "
         .as_bytes();
 

@@ -69,6 +69,21 @@ std::vector<std::string> IniFile::ReadMultipleStrings(const char *section, const
     return values;
 }
 
+int32_t IniFile::GetInt(const char *section, const char *key, int32_t default_value)
+{
+    return ffi_get_int(iniData, section, key, default_value);
+}
+
+double IniFile::GetDouble(const char *section, const char *key, double default_value)
+{
+    return ffi_get_double(iniData, section, key, default_value);
+}
+
+float IniFile::GetFloat(const char *section, const char *key, float default_value)
+{
+    return ffi_get_float(iniData, section, key, default_value);
+}
+
 void IniFile::Unload()
 {
     if (iniData != nullptr)
