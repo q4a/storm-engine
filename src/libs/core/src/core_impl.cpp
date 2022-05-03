@@ -244,17 +244,17 @@ void CoreImpl::ProcessEngineIniFile()
 
     bEngineIniProcessed = true;
 
-    auto engine_ini = fio->OpenIniFile(rust::fs::ENGINE_INI_FILE_NAME);
-    if (!engine_ini)
+    auto engine_ini = rust::ini::IniFile();
+    if (!engine_ini.Load(rust::fs::ENGINE_INI_FILE_NAME))
         throw std::runtime_error("no 'engine.ini' file");
 
-    auto res = engine_ini->ReadString(nullptr, "program_directory", String, sizeof(String), "");
+    auto res = engine_ini.ReadString(nullptr, "program_directory", String, sizeof(String), "");
     if (res)
     {
         Compiler->SetProgramDirectory(String);
     }
 
-    res = engine_ini->ReadString(nullptr, "controls", String, sizeof(String), "");
+    res = engine_ini.ReadString(nullptr, "controls", String, sizeof(String), "");
     if (res)
     {
         core_internal.Controls = static_cast<CONTROLS *>(MakeClass(String));
@@ -269,9 +269,9 @@ void CoreImpl::ProcessEngineIniFile()
         core_internal.Controls = new CONTROLS;
     }
 
-    loadCompatibilitySettings(*engine_ini);
+    loadCompatibilitySettings(engine_ini);
 
-    res = engine_ini->ReadString(nullptr, "run", String, sizeof(String), "");
+    res = engine_ini.ReadString(nullptr, "run", String, sizeof(String), "");
     if (res)
     {
         if (!Compiler->CreateProgram(String))
@@ -923,7 +923,7 @@ void CoreImpl:: collectCrashInfo() const
     Compiler->CollectCallStack();
 }
 
-void CoreImpl::loadCompatibilitySettings(INIFILE &inifile)
+void CoreImpl::loadCompatibilitySettings(rust::ini::IniFile &inifile)
 {
     using namespace storm;
 

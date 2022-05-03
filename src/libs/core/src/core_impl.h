@@ -5,6 +5,7 @@
 #include "compiler.h"
 #include "services_list.h"
 #include "timer.h"
+#include "ini_file.hpp"
 
 #include <windows.h>
 
@@ -131,7 +132,7 @@ class CoreImpl : public CorePrivate
     bool Exit_flag; // true if the program closing
 
   private:
-    void loadCompatibilitySettings(INIFILE &inifile);
+    void loadCompatibilitySettings(rust::ini::IniFile &inifile);
 
     storm::ENGINE_VERSION targetVersion_ = storm::ENGINE_VERSION::LATEST;
 
