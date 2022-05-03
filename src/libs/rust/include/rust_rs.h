@@ -76,6 +76,8 @@ CCharArray *ffi_get_string(IniData *ptr, const char *section, const char *key);
 
 ArrayOfCCharArrays *ffi_get_multiple_strings(IniData *ptr, const char *section, const char *key);
 
+size_t ffi_get_amount_of_values(IniData *ptr, const char *section, const char *key);
+
 void ffi_new_file_logger(const char *name, LogLevel level);
 
 void ffi_new_console_logger(const char *name, LogLevel level);

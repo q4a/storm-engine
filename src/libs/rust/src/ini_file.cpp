@@ -44,6 +44,17 @@ bool IniFile::ReadString(const char *section, const char *key, char *buffer, siz
     return true;
 }
 
+size_t IniFile::AmountOfValues(const char *section, const char *key)
+{
+    if (iniData == nullptr)
+    {
+        return 0;
+    }
+
+    const auto value = ffi_get_amount_of_values(iniData, section, key);
+    return value;
+}
+
 std::vector<std::string> IniFile::ReadMultipleStrings(const char *section, const char *key)
 {
     std::vector<std::string> values;
