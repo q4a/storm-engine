@@ -7,6 +7,7 @@
 #include "v_s_stack.h"
 #include "string_compare.hpp"
 #include <filesystem>
+#include "ini_file.hpp"
 
 #define USER_BLOCK_BEGINER '{'
 #define USER_BLOCK_ENDING '}'
@@ -196,10 +197,9 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         return;
 
     // initialize ini file
-    auto langIni = fio->OpenIniFile(sLanguageFile);
-    if (!langIni)
+    auto langIni = rust::ini::IniFile();
+    if (!langIni.Load(sLanguageFile))
     {
-        rust::log::info("ini file %s not found!", sLanguageFile);
         return;
     }
 
@@ -219,7 +219,7 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
         STORM_DELETE(m_sLanguageDir);
 
         // get a directory for text files of a given language
-        if (langIni->ReadString("DIRECTORY", m_sLanguage, param, sizeof(param) - 1, ""))
+        if (langIni.ReadString("DIRECTORY", m_sLanguage, param, sizeof(param) - 1, ""))
         {
             const auto len = strlen(param) + 1;
             if ((m_sLanguageDir = new char[len]) == nullptr)
@@ -228,11 +228,9 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             }
             memcpy(m_sLanguageDir, param, len);
         }
-        else
-            rust::log::warn("Not found directory record for language %s", sLanguage);
 
         // get the name of the ini file with common strings for this language
-        if (langIni->ReadString("COMMON", "strings", param, sizeof(param) - 1, ""))
+        if (langIni.ReadString("COMMON", "strings", param, sizeof(param) - 1, ""))
         {
             const auto len = strlen(param) + 1;
             if ((m_sIniFileName = new char[len]) == nullptr)
@@ -241,14 +239,12 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             }
             memcpy(m_sIniFileName, param, len);
         }
-        else
-            rust::log::warn("Not found common strings file record");
 
         if (m_sLanguageDir != nullptr && m_sIniFileName != nullptr)
             break;
 
         // compare the current language with the default
-        if (langIni->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
+        if (langIni.ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
         {
             if (rust::string::iEquals(m_sLanguage, param))
                 break;
@@ -272,13 +268,12 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
     if (RenderService)
     {
         char fullIniPath[512];
-        if (langIni->ReadString("FONTS", m_sLanguage, param, sizeof(param) - 1, ""))
+        if (langIni.ReadString("FONTS", m_sLanguage, param, sizeof(param) - 1, ""))
         {
             sprintf_s(fullIniPath, "resource\\ini\\%s", param);
         }
         else
         {
-            rust::log::warn("Not found font record for language %s", m_sLanguage);
             sprintf_s(fullIniPath, "resource\\ini\\fonts.ini");
         }
         RenderService->SetFontIniFileName(fullIniPath);
@@ -307,31 +302,25 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
 
     // initialize ini file
     sprintf_s(param, "resource\\ini\\texts\\%s\\%s", m_sLanguageDir, m_sIniFileName);
-    auto ini = fio->OpenIniFile(param);
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load(param))
     {
-        rust::log::warn("ini file \"%s\" not found!", param);
         return;
     }
 
     // get string quantity
-    auto newSize = 0;
-    if (ini->ReadString(nullptr, "string", param, sizeof(param) - 1, ""))
-        do
-        {
-            newSize++;
-        } while (ini->ReadStringNext(nullptr, "string", param, sizeof(param) - 1));
+    auto string_values = ini.ReadMultipleStrings(nullptr, "string");
 
     // check to right of ini files
-    if (newSize != m_nStringQuantity && m_nStringQuantity != 0)
-        rust::log::warn("language %s ini file has different size", sLanguage);
-    m_nStringQuantity = newSize;
+    if (string_values.size() != m_nStringQuantity && m_nStringQuantity != 0)
+        rust::log::warn("language %s ini file has different size", m_sLanguage);
+    m_nStringQuantity = string_values.size();
 
     // create strings & string names arreys
-    if (newSize > 0)
+    if (m_nStringQuantity > 0)
     {
-        m_psString = new char *[newSize];
-        m_psStrName = new char *[newSize];
+        m_psString = new char *[m_nStringQuantity];
+        m_psStrName = new char *[m_nStringQuantity];
         if (m_psStrName == nullptr || m_psString == nullptr)
             throw std::runtime_error("Allocate memory error");
     }
@@ -344,13 +333,13 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
     // fill stringes
     char strName[sizeof(param)];
     char string[sizeof(param)];
-    ini->ReadString(nullptr, "string", param, sizeof(param) - 1, "");
-    for (i = 0; i < m_nStringQuantity; i++)
+
+    for (i = 0; i < string_values.size(); i++)
     {
-        if (GetStringDescribe(param, strName, string))
+        if (GetStringDescribe(string_values[i].data(), strName, string))
         {
             // fill string name
-            auto len = strlen(param) + 1;
+            auto len = string_values[i].size();
             m_psStrName[i] = new char[len];
             if (m_psStrName[i] == nullptr)
                 throw std::runtime_error("allocate memory error");
@@ -372,9 +361,6 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             m_psStrName[i] = nullptr;
             m_psString[i] = nullptr;
         }
-
-        // next string
-        ini->ReadStringNext(nullptr, "string", param, sizeof(param) - 1);
     }
 
     // end of search
@@ -491,27 +477,23 @@ void STRSERVICE::LoadIni()
 {
     // GUARD(void STRSERVICE::LoadIni())
 
-    char param[256];
-
     // initialize ini file
-    auto ini = fio->OpenIniFile(sLanguageFile);
-    if (!ini)
+    auto rust_ini = rust::ini::IniFile();
+    if (!rust_ini.Load(sLanguageFile))
     {
-        rust::log::error("Language ini file not found!");
         return;
     }
 
     char sGlobalUserFileName[256];
-    if (!ini->ReadString("COMMON", "GlobalFile", sGlobalUserFileName, sizeof(sGlobalUserFileName) - 1, ""))
+    if (!rust_ini.ReadString("COMMON", "GlobalFile", sGlobalUserFileName, sizeof(sGlobalUserFileName) - 1, ""))
     {
         sGlobalUserFileName[0] = 0;
-        rust::log::warn("Language ini file have not global file name");
     }
 
     // Get default language name
-    if (!ini->ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
+    char param[256];
+    if (!rust_ini.ReadString("COMMON", "defaultLanguage", param, sizeof(param) - 1, ""))
     {
-        rust::log::warn("Language ini file have not default language.");
         strcpy_s(param, "English");
     }
 

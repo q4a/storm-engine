@@ -186,88 +186,6 @@ void WEATHER::CleanUP()
     pRS->LightEnable(0, false);
 }
 
-/*void WEATHER::LoadWeatherIni()
-{
-    char    section[256],param[256],str[256];
-    int32_t    i;
-    uint32_t    r,g,b;
-
-    CleanUP();
-
-    INIFILE * ini;
-    WIN32_FIND_DATA    wfd;
-    HANDLE h = fio->_FindFirstFile(WHT_INI_FILE,&wfd);
-    if (INVALID_HANDLE_VALUE != h)
-    {
-        ft_old = wfd.ftLastWriteTime;
-        fio->_FindClose(h);
-    }
-    ini = fio->OpenIniFile(WHT_INI_FILE);
-    if(!ini) throw std::runtime_error("weather.ini file not found!");
-
-    //iHour = ini->GetInt(0,"iCurHour",0);
-    iHour = AttributesPointer->GetAttributeAsuint32_t("Hour",0);
-
-    sprintf_s(section,"%s%d:00",(iHour<10) ? "0" : "", iHour);
-
-    ZERO4(fFloats,iLongs,dwColors,vVectors);
-
-    // load float parameters
-    for (i=0;i<iNumFloatNames;i++)
-    {
-        fFloats[FloatNames[i].dwCode] = (float)ini->GetDouble(section,FloatNames[i].name,1000.0);
-    }
-
-    // load int32_t parameters
-    for (i=0;i<iNumLongNames;i++)
-    {
-        iLongs[LongNames[i].dwCode] = ini->GetInt(section,LongNames[i].name,0);
-    }
-
-    // load colors parameters
-    for (i=0;i<iNumColorNames;i++)
-    {
-        str[0] = 0;
-        ini->ReadString(section,ColorNames[i].name,str,sizeof(str)-1,"255,255,255");
-        sscanf(str,"%d,%d,%d",&r,&g,&b);
-        dwColors[ColorNames[i].dwCode] = RGB(r,g,b);
-    }
-
-    // load vectors parameters
-
-    // load harmonics
-    if (GetInt(whi_harmonics_num)>0)
-    {
-        pHarmonics = new sea_harmonic_t[GetInt(whi_harmonics_num)];
-        for (i=0;i<iLongs[whi_harmonics_num];i++)
-        {
-            str[0] = 0;
-            sprintf_s(param,"Harmonic%d",i);
-            ini->ReadString(section,param,str,sizeof(str)-1,"1,0.0,20.0,0.1202,80.87,-28.00");
-            sea_harmonic_t *pH = &pHarmonics[i];
-            pH->bUse = true;
-            sscanf(str,"%d,%f,%f,%f,%f,%f",&pH->bUse,&pH->fAng,&pH->fLen,&pH->fAmp,&pH->fPhase,&pH->fPhaseDelta);
-        }
-    }
-    // load strings
-    for (i=0;i<iNumStringNames;i++)
-    {
-        str[0] = 0;
-        ini->ReadString(section,StringNames[i].name,str,sizeof(str)-1,"");
-        pStrings[StringNames[i].dwCode] = (char*)new char[strlen(str)+1];
-        strcpy_s(pStrings[StringNames[i].dwCode],str);
-    }
-
-    SetLong(whi_weather_update,1);
-    dwFrames = 0;
-
-    delete ini;
-
-    SetCommonStates();
-
-    core.Trace("Weather: Load ini complete");
-}*/
-
 void WEATHER::SetCommonStates()
 {
     pRS->SetRenderState(D3DRS_FOGENABLE, GetInt(whi_fog_enable));
@@ -331,22 +249,6 @@ void WEATHER::SetCommonStates()
 
     pRS->SetRenderState(D3DRS_LIGHTING, false);
 }
-
-/*bool WEATHER::SetHour(int32_t hour)
-{
-    if (iHour == hour) return false;
-    iHour = hour;
-
-    INIFILE *ini = fio->OpenIniFile(WHT_INI_FILE);
-    if(!ini) throw std::runtime_error("weather.ini file not found!");
-    ini->WriteLong(0,"iCurHour",iHour);
-    delete ini;
-
-    AttributesPointer->SetAttributeUseuint32_t("Hour",iHour);
-
-    LoadWeatherIni();
-    return true;
-}*/
 
 int32_t WEATHER::GetInt(uint32_t dwCode)
 {

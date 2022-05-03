@@ -334,6 +334,7 @@ mod tests {
     use super::new_console_logger;
 
     #[test]
+    #[cfg_attr(miri, ignore)]
     fn recreate_logger_test() {
         let _ = new_console_logger("test", log::LevelFilter::Trace).unwrap();
         let _ = new_console_logger("test", log::LevelFilter::Trace).unwrap();
