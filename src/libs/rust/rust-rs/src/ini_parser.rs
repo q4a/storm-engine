@@ -93,35 +93,31 @@ impl IniData {
         Self::parse(&mut reader)
     }
 
-    /// Get single string value by it's `section_name` and `key`.
-    /// If `section_name` is `None`, the `default` section is used.
-    pub fn get_string(&self, section_name: Option<&str>, key: &str) -> Option<&str> {
-        let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
+    /// Get single string value by it's `section` and `key`.
+    /// If `section` is `None`, the `default` section is used.
+    pub fn get_string(&self, section: Option<&str>, key: &str) -> Option<&str> {
+        let section = section.unwrap_or(DEFAULT_SECTION).to_lowercase();
         let value = self
             .sections
-            .get(&section_name)?
+            .get(&section)?
             .get(&key.to_lowercase())?
             .first()?;
 
         Some(value)
     }
 
-    /// Get all values associated with this `section_name` and `key`.
-    /// If `section_name` is `None`, the `default` section is used.
-    pub fn get_multiple_strings(
-        &self,
-        section_name: Option<&str>,
-        key: &str,
-    ) -> Option<&Vec<String>> {
-        let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
-        self.sections.get(&section_name)?.get(&key.to_lowercase())
+    /// Get all values associated with this `section` and `key`.
+    /// If `section` is `None`, the `default` section is used.
+    pub fn get_multiple_strings(&self, section: Option<&str>, key: &str) -> Option<&Vec<String>> {
+        let section = section.unwrap_or(DEFAULT_SECTION).to_lowercase();
+        self.sections.get(&section)?.get(&key.to_lowercase())
     }
 
-    /// Count the amount of values associated with this `section_name` and `key`.
-    /// If `section_name` is `None`, the `default` section is used.
-    pub fn get_amount_of_values(&self, section_name: Option<&str>, key: &str) -> usize {
-        let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
-        let section = match self.sections.get(&section_name) {
+    /// Count the amount of values associated with this `section` and `key`.
+    /// If `section` is `None`, the `default` section is used.
+    pub fn get_amount_of_values(&self, section: Option<&str>, key: &str) -> usize {
+        let section = section.unwrap_or(DEFAULT_SECTION).to_lowercase();
+        let section = match self.sections.get(&section) {
             Some(section) => section,
             None => return 0,
         };
@@ -135,7 +131,9 @@ mod export {
 
     use log::error;
 
-    use crate::common::{c_char_to_str, size_t, ArrayOfCCharArrays, CCharArray, DEFAULT_LOGGER};
+    use crate::common::{
+        c_char_to_str, copy_to_c_char, size_t, ArrayOfCCharArrays, DEFAULT_LOGGER,
+    };
 
     use super::IniData;
 
@@ -170,21 +168,22 @@ mod export {
         ptr: *mut IniData,
         section: *const c_char,
         key: *const c_char,
-    ) -> *mut CCharArray {
-        match ptr.as_ref() {
-            Some(ini) => {
-                let section = get_section_name(section);
-                let key = c_char_to_str(key);
-                match ini.get_string(section, key) {
-                    Some(val) => {
-                        let array: CCharArray = val.to_string().into();
-                        array.into_raw()
-                    }
-                    None => std::ptr::null_mut(),
-                }
-            }
-            None => std::ptr::null_mut(),
-        }
+        buffer: *mut c_char,
+        buffer_size: size_t,
+    ) -> bool {
+        let ini_data = match ptr.as_ref() {
+            Some(ini) => ini,
+            None => return false,
+        };
+
+        let section = get_section_name(section);
+        let key = c_char_to_str(key);
+        match ini_data.get_string(section, key) {
+            Some(val) => copy_to_c_char(val, buffer, buffer_size),
+            None => return false,
+        };
+
+        true
     }
 
     #[no_mangle]

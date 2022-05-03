@@ -72,7 +72,11 @@ IniData *ffi_load_ini_data(const char *path);
 
 void ffi_free_ini_data(IniData *ptr);
 
-CCharArray *ffi_get_string(IniData *ptr, const char *section, const char *key);
+bool ffi_get_string(IniData *ptr,
+                    const char *section,
+                    const char *key,
+                    char *buffer,
+                    size_t buffer_size);
 
 ArrayOfCCharArrays *ffi_get_multiple_strings(IniData *ptr, const char *section, const char *key);
 

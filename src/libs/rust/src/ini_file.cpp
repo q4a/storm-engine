@@ -25,32 +25,28 @@ bool IniFile::Load(std::string path)
     return false;
 }
 
+bool IniFile::ReadString(const char *section, const char *key, char *buffer, size_t buffer_size)
+{
+    return ReadString(section, key, buffer, buffer_size, nullptr);
+}
+
 bool IniFile::ReadString(const char *section, const char *key, char *buffer, size_t buffer_size, const char *default_value)
 {
+    if (ffi_get_string(iniData, section, key, buffer, buffer_size))
+    {
+        return true;
+    }
+
+    if (default_value == nullptr)
+    {
+        throw std::runtime_error("no key value");
+    }
     strcpy_s(buffer, buffer_size, default_value);
-    if (iniData == nullptr)
-    {
-        return false;
-    }
-
-    const auto value = ffi_get_string(iniData, section, key);
-    if (value == nullptr)
-    {
-        return false;
-    }
-
-    strcpy_s(buffer, buffer_size, value->ptr);
-    ffi_free_cchar_array(value);
-    return true;
+    return false;
 }
 
 size_t IniFile::AmountOfValues(const char *section, const char *key)
 {
-    if (iniData == nullptr)
-    {
-        return 0;
-    }
-
     const auto value = ffi_get_amount_of_values(iniData, section, key);
     return value;
 }
@@ -58,12 +54,12 @@ size_t IniFile::AmountOfValues(const char *section, const char *key)
 std::vector<std::string> IniFile::ReadMultipleStrings(const char *section, const char *key)
 {
     std::vector<std::string> values;
-    if (iniData == nullptr)
+    const auto ffi_values = ffi_get_multiple_strings(iniData, section, key);
+    if (ffi_values == nullptr)
     {
         return values;
     }
 
-    const auto ffi_values = ffi_get_multiple_strings(iniData, section, key);
     for (int i = 0; i < ffi_values->len; i++)
     {
         values.push_back(ffi_values->ptr[i].ptr);
