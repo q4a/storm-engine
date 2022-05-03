@@ -94,7 +94,7 @@ impl IniData {
     }
 
     /// Get single string value by it's `section_name` and `key`.
-    /// If `section_name` is `None`, then `default` section is used.
+    /// If `section_name` is `None`, the `default` section is used.
     pub fn get_string(&self, section_name: Option<&str>, key: &str) -> Option<&str> {
         let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
         let value = self
@@ -107,7 +107,7 @@ impl IniData {
     }
 
     /// Get all values associated with this `section_name` and `key`.
-    /// If `section_name` is `None`, then `default` section is used.
+    /// If `section_name` is `None`, the `default` section is used.
     pub fn get_multiple_strings(
         &self,
         section_name: Option<&str>,
@@ -116,6 +116,18 @@ impl IniData {
         let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
         self.sections.get(&section_name)?.get(&key.to_lowercase())
     }
+
+    /// Count the amount of values associated with this `section_name` and `key`.
+    /// If `section_name` is `None`, the `default` section is used.
+    pub fn get_amount_of_values(&self, section_name: Option<&str>, key: &str) -> usize {
+        let section_name = section_name.unwrap_or(DEFAULT_SECTION).to_lowercase();
+        let section = match self.sections.get(&section_name) {
+            Some(section) => section,
+            None => return 0,
+        };
+
+        section.get(&key.to_lowercase()).map_or(0, |v| v.len())
+    }
 }
 
 mod export {
@@ -123,7 +135,7 @@ mod export {
 
     use log::error;
 
-    use crate::common::{c_char_to_str, ArrayOfCCharArrays, CCharArray, DEFAULT_LOGGER};
+    use crate::common::{c_char_to_str, size_t, ArrayOfCCharArrays, CCharArray, DEFAULT_LOGGER};
 
     use super::IniData;
 
@@ -197,6 +209,22 @@ mod export {
         }
     }
 
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_get_amount_of_values(
+        ptr: *mut IniData,
+        section: *const c_char,
+        key: *const c_char,
+    ) -> size_t {
+        match ptr.as_ref() {
+            Some(ini) => {
+                let section = get_section_name(section);
+                let key = c_char_to_str(key);
+                ini.get_amount_of_values(section, key)
+            }
+            None => 0,
+        }
+    }
+
     unsafe fn get_section_name<'a>(section: *const c_char) -> Option<&'a str> {
         if section.is_null() {
             None
@@ -258,6 +286,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(None, "model"), 1);
         assert_eq!(result.get_string(None, "model"), Some(r"resource\land"));
     }
 
@@ -274,6 +303,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(None, "model"), 1);
         assert_eq!(result.get_string(None, "model"), Some(r"resource\land"));
     }
 
@@ -290,6 +320,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model"), 1);
         assert_eq!(
             result.get_string(Some("models"), "model"),
             Some(r"resource\land")
@@ -310,6 +341,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model"), 1);
         assert_eq!(
             result.get_string(Some("models"), "model"),
             Some(r"resource\land")
@@ -330,6 +362,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models1"), "model"), 0);
         assert_eq!(result.get_string(Some("models1"), "model"), None);
     }
 
@@ -347,6 +380,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model1"), 0);
         assert_eq!(result.get_string(Some("models"), "model1"), None);
     }
 
@@ -363,6 +397,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model"), 1);
         assert_eq!(
             result.get_string(Some("models"), "model"),
             Some(r"resource\land")
@@ -383,6 +418,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model"), 1);
         assert_eq!(
             result.get_string(Some("models"), "model"),
             Some(r"resource\land")
@@ -403,6 +439,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("MODELS"), "model"), 1);
         assert_eq!(
             result.get_string(Some("MODELS"), "model"),
             Some(r"resource\land")
@@ -423,6 +460,7 @@ MODEL	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "model"), 1);
         assert_eq!(
             result.get_string(Some("models"), "model"),
             Some(r"resource\land")
@@ -443,6 +481,7 @@ model	= resource\land
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("models"), "MODEL"), 1);
         assert_eq!(
             result.get_string(Some("models"), "MODEL"),
             Some(r"resource\land")
@@ -465,12 +504,24 @@ colquantity = 1
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
         assert_eq!(
+            result.get_amount_of_values(Some("TABLE_ICONSELECTOR"), "position"),
+            1
+        );
+        assert_eq!(
             result.get_string(Some("TABLE_ICONSELECTOR"), "position"),
             Some(r"133,189,263,276")
         );
         assert_eq!(
+            result.get_amount_of_values(Some("TABLE_ICONSELECTOR"), "rowquantity"),
+            1
+        );
+        assert_eq!(
             result.get_string(Some("TABLE_ICONSELECTOR"), "rowquantity"),
             Some(r"4")
+        );
+        assert_eq!(
+            result.get_amount_of_values(Some("TABLE_ICONSELECTOR"), "colquantity"),
+            1
         );
         assert_eq!(
             result.get_string(Some("TABLE_ICONSELECTOR"), "colquantity"),
@@ -495,13 +546,19 @@ bAbsoluteRectangle = 5
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 3);
+        assert_eq!(result.get_amount_of_values(Some("MAIN"), "item"), 1);
         assert_eq!(
             result.get_string(Some("MAIN"), "item"),
             Some(r"VIDEO,VIDEOBASE")
         );
+        assert_eq!(result.get_amount_of_values(Some("EXIT_BTN"), "position"), 1);
         assert_eq!(
             result.get_string(Some("EXIT_BTN"), "position"),
             Some(r"777,0,799,22")
+        );
+        assert_eq!(
+            result.get_amount_of_values(Some("SCROLLPICT"), "bAbsoluteRectangle"),
+            1
         );
         assert_eq!(
             result.get_string(Some("SCROLLPICT"), "bAbsoluteRectangle"),
@@ -524,6 +581,7 @@ item	= 100,pc,BUTTON,EXIT_BTN
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("MAIN"), "item"), 3);
         assert_eq!(
             result.get_string(Some("MAIN"), "item"),
             Some(r"VIDEO,VIDEOBASE")
@@ -545,6 +603,7 @@ item	= 100,pc,BUTTON,EXIT_BTN
 
         let result = result.unwrap();
         assert_eq!(result.sections.len(), 1);
+        assert_eq!(result.get_amount_of_values(Some("MAIN"), "item"), 3);
 
         let expected = vec![
             "VIDEO,VIDEOBASE".to_string(),
