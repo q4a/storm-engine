@@ -302,31 +302,25 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
 
     // initialize ini file
     sprintf_s(param, "resource\\ini\\texts\\%s\\%s", m_sLanguageDir, m_sIniFileName);
-    auto ini = fio->OpenIniFile(param);
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load(param))
     {
-        rust::log::warn("ini file \"%s\" not found!", param);
         return;
     }
 
     // get string quantity
-    auto newSize = 0;
-    if (ini->ReadString(nullptr, "string", param, sizeof(param) - 1, ""))
-        do
-        {
-            newSize++;
-        } while (ini->ReadStringNext(nullptr, "string", param, sizeof(param) - 1));
+    auto string_values = ini.ReadMultipleStrings(nullptr, "string");
 
     // check to right of ini files
-    if (newSize != m_nStringQuantity && m_nStringQuantity != 0)
+    if (string_values.size() != m_nStringQuantity && m_nStringQuantity != 0)
         rust::log::warn("language %s ini file has different size", m_sLanguage);
-    m_nStringQuantity = newSize;
+    m_nStringQuantity = string_values.size();
 
     // create strings & string names arreys
-    if (newSize > 0)
+    if (m_nStringQuantity > 0)
     {
-        m_psString = new char *[newSize];
-        m_psStrName = new char *[newSize];
+        m_psString = new char *[m_nStringQuantity];
+        m_psStrName = new char *[m_nStringQuantity];
         if (m_psStrName == nullptr || m_psString == nullptr)
             throw std::runtime_error("Allocate memory error");
     }
@@ -339,13 +333,13 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
     // fill stringes
     char strName[sizeof(param)];
     char string[sizeof(param)];
-    ini->ReadString(nullptr, "string", param, sizeof(param) - 1, "");
-    for (i = 0; i < m_nStringQuantity; i++)
+
+    for (i = 0; i < string_values.size(); i++)
     {
-        if (GetStringDescribe(param, strName, string))
+        if (GetStringDescribe(string_values[i].data(), strName, string))
         {
             // fill string name
-            auto len = strlen(param) + 1;
+            auto len = string_values[i].size();
             m_psStrName[i] = new char[len];
             if (m_psStrName[i] == nullptr)
                 throw std::runtime_error("allocate memory error");
@@ -367,9 +361,6 @@ void STRSERVICE::SetLanguage(const char *sLanguage)
             m_psStrName[i] = nullptr;
             m_psString[i] = nullptr;
         }
-
-        // next string
-        ini->ReadStringNext(nullptr, "string", param, sizeof(param) - 1);
     }
 
     // end of search
