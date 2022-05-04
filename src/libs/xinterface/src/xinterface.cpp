@@ -10,6 +10,7 @@
 #include "xservice.h"
 #include <cstdio>
 #include "string_compare.hpp"
+#include "fs.hpp"
 #include <direct.h>
 
 #define CHECK_FILE_NAME "PiratesReadme.txt"
@@ -3244,7 +3245,7 @@ void XINTERFACE::LoadOptionsFile(std::string_view fileName, ATTRIBUTES *pAttr)
         return;
     }
 
-    const uint32_t fileSize = fio->_GetFileSize(fileName.data());
+    const uint32_t fileSize = rust::fs::GetFileSize(fileName.data());
     if (fileSize == 0)
     {
         core.Event("evntOptionsBreak");

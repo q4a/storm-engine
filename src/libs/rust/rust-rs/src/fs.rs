@@ -1,4 +1,6 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+
+use log::error;
 
 use crate::common::DEFAULT_LOGGER;
 
@@ -8,7 +10,7 @@ pub fn home_directory() -> PathBuf {
     match dirs_next::document_dir() {
         Some(path) => path.join("My Games").join("Sea Dogs"),
         None => {
-            log::error!(
+            error!(
                 target: DEFAULT_LOGGER,
                 "Couldn't find `Documents` directory, using <user_data> instead"
             );
@@ -37,11 +39,36 @@ pub fn screenshot_filename() -> String {
     chrono::Local::now().format("%Y-%m-%d_%H-%M-%S").to_string()
 }
 
+/// Returns executable directory or panics if it's not available or the app doesn't have permissions
+pub fn executable_directory() -> PathBuf {
+    match std::env::current_dir() {
+        Ok(dir) => dir,
+        Err(e) => {
+            error!(target: DEFAULT_LOGGER, "Couldn't get current directory: {}", &e);
+            panic!("Current dir is unavailable")
+        },
+    }
+}
+
+/// Returns file size in bytes or panics if the file doesn't exist or the app doesn't have permissions
+pub fn file_size(path: &Path) -> u64 {
+    match path.metadata() {
+        Ok(meta) => meta.len(),
+        Err(e) => {
+            error!(target: DEFAULT_LOGGER, "Couldn't get <{}>'s metadata: {}", &path.to_string_lossy(), &e);
+            panic!("File is not available")
+        },
+    }
+}
+
 mod export {
-    use crate::common::ffi::{CCharArray, WCharArray};
+    use std::{os::raw::c_char, path::Path};
+
+    use crate::common::ffi::{c_char_to_str, uintmax_t, CCharArray, WCharArray};
 
     use super::{
-        home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename,
+        executable_directory, file_size, home_directory, logs_directory, save_directory,
+        screenshot_directory, screenshot_filename,
     };
 
     #[no_mangle]
@@ -72,5 +99,18 @@ mod export {
     pub extern "C" fn ffi_screenshot_filename() -> *mut CCharArray {
         let filename: CCharArray = screenshot_filename().into();
         filename.into_raw()
+    }
+
+    #[no_mangle]
+    pub extern "C" fn ffi_executable_directory() -> *mut WCharArray {
+        let array: WCharArray = executable_directory().into();
+        array.into_raw()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_file_size(path: *const c_char) -> uintmax_t {
+        let path = c_char_to_str(path);
+        let path: &Path = path.as_ref();
+        file_size(path)
     }
 }

@@ -208,11 +208,6 @@ std::fstream GEOM_SERVICE_R::OpenFile(const char *fname)
     return fileS;
 }
 
-int GEOM_SERVICE_R::FileSize(const char *fname)
-{
-    return fio->_GetFileSize(fname);
-}
-
 bool GEOM_SERVICE_R::ReadFile(std::fstream &fileS, void *data, int32_t bytes)
 {
     return fio->_ReadFile(fileS, data, bytes);

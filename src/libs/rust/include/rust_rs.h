@@ -41,6 +41,8 @@ struct ArrayOfCCharArrays {
   size_t capacity;
 };
 
+using uintmax_t = uint64_t;
+
 extern "C" {
 
 /// # Safety
@@ -67,6 +69,10 @@ WCharArray *ffi_save_directory();
 WCharArray *ffi_screenshot_directory();
 
 CCharArray *ffi_screenshot_filename();
+
+WCharArray *ffi_executable_directory();
+
+uintmax_t ffi_file_size(const char *path);
 
 IniData *ffi_load_ini_data(const char *path);
 

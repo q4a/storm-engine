@@ -5,6 +5,7 @@
 #include "v_file_service.h"
 #include "v_module_api.h"
 #include "string_compare.hpp"
+#include "fs.hpp"
 
 bool ReadingAlreadyComplete;
 
@@ -44,7 +45,7 @@ void DataCache::CacheSystem(const char *FileName)
         return;
     }
 
-    const auto FileSize = fio->_GetFileSize(pathStr.c_str());
+    const auto FileSize = rust::fs::GetFileSize(pathStr.c_str());
 
     auto *pMemBuffer = new uint8_t[FileSize];
     fio->_ReadFile(sysFile, pMemBuffer, FileSize);

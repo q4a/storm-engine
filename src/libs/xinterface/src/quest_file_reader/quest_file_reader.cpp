@@ -8,6 +8,7 @@
 #include "core.h"
 
 #include "storm_assert.h"
+#include "fs.hpp"
 
 namespace
 {
@@ -270,7 +271,7 @@ void QuestFileReader::SetQuestTextFileName(const std::string_view &fileName)
     }
 
     /// Obtain file size
-    const uint32_t filesize = fio->_GetFileSize(fileName.data());
+    const uint32_t filesize = rust::fs::GetFileSize(fileName.data());
     if (filesize == 0)
     {
         rust::log::info("Empty quest log file %s", std::string(fileName).c_str());

@@ -42,7 +42,6 @@ class GEOM_SERVICE_R final : public GEOM_SERVICE
     void SetRenderService(VDX9RENDER *render_service);
 
     std::fstream OpenFile(const char *fname);
-    int FileSize(const char *fname);
     bool ReadFile(std::fstream &fileS, void *data, int32_t bytes);
     void CloseFile(std::fstream &fileS);
     void *malloc(int32_t bytes);

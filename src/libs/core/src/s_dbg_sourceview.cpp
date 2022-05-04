@@ -6,6 +6,7 @@
 #include "s_debug.h"
 #include "string_compare.hpp"
 #include <algorithm>
+#include "fs.hpp"
 
 extern S_DEBUG * CDebug;
 
@@ -542,7 +543,7 @@ bool SOURCE_VIEW::OpenSourceFile(const char *_filename)
     {
         return false;
     }
-    const uint32_t nDataSize = fio->_GetFileSize(DirectoryName.c_str());
+    const uint32_t nDataSize = rust::fs::GetFileSize(DirectoryName.c_str());
 
     nTopLine = 0;
     delete[] pSourceFile;

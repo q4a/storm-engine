@@ -17,6 +17,8 @@ use crate::common::DEFAULT_LOGGER;
 pub type size_t = usize;
 #[allow(non_camel_case_types)]
 pub type wchar_t = c_ushort;
+#[allow(non_camel_case_types)]
+pub type uintmax_t = u64;
 
 #[repr(C)]
 pub struct WCharArray {

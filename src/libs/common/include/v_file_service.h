@@ -33,8 +33,6 @@ class VFILE_SERVICE
     virtual std::filesystem::file_time_type _GetLastWriteTime(const char *filename) = 0;
     virtual void _FlushFileBuffers(std::fstream &fileS) = 0;
     virtual std::string _GetCurrentDirectory() = 0;
-    virtual std::string _GetExecutableDirectory() = 0;
-    virtual std::uintmax_t _GetFileSize(const char *filename) = 0;
     virtual void _SetCurrentDirectory(const char *pathName) = 0;
     virtual bool _CreateDirectory(const char *pathName) = 0;
     virtual std::uintmax_t _RemoveDirectory(const char *pathName) = 0;

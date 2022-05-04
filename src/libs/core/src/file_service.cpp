@@ -2,6 +2,7 @@
 #include "core_impl.h"
 #include "storm_assert.h"
 #include "string_compare.hpp"
+#include "fs.hpp"
 
 #include <SDL2/SDL.h>
 #include <exception>
@@ -202,18 +203,6 @@ std::string FILE_SERVICE::_GetCurrentDirectory()
     return result;
 }
 
-std::string FILE_SERVICE::_GetExecutableDirectory()
-{
-    std::string result(SDL_GetBasePath());
-    return result;
-}
-
-std::uintmax_t FILE_SERVICE::_GetFileSize(const char *filename)
-{
-    std::filesystem::path path = std::filesystem::u8path(filename);
-    return std::filesystem::file_size(path);
-}
-
 void FILE_SERVICE::_SetCurrentDirectory(const char *pathName)
 {
     std::filesystem::path path = std::filesystem::u8path(pathName);
@@ -348,7 +337,7 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
         rust::log::warn("Can't load file: %s", file_name);
         return false;
     }
-    const auto dwLowSize = _GetFileSize(file_name);
+    const auto dwLowSize = rust::fs::GetFileSize(file_name);
     if (dwSize)
     {
         *dwSize = dwLowSize;

@@ -6,6 +6,7 @@
 #include "pcs_controls.h"
 #include "v_file_service.h"
 #include "string_compare.hpp"
+#include "fs.hpp"
 
 CREATE_CLASS(TMPTELEPORT)
 
@@ -329,7 +330,7 @@ bool FINDDIALOGNODES::Init()
                 return false;
             }
 
-            const int32_t filesize = fio->_GetFileSize(fileName);
+            const int32_t filesize = rust::fs::GetFileSize(fileName);
             if (filesize == 0)
             {
                 rust::log::info("Empty dialog file %s", fileName);

@@ -1935,7 +1935,7 @@ bool DX9RENDER::TextureRelease(int32_t texid)
         if (texLog)
         {
             auto fileS = fio->_CreateFile("texLoad.txt", std::ios::binary | std::ios::in | std::ios::out);
-            const int bytes = fio->_GetFileSize("texLoad.txt");
+            const int bytes = rust::fs::GetFileSize("texLoad.txt");
             auto buf = new char[bytes + 1];
             fio->_ReadFile(fileS, buf, bytes);
             buf[bytes] = 0;
@@ -2649,7 +2649,7 @@ void DX9RENDER::RecompileEffects()
     effects_.release();
 
     std::filesystem::path cur_path = std::filesystem::current_path();
-    std::filesystem::current_path(std::filesystem::u8path(fio->_GetExecutableDirectory()));
+    std::filesystem::current_path(rust::fs::GetExecutableDirectory());
     for (const auto &p : std::filesystem::recursive_directory_iterator("resource/techniques"))
         if (is_regular_file(p) && p.path().extension() == ".fx")
         {

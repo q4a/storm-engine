@@ -106,8 +106,6 @@ class FILE_SERVICE : public VFILE_SERVICE
     std::filesystem::file_time_type _GetLastWriteTime(const char *filename) override;
     void _FlushFileBuffers(std::fstream &fileS) override;
     std::string _GetCurrentDirectory() override;
-    std::string _GetExecutableDirectory() override;
-    std::uintmax_t _GetFileSize(const char *filename) override;
     void _SetCurrentDirectory(const char *pathName) override;
     bool _CreateDirectory(const char *pathName) override;
     std::uintmax_t _RemoveDirectory(const char *pathName) override;

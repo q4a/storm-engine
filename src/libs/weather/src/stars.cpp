@@ -1,6 +1,7 @@
 #include "astronomy.h"
 #include "weather_base.h"
 #include "v_file_service.h"
+#include "fs.hpp"
 
 Astronomy::STARS::STARS()
 {
@@ -166,7 +167,7 @@ void Astronomy::STARS::Init(ATTRIBUTES *pAP)
         auto outfileS = fio->_CreateFile("resource\\star.dat", std::ios::binary | std::ios::in);
         if (outfileS.is_open())
         {
-            uint32_t dwFileLen = fio->_GetFileSize("resource\\star.dat");
+            uint32_t dwFileLen = rust::fs::GetFileSize("resource\\star.dat");
             const uint32_t stride = (sizeof(Star) + sizeof(CVECTOR) + sizeof(uint32_t));
             if (dwFileLen == dwSize * stride)
             {

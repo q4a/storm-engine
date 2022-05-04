@@ -2,6 +2,7 @@
 #include "core_impl.h"
 #include "v_module_api.h"
 #include "string_compare.hpp"
+#include "fs.hpp"
 
 #define COMMENT ';'
 #define SECTION_A '['
@@ -420,7 +421,7 @@ bool IFS::LoadFile(const char *_file_name)
         return false;
     }
 
-    const auto file_size = fs->_GetFileSize(_file_name);
+    const auto file_size = rust::fs::GetFileSize(_file_name);
 
     auto *const file_data = new char[file_size + 1]; // +1 for zero at the end
     if (file_data == nullptr)

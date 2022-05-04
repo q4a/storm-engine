@@ -9,6 +9,7 @@
 #include "script_cache.h"
 #include "storm_assert.h"
 #include "string_compare.hpp"
+#include "fs.hpp"
 
 #include <unordered_map>
 
@@ -151,7 +152,7 @@ char *COMPILER::LoadFile(const char *file_name, uint32_t &file_size, bool bFullP
         std::string EngineDir = "storm-engine\\";
         if (strncmp(file_name, EngineDir.c_str(), EngineDir.length()) == 0)
         {
-            std::string ExePath = fio->_GetExecutableDirectory() + "resource\\shared\\";
+            std::string ExePath = rust::fs::GetExecutableDirectory().string() + "\\resource\\shared\\";
             strcpy_s(buffer, ExePath.c_str());
             strcat_s(buffer, file_name + EngineDir.length());
         }
@@ -196,7 +197,7 @@ char *COMPILER::LoadFile(const char *file_name, uint32_t &file_size, bool bFullP
     {
         return nullptr;
     }
-    const auto fsize = fio->_GetFileSize(fName);
+    const auto fsize = rust::fs::GetFileSize(fName);
 
     auto *const pData = static_cast<char *>(new char[fsize + 1]);
     if (!fio->_ReadFile(fileS, pData, fsize))
@@ -6753,7 +6754,7 @@ bool COMPILER::SetSaveData(const char *file_name, void *save_data, int32_t data_
         return false;
     }
 
-    const uint32_t dwFileSize = fio->_GetFileSize(file_name);
+    const uint32_t dwFileSize = rust::fs::GetFileSize(file_name);
     auto *pVDat = static_cast<VDATA *>(core_internal.GetScriptVariable("savefile_info"));
     if (pVDat && pVDat->GetString())
         sprintf_s(exdh.sFileInfo, sizeof(exdh.sFileInfo), "%s", pVDat->GetString());
@@ -6873,7 +6874,7 @@ void *COMPILER::GetSaveData(const char *file_name, int32_t &data_size)
         return nullptr;
     }
 
-    const auto file_size = fio->_GetFileSize(file_name);
+    const auto file_size = rust::fs::GetFileSize(file_name);
     if (file_size < sizeof(EXTDATA_HEADER) + sizeof(uint32_t))
     {
         data_size = 0;

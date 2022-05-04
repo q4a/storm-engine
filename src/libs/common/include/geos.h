@@ -281,7 +281,6 @@ class GEOM_SERVICE
     virtual ~GEOM_SERVICE(){};
     virtual std::fstream OpenFile(const char *fname) = 0;
     virtual bool ReadFile(std::fstream &fileS, void *data, int32_t bytes) = 0;
-    virtual int FileSize(const char *fname) = 0;
     virtual void CloseFile(std::fstream &fileS) = 0;
     virtual void *malloc(int32_t bytes) = 0;
     virtual void free(void *ptr) = 0;

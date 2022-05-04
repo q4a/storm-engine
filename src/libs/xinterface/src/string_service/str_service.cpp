@@ -8,6 +8,7 @@
 #include "string_compare.hpp"
 #include <filesystem>
 #include "ini_file.hpp"
+#include "fs.hpp"
 
 #define USER_BLOCK_BEGINER '{'
 #define USER_BLOCK_ENDING '}'
@@ -579,7 +580,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
         return -1;
     }
 
-    const int32_t filesize = fio->_GetFileSize(param);
+    const int32_t filesize = rust::fs::GetFileSize(param);
 
     if (filesize <= 0)
     {

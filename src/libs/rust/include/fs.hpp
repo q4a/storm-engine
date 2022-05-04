@@ -48,4 +48,17 @@ static std::string GetScreenshotFilename()
     ffi_free_cchar_array(r_str);
     return c_str;
 }
+
+static path GetExecutableDirectory()
+{
+    const auto r_str = ffi_executable_directory();
+    const path c_str = r_str->ptr;
+    ffi_free_wchar_array(r_str);
+    return c_str;
+}
+
+static uintmax_t GetFileSize(const char *path)
+{
+    return ffi_file_size(path);
+}
 }

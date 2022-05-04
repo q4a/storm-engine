@@ -14,6 +14,7 @@ Import library main file
 #include <vector>
 
 #include "string_compare.hpp"
+#include "fs.hpp"
 
 namespace
 {
@@ -24,7 +25,7 @@ std::vector<uint32_t> getColData(GEOM_SERVICE &srv, const std::string_view &file
     auto ltfl = srv.OpenFile(file_name.data());
     if (ltfl.is_open())
     {
-        const auto file_size = srv.FileSize(file_name.data());
+        const auto file_size = rust::fs::GetFileSize(file_name.data());
         if (file_size > 0)
         {
             result.resize(file_size / sizeof(uint32_t));
