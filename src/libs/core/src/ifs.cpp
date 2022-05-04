@@ -1,7 +1,6 @@
 #include "ifs.h"
 #include "core_impl.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
 #include "fs.hpp"
 
 #define COMMENT ';'

@@ -3,7 +3,6 @@
 #include "core.h"
 
 #include "v_file_service.h"
-#include "string_compare.hpp"
 #include <input.hpp>
 
 CREATE_SERVICE(PCS_CONTROLS)

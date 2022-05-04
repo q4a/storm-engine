@@ -16,7 +16,6 @@
 #include "character.h"
 #include "grass.h"
 #include "lights.h"
-#include "string_compare.hpp"
 #include "c_vector4.h"
 #include "defines.h"
 #include "shared/messages.h"

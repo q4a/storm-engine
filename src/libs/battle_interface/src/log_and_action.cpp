@@ -4,7 +4,6 @@
 #include "message.h"
 #include "shared/battle_interface/log_msg.h"
 #include <stdio.h>
-#include "string_compare.hpp"
 
 static entid_t g_ILogAndActions;
 

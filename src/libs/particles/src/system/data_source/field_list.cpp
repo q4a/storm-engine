@@ -8,7 +8,7 @@
 #include "data_string.h"
 #include "data_uv.h"
 #include "defines.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 FieldList::FieldList()
 {

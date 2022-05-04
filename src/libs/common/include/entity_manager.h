@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "shared/layers.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 #include <algorithm>
 #include <array>

@@ -16,7 +16,6 @@
 #include "wdm_ship.h"
 #include "world_map.h"
 #include "defines.h"
-#include "string_compare.hpp"
 
 // ============================================================================================
 // Collision data

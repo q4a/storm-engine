@@ -2,7 +2,6 @@
 
 #include "storm_assert.h"
 #include "v_file_service.h"
-#include "string_compare.hpp"
 
 CXI_PICTURE::CXI_PICTURE()
 {

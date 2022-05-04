@@ -8,7 +8,6 @@
 #include "texture.h"
 #include "v_s_stack.h"
 #include "fs.hpp"
-#include "string_compare.hpp"
 
 #include <string_view>
 

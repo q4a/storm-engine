@@ -17,7 +17,6 @@
 #include "sea_base.h"
 #include "shared/messages.h"
 #include "v_sound_service.h"
-#include "string_compare.hpp"
 
 #include "core.h"
 #include "v_data.h"

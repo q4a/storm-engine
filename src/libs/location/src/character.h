@@ -14,7 +14,7 @@
 #include "model.h"
 #include "v_module_api.h"
 #include <string>
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 class Location;
 class MODEL;

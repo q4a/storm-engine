@@ -4,7 +4,6 @@
 #include "entity.h"
 #include "core.h"
 #include "defines.h"
-#include "string_compare.hpp"
 
 CREATE_CLASS(SEAFOAM)
 

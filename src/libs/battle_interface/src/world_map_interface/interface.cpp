@@ -4,7 +4,6 @@
 #include "shared/battle_interface/msg_control.h"
 #include "ship_command.h"
 #include "ship_sign.h"
-#include "string_compare.hpp"
 
 WM_INTERFACE::WM_INTERFACE() : rs(nullptr)
 {

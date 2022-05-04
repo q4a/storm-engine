@@ -4,7 +4,6 @@
 #include "shared/battle_interface/msg_control.h"
 #include "v_module_api.h"
 #include <exception>
-#include "string_compare.hpp"
 
 ActivePerkShower::ActivePerkShower()
     : m_nIconWidth(0), m_nIconHeight(0), m_nSpaceHorz(0), m_nSpaceVert(0)

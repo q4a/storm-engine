@@ -11,7 +11,6 @@
 #include "characters_groups.h"
 #include "np_character.h"
 #include "storm_assert.h"
-#include "string_compare.hpp"
 
 #define CGS_LOOK 15.0f
 #define CGS_HEAR 2.5f

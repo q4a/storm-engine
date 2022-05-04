@@ -2,7 +2,6 @@
 #include "defines.h"
 #include "dx9render.h"
 #include "v_file_service.h"
-#include "string_compare.hpp"
 
 #define ERROR_MUL 1.0f
 

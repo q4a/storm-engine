@@ -2,7 +2,6 @@
 #include "core.h"
 #include "entity.h"
 #include "shared/messages.h"
-#include "string_compare.hpp"
 
 CREATE_CLASS(LOCATOR)
 

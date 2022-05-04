@@ -1,5 +1,4 @@
 #include "xi_img_collection.h"
-#include "string_compare.hpp"
 
 CXI_IMGCOLLECTION::CXI_IMGCOLLECTION()
     : m_bRelativeRect(false)

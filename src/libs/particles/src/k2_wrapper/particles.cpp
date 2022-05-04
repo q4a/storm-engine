@@ -7,7 +7,6 @@
 #include "particles/i_particle_system.h"
 #include "p_system.h"
 #include "shared/messages.h"
-#include "string_compare.hpp"
 
 PARTICLES::PARTICLES()
 {

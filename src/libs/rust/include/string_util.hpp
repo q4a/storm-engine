@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <ctype.h>
+#include <string>
 #include "rust_rs.h"
 
 namespace rust::string

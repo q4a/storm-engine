@@ -11,7 +11,6 @@
 #include "shared/sea_ai/script_defines.h"
 #include "ship_base.h"
 #include "v_file_service.h"
-#include "string_compare.hpp"
 
 #define WIND_SPEED_MAX 12.f
 

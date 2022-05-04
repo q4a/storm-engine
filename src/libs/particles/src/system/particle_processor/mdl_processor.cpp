@@ -9,7 +9,6 @@
 #include "defines.h"
 #include "geos.h"
 #include "physic.h"
-#include "string_compare.hpp"
 
 // how many models there can be
 #define MAX_MODELS 8192

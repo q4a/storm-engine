@@ -2,7 +2,7 @@
 
 #include "s_import_func.h"
 #include "s_vartab.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 #include <unordered_map>
 #include <vector>
 

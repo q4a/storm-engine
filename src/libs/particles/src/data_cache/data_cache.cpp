@@ -4,7 +4,6 @@
 
 #include "v_file_service.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
 #include "fs.hpp"
 
 bool ReadingAlreadyComplete;

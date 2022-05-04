@@ -5,7 +5,6 @@
 #include "defines.h"
 #include "pcs_controls.h"
 #include "v_file_service.h"
-#include "string_compare.hpp"
 #include "fs.hpp"
 
 CREATE_CLASS(TMPTELEPORT)

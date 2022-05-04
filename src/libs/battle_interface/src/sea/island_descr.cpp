@@ -4,7 +4,6 @@
 
 #include "model.h"
 #include "shared/battle_interface/msg_control.h"
-#include "string_compare.hpp"
 
 ISLAND_DESCRIBER::ISLAND_DESCRIBER() : m_lastFindIdx(0), m_nFindType(0)
 {

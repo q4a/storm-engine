@@ -8,7 +8,6 @@
 #include "s_debug.h"
 #include "script_cache.h"
 #include "storm_assert.h"
-#include "string_compare.hpp"
 #include "fs.hpp"
 
 #include <unordered_map>

@@ -7,6 +7,7 @@
 #include "engine_version.hpp"
 #include "v_data.h"
 #include "v_file_service.h"
+#include "string_util.hpp"
 
 struct IFUNCINFO;
 

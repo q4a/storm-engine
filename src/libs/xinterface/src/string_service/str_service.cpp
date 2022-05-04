@@ -5,7 +5,6 @@
 #include "../xinterface.h"
 #include "s_import_func.h"
 #include "v_s_stack.h"
-#include "string_compare.hpp"
 #include <filesystem>
 #include "ini_file.hpp"
 #include "fs.hpp"

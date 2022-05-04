@@ -3,6 +3,7 @@
 #include "geos.h"
 #include "service.h"
 #include "v_module_api.h"
+#include "string_util.hpp"
 
 class ANIMATION
 {

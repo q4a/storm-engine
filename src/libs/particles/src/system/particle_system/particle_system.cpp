@@ -1,6 +1,6 @@
 #include "particle_system.h"
 #include "../emitters/point.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 // Global GUID to assign to emitters
 uint32_t EmitterID = 0;

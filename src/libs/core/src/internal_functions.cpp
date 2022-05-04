@@ -1,6 +1,5 @@
 #include "compiler.h"
 #include "core_impl.h"
-#include "string_compare.hpp"
 
 #include <execution>
 

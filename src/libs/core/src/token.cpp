@@ -4,7 +4,7 @@
 
 #include "defines.h"
 #include "utf8.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 #define DISCARD_DATABUFFER                                                                                             \
     {                                                                                                                  \

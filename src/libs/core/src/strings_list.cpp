@@ -2,8 +2,7 @@
 
 #include <cstring>
 #include <stdexcept>
-
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 STRINGS_LIST::STRINGS_LIST()
 {

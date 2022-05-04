@@ -1,6 +1,5 @@
 #include "xdefines.h"
 #include <defines.h>
-#include "string_compare.hpp"
 #include "storm_assert.h"
 
 //////////////////////////////////////////////

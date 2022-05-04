@@ -9,7 +9,6 @@
 #include "string_service/str_service.h"
 #include "xservice.h"
 #include <cstdio>
-#include "string_compare.hpp"
 #include "fs.hpp"
 #include <direct.h>
 

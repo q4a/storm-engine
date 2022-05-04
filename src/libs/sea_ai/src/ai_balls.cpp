@@ -2,7 +2,6 @@
 #include "ai_fort.h"
 #include "inlines.h"
 #include "shared/messages.h"
-#include "string_compare.hpp"
 
 
 AIBalls *AIBalls::pAIBalls = nullptr;

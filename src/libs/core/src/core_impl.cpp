@@ -4,7 +4,6 @@
 #include "controls.h"
 #include "steam_api.hpp"
 #include "fs.hpp"
-#include "string_compare.hpp"
 #include "logger.hpp"
 
 #include <fstream>

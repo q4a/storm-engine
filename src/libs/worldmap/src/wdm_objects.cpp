@@ -11,7 +11,6 @@
 #include "wdm_objects.h"
 
 #include <chrono>
-#include "string_compare.hpp"
 #include "defines.h"
 #include "geometry.h"
 

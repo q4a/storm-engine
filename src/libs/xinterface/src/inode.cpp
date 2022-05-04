@@ -2,7 +2,6 @@
 #include <cstdarg>
 
 #include "core.h"
-#include "string_compare.hpp"
 
 CINODE::CINODE()
 {

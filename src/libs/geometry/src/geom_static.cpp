@@ -12,8 +12,7 @@ Import library main file
 #include <cstdint>
 #include <cstring>
 #include <vector>
-
-#include "string_compare.hpp"
+#include "string_util.hpp"
 #include "fs.hpp"
 
 namespace

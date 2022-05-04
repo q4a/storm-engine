@@ -4,7 +4,6 @@
 #include "defines.h"
 #include "resource.h"
 #include "s_debug.h"
-#include "string_compare.hpp"
 #include <algorithm>
 #include "fs.hpp"
 

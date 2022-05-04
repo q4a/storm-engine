@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 #define HASH_TABLE_SIZE 512 // must be power of 2
 
 struct HTSUBELEMENT
