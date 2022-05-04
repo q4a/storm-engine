@@ -7,6 +7,16 @@
 
 #include <stdint.h>
 
+enum class EngineVersion {
+  Unknown,
+  SeaDogs,
+  PiratesOfTheCaribbean,
+  CaribbeanTales,
+  CityOfAbandonedShips,
+  ToEachHisOwn,
+  Latest,
+};
+
 enum class LogLevel {
   Error,
   Warn,
@@ -55,6 +65,10 @@ void ffi_free_cchar_array(CCharArray *ptr);
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
 void ffi_free_array_of_cchar_arrays(ArrayOfCCharArrays *ptr);
+
+EngineVersion ffi_get_target_engine_version(const char *version);
+
+bool ffi_engine_versions_eq(EngineVersion first, EngineVersion second);
 
 WCharArray *ffi_home_directory();
 

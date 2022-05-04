@@ -10,44 +10,6 @@
 
 Core& core = core_internal;
 
-namespace storm
-{
-namespace
-{
-ENGINE_VERSION getTargetEngineVersion(const std::string_view &version)
-{
-    using namespace std::string_view_literals;
-
-    if (rust::string::iEquals(version, "sd"sv))
-    {
-        return ENGINE_VERSION::SEA_DOGS;
-    }
-    else if (rust::string::iEquals(version, "potc"sv))
-    {
-        return ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN;
-    }
-    else if (rust::string::iEquals(version, "ct"sv))
-    {
-        return ENGINE_VERSION::CARIBBEAN_TALES;
-    }
-    else if (rust::string::iEquals(version, "coas"sv))
-    {
-        return ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS;
-    }
-    else if (rust::string::iEquals(version, "teho"sv))
-    {
-        return ENGINE_VERSION::TO_EACH_HIS_OWN;
-    }
-    else if (rust::string::iEquals(version, "latest"sv))
-    {
-        return ENGINE_VERSION::LATEST;
-    }
-
-    return ENGINE_VERSION::UNKNOWN;
-}
-} // namespace
-} // namespace storm
-
 uint32_t dwNumberScriptCommandsExecuted = 0;
 
 typedef struct
@@ -279,7 +241,7 @@ void CoreImpl::ProcessEngineIniFile()
             throw std::runtime_error("fail to run program");
 
         // Script version test
-        if (targetVersion_ >= storm::ENGINE_VERSION::LATEST)
+        if (targetVersion_ >= EngineVersion::Latest)
         {
             int32_t iScriptVersion = 0xFFFFFFFF;
             auto *pVScriptVersion = static_cast<VDATA *>(core_internal.GetScriptVariable("iScriptVersion"));
@@ -894,7 +856,7 @@ void *CoreImpl::GetScriptVariable(const char *pVariableName, uint32_t *pdwVarInd
     return real_var->value.get();
 }
 
-storm::ENGINE_VERSION CoreImpl::GetTargetEngineVersion() const noexcept
+EngineVersion CoreImpl::GetTargetEngineVersion() const noexcept
 {
     return targetVersion_;
 }
@@ -903,7 +865,7 @@ ScreenSize CoreImpl::GetScreenSize() const noexcept
 {
     switch (targetVersion_)
     {
-    case storm::ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN: {
+    case EngineVersion::PiratesOfTheCaribbean: {
         return {640, 480};
     }
     default: {
@@ -930,10 +892,10 @@ void CoreImpl::loadCompatibilitySettings(rust::ini::IniFile &inifile)
     inifile.ReadString("compatibility", "target_version", strBuffer.data(), strBuffer.size(), "latest");
     const std::string_view target_engine_version = strBuffer.data();
 
-    targetVersion_ = getTargetEngineVersion(target_engine_version);
-    if (targetVersion_ == ENGINE_VERSION::UNKNOWN)
+    targetVersion_ = ffi_get_target_engine_version(target_engine_version.data());
+    if (targetVersion_ == EngineVersion::Unknown)
     {
         rust::log::warn("Unknown target version '%s' in engine compatibility settings", target_engine_version);
-        targetVersion_ = ENGINE_VERSION::LATEST;
+        targetVersion_ = EngineVersion::Latest;
     }
 }

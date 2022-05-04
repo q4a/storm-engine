@@ -112,7 +112,7 @@ class CoreImpl : public CorePrivate
 
     void *GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex = nullptr) override;
 
-    [[nodiscard]] storm::ENGINE_VERSION GetTargetEngineVersion() const noexcept override;
+    [[nodiscard]] EngineVersion GetTargetEngineVersion() const noexcept override;
 
     [[nodiscard]] ScreenSize GetScreenSize() const noexcept override;
 
@@ -134,7 +134,7 @@ class CoreImpl : public CorePrivate
   private:
     void loadCompatibilitySettings(rust::ini::IniFile &inifile);
 
-    storm::ENGINE_VERSION targetVersion_ = storm::ENGINE_VERSION::LATEST;
+    EngineVersion targetVersion_ = EngineVersion::Latest;
 
     bool stopFrameProcessing_ = false;
 

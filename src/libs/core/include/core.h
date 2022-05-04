@@ -4,7 +4,6 @@
 #include "message.h"
 #include "entity_manager.h"
 #include "controls.h"
-#include "engine_version.hpp"
 #include "v_data.h"
 #include "v_file_service.h"
 #include "string_util.hpp"
@@ -76,7 +75,7 @@ class Core
 
     virtual void *GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex = nullptr) = 0;
 
-    [[nodiscard]] virtual storm::ENGINE_VERSION GetTargetEngineVersion() const noexcept = 0;
+    [[nodiscard]] virtual EngineVersion GetTargetEngineVersion() const noexcept = 0;
 
     [[nodiscard]] virtual ScreenSize GetScreenSize() const noexcept = 0;
 

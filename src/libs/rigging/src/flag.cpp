@@ -600,7 +600,7 @@ void FLAG::LoadIni()
         memcpy(TextureName, param, len);
     }
 
-    if (core.GetTargetEngineVersion() <= storm::ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS)
+    if (core.GetTargetEngineVersion() <= EngineVersion::CityOfAbandonedShips)
     {
         FlagTextureQuantity = static_cast<int>(ini->GetInt(section, "TextureCount", 10));
         FlagTextureQuantityRow = 1;
@@ -837,7 +837,7 @@ void FLAG::SetAdd(int flagNum)
             int32_t curTexNumR = 0;
 
             // set texture number
-            if (core.GetTargetEngineVersion() <= storm::ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS)
+            if (core.GetTargetEngineVersion() <= EngineVersion::CityOfAbandonedShips)
             {
                 pvdat = core.Event("GetRiggingData", "sll", "GetFlagTexNum", flist[fn]->triangle,
                                    gdata[flist[fn]->HostGroup].nation);

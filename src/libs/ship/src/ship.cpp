@@ -1749,7 +1749,7 @@ float SHIP::Cannon_Trace(int32_t iBallOwner, const CVECTOR &vSrc, const CVECTOR 
             }
         }
 
-    if (core.GetTargetEngineVersion() >= storm::ENGINE_VERSION::TO_EACH_HIS_OWN)
+    if (core.GetTargetEngineVersion() >= EngineVersion::ToEachHisOwn)
     {
         for (int32_t i = 0; i < iNumHulls; i++)
             if (!pHulls[i].bBroken)
