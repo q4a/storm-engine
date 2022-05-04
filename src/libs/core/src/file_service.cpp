@@ -64,12 +64,6 @@ void FILE_SERVICE::_SetFilePointer(std::fstream &fileS, std::streamoff off, std:
     fileS.seekp(off, dir);
 }
 
-bool FILE_SERVICE::_DeleteFile(const char *filename)
-{
-    std::filesystem::path path = std::filesystem::u8path(filename);
-    return std::filesystem::remove(path);
-}
-
 bool FILE_SERVICE::_WriteFile(std::fstream &fileS, const void *s, std::streamsize count)
 {
     fileS.exceptions(std::fstream::failbit | std::fstream::badbit);

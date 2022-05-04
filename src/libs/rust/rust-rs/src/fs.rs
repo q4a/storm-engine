@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use log::error;
+use log::{error, warn};
 
 use crate::common::DEFAULT_LOGGER;
 
@@ -44,9 +44,12 @@ pub fn executable_directory() -> PathBuf {
     match std::env::current_dir() {
         Ok(dir) => dir,
         Err(e) => {
-            error!(target: DEFAULT_LOGGER, "Couldn't get current directory: {}", &e);
+            error!(
+                target: DEFAULT_LOGGER,
+                "Couldn't get current directory: {}", &e
+            );
             panic!("Current dir is unavailable")
-        },
+        }
     }
 }
 
@@ -55,20 +58,36 @@ pub fn file_size(path: &Path) -> u64 {
     match path.metadata() {
         Ok(meta) => meta.len(),
         Err(e) => {
-            error!(target: DEFAULT_LOGGER, "Couldn't get <{}>'s metadata: {}", &path.to_string_lossy(), &e);
+            error!(
+                target: DEFAULT_LOGGER,
+                "Couldn't get <{}>'s metadata: {}",
+                &path.to_string_lossy(),
+                &e
+            );
             panic!("File is not available")
-        },
+        }
+    }
+}
+
+/// Attempts to delete a file
+pub fn delete_file(path: &Path) -> bool {
+    match std::fs::remove_file(&path) {
+        Ok(_r) => true,
+        Err(e) => {
+            warn!(target: DEFAULT_LOGGER, "Couldn't delete <{}> file", &e);
+            true
+        }
     }
 }
 
 mod export {
-    use std::{os::raw::c_char, path::Path};
+    use std::os::raw::c_char;
 
-    use crate::common::ffi::{c_char_to_str, uintmax_t, CCharArray, WCharArray};
+    use crate::common::ffi::{c_char_to_str, uint64_t, CCharArray, WCharArray};
 
     use super::{
-        executable_directory, file_size, home_directory, logs_directory, save_directory,
-        screenshot_directory, screenshot_filename,
+        delete_file, executable_directory, file_size, home_directory, logs_directory,
+        save_directory, screenshot_directory, screenshot_filename,
     };
 
     #[no_mangle]
@@ -108,9 +127,14 @@ mod export {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ffi_file_size(path: *const c_char) -> uintmax_t {
-        let path = c_char_to_str(path);
-        let path: &Path = path.as_ref();
+    pub unsafe extern "C" fn ffi_file_size(path: *const c_char) -> uint64_t {
+        let path = c_char_to_str(path).as_ref();
         file_size(path)
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_delete_file(path: *const c_char) -> bool {
+        let path = c_char_to_str(path).as_ref();
+        delete_file(path)
     }
 }

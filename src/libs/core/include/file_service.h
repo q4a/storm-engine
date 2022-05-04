@@ -94,7 +94,6 @@ class FILE_SERVICE : public VFILE_SERVICE
     std::fstream _CreateFile(const char *filename, std::ios::openmode mode) override;
     void _CloseFile(std::fstream &fileS) override;
     void _SetFilePointer(std::fstream &fileS, std::streamoff off, std::ios::seekdir dir) override;
-    bool _DeleteFile(const char *filename) override;
     bool _WriteFile(std::fstream &fileS, const void *s, std::streamsize count) override;
     bool _ReadFile(std::fstream &fileS, void *s, std::streamsize count) override;
     bool _FileOrDirectoryExists(const char *p) override;

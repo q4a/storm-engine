@@ -1,42 +1,41 @@
 #pragma once
 
-#include <filesystem>
 #include "rust_rs.h"
+#include <filesystem>
 
 namespace rust::fs
 {
-using namespace std::filesystem;
 
 constexpr char ENGINE_INI_FILE_NAME[] = "engine.ini";
 
-static path GetStashPath()
+static std::filesystem::path GetStashPath()
 {
     const auto r_str = ffi_home_directory();
-    const path c_str = r_str->ptr;
+    const std::filesystem::path c_str = r_str->ptr;
     ffi_free_wchar_array(r_str);
     return c_str;
 }
 
-static path GetLogsPath()
+static std::filesystem::path GetLogsPath()
 {
     const auto r_str = ffi_logs_directory();
-    const path c_str = r_str->ptr;
+    const std::filesystem::path c_str = r_str->ptr;
     ffi_free_wchar_array(r_str);
     return c_str;
 }
 
-static path GetSaveDataPath()
+static std::filesystem::path GetSaveDataPath()
 {
     const auto r_str = ffi_save_directory();
-    const path c_str = r_str->ptr;
+    const std::filesystem::path c_str = r_str->ptr;
     ffi_free_wchar_array(r_str);
     return c_str;
 }
 
-static path GetScreenshotsPath()
+static std::filesystem::path GetScreenshotsPath()
 {
     const auto r_str = ffi_screenshot_directory();
-    const path c_str = r_str->ptr;
+    const std::filesystem::path c_str = r_str->ptr;
     ffi_free_wchar_array(r_str);
     return c_str;
 }
@@ -49,10 +48,10 @@ static std::string GetScreenshotFilename()
     return c_str;
 }
 
-static path GetExecutableDirectory()
+static std::filesystem::path GetExecutableDirectory()
 {
     const auto r_str = ffi_executable_directory();
-    const path c_str = r_str->ptr;
+    const std::filesystem::path c_str = r_str->ptr;
     ffi_free_wchar_array(r_str);
     return c_str;
 }
@@ -60,5 +59,10 @@ static path GetExecutableDirectory()
 static uintmax_t GetFileSize(const char *path)
 {
     return ffi_file_size(path);
+}
+
+static bool DeleteFile(const char *path)
+{
+    return ffi_delete_file(path);
 }
 }

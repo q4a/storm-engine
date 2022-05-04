@@ -2905,7 +2905,7 @@ void XINTERFACE::DeleteSaveFile(const char *fileName)
     {
         sprintf(param, "%s\\%s", sSavePath, fileName);
     }
-    fio->_DeleteFile(param);
+    rust::fs::DeleteFile(param);
 }
 
 uint32_t XINTERFACE_BASE::GetBlendColor(uint32_t minCol, uint32_t maxCol, float fBlendFactor)

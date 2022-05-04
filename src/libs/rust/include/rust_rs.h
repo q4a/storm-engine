@@ -3,11 +3,9 @@
 
 #pragma once
 
-#include <cstdarg>
-#include <cstdint>
-#include <cstdlib>
-#include <ostream>
-#include <new>
+/* Generated with cbindgen:0.21.0 */
+
+#include <stdint.h>
 
 enum class LogLevel {
   Error,
@@ -41,8 +39,6 @@ struct ArrayOfCCharArrays {
   size_t capacity;
 };
 
-using uintmax_t = uint64_t;
-
 extern "C" {
 
 /// # Safety
@@ -72,7 +68,9 @@ CCharArray *ffi_screenshot_filename();
 
 WCharArray *ffi_executable_directory();
 
-uintmax_t ffi_file_size(const char *path);
+uint64_t ffi_file_size(const char *path);
+
+bool ffi_delete_file(const char *path);
 
 IniData *ffi_load_ini_data(const char *path);
 

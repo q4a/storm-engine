@@ -20,7 +20,6 @@ class VFILE_SERVICE
     virtual std::fstream _CreateFile(const char *filename, std::ios::openmode mode) = 0;
     virtual void _CloseFile(std::fstream &fileS) = 0;
     virtual void _SetFilePointer(std::fstream &fileS, std::streamoff off, std::ios::seekdir dir) = 0;
-    virtual bool _DeleteFile(const char *filename) = 0;
     virtual bool _WriteFile(std::fstream &fileS, const void *s, std::streamsize count) = 0;
     virtual bool _ReadFile(std::fstream &fileS, void *s, std::streamsize count) = 0;
     virtual bool _FileOrDirectoryExists(const char *p) = 0;

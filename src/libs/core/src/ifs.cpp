@@ -599,7 +599,7 @@ bool IFS::FlushFile()
         return true;
     }
 
-    fs->_DeleteFile(FileName);
+    rust::fs::DeleteFile(FileName);
     auto fileS = fio->_CreateFile(FileName, std::ios::binary | std::ios::out);
     if (!fileS.is_open())
     {

@@ -1753,7 +1753,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
         char s[256];
         if (totSize == 0)
         {
-            fio->_DeleteFile("texLoad.txt");
+            rust::fs::DeleteFile("texLoad.txt");
         }
         auto fileS2 = fio->_CreateFile("texLoad.txt", std::ios::binary | std::ios::out | std::ios::app);
         totSize += Textures[t].dwSize;

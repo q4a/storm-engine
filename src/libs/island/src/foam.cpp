@@ -2,6 +2,7 @@
 #include "core.h"
 #include "inlines.h"
 #include "math3d/plane.h"
+#include "fs.hpp"
 
 CoastFoam::CoastFoam()
 {
@@ -770,7 +771,7 @@ void CoastFoam::Save()
 
     char cKey[128], cSection[128], cTemp[1024];
     const auto sID = std::string("resource\\foam\\locations\\") + to_string(AttributesPointer->GetAttribute("id")) + ".ini";
-    fio->_DeleteFile(sID.c_str());
+    rust::fs::DeleteFile(sID.c_str());
 
     auto pI = fio->CreateIniFile(sID.c_str(), false);
     if (!pI)
