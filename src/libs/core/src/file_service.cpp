@@ -203,18 +203,6 @@ void FILE_SERVICE::_SetCurrentDirectory(const char *pathName)
     std::filesystem::current_path(path);
 }
 
-bool FILE_SERVICE::_CreateDirectory(const char *pathName)
-{
-    std::filesystem::path path = std::filesystem::u8path(pathName);
-    return std::filesystem::create_directories(path);
-}
-
-std::uintmax_t FILE_SERVICE::_RemoveDirectory(const char *pathName)
-{
-    std::filesystem::path path = std::filesystem::u8path(pathName);
-    return std::filesystem::remove_all(path);
-}
-
 //------------------------------------------------------------------------------------------------
 // inifile objects managment
 //

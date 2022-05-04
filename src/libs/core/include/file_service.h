@@ -106,8 +106,6 @@ class FILE_SERVICE : public VFILE_SERVICE
     void _FlushFileBuffers(std::fstream &fileS) override;
     std::string _GetCurrentDirectory() override;
     void _SetCurrentDirectory(const char *pathName) override;
-    bool _CreateDirectory(const char *pathName) override;
-    std::uintmax_t _RemoveDirectory(const char *pathName) override;
     bool LoadFile(const char *file_name, char **ppBuffer, uint32_t *dwSize) override;
     // ini files section
     void Close();

@@ -61,8 +61,18 @@ static uintmax_t GetFileSize(const char *path)
     return ffi_file_size(path);
 }
 
+static void DeleteDirectory(const char *path)
+{
+    ffi_delete_directory(path);
+}
+
 static bool DeleteFile(const char *path)
 {
     return ffi_delete_file(path);
+}
+
+static bool CreateDirectory(const char *path)
+{
+    return ffi_create_directory(path);
 }
 }

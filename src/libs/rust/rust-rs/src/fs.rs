@@ -1,6 +1,9 @@
-use std::path::{Path, PathBuf};
+use std::{
+    io,
+    path::{Path, PathBuf},
+};
 
-use log::{error, warn};
+use log::error;
 
 use crate::common::DEFAULT_LOGGER;
 
@@ -40,54 +43,43 @@ pub fn screenshot_filename() -> String {
 }
 
 /// Returns executable directory or panics if it's not available or the app doesn't have permissions
-pub fn executable_directory() -> PathBuf {
-    match std::env::current_dir() {
-        Ok(dir) => dir,
-        Err(e) => {
-            error!(
-                target: DEFAULT_LOGGER,
-                "Couldn't get current directory: {}", &e
-            );
-            panic!("Current dir is unavailable")
-        }
-    }
+pub fn executable_directory() -> Result<PathBuf, io::Error> {
+    std::env::current_dir()
 }
 
 /// Returns file size in bytes or panics if the file doesn't exist or the app doesn't have permissions
-pub fn file_size(path: &Path) -> u64 {
-    match path.metadata() {
-        Ok(meta) => meta.len(),
-        Err(e) => {
-            error!(
-                target: DEFAULT_LOGGER,
-                "Couldn't get <{}>'s metadata: {}",
-                &path.to_string_lossy(),
-                &e
-            );
-            panic!("File is not available")
-        }
-    }
+pub fn file_size(path: &Path) -> Result<u64, io::Error> {
+    path.metadata().map(|m| m.len())
 }
 
-/// Attempts to delete a file
-pub fn delete_file(path: &Path) -> bool {
-    match std::fs::remove_file(&path) {
-        Ok(_r) => true,
-        Err(e) => {
-            warn!(target: DEFAULT_LOGGER, "Couldn't delete <{}> file", &e);
-            true
-        }
-    }
+/// Delete a directory with all it's children
+pub fn delete_directory(path: &Path) -> Result<(), io::Error> {
+    std::fs::remove_dir_all(path)
+}
+
+/// Delete a file
+pub fn delete_file(path: &Path) -> Result<(), io::Error> {
+    std::fs::remove_file(&path)
+}
+
+/// Create a directory with all it's parents
+pub fn create_directory(path: &Path) -> Result<(), io::Error> {
+    std::fs::create_dir_all(path)
 }
 
 mod export {
     use std::os::raw::c_char;
 
-    use crate::common::ffi::{c_char_to_str, uint64_t, CCharArray, WCharArray};
+    use log::error;
+
+    use crate::common::{
+        ffi::{c_char_to_str, uint64_t, CCharArray, WCharArray},
+        DEFAULT_LOGGER,
+    };
 
     use super::{
-        delete_file, executable_directory, file_size, home_directory, logs_directory,
-        save_directory, screenshot_directory, screenshot_filename,
+        create_directory, delete_directory, delete_file, executable_directory, file_size,
+        home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename,
     };
 
     #[no_mangle]
@@ -122,19 +114,83 @@ mod export {
 
     #[no_mangle]
     pub extern "C" fn ffi_executable_directory() -> *mut WCharArray {
-        let array: WCharArray = executable_directory().into();
+        let array: WCharArray = match executable_directory() {
+            Ok(dir) => dir.into(),
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't get current directory: {}", &e
+                );
+                panic!("Current dir is unavailable")
+            }
+        };
         array.into_raw()
     }
 
     #[no_mangle]
     pub unsafe extern "C" fn ffi_file_size(path: *const c_char) -> uint64_t {
         let path = c_char_to_str(path).as_ref();
-        file_size(path)
+        match file_size(path) {
+            Ok(size) => size,
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't get <{}>'s metadata: {}",
+                    &path.to_string_lossy(),
+                    &e
+                );
+                panic!("File is not available")
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_delete_directory(path: *const c_char) {
+        let path = c_char_to_str(path).as_ref();
+        match delete_directory(path) {
+            Ok(_r) => {}
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't delete <{}> directory: {}",
+                    path.to_string_lossy(),
+                    &e
+                )
+            }
+        };
     }
 
     #[no_mangle]
     pub unsafe extern "C" fn ffi_delete_file(path: *const c_char) -> bool {
         let path = c_char_to_str(path).as_ref();
-        delete_file(path)
+        match delete_file(path) {
+            Ok(_r) => true,
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't delete <{}> file: {}",
+                    path.to_string_lossy(),
+                    &e
+                );
+                true
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_create_directory(path: *const c_char) -> bool {
+        let path = c_char_to_str(path).as_ref();
+        match create_directory(path) {
+            Ok(_r) => true,
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't create <{}> directory: {}",
+                    path.to_string_lossy(),
+                    &e
+                );
+                false
+            }
+        }
     }
 }

@@ -2829,7 +2829,7 @@ char *XINTERFACE::SaveFileFind(int32_t saveNum, char *buffer, size_t bufSize, in
         const char *sSavePath = AttributesPointer->GetAttribute("SavePath");
         if (sSavePath != nullptr)
         {
-            fio->_CreateDirectory(sSavePath);
+            rust::fs::CreateDirectory(sSavePath);
         }
 
         // start save file finding
@@ -3348,7 +3348,7 @@ int XINTERFACE::LoadIsExist()
     const char *sSavePath = AttributesPointer->GetAttribute("SavePath");
     if (sSavePath != nullptr)
     {
-        fio->_CreateDirectory(sSavePath);
+        rust::fs::CreateDirectory(sSavePath);
     }
 
     bool bFindFile = false;
@@ -3395,7 +3395,7 @@ void XINTERFACE::PrecreateDirForFile(const char *pcFullFileName)
             break;
         }
     if (n > 0)
-        fio->_CreateDirectory(path);
+        rust::fs::CreateDirectory(path);
 }
 
 // controls Container

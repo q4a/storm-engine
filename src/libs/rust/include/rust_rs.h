@@ -70,7 +70,11 @@ WCharArray *ffi_executable_directory();
 
 uint64_t ffi_file_size(const char *path);
 
+void ffi_delete_directory(const char *path);
+
 bool ffi_delete_file(const char *path);
+
+bool ffi_create_directory(const char *path);
 
 IniData *ffi_load_ini_data(const char *path);
 

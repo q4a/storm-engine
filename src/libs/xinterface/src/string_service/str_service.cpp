@@ -1273,7 +1273,7 @@ uint32_t _InterfaceCreateFolder(VS_STACK *pS)
     if (!pDat)
         return IFUNCRESULT_FAILED;
     const char *sFolderName = pDat->GetString();
-    const int32_t nSuccess = fio->_CreateDirectory(sFolderName);
+    const int32_t nSuccess = rust::fs::CreateDirectory(sFolderName);
 
     pDat = (VDATA *)pS->Push();
     if (!pDat)
@@ -1301,11 +1301,6 @@ uint32_t _InterfaceCheckFolder(VS_STACK *pS)
     return IFUNCRESULT_OK;
 }
 
-bool DeleteFolderWithCantainment(const char *sFolderName)
-{
-    return (fio->_RemoveDirectory(sFolderName) > 0);
-}
-
 uint32_t _InterfaceDeleteFolder(VS_STACK *pS)
 {
     VDATA *pDat;
@@ -1313,8 +1308,8 @@ uint32_t _InterfaceDeleteFolder(VS_STACK *pS)
     if (!pDat)
         return IFUNCRESULT_FAILED;
     const char *sFolderName = pDat->GetString();
-    // int32_t nSuccess = fio->_RemoveDirectory(sFolderName);
-    const int32_t nSuccess = DeleteFolderWithCantainment(sFolderName);
+    rust::fs::DeleteDirectory(sFolderName);
+    const int32_t nSuccess = 1;
     pDat = (VDATA *)pS->Push();
     if (!pDat)
         return IFUNCRESULT_FAILED;
