@@ -11,7 +11,7 @@ use std::{
 
 use log::error;
 
-pub const DEFAULT_LOGGER: &str = "system";
+use crate::common::DEFAULT_LOGGER;
 
 #[allow(non_camel_case_types)]
 pub type size_t = usize;

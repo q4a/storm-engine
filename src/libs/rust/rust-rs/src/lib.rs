@@ -2,4 +2,4 @@ pub mod common;
 pub mod fs;
 pub mod ini_parser;
 pub mod logger;
-pub mod string_compare;
+pub mod string_utils;

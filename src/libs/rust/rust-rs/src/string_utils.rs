@@ -82,7 +82,7 @@ mod export {
         os::raw::{c_char, c_int},
     };
 
-    use crate::common::{c_char_to_str, size_t, win1251_char_to_str};
+    use crate::common::ffi::{c_char_to_str, size_t, win1251_char_to_str};
 
     use super::{
         ends_with_ignore_case, equal_ignore_case, find_ignore_case, glob_ignore_case,
@@ -195,7 +195,7 @@ mod tests {
         io::{BufRead, BufReader},
     };
 
-    use crate::string_compare::{
+    use crate::string_utils::{
         ends_with_ignore_case, find_ignore_case, glob_ignore_case, less_ignore_case,
         starts_with_ignore_case,
     };

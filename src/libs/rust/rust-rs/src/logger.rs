@@ -247,7 +247,7 @@ mod export {
 
     use log::{debug, error, info, trace, warn};
 
-    use crate::common::{c_char_to_str, DEFAULT_LOGGER};
+    use crate::common::{ffi::c_char_to_str, DEFAULT_LOGGER};
 
     use super::{new_console_logger, new_file_logger, LogLevel};
 

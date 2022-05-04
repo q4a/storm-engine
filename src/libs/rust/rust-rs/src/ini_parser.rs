@@ -157,7 +157,8 @@ mod export {
     use log::{error, warn};
 
     use crate::common::{
-        c_char_to_str, copy_to_c_char, size_t, ArrayOfCCharArrays, DEFAULT_LOGGER,
+        ffi::{c_char_to_str, copy_to_c_char, size_t, ArrayOfCCharArrays},
+        DEFAULT_LOGGER,
     };
 
     use super::IniData;

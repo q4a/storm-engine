@@ -38,7 +38,7 @@ pub fn screenshot_filename() -> String {
 }
 
 mod export {
-    use crate::common::{CCharArray, WCharArray};
+    use crate::common::ffi::{CCharArray, WCharArray};
 
     use super::{
         home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename,
