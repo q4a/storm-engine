@@ -93,20 +93,6 @@ bool FILE_SERVICE::_ReadFile(std::fstream &fileS, void *s, std::streamsize count
     }
 }
 
-bool FILE_SERVICE::_FileOrDirectoryExists(const char *p)
-{
-    std::filesystem::path path = std::filesystem::u8path(p);
-    auto ec = std::error_code{};
-    bool result = std::filesystem::exists(path, ec);
-    if (ec)
-    {
-        rust::log::error("Failed to to check if %s exists: %s", p, ec.message());
-        return false;
-    }
-
-    return result;
-}
-
 std::vector<std::string> FILE_SERVICE::_GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask,
                                                                   bool getPaths, bool onlyDirs, bool onlyFiles)
 {

@@ -96,7 +96,6 @@ class FILE_SERVICE : public VFILE_SERVICE
     void _SetFilePointer(std::fstream &fileS, std::streamoff off, std::ios::seekdir dir) override;
     bool _WriteFile(std::fstream &fileS, const void *s, std::streamsize count) override;
     bool _ReadFile(std::fstream &fileS, void *s, std::streamsize count) override;
-    bool _FileOrDirectoryExists(const char *p) override;
     std::vector<std::string> _GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask, bool getPaths,
                                                         bool onlyDirs = false, bool onlyFiles = true) override;
     std::vector<std::filesystem::path> _GetFsPathsByMask(const char *sourcePath, const char *mask, bool getPaths,

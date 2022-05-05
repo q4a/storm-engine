@@ -465,7 +465,7 @@ bool LGeometry::Save()
             if (dir[p] == '\\')
             {
                 dir[p] = 0;
-                if (!fio->_FileOrDirectoryExists(dir))
+                if (!rust::fs::PathExists(dir))
                 {
                     if (!rust::fs::CreateDirectory(dir))
                     {

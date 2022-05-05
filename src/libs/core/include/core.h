@@ -7,6 +7,8 @@
 #include "v_data.h"
 #include "v_file_service.h"
 #include "string_util.hpp"
+#include "fs.hpp"
+#include "ini_file.hpp"
 
 struct IFUNCINFO;
 

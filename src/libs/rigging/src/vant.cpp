@@ -91,7 +91,7 @@ void VANT_BASE::Execute(uint32_t Delta_Time)
     {
         // ====================================================
         // If the ini-file has been changed, read the info from it
-        if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+        if (rust::fs::PathExists(RIGGING_INI_FILE))
         {
             auto ft_new = fio->_GetLastWriteTime(RIGGING_INI_FILE);
             if (ft_old != ft_new)
@@ -628,12 +628,12 @@ void VANT::LoadIni()
     char section[256];
     char param[256];
 
-    if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+    if (rust::fs::PathExists(RIGGING_INI_FILE))
     {
         ft_old = fio->_GetLastWriteTime(RIGGING_INI_FILE);
     }
-    auto ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load("resource\\ini\\rigging.ini"))
     {
         throw std::runtime_error("rigging.ini file not found!");
     }
@@ -641,7 +641,7 @@ void VANT::LoadIni()
     sprintf_s(section, "VANTS");
 
     // texture name
-    ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");
+    ini.ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");
     if (texl != -1)
     {
         if (strcmp(TextureName, param))
@@ -662,42 +662,42 @@ void VANT::LoadIni()
         memcpy(TextureName, param, len);
     }
     // rope thickness
-    ROPE_WIDTH = ini->GetFloat(section, "fWidth", 0.1f);
+    ROPE_WIDTH = ini.GetFloat(section, "fWidth", 0.1f);
     // number of ropes
-    ROPE_QUANT = static_cast<int>(ini->GetInt(section, "fRopeQuant", 5));
+    ROPE_QUANT = static_cast<int>(ini.GetInt(section, "fRopeQuant", 5));
     if (ROPE_QUANT < 2)
         ROPE_QUANT = 2;
     // xBeg horizontal rope texture coordinates
-    ropeXl = ini->GetFloat(section, "fHRopeXbeg", 0.5f);
-    ropeXr = ini->GetFloat(section, "fHRopeXend", 1.f);
+    ropeXl = ini.GetFloat(section, "fHRopeXbeg", 0.5f);
+    ropeXr = ini.GetFloat(section, "fHRopeXend", 1.f);
     // triangle texture coordinates
-    treangXl = ini->GetFloat(section, "fTreangXbeg", 0.f);
-    treangXr = ini->GetFloat(section, "fTreangXend", 0.5f);
-    treangYu = ini->GetFloat(section, "fTreangYbeg", 0.f);
-    treangYd = ini->GetFloat(section, "fTreangYend", 1.f);
+    treangXl = ini.GetFloat(section, "fTreangXbeg", 0.f);
+    treangXr = ini.GetFloat(section, "fTreangXend", 0.5f);
+    treangYu = ini.GetFloat(section, "fTreangYbeg", 0.f);
+    treangYd = ini.GetFloat(section, "fTreangYend", 1.f);
     // beam texture coordinates
-    balkYu = ini->GetFloat(section, "fBalkYbeg", 0.6f);
-    balkYd = ini->GetFloat(section, "fBalkYend", 1.f);
+    balkYu = ini.GetFloat(section, "fBalkYbeg", 0.6f);
+    balkYd = ini.GetFloat(section, "fBalkYend", 1.f);
     // vertical rope texture coordinates
-    vRopeXl = ini->GetFloat(section, "fVRopeXbeg", 0.f);
-    vRopeXr = ini->GetFloat(section, "fVRopeXend", 0.1f);
+    vRopeXl = ini.GetFloat(section, "fVRopeXbeg", 0.f);
+    vRopeXr = ini.GetFloat(section, "fVRopeXend", 0.1f);
     // upper triangle width
-    upWidth = ini->GetFloat(section, "fTreangWidth", 1.f);
+    upWidth = ini.GetFloat(section, "fTreangWidth", 1.f);
     // the height of the upper triangle
-    upHeight = ini->GetFloat(section, "fTreangHeight", 1.f);
+    upHeight = ini.GetFloat(section, "fTreangHeight", 1.f);
     // vertical rope height
-    vRopeHeight = ini->GetFloat(section, "fVRopeHeight", 1.f);
+    vRopeHeight = ini.GetFloat(section, "fVRopeHeight", 1.f);
     // horizontal rope height
-    hRopeHeight = ini->GetFloat(section, "fHRopeHeight", 1.f);
+    hRopeHeight = ini.GetFloat(section, "fHRopeHeight", 1.f);
     // beam height relative to triangle height
-    fBalkHeight = ini->GetFloat(section, "fBalkHeight", 0.1f);
-    fBalkWidth = ini->GetFloat(section, "fBalkWidth", 1.2f);
+    fBalkHeight = ini.GetFloat(section, "fBalkHeight", 0.1f);
+    fBalkWidth = ini.GetFloat(section, "fBalkWidth", 1.2f);
     // the square of the distance from which the cables are not visible
-    fVantMaxDist = ini->GetFloat(section, "fVantMaxDist", 10000.f);
+    fVantMaxDist = ini.GetFloat(section, "fVantMaxDist", 10000.f);
     // Guy motion sampling step
-    ZERO_CMP_VAL = ini->GetFloat(section, "fDiscrValue", 0.01f);
+    ZERO_CMP_VAL = ini.GetFloat(section, "fDiscrValue", 0.01f);
     // the maximum change in the guy position at which the guy stops being displayed
-    MAXFALL_CMP_VAL = ini->GetFloat(section, "fDisapearValue", 5.f);
+    MAXFALL_CMP_VAL = ini.GetFloat(section, "fDisapearValue", 5.f);
 
     VantId = 0;
     // UNGUARD
@@ -709,12 +709,12 @@ void VANTL::LoadIni()
     char section[256];
     char param[256];
 
-    if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+    if (rust::fs::PathExists(RIGGING_INI_FILE))
     {
         ft_old = fio->_GetLastWriteTime(RIGGING_INI_FILE);
     }
-    auto ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load("resource\\ini\\rigging.ini"))
     {
         throw std::runtime_error("rigging.ini file not found!");
     }
@@ -722,7 +722,7 @@ void VANTL::LoadIni()
     sprintf(section, "VANTS_L");
 
     // texture name
-    ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");
+    ini.ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");
     if (texl != -1)
     {
         if (strcmp(TextureName, param))
@@ -743,42 +743,42 @@ void VANTL::LoadIni()
         memcpy(TextureName, param, len);
     }
     // rope thickness
-    ROPE_WIDTH = ini->GetFloat(section, "fWidth", 0.1f);
+    ROPE_WIDTH = ini.GetFloat(section, "fWidth", 0.1f);
     // number of ropes
-    ROPE_QUANT = (int)ini->GetInt(section, "fRopeQuant", 5);
+    ROPE_QUANT = (int)ini.GetInt(section, "fRopeQuant", 5);
     if (ROPE_QUANT < 2)
         ROPE_QUANT = 2;
     // xBeg horizontal rope texture coordinates
-    ropeXl = ini->GetFloat(section, "fHRopeXbeg", 0.5f);
-    ropeXr = ini->GetFloat(section, "fHRopeXend", 1.f);
+    ropeXl = ini.GetFloat(section, "fHRopeXbeg", 0.5f);
+    ropeXr = ini.GetFloat(section, "fHRopeXend", 1.f);
     // triangle texture coordinates
-    treangXl = ini->GetFloat(section, "fTreangXbeg", 0.f);
-    treangXr = ini->GetFloat(section, "fTreangXend", 0.5f);
-    treangYu = ini->GetFloat(section, "fTreangYbeg", 0.f);
-    treangYd = ini->GetFloat(section, "fTreangYend", 1.f);
+    treangXl = ini.GetFloat(section, "fTreangXbeg", 0.f);
+    treangXr = ini.GetFloat(section, "fTreangXend", 0.5f);
+    treangYu = ini.GetFloat(section, "fTreangYbeg", 0.f);
+    treangYd = ini.GetFloat(section, "fTreangYend", 1.f);
     // beam texture coordinates
-    balkYu = ini->GetFloat(section, "fBalkYbeg", 0.6f);
-    balkYd = ini->GetFloat(section, "fBalkYend", 1.f);
+    balkYu = ini.GetFloat(section, "fBalkYbeg", 0.6f);
+    balkYd = ini.GetFloat(section, "fBalkYend", 1.f);
     // vertical rope texture coordinates
-    vRopeXl = ini->GetFloat(section, "fVRopeXbeg", 0.f);
-    vRopeXr = ini->GetFloat(section, "fVRopeXend", 0.1f);
+    vRopeXl = ini.GetFloat(section, "fVRopeXbeg", 0.f);
+    vRopeXr = ini.GetFloat(section, "fVRopeXend", 0.1f);
     // upper triangle width
-    upWidth = ini->GetFloat(section, "fTreangWidth", 1.f);
+    upWidth = ini.GetFloat(section, "fTreangWidth", 1.f);
     // the height of the upper triangle
-    upHeight = ini->GetFloat(section, "fTreangHeight", 1.f);
+    upHeight = ini.GetFloat(section, "fTreangHeight", 1.f);
     // vertical rope height
-    vRopeHeight = ini->GetFloat(section, "fVRopeHeight", 1.f);
+    vRopeHeight = ini.GetFloat(section, "fVRopeHeight", 1.f);
     // horizontal rope height
-    hRopeHeight = ini->GetFloat(section, "fHRopeHeight", 1.f);
+    hRopeHeight = ini.GetFloat(section, "fHRopeHeight", 1.f);
     // beam height relative to triangle height
-    fBalkHeight = ini->GetFloat(section, "fBalkHeight", 0.1f);
-    fBalkWidth = ini->GetFloat(section, "fBalkWidth", 1.2f);
+    fBalkHeight = ini.GetFloat(section, "fBalkHeight", 0.1f);
+    fBalkWidth = ini.GetFloat(section, "fBalkWidth", 1.2f);
     // the square of the distance from which the cables are not visible
-    fVantMaxDist = ini->GetFloat(section, "fVantMaxDist", 10000.f);
+    fVantMaxDist = ini.GetFloat(section, "fVantMaxDist", 10000.f);
     // Guy motion sampling step
-    ZERO_CMP_VAL = ini->GetFloat(section, "fDiscrValue", 0.01f);
+    ZERO_CMP_VAL = ini.GetFloat(section, "fDiscrValue", 0.01f);
     // the maximum change in the guy position at which the guy stops being displayed
-    MAXFALL_CMP_VAL = ini->GetFloat(section, "fDisapearValue", 5.f);
+    MAXFALL_CMP_VAL = ini.GetFloat(section, "fDisapearValue", 5.f);
 
     VantId = 1;
     // UNGUARD
@@ -790,12 +790,12 @@ void VANTZ::LoadIni()
     char section[256];
     char param[256];
 
-    if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+    if (rust::fs::PathExists(RIGGING_INI_FILE))
     {
         ft_old = fio->_GetLastWriteTime(RIGGING_INI_FILE);
     }
-    auto ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load("resource\\ini\\rigging.ini"))
     {
         throw std::runtime_error("rigging.ini file not found!");
     }
@@ -803,7 +803,7 @@ void VANTZ::LoadIni()
     sprintf(section, "VANTS_Z");
 
     // texture name
-    ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");
+    ini.ReadString(section, "TextureName", param, sizeof(param) - 1, "vant.tga");
     if (texl != -1)
     {
         if (strcmp(TextureName, param))
@@ -824,42 +824,42 @@ void VANTZ::LoadIni()
         memcpy(TextureName, param, len);
     }
     // rope thickness
-    ROPE_WIDTH = ini->GetFloat(section, "fWidth", 0.1f);
+    ROPE_WIDTH = ini.GetFloat(section, "fWidth", 0.1f);
     // number of ropes
-    ROPE_QUANT = (int)ini->GetInt(section, "fRopeQuant", 5);
+    ROPE_QUANT = (int)ini.GetInt(section, "fRopeQuant", 5);
     if (ROPE_QUANT < 2)
         ROPE_QUANT = 2;
     // xBeg horizontal rope texture coordinates
-    ropeXl = ini->GetFloat(section, "fHRopeXbeg", 0.5f);
-    ropeXr = ini->GetFloat(section, "fHRopeXend", 1.f);
+    ropeXl = ini.GetFloat(section, "fHRopeXbeg", 0.5f);
+    ropeXr = ini.GetFloat(section, "fHRopeXend", 1.f);
     // triangle texture coordinates
-    treangXl = ini->GetFloat(section, "fTreangXbeg", 0.f);
-    treangXr = ini->GetFloat(section, "fTreangXend", 0.5f);
-    treangYu = ini->GetFloat(section, "fTreangYbeg", 0.f);
-    treangYd = ini->GetFloat(section, "fTreangYend", 1.f);
+    treangXl = ini.GetFloat(section, "fTreangXbeg", 0.f);
+    treangXr = ini.GetFloat(section, "fTreangXend", 0.5f);
+    treangYu = ini.GetFloat(section, "fTreangYbeg", 0.f);
+    treangYd = ini.GetFloat(section, "fTreangYend", 1.f);
     // beam texture coordinates
-    balkYu = ini->GetFloat(section, "fBalkYbeg", 0.6f);
-    balkYd = ini->GetFloat(section, "fBalkYend", 1.f);
+    balkYu = ini.GetFloat(section, "fBalkYbeg", 0.6f);
+    balkYd = ini.GetFloat(section, "fBalkYend", 1.f);
     // vertical rope texture coordinates
-    vRopeXl = ini->GetFloat(section, "fVRopeXbeg", 0.f);
-    vRopeXr = ini->GetFloat(section, "fVRopeXend", 0.1f);
+    vRopeXl = ini.GetFloat(section, "fVRopeXbeg", 0.f);
+    vRopeXr = ini.GetFloat(section, "fVRopeXend", 0.1f);
     // upper triangle width
-    upWidth = ini->GetFloat(section, "fTreangWidth", 1.f);
+    upWidth = ini.GetFloat(section, "fTreangWidth", 1.f);
     // the height of the upper triangle
-    upHeight = ini->GetFloat(section, "fTreangHeight", 1.f);
+    upHeight = ini.GetFloat(section, "fTreangHeight", 1.f);
     // vertical rope height
-    vRopeHeight = ini->GetFloat(section, "fVRopeHeight", 1.f);
+    vRopeHeight = ini.GetFloat(section, "fVRopeHeight", 1.f);
     // horizontal rope height
-    hRopeHeight = ini->GetFloat(section, "fHRopeHeight", 1.f);
+    hRopeHeight = ini.GetFloat(section, "fHRopeHeight", 1.f);
     // beam height relative to triangle height
-    fBalkHeight = ini->GetFloat(section, "fBalkHeight", 0.1f);
-    fBalkWidth = ini->GetFloat(section, "fBalkWidth", 1.2f);
+    fBalkHeight = ini.GetFloat(section, "fBalkHeight", 0.1f);
+    fBalkWidth = ini.GetFloat(section, "fBalkWidth", 1.2f);
     // the square of the distance from which the cables are not visible
-    fVantMaxDist = ini->GetFloat(section, "fVantMaxDist", 10000.f);
+    fVantMaxDist = ini.GetFloat(section, "fVantMaxDist", 10000.f);
     // Guy motion sampling step
-    ZERO_CMP_VAL = ini->GetFloat(section, "fDiscrValue", 0.01f);
+    ZERO_CMP_VAL = ini.GetFloat(section, "fDiscrValue", 0.01f);
     // the maximum change in the guy position at which the guy stops being displayed
-    MAXFALL_CMP_VAL = ini->GetFloat(section, "fDisapearValue", 5.f);
+    MAXFALL_CMP_VAL = ini.GetFloat(section, "fDisapearValue", 5.f);
 
     VantId = 2;
     // UNGUARD

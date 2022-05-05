@@ -993,7 +993,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         }
         else
         {
-            if (!fio->_FileOrDirectoryExists(param.c_str()))
+            if (!rust::fs::PathExists(param.c_str()))
             {
                 systTime = std::time(nullptr);
             }
@@ -2885,7 +2885,7 @@ bool XINTERFACE::NewSaveFileName(const char *fileName) const
         sprintf(param, "%s\\%s", sSavePath, fileName);
     }
 
-    return !(fio->_FileOrDirectoryExists(param));
+    return !(rust::fs::PathExists(param));
 }
 
 void XINTERFACE::DeleteSaveFile(const char *fileName)

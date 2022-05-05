@@ -88,6 +88,8 @@ bool ffi_delete_file(const char *path);
 
 bool ffi_create_directory(const char *path);
 
+bool ffi_path_exists(const char *path);
+
 IniData *ffi_load_ini_data(const char *path);
 
 void ffi_free_ini_data(IniData *ptr);

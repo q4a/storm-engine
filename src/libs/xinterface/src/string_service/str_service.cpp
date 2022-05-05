@@ -1290,7 +1290,7 @@ uint32_t _InterfaceCheckFolder(VS_STACK *pS)
         return IFUNCRESULT_FAILED;
     }
     const char *sFolderName = pDat->GetString();
-    int32_t nSuccess = fio->_FileOrDirectoryExists(sFolderName);
+    int32_t nSuccess = rust::fs::PathExists(sFolderName);
     pDat = (VDATA *)pS->Push();
     if (!pDat)
     {

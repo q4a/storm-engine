@@ -75,4 +75,9 @@ static bool CreateDirectory(const char *path)
 {
     return ffi_create_directory(path);
 }
+
+static bool PathExists(const char *path)
+{
+    return ffi_path_exists(path);
+}
 }

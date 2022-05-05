@@ -86,7 +86,7 @@ void FLAG::Execute(uint32_t Delta_Time)
     {
         // ====================================================
         // If the ini-file has been changed, read the info from it
-        if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+        if (rust::fs::PathExists(RIGGING_INI_FILE))
         {
             auto ft_new = fio->_GetLastWriteTime(RIGGING_INI_FILE);
             if (ft_old != ft_new)
@@ -565,12 +565,12 @@ void FLAG::LoadIni()
     char section[256];
     char param[256];
 
-    if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+    if (rust::fs::PathExists(RIGGING_INI_FILE))
     {
         ft_old = fio->_GetLastWriteTime(RIGGING_INI_FILE);
     }
-    auto ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load("resource\\ini\\rigging.ini"))
     {
         throw std::runtime_error("rigging.ini file not found!");
     }
@@ -580,7 +580,7 @@ void FLAG::LoadIni()
     auto texChange = false;
     int tmp;
     // load texture parameters
-    ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "flagall.tga");
+    ini.ReadString(section, "TextureName", param, sizeof(param) - 1, "flagall.tga");
     if (TextureName != nullptr)
     {
         if (strcmp(TextureName, param))
@@ -602,46 +602,46 @@ void FLAG::LoadIni()
 
     if (core.GetTargetEngineVersion() <= EngineVersion::CityOfAbandonedShips)
     {
-        FlagTextureQuantity = static_cast<int>(ini->GetInt(section, "TextureCount", 10));
+        FlagTextureQuantity = static_cast<int>(ini.GetInt(section, "TextureCount", 10));
         FlagTextureQuantityRow = 1;
     }
     else
     {
-        FlagTextureQuantity = static_cast<int>(ini->GetInt(section, "TextureCountColumn", 4));
-        FlagTextureQuantityRow = static_cast<int>(ini->GetInt(section, "TextureCountRow", 8));
+        FlagTextureQuantity = static_cast<int>(ini.GetInt(section, "TextureCountColumn", 4));
+        FlagTextureQuantityRow = static_cast<int>(ini.GetInt(section, "TextureCountRow", 8));
     }
 
     SetTextureCoordinate();
 
     // flag segment length
-    FLAGVECTORLEN = ini->GetFloat(section, "fSegLen", 0.2f);
+    FLAGVECTORLEN = ini.GetFloat(section, "fSegLen", 0.2f);
 
     // Wind influence parameters
     // vertical wind speed
-    ALFA_DEPEND = ini->GetFloat(section, "alfa_depend", 0.1f);
+    ALFA_DEPEND = ini.GetFloat(section, "alfa_depend", 0.1f);
     // horizontal wind speed
-    BETA_DEPEND = ini->GetFloat(section, "beta_depend", 0.06f);
+    BETA_DEPEND = ini.GetFloat(section, "beta_depend", 0.06f);
     // the maximum value of the random change in the angle Alpha
-    ALFA_RAND = ini->GetFloat(section, "alpha_rand", 0.1f);
+    ALFA_RAND = ini.GetFloat(section, "alpha_rand", 0.1f);
     // the maximum value of the random change in the angle Beta
-    BETA_RAND = ini->GetFloat(section, "beta_rand", 0.1f);
+    BETA_RAND = ini.GetFloat(section, "beta_rand", 0.1f);
     // maximum angle (for the end of the flag)
-    fAlfaMax = ini->GetFloat(section, "fAlfaMax", 4.71f);
-    fAlfaStep = ini->GetFloat(section, "fAlfaStep", .2f);
+    fAlfaMax = ini.GetFloat(section, "fAlfaMax", 4.71f);
+    fAlfaStep = ini.GetFloat(section, "fAlfaStep", .2f);
     // maximum angle (for the end of the flag)
-    fBetaMax = ini->GetFloat(section, "fBetaMax", 7.85f);
-    fBetaStep = ini->GetFloat(section, "fBetaStep", .3f);
+    fBetaMax = ini.GetFloat(section, "fBetaMax", 7.85f);
+    fBetaStep = ini.GetFloat(section, "fBetaStep", .3f);
     // Parameters of forming the shape of the flag and its fluctuation
     // amplitude of the flag guideline
-    fWindAm = ini->GetFloat(section, "fWindAm", 0.2f);
+    fWindAm = ini.GetFloat(section, "fWindAm", 0.2f);
     // amplitude of oscillation (rotation) of the diameter of the flag
-    fRotAm = ini->GetFloat(section, "fRotAm", 0.2f);
+    fRotAm = ini.GetFloat(section, "fRotAm", 0.2f);
     // the value of lowering the flag at each step from the mast
-    DOWNVAL = ini->GetFloat(section, "fDownVal", 0.05f);
+    DOWNVAL = ini.GetFloat(section, "fDownVal", 0.05f);
     // maximum wind value
-    fWindMaxValue = ini->GetFloat(section, "fWindMaxValue", 12.f);
+    fWindMaxValue = ini.GetFloat(section, "fWindMaxValue", 12.f);
     // minimum number of segments in the flag
-    MinSegmentQuantity = ini->GetInt(section, "MinSegQuantity", 4);
+    MinSegmentQuantity = ini.GetInt(section, "MinSegQuantity", 4);
     // UNGUARD
 }
 

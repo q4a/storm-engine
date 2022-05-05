@@ -22,7 +22,6 @@ class VFILE_SERVICE
     virtual void _SetFilePointer(std::fstream &fileS, std::streamoff off, std::ios::seekdir dir) = 0;
     virtual bool _WriteFile(std::fstream &fileS, const void *s, std::streamsize count) = 0;
     virtual bool _ReadFile(std::fstream &fileS, void *s, std::streamsize count) = 0;
-    virtual bool _FileOrDirectoryExists(const char *p) = 0;
     virtual std::vector<std::string> _GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask, bool getPaths,
                                                                 bool onlyDirs = false, bool onlyFiles = true) = 0;
     virtual std::vector<std::filesystem::path> _GetFsPathsByMask(const char *sourcePath, const char *mask,

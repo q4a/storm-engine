@@ -794,14 +794,14 @@ void ROPE::LoadIni()
     char section[256];
     char param[256];
 
-    auto ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load("resource\\ini\\rigging.ini"))
         throw std::runtime_error("rigging.ini file not found!");
 
     sprintf_s(section, "ROPES");
 
     // texture name
-    ini->ReadString(section, "TextureName", param, sizeof(param) - 1, "sail_rope.tga");
+    ini.ReadString(section, "TextureName", param, sizeof(param) - 1, "sail_rope.tga");
     if (texl != -1)
     {
         if (strcmp(TextureName, param))
@@ -822,31 +822,31 @@ void ROPE::LoadIni()
         memcpy(TextureName, param, len);
     }
     // length of one rope segment
-    ROPE_SEG_LENGTH = ini->GetFloat(section, "fSEG_LENGTH", 2.f);
+    ROPE_SEG_LENGTH = ini.GetFloat(section, "fSEG_LENGTH", 2.f);
     // rope thickness
-    ROPE_WIDTH = ini->GetFloat(section, "fWIDTH", 0.025f);
+    ROPE_WIDTH = ini.GetFloat(section, "fWIDTH", 0.025f);
     // rope (head) thickness
-    STAY_WIDTH = ini->GetFloat(section, "fSTAY_WIDTH", 0.12f);
+    STAY_WIDTH = ini.GetFloat(section, "fSTAY_WIDTH", 0.12f);
     // the length of the rope (triangle) at the point of connection with the sail in relation to the total length
-    ROPE_END_LENGTH = ini->GetFloat(section, "fEND_LENGTH", 0.05f);
+    ROPE_END_LENGTH = ini.GetFloat(section, "fEND_LENGTH", 0.05f);
     // amplitude of rope vibration in absolute values
-    ROPE_WAVE = ini->GetFloat(section, "fWAVE", 0.1f);
+    ROPE_WAVE = ini.GetFloat(section, "fWAVE", 0.1f);
     // maximum coordinate change at which the entire rope is recalculated
-    MaxCh = ini->GetFloat(section, "fMaxCh", .1f);
+    MaxCh = ini.GetFloat(section, "fMaxCh", .1f);
     // the length of the rope on which the texture applies
-    ROPE_TEX_LEN = ini->GetFloat(section, "fTexHeight", .5f);
+    ROPE_TEX_LEN = ini.GetFloat(section, "fTexHeight", .5f);
     // maximum distance from which the ropes are visible
-    fMaxRopeDist = ini->GetFloat(section, "fMaxDist", 5000.f);
+    fMaxRopeDist = ini.GetFloat(section, "fMaxDist", 5000.f);
     // the rate of change in the depth of the rope deflection
-    DEEP_CHANGE_SPEED = ini->GetFloat(section, "fDeepChangeSpeed", 0.15f);
+    DEEP_CHANGE_SPEED = ini.GetFloat(section, "fDeepChangeSpeed", 0.15f);
     // rope swing speed
-    ROTATE_SPEED = ini->GetFloat(section, "fRotateSpeed", 0.08f);
+    ROTATE_SPEED = ini.GetFloat(section, "fRotateSpeed", 0.08f);
     // the minimum value of the coefficient of use of the deflection of the rope
-    MIN_DEEP_MUL = ini->GetFloat(section, "fMinDeepMul", 1.f);
+    MIN_DEEP_MUL = ini.GetFloat(section, "fMinDeepMul", 1.f);
     // limit of variation of the coefficient of use of rope deflection
-    VAR_DEEP_MUL = ini->GetFloat(section, "fVarDeepMul", .7f);
+    VAR_DEEP_MUL = ini.GetFloat(section, "fVarDeepMul", .7f);
     // rope swing angle
-    VAR_ROTATE_ANGL = ini->GetFloat(section, "fRotateAng", .1f);
+    VAR_ROTATE_ANGL = ini.GetFloat(section, "fRotateAng", .1f);
 
     // UNGUARD
 }

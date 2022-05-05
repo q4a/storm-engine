@@ -67,6 +67,11 @@ pub fn create_directory(path: &Path) -> Result<(), io::Error> {
     std::fs::create_dir_all(path)
 }
 
+/// Check if file or directory this path points to exists. Any error will be coerced to `false`
+pub fn path_exists(path: &Path) -> bool {
+    path.exists()
+}
+
 mod export {
     use std::os::raw::c_char;
 
@@ -79,7 +84,7 @@ mod export {
 
     use super::{
         create_directory, delete_directory, delete_file, executable_directory, file_size,
-        home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename,
+        home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename, path_exists,
     };
 
     #[no_mangle]
@@ -192,5 +197,11 @@ mod export {
                 false
             }
         }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_path_exists(path: *const c_char) -> bool {
+        let path = c_char_to_str(path).as_ref();
+        path_exists(path)
     }
 }
