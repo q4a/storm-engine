@@ -1213,7 +1213,7 @@ S_TOKEN_TYPE TOKEN::Keyword2TokenType(const char *pString)
       }
       return UNKNOWN;//*/
 
-    const auto hash = MakeHashValue(pString, 4) % TOKENHASHTABLE_SIZE;
+    const uint32_t hash = ffi_hash_ignore_case(pString) % TOKENHASHTABLE_SIZE;
     for (uint32_t n = 0; n < KeywordsHash[hash].dwNum; n++)
     {
         const uint32_t index = KeywordsHash[hash].pIndex[n];
@@ -1223,34 +1223,6 @@ S_TOKEN_TYPE TOKEN::Keyword2TokenType(const char *pString)
         }
     }
     return UNKNOWN; //*/
-}
-
-uint32_t TOKEN::MakeHashValue(const char *string, uint32_t max_syms)
-{
-    // if ('A' <= string[0] && string[0] <= 'Z') return (DWORD)(string[0] + 'a' - 'A');
-    // else return string[0];
-    // return (DWORD)string[0];
-    uint32_t hval = 0;
-    while (*string != 0)
-    {
-        auto v = *string++;
-        if ('A' <= v && v <= 'Z')
-            v += 'a' - 'A'; // case independent
-        hval = (hval << 4) + static_cast<uint32_t>(v);
-        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-        if (max_syms != 0)
-        {
-            max_syms--;
-            if (max_syms == 0)
-                return hval;
-        }
-    }
-    return hval;
 }
 
 bool TOKEN::InitializeHashTable()
@@ -1265,7 +1237,7 @@ bool TOKEN::InitializeHashTable()
 
     for (uint32_t n = 0; n < dwKeywordsNum; n++)
     {
-        const auto hash = MakeHashValue(Keywords[n].name, 4) % TOKENHASHTABLE_SIZE;
+        const uint32_t hash = ffi_hash_ignore_case(Keywords[n].name) % TOKENHASHTABLE_SIZE;
 
         KeywordsHash[hash].dwNum++;
         KeywordsHash[hash].pIndex =

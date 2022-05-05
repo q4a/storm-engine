@@ -39,5 +39,4 @@ class STRINGS_LIST
     void SetStringDataSize(uint32_t size);
 
     void CacheString(uint32_t code);
-    uint32_t MakeHashValue(const char *string);
 };

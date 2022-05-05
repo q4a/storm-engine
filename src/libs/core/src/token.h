@@ -206,6 +206,5 @@ class TOKEN
     S_TOKEN_TYPE FormatGet();
 
     S_TOKEN_TYPE Keyword2TokenType(const char *pString);
-    uint32_t MakeHashValue(const char *string, uint32_t max_syms = 0);
     bool InitializeHashTable();
 };

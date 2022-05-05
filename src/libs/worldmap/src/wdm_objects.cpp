@@ -143,7 +143,7 @@ GEOS *WdmObjects::CreateGeometry(const char *path)
     if (!path || !path[0] || !gs)
         return nullptr;
     // Looking among added
-    const uint32_t hash = TOREMOVE::HashNoCase(path);
+    const uint32_t hash = ffi_hash_ignore_case(path);
     int32_t i = hash & (sizeof(entryModels) / sizeof(entryModels[0]) - 1);
     for (i = entryModels[i]; i >= 0; i = models[i].next)
     {

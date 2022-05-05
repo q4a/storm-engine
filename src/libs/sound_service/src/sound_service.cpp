@@ -297,7 +297,7 @@ const char *SoundService::GetRandomName(tAlias *_alias) const
 
 int SoundService::GetAliasIndexByName(const char *szAliasName)
 {
-    const uint32_t dwSearchHash = TOREMOVE::HashNoCase(szAliasName);
+    const uint32_t dwSearchHash = ffi_hash_ignore_case(szAliasName);
     for (size_t i = 0; i < Aliases.size(); i++)
     {
         if (Aliases[i].dwNameHash == dwSearchHash)
@@ -1081,7 +1081,7 @@ void SoundService::AddAlias(INIFILE &_iniFile, char *_sectionName)
     Aliases.push_back(tAlias{});
     tAlias &alias = Aliases.back();
     alias.Name = _sectionName;
-    alias.dwNameHash = TOREMOVE::HashNoCase(alias.Name.c_str());
+    alias.dwNameHash = ffi_hash_ignore_case(alias.Name.c_str());
     alias.fMaxDistance = _iniFile.GetFloat(_sectionName, "maxDistance", -1.0f);
     alias.fMinDistance = _iniFile.GetFloat(_sectionName, "minDistance", -1.0f);
     alias.fVolume = _iniFile.GetFloat(_sectionName, "volume", -1.0f);
@@ -1292,7 +1292,7 @@ void SoundService::DebugDraw()
 
 int SoundService::GetFromCache(const char *szName, eSoundType _type)
 {
-    const uint32_t dwSearchHash = TOREMOVE::HashNoCase(szName);
+    const uint32_t dwSearchHash = ffi_hash_ignore_case(szName);
 
     for (size_t i = 0; i < SoundCache.size(); i++)
     {
@@ -1624,7 +1624,7 @@ void SoundService::ProcessSoundSchemes()
 
 int SoundService::GetOGGPositionIndex(const char *szName)
 {
-    const uint32_t dwHash = TOREMOVE::HashNoCase(szName);
+    const uint32_t dwHash = ffi_hash_ignore_case(szName);
 
     for (size_t i = 0; i < OGGPosition.size(); i++)
     {
@@ -1659,7 +1659,7 @@ void SoundService::SetOGGPosition(const char *szName, unsigned int pos)
     }
 
     PlayedOGG ogg;
-    ogg.dwHash = TOREMOVE::HashNoCase(szName);
+    ogg.dwHash = ffi_hash_ignore_case(szName);
     ogg.Name = szName;
     ogg.position = pos;
 

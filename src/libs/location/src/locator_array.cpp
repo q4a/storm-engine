@@ -31,7 +31,7 @@ LocatorArray::LocatorArray(const char *groupName)
         group = new char[1];
         group[0] = 0;
     }
-    hash = CalcHashString(group);
+    hash = ffi_hash_ignore_case(group);
     isVisible = false;
     radius = 0.0f;
     kViewRadius = -1.0f;
@@ -60,7 +60,7 @@ void LocatorArray::AddLocator(CMatrix &mtx, const char *name)
         locatorNames = static_cast<char *>(realloc(locatorNames, bytesInLNArray + slen));
         locator[numLocators].name = bytesInLNArray;
         memcpy(locatorNames + bytesInLNArray, name, slen);
-        locator[numLocators].hash = CalcHashString(locatorNames + bytesInLNArray);
+        locator[numLocators].hash = ffi_hash_ignore_case(locatorNames + bytesInLNArray);
         bytesInLNArray += slen;
     }
     else
@@ -137,7 +137,7 @@ int32_t LocatorArray::FindByName(const char *locName)
 {
     if (!locName)
         return -1;
-    const auto hash = CalcHashString(locName);
+    const int32_t hash = ffi_hash_ignore_case(locName);
     for (int32_t i = 0; i < numLocators; i++)
     {
         if (locator[i].name >= 0)
@@ -150,25 +150,6 @@ int32_t LocatorArray::FindByName(const char *locName)
         }
     }
     return -1;
-}
-
-int32_t LocatorArray::CalcHashString(const char *str)
-{
-    uint32_t hval = 0;
-    while (*str != '\0')
-    {
-        auto c = *str++;
-        if (c >= 'A' && c <= 'Z')
-            c += 'a' - 'A';
-        hval = (hval << 4) + static_cast<uint32_t>(c);
-        const auto g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return static_cast<int32_t>(hval);
 }
 
 // Compare group names

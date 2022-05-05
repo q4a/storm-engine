@@ -68,8 +68,6 @@ void ffi_free_array_of_cchar_arrays(ArrayOfCCharArrays *ptr);
 
 EngineVersion ffi_get_target_engine_version(const char *version);
 
-bool ffi_engine_versions_eq(EngineVersion first, EngineVersion second);
-
 WCharArray *ffi_home_directory();
 
 WCharArray *ffi_logs_directory();
@@ -151,6 +149,10 @@ bool ffi_less_ignore_case(const char *first, const char *second);
 bool ffi_less_or_equal_ignore_case(const char *first, const char *second);
 
 bool ffi_glob_ignore_case(const char *s, const char *pattern);
+
+uint64_t ffi_hash(const char *s);
+
+uint64_t ffi_hash_ignore_case(const char *s);
 
 } // extern "C"
 

@@ -1,28 +1,6 @@
 #pragma once
 #include <vector>
 
-/* TODO: REMOVE THIS.... */
-constexpr uint32_t MakeHashValue(const char *string)
-{
-    uint32_t hval = 0;
-
-    while (*string != 0)
-    {
-        auto v = *string++;
-        if ('A' <= v && v <= 'Z')
-            v += 'a' - 'A';
-
-        hval = (hval << 4) + static_cast<uint32_t>(v);
-        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
-}
-
 class VMA;
 inline std::vector<VMA *> __STORM_CLASSES_REGISTRY;
 

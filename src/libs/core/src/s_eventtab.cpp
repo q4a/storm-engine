@@ -69,7 +69,7 @@ uint32_t S_EVENTTAB::AddEventHandler(const char *event_name, uint32_t func_code,
 {
     uint32_t i;
 
-    const auto hash = MakeHashValue(event_name);
+    const uint32_t hash = ffi_hash_ignore_case(event_name);
 
     const auto ti = HASH2INDEX(hash);
 
@@ -146,30 +146,11 @@ uint32_t S_EVENTTAB::AddEventHandler(const char *event_name, uint32_t func_code,
     return (((ti << 24) & 0xff000000) | ((Event_num[ti] - 1) & 0xffffff));
 }
 
-uint32_t S_EVENTTAB::MakeHashValue(const char *string)
-{
-    uint32_t hval = 0;
-    while (*string != 0)
-    {
-        auto v = *string++;
-        if ('A' <= v && v <= 'Z')
-            v += 'a' - 'A'; // case independent
-        hval = (hval << 4) + static_cast<uint32_t>(v);
-        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
-}
-
 bool S_EVENTTAB::DelEventHandler(const char *event_name, uint32_t func_code)
 {
     if (event_name == nullptr)
         return false;
-    const auto hash = MakeHashValue(event_name);
+    const uint32_t hash = ffi_hash_ignore_case(event_name);
 
     const auto ti = HASH2INDEX(hash);
 
@@ -190,7 +171,7 @@ void S_EVENTTAB::SetStatus(const char *event_name, uint32_t func_code, uint32_t 
     if (event_name == nullptr)
         return;
 
-    const auto hash = MakeHashValue(event_name);
+    const uint32_t hash = ffi_hash_ignore_case(event_name);
     const auto ti = HASH2INDEX(hash);
 
     for (uint32_t n = 0; n < Event_num[ti]; n++)
@@ -251,7 +232,7 @@ uint32_t S_EVENTTAB::FindEvent(const char *event_name)
 {
     if (event_name == nullptr)
         return INVALID_EVENT_CODE;
-    const auto hash = MakeHashValue(event_name);
+    const uint32_t hash = ffi_hash_ignore_case(event_name);
     const auto ti = HASH2INDEX(hash);
     for (uint32_t n = 0; n < Event_num[ti]; n++)
     {

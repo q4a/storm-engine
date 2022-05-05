@@ -96,6 +96,5 @@ class FuncTable
 
   private:
     std::vector<FuncInfo> funcs_;
-    rust::string::iStrHasher hasher_;
     std::unordered_map<std::string, size_t, rust::string::iStrHasher, rust::string::iStrComparator> hash_table_;
 };

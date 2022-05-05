@@ -90,7 +90,7 @@ bool SEA::SunRoad_Render2()
         // rs->SetView(mView);
 
         // Render scene here.
-        // uint32_t dwSkyCode = MakeHashValue("sky");
+        // uint32_t dwSkyCode = ffi_hash_ignore_case("sky");
 
         if (!EntityManager::IsLayerFrozen(SEA_REFLECTION2))
         {

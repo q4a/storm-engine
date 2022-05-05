@@ -91,7 +91,7 @@ void CharactersGroups::String::operator=(const char *str)
             name = new char[max];
         }
         strcpy_s(name, len + 1, str);
-        hash = LocatorArray::CalcHashString(str);
+        hash = ffi_hash_ignore_case(str);
     }
 }
 
@@ -114,7 +114,7 @@ int32_t CharactersGroups::String::GetHash(const char *str)
 {
     if (!str)
         return 0;
-    return LocatorArray::CalcHashString(str);
+    return ffi_hash_ignore_case(str);
 }
 
 int32_t CharactersGroups::String::GetLen(const char *str)

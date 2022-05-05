@@ -51,7 +51,6 @@ class S_DEFTAB
     uint32_t AddDef(DEFINFO &di);
     bool GetDef(DEFINFO &di, uint32_t def_code);
     bool GetDefX(DEFINFO &vi, uint32_t def_code);
-    uint32_t MakeHashValue(const char *string);
     //    void  KeepNameMode(bool on){bKeepName = on;};
     void Release();
     void InvalidateBySegmentID(uint32_t segment_id);

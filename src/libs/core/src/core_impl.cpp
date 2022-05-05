@@ -262,7 +262,7 @@ bool CoreImpl::LoadClassesTable()
 {
     for (auto *c : __STORM_CLASSES_REGISTRY)
     {
-        const auto hash = MakeHashValue(c->GetName());
+        const auto hash = ffi_hash_ignore_case(c->GetName());
         c->SetHash(hash);
     }
 
@@ -396,7 +396,7 @@ VDATA *CoreImpl::Event(const std::string_view &event_name, MESSAGE& message)
 
 void *CoreImpl::MakeClass(const char *class_name)
 {
-    const int32_t hash = MakeHashValue(class_name);
+    const int32_t hash = ffi_hash_ignore_case(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c->CreateClass();
@@ -415,7 +415,7 @@ void CoreImpl::ReleaseServices()
 
 VMA *CoreImpl::FindVMA(const char *class_name)
 {
-    const int32_t hash = MakeHashValue(class_name);
+    const int32_t hash = ffi_hash_ignore_case(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c;
@@ -452,7 +452,7 @@ void *CoreImpl::GetService(const char *service_name)
 
     auto *service_PTR = static_cast<SERVICE *>(pClass->CreateClass());
 
-    const auto class_code = MakeHashValue(service_name);
+    const auto class_code = ffi_hash_ignore_case(service_name);
     pClass->SetHash(class_code);
 
     if (!service_PTR->Init())
@@ -722,27 +722,6 @@ void CoreImpl::AppState(bool state)
 {
     if (Controls)
         Controls->AppState(state);
-}
-
-uint32_t CoreImpl::MakeHashValue(const char *string)
-{
-    uint32_t hval = 0;
-
-    while (*string != 0)
-    {
-        char v = *string++;
-        if ('A' <= v && v <= 'Z')
-            v += 'a' - 'A';
-
-        hval = (hval << 4) + static_cast<uint32_t>(v);
-        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
 }
 
 //==========================================================================================================================

@@ -51,7 +51,6 @@ class CoreImpl : public CorePrivate
     void ClearEvents();
     void *MakeClass(const char *class_name);
     void AppState(bool state);
-    uint32_t MakeHashValue(const char *string);
     VMA *FindVMA(const char *class_name);
     VMA *FindVMA(int32_t hash);
     //------------------------------------------------------------------------------------------------

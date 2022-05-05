@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::hash_map::DefaultHasher, hash::Hasher};
 
 use crate::common::DEFAULT_LOGGER;
 
@@ -76,17 +76,29 @@ pub fn glob_ignore_case(s: &str, pattern: &str) -> bool {
     matcher.is_match(&s_lowercase)
 }
 
+/// Case-dependent hashing
+pub fn hash(s: &str) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    hasher.write(s.as_bytes());
+    hasher.finish()
+}
+
+/// Case-independent hashing
+pub fn hash_ignore_case(s: &str) -> u64 {
+    hash(&s.to_lowercase())
+}
+
 mod export {
     use std::{
         borrow::Borrow,
         os::raw::{c_char, c_int},
     };
 
-    use crate::common::ffi::{c_char_to_str, size_t, win1251_char_to_str};
+    use crate::common::ffi::{c_char_to_str, size_t, uint64_t, win1251_char_to_str};
 
     use super::{
         ends_with_ignore_case, equal_ignore_case, find_ignore_case, glob_ignore_case,
-        less_ignore_case, less_or_equal_ignore_case, starts_with_ignore_case,
+        hash_ignore_case, less_ignore_case, less_or_equal_ignore_case, starts_with_ignore_case, hash,
     };
 
     #[no_mangle]
@@ -186,6 +198,18 @@ mod export {
 
         glob_ignore_case(s, pattern)
     }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_hash(s: *const c_char) -> uint64_t {
+        let s = c_char_to_str(s);
+        hash(s)
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_hash_ignore_case(s: *const c_char) -> uint64_t {
+        let s = c_char_to_str(s);
+        hash_ignore_case(s)
+    }
 }
 
 #[cfg(test)]
@@ -197,8 +221,10 @@ mod tests {
 
     use crate::string_utils::{
         ends_with_ignore_case, find_ignore_case, glob_ignore_case, less_ignore_case,
-        starts_with_ignore_case,
+        starts_with_ignore_case, hash,
     };
+
+    use super::hash_ignore_case;
 
     #[test]
     fn ignore_case_find_test() {
@@ -330,6 +356,43 @@ mod tests {
             let result = glob_ignore_case(s, pat);
             assert_eq!(result, expected);
         }
+    }
+
+    #[test]
+    fn hash_test() {
+        let s1 = "TEST";
+        let s2 = "test";
+        let s3 = "TeSt";
+
+        let hash1 = hash(s1);
+        let hash2 = hash(s2);
+        let hash3 = hash(s3);
+
+        assert_ne!(hash1, hash2);
+        assert_ne!(hash2, hash3);
+        assert_ne!(hash1, hash3);
+
+        let hash1_2 = hash(s1);
+        let hash2_2 = hash(s2);
+        let hash3_2 = hash(s3);
+
+        assert_eq!(hash1, hash1_2);
+        assert_eq!(hash2, hash2_2);
+        assert_eq!(hash3, hash3_2);
+    }
+
+    #[test]
+    fn ignore_case_hash_test() {
+        let s1 = "TEST";
+        let s2 = "test";
+        let s3 = "TeSt";
+
+        let hash1 = hash_ignore_case(s1);
+        let hash2 = hash_ignore_case(s2);
+        let hash3 = hash_ignore_case(s3);
+
+        assert_eq!(hash1, hash2);
+        assert_eq!(hash2, hash3);
     }
 
     #[allow(dead_code)]
