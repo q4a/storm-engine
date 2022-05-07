@@ -293,25 +293,6 @@ void FILE_SERVICE::Close()
     }
 }
 
-bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dwSize)
-{
-    if (ppBuffer == nullptr)
-        return false;
-
-    uint64_t file_size = 0;
-    auto data = rust::fs::ReadBytesFromFile(file_name, file_size);
-    if (file_size == 0)
-    {
-        *ppBuffer = nullptr;
-        return false;
-    }
-
-    *dwSize = file_size;
-
-    *ppBuffer = reinterpret_cast<char *>(data);
-    return true;
-}
-
 //=================================================================================================
 
 INIFILE_T::~INIFILE_T()

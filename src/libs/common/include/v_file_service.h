@@ -32,7 +32,6 @@ class VFILE_SERVICE
     virtual void _FlushFileBuffers(std::fstream &fileS) = 0;
     virtual std::string _GetCurrentDirectory() = 0;
     virtual void _SetCurrentDirectory(const char *pathName) = 0;
-    virtual bool LoadFile(const char *file_name, char **ppBuffer, uint32_t *dwSize = nullptr) = 0;
 
     // ini files section
     virtual std::unique_ptr<INIFILE> CreateIniFile(const char *file_name, bool fail_if_exist) = 0;

@@ -42,23 +42,24 @@ bool PathTracks::Load(const char *fileName)
     numPoints = 0;
 
     char *data = nullptr;
-    uint32_t size = 0;
-    if (fio->LoadFile(fileName, &data, &size) == FALSE || !data)
+    uint64_t size = 0;
+    auto file_data = rust::fs::ReadBytesFromFile(fileName, size);
+    if (size == 0)
     {
-        rust::log::info("Camera tracks file %s not loaded...", fileName);
         return false;
     }
+    data = reinterpret_cast<char *>(file_data);
     // Checking the title
     if (((AntFileHeader *)data)->id != ANTFILE_ID)
     {
         rust::log::info("Camera tracks file %s is invalidate...", fileName);
-        delete data;
+        delete[] data;
         return false;
     }
     if (((AntFileHeader *)data)->ver != ANTFILE_VER)
     {
         rust::log::info("Camera tracks file %s have incorrect version...", fileName);
-        delete data;
+        delete[] data;
         return false;
     }
     const int32_t nPoints = ((AntFileHeader *)data)->framesCount;
@@ -69,7 +70,7 @@ bool PathTracks::Load(const char *fileName)
                    sizeof(AntFileTrackElement) * nPoints)
     {
         rust::log::info("Camera tracks file %s is invalidate...", fileName);
-        delete data;
+        delete[] data;
         return false;
     }
     // save the data
