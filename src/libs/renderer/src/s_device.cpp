@@ -489,7 +489,7 @@ bool DX9RENDER::Init()
 
     create_directories(rust::fs::GetScreenshotsPath());
 
-    auto ini = core.EngineIni();
+    auto &ini = core.EngineIni();
     // bPostProcessEnabled = ini->GetInt(0, "PostProcess", 0) == 1;
     bPostProcessEnabled = false; //~!~
 

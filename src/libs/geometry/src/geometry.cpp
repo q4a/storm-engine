@@ -61,7 +61,7 @@ bool GEOMETRY::Init()
     }
     GSR.SetRenderService(RenderService);
 
-    auto ini = core.EngineIni();
+    auto &ini = core.EngineIni();
     geoLog = ini.GetInt(nullptr, "geometry_log", 0) == 1;
 
     return true;

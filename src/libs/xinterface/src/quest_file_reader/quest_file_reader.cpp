@@ -139,7 +139,7 @@ bool QuestFileReader::GetQuestTitle(const std::string_view &questId, const std::
     const auto n = FindQuestByID(questId);
     if (!n.has_value())
     {
-        rust::log::info("Can`t find title whith ID = %s", questId);
+        rust::log::info("Can`t find title whith ID = %s", questId.data());
         return false;
     }
 

@@ -808,7 +808,7 @@ uint32_t CoreImpl::SetScriptFunction(IFUNCINFO *pFuncInfo)
     return Compiler->SetScriptFunction(pFuncInfo);
 }
 
-const rust::ini::IniFile &CoreImpl::EngineIni()
+rust::ini::IniFile &CoreImpl::EngineIni()
 {
     return engine_ini;
 }

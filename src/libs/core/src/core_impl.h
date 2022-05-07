@@ -107,7 +107,7 @@ class CoreImpl : public CorePrivate
 
     uint32_t SetScriptFunction(IFUNCINFO *pFuncInfo) override;
 
-    const rust::ini::IniFile &EngineIni() override;
+    rust::ini::IniFile &EngineIni() override;
 
     void *GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex = nullptr) override;
 

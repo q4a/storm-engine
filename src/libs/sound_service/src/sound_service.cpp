@@ -96,7 +96,7 @@ bool SoundService::Init()
     CHECKFMODERR(system->init(MAX_SOUNDS_SLOTS, FMOD_INIT_NORMAL, nullptr));
     CHECKFMODERR(system->set3DSettings(1.0, DISTANCEFACTOR, 1.0f));
 
-    auto ini = core.EngineIni();
+    auto &ini = core.EngineIni();
     fadeTimeInSeconds = ini.GetFloat("sound", "fade_time", 0.5f);
 
     SoundsActive = 2; // 0 and 1 are special

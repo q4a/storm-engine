@@ -187,7 +187,7 @@ bool SEA::Init()
     rs = static_cast<VDX9RENDER *>(core.GetService("dx9render"));
     CreateVertexDeclaration();
     {
-        auto pEngineIni = core.EngineIni();
+        auto &pEngineIni = core.EngineIni();
         bIniFoamEnable = pEngineIni.GetInt("Sea", "FoamEnable", 1) != 0;
     }
 

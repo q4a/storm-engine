@@ -360,7 +360,7 @@ void COMPILER::SetWarning(const char *data_PTR, ...)
 
 void COMPILER::LoadPreprocess()
 {
-    auto engine_ini = core_internal.EngineIni();
+    auto &engine_ini = core_internal.EngineIni();
     if (engine_ini.GetInt("script", "debuginfo", 0) == 0)
     {
         bDebugInfo = false;

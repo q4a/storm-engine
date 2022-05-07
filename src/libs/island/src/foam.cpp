@@ -834,15 +834,15 @@ void CoastFoam::Load()
     char cSection[256], cKey[256], cTemp[1024];
 
     const auto sID = std::string("resource\\foam\\locations\\") + to_string(AttributesPointer->GetAttribute("id")) + ".ini";
-    auto pI = fio->OpenIniFile(sID.c_str());
-    if (!pI)
+    auto pI = rust::ini::IniFile();
+    if (!pI.Load(sID.c_str()))
         return;
 
     clear();
-    const auto iNumFoams = pI->GetInt(nullptr, "NumFoams", 0);
-    fMaxFoamDistance = pI->GetFloat(nullptr, "MaxFoamDistance", 1000.0f);
-    fFoamDeltaY = pI->GetFloat(nullptr, "FoamDeltaY", 0.2f);
-    iFoamDivides = pI->GetInt(nullptr, "FoamDivides", 4);
+    const auto iNumFoams = pI.GetInt(nullptr, "NumFoams", 0);
+    fMaxFoamDistance = pI.GetFloat(nullptr, "MaxFoamDistance", 1000.0f);
+    fFoamDeltaY = pI.GetFloat(nullptr, "FoamDeltaY", 0.2f);
+    iFoamDivides = pI.GetInt(nullptr, "FoamDivides", 4);
     for (int32_t i = 0; i < iNumFoams; i++)
     {
         // Foam * pF = aFoams[aFoams.Add(new Foam)];
@@ -851,36 +851,36 @@ void CoastFoam::Load()
 
         sprintf_s(cSection, "foam_%d", i);
 
-        const int32_t iNumParts = pI->GetInt(cSection, "NumParts", 0);
+        const int32_t iNumParts = pI.GetInt(cSection, "NumParts", 0);
 
-        pI->ReadString(cSection, "Alpha", cTemp, sizeof(cTemp), "148, 196");
+        pI.ReadString(cSection, "Alpha", cTemp, sizeof(cTemp), "148, 196");
         sscanf(cTemp, "%f, %f", &pF->fAlphaMin, &pF->fAlphaMax);
 
-        pI->ReadString(cSection, "Speed", cTemp, sizeof(cTemp), "0.200, 0.30");
+        pI.ReadString(cSection, "Speed", cTemp, sizeof(cTemp), "0.200, 0.30");
         sscanf(cTemp, "%f, %f", &pF->fSpeedMin, &pF->fSpeedMax);
 
-        pI->ReadString(cSection, "Braking", cTemp, sizeof(cTemp), "0.000, 0.000");
+        pI.ReadString(cSection, "Braking", cTemp, sizeof(cTemp), "0.000, 0.000");
         sscanf(cTemp, "%f, %f", &pF->fBrakingMin, &pF->fBrakingMax);
 
-        pI->ReadString(cSection, "Appear", cTemp, sizeof(cTemp), "0.000, 0.200");
+        pI.ReadString(cSection, "Appear", cTemp, sizeof(cTemp), "0.000, 0.200");
         sscanf(cTemp, "%f, %f", &pF->fAppearMin, &pF->fAppearMax);
 
-        pI->ReadString(cSection, "TexScaleX", cTemp, sizeof(cTemp), "0.050");
+        pI.ReadString(cSection, "TexScaleX", cTemp, sizeof(cTemp), "0.050");
         sscanf(cTemp, "%f", &pF->fTexScaleX);
 
-        pF->iNumFoams = (pI->GetInt(cSection, "NumFoams", 2) == 2) ? 2 : 1;
+        pF->iNumFoams = (pI.GetInt(cSection, "NumFoams", 2) == 2) ? 2 : 1;
 
-        pI->ReadString(cSection, "Texture", cTemp, sizeof(cTemp), "foam.tga");
+        pI.ReadString(cSection, "Texture", cTemp, sizeof(cTemp), "foam.tga");
         pF->sTexture = cTemp;
         pF->iTexture = rs->TextureCreate((std::string("weather\\coastfoam\\") + cTemp).c_str());
-        pF->Type = static_cast<FOAMTYPE>(pI->GetInt(cSection, "Type", FOAM_TYPE_2));
+        pF->Type = static_cast<FOAMTYPE>(pI.GetInt(cSection, "Type", FOAM_TYPE_2));
 
         for (int32_t j = 0; j < ((iNumParts) ? iNumParts : 100000); j++)
         {
             sprintf_s(cKey, "key_%d", j);
             CVECTOR v1, v2;
             v1.y = v2.y = 0.0f;
-            pI->ReadString(cSection, cKey, cTemp, sizeof(cTemp), "");
+            pI.ReadString(cSection, cKey, cTemp, sizeof(cTemp), "");
             if (!cTemp[0])
                 break;
             sscanf(cTemp, "%f, %f, %f, %f", &v1.x, &v1.z, &v2.x, &v2.z);

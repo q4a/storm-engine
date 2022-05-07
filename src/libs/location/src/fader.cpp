@@ -151,7 +151,7 @@ bool Fader::Init()
     // read the number of tips, if necessary
     if (!numberOfTips)
     {
-        auto ini = core.EngineIni();
+        auto &ini = core.EngineIni();
         numberOfTips = ini.GetInt(nullptr, "ProgressFrame", 1);
         if (numberOfTips > 1)
             numberOfTips = 1;

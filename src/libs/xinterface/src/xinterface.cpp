@@ -1063,8 +1063,8 @@ void XINTERFACE::LoadIni()
     char section[256];
 
     auto platform = "PC_SCREEN";
-    auto ini = fio->OpenIniFile(RESOURCE_FILENAME);
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load(RESOURCE_FILENAME))
         throw std::runtime_error("ini file not found!");
 
     RECT Screen_Rect;
@@ -1084,23 +1084,23 @@ void XINTERFACE::LoadIni()
     sprintf_s(section, "COMMON");
 
     // set screen parameters
-    if (ini->GetInt(platform, "bDynamicScaling", 0) == 0)
+    if (ini.GetInt(platform, "bDynamicScaling", 0) == 0)
     {
         const auto &canvas_size = core.GetScreenSize();
-        fScale = ini->GetFloat(platform, "fScale", 1.f);
+        fScale = ini.GetFloat(platform, "fScale", 1.f);
         if (fScale < MIN_SCALE || fScale > MAX_SCALE)
             fScale = 1.f;
-        dwScreenWidth = ini->GetInt(platform, "wScreenWidth", canvas_size.width);
-        dwScreenHeight = ini->GetInt(platform, "wScreenHeight", canvas_size.height);
-        GlobalScreenRect.left = ini->GetInt(platform, "wScreenLeft", 0);
-        GlobalScreenRect.top = ini->GetInt(platform, "wScreenTop", canvas_size.height);
-        GlobalScreenRect.right = ini->GetInt(platform, "wScreenRight", canvas_size.width);
-        GlobalScreenRect.bottom = ini->GetInt(platform, "wScreenDown", 0);
+        dwScreenWidth = ini.GetInt(platform, "wScreenWidth", canvas_size.width);
+        dwScreenHeight = ini.GetInt(platform, "wScreenHeight", canvas_size.height);
+        GlobalScreenRect.left = ini.GetInt(platform, "wScreenLeft", 0);
+        GlobalScreenRect.top = ini.GetInt(platform, "wScreenTop", canvas_size.height);
+        GlobalScreenRect.right = ini.GetInt(platform, "wScreenRight", canvas_size.width);
+        GlobalScreenRect.bottom = ini.GetInt(platform, "wScreenDown", 0);
     }
 
-    m_fpMouseOutZoneOffset.x = ini->GetFloat(section, "mouseOutZoneWidth", 0.f);
-    m_fpMouseOutZoneOffset.y = ini->GetFloat(section, "mouseOutZoneHeight", 0.f);
-    m_nMouseLastClickTimeMax = ini->GetInt(section, "mouseDblClickInterval", 300);
+    m_fpMouseOutZoneOffset.x = ini.GetFloat(section, "mouseOutZoneWidth", 0.f);
+    m_fpMouseOutZoneOffset.y = ini.GetFloat(section, "mouseOutZoneHeight", 0.f);
+    m_nMouseLastClickTimeMax = ini.GetInt(section, "mouseDblClickInterval", 300);
 
     CMatrix oldmatp;
     pRenderService->GetTransform(D3DTS_PROJECTION, (D3DMATRIX *)&oldmatp);
@@ -1121,11 +1121,11 @@ void XINTERFACE::LoadIni()
     matv.m[3][1] = -(GlobalScreenRect.top + GlobalScreenRect.bottom) / 2.f;
 
     // set key press data
-    m_nMaxPressDelay = ini->GetInt(section, "RepeatDelay", 500);
+    m_nMaxPressDelay = ini.GetInt(section, "RepeatDelay", 500);
 
     // set mouse cursor
     char param[256];
-    ini->ReadString(section, "MousePointer", param, sizeof(param) - 1, "");
+    ini.ReadString(section, "MousePointer", param, sizeof(param) - 1, "");
     char param2[256];
     sscanf(param, "%[^,],%d,size:(%d,%d),pos:(%d,%d)", param2, &m_lMouseSensitive, &MouseSize.x, &MouseSize.y,
            &m_lXMouse, &m_lYMouse);
@@ -1146,18 +1146,18 @@ void XINTERFACE::LoadIni()
     ShowCursor(false);
 
     // set blind parameters
-    m_fBlindSpeed = ini->GetFloat(section, "BlindTime", 1.f);
+    m_fBlindSpeed = ini.GetFloat(section, "BlindTime", 1.f);
     if (m_fBlindSpeed <= 0.0001f)
         m_fBlindSpeed = 1.f;
     m_fBlindSpeed = 0.002f / m_fBlindSpeed;
 
     // set wave parameters
-    m_nColumnQuantity = ini->GetInt(section, "columnQuantity", m_nColumnQuantity);
-    m_fWaveAmplitude = ini->GetFloat(section, "waveAmplitude", m_fWaveAmplitude);
-    m_fWavePhase = ini->GetFloat(section, "wavePhase", m_fWavePhase);
-    m_fWaveSpeed = ini->GetFloat(section, "waveSpeed", m_fWaveSpeed);
-    m_nBlendStepMax = ini->GetInt(section, "waveStepQuantity", m_nBlendStepMax);
-    m_nBlendSpeed = ini->GetInt(section, "blendSpeed", m_nBlendSpeed);
+    m_nColumnQuantity = ini.GetInt(section, "columnQuantity", m_nColumnQuantity);
+    m_fWaveAmplitude = ini.GetFloat(section, "waveAmplitude", m_fWaveAmplitude);
+    m_fWavePhase = ini.GetFloat(section, "wavePhase", m_fWavePhase);
+    m_fWaveSpeed = ini.GetFloat(section, "waveSpeed", m_fWaveSpeed);
+    m_nBlendStepMax = ini.GetInt(section, "waveStepQuantity", m_nBlendStepMax);
+    m_nBlendSpeed = ini.GetInt(section, "blendSpeed", m_nBlendSpeed);
 
     oldKeyState.dwKeyCode = -1;
     DoControl();

@@ -47,7 +47,7 @@ impl IniData {
         for line in reader.lines() {
             let original_line = line?;
             let trimmed_line = original_line.trim();
-            if trimmed_line.starts_with(';') || trimmed_line.is_empty() {
+            if trimmed_line.starts_with(';') || trimmed_line.starts_with("//") || trimmed_line.is_empty() {
                 continue;
             }
 

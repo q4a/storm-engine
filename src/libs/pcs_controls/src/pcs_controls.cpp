@@ -28,7 +28,7 @@ PCS_CONTROLS::PCS_CONTROLS()
     nMouseWheel = 0;
     memset(&ControlsTab[0], 0, sizeof(ControlsTab));
 
-    auto pIni = core.EngineIni();
+    auto &pIni = core.EngineIni();
     m_bIsOffDebugKeys = pIni.GetInt("controls", "ondebugkeys", 0) == 0;
 
     input_ = Input::Create();
