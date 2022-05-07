@@ -177,8 +177,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     if (ini.Load(rust::fs::ENGINE_INI_FILE_NAME))
     {
         dwMaxFPS = static_cast<uint32_t>(ini.GetInt(nullptr, "max_fps", 0));
-        auto bDebugWindow = ini.GetInt(nullptr, "DebugWindow", 0) == 1;
-        auto bAcceleration = ini.GetInt(nullptr, "Acceleration", 0) == 1;
         width = ini.GetInt(nullptr, "screen_x", 1024);
         height = ini.GetInt(nullptr, "screen_y", 768);
         fullscreen = ini.GetInt(nullptr, "full_screen", false) ? true : false;

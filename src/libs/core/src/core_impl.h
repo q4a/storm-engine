@@ -107,7 +107,7 @@ class CoreImpl : public CorePrivate
 
     uint32_t SetScriptFunction(IFUNCINFO *pFuncInfo) override;
 
-    const char *EngineIniFileName() override;
+    const rust::ini::IniFile &EngineIni() override;
 
     void *GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex = nullptr) override;
 
@@ -154,6 +154,8 @@ class CoreImpl : public CorePrivate
     char *State_file_name;
 
     float fTimeScale;
+
+    rust::ini::IniFile engine_ini;
 };
 
 inline CoreImpl core_internal;

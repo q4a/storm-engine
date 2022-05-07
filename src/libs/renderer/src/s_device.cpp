@@ -489,133 +489,130 @@ bool DX9RENDER::Init()
 
     create_directories(rust::fs::GetScreenshotsPath());
 
-    auto ini = fio->OpenIniFile(core.EngineIniFileName());
-    if (ini)
+    auto ini = core.EngineIni();
+    // bPostProcessEnabled = ini->GetInt(0, "PostProcess", 0) == 1;
+    bPostProcessEnabled = false; //~!~
+
+    // screenshot format and extension
+    ini.ReadString(nullptr, "screenshot_format", str, sizeof(str), "jpg");
+    screenshotExt = str;
+    std::ranges::transform(screenshotExt, screenshotExt.begin(),
+                            [](const unsigned char c) { return std::tolower(c); });
+    screenshotFormat = GetScreenshotFormat(str);
+    if (screenshotFormat == D3DXIFF_FORCE_DWORD)
     {
-        // bPostProcessEnabled = ini->GetInt(0, "PostProcess", 0) == 1;
-        bPostProcessEnabled = false; //~!~
+        screenshotExt = "jpg";
+        screenshotFormat = D3DXIFF_JPG;
+    }
 
-        // screenshot format and extension
-        ini->ReadString(nullptr, "screenshot_format", str, sizeof(str), "jpg");
-        screenshotExt = str;
-        std::ranges::transform(screenshotExt, screenshotExt.begin(),
-                               [](const unsigned char c) { return std::tolower(c); });
-        screenshotFormat = GetScreenshotFormat(str);
-        if (screenshotFormat == D3DXIFF_FORCE_DWORD)
-        {
-            screenshotExt = "jpg";
-            screenshotFormat = D3DXIFF_JPG;
-        }
+    bShowFps = ini.GetInt(nullptr, "show_fps", 0) == 1;
+    bShowExInfo = ini.GetInt(nullptr, "show_exinfo", 0) == 1;
+    bSafeRendering = ini.GetInt(nullptr, "safe_render", 0) == 0;
+    bDropVideoConveyor = ini.GetInt(nullptr, "DropVideoConveyor", 0) != 0;
+    texLog = ini.GetInt(nullptr, "texture_log", 0) == 1;
+    bUseLargeBackBuffer = ini.GetInt(nullptr, "UseLargeBackBuffer", 0) != 0;
 
-        bShowFps = ini->GetInt(nullptr, "show_fps", 0) == 1;
-        bShowExInfo = ini->GetInt(nullptr, "show_exinfo", 0) == 1;
-        bSafeRendering = ini->GetInt(nullptr, "safe_render", 0) == 0;
-        bDropVideoConveyor = ini->GetInt(nullptr, "DropVideoConveyor", 0) != 0;
-        texLog = ini->GetInt(nullptr, "texture_log", 0) == 1;
-        bUseLargeBackBuffer = ini->GetInt(nullptr, "UseLargeBackBuffer", 0) != 0;
+    bWindow = ini.GetInt(nullptr, "full_screen", 1) == 0;
 
-        bWindow = ini->GetInt(nullptr, "full_screen", 1) == 0;
+    nTextureDegradation = ini.GetInt(nullptr, "texture_degradation", 0);
 
-        nTextureDegradation = ini->GetInt(nullptr, "texture_degradation", 0);
+    FovMultiplier = ini.GetFloat(nullptr, "fov_multiplier", 1.0f);
 
-        FovMultiplier = ini->GetFloat(nullptr, "fov_multiplier", 1.0f);
-
-        screen_size.x = ini->GetInt(nullptr, "screen_x", 1024);
-        screen_size.y = ini->GetInt(nullptr, "screen_y", 768);
-        fNearClipPlane = ini->GetFloat(nullptr, "NearClipPlane", 0.1f);
-        fFarClipPlane = ini->GetFloat(nullptr, "FarClipPlane", 4000.0f);
-        bBackBufferCanLock = ini->GetInt(nullptr, "lockable_back_buffer", 0) != 0;
-        ini->ReadString(nullptr, "screen_bpp", str, sizeof(str), "D3DFMT_R5G6B5");
+    screen_size.x = ini.GetInt(nullptr, "screen_x", 1024);
+    screen_size.y = ini.GetInt(nullptr, "screen_y", 768);
+    fNearClipPlane = ini.GetFloat(nullptr, "NearClipPlane", 0.1f);
+    fFarClipPlane = ini.GetFloat(nullptr, "FarClipPlane", 4000.0f);
+    bBackBufferCanLock = ini.GetInt(nullptr, "lockable_back_buffer", 0) != 0;
+    ini.ReadString(nullptr, "screen_bpp", str, sizeof(str), "D3DFMT_R5G6B5");
+    screen_bpp = D3DFMT_R5G6B5;
+    stencil_format = D3DFMT_D16;
+    if (rust::string::iEquals(str, "D3DFMT_A8R8G8B8"))
+    {
+        screen_bpp = D3DFMT_A8R8G8B8;
+        stencil_format = D3DFMT_D24S8;
+    }
+    if (rust::string::iEquals(str, "D3DFMT_X8R8G8B8"))
+    {
+        screen_bpp = D3DFMT_X8R8G8B8;
+        stencil_format = D3DFMT_D24S8;
+    }
+    if (rust::string::iEquals(str, "D3DFMT_R5G6B5"))
+    {
         screen_bpp = D3DFMT_R5G6B5;
         stencil_format = D3DFMT_D16;
-        if (rust::string::iEquals(str, "D3DFMT_A8R8G8B8"))
-        {
-            screen_bpp = D3DFMT_A8R8G8B8;
-            stencil_format = D3DFMT_D24S8;
-        }
-        if (rust::string::iEquals(str, "D3DFMT_X8R8G8B8"))
-        {
-            screen_bpp = D3DFMT_X8R8G8B8;
-            stencil_format = D3DFMT_D24S8;
-        }
-        if (rust::string::iEquals(str, "D3DFMT_R5G6B5"))
-        {
-            screen_bpp = D3DFMT_R5G6B5;
-            stencil_format = D3DFMT_D16;
-        }
-
-        // new renderer settings
-        vSyncEnabled = ini->GetInt(nullptr, "vsync", 0);
-
-        msaa = ini->GetInt(nullptr, "msaa", D3DMULTISAMPLE_16_SAMPLES);
-        if (msaa != D3DMULTISAMPLE_NONE)
-        {
-            if (msaa < D3DMULTISAMPLE_2_SAMPLES || msaa > D3DMULTISAMPLE_16_SAMPLES)
-            {
-                msaa = D3DMULTISAMPLE_16_SAMPLES;
-            }
-        }
-
-        videoAdapterIndex = ini->GetInt(nullptr, "adapter", std::numeric_limits<int32_t>::max());
-
-        // stencil_format = D3DFMT_D24S8;
-        if (!InitDevice(bWindow, static_cast<HWND>(core.GetAppHWND()), screen_size.x, screen_size.y))
-            return false;
-
-        RecompileEffects();
-
-        // get start ini file for fonts
-        if (!ini->ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
-        {
-            rust::log::info("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
-            sprintf_s(str, "resource\\ini\\fonts.ini");
-        }
-        const auto len = strlen(str) + 1;
-        if ((fontIniFileName = new char[len]) == nullptr)
-            throw std::runtime_error("allocate memory error");
-        strcpy_s(fontIniFileName, len, str);
-        // get start font quantity
-        if (!ini->ReadString(nullptr, "font", str, sizeof(str) - 1, ""))
-        {
-            rust::log::info("Start font not defined");
-            sprintf_s(str, "normal");
-        }
-        if (LoadFont(str) == -1L)
-            rust::log::info("can not init start font: %s", str);
-        idFontCurrent = 0L;
-
-        // Progress image parameters
-        progressFramesPosX = ini->GetFloat("ProgressImage", "RelativePosX", 0.85f);
-        progressFramesPosY = ini->GetFloat("ProgressImage", "RelativePosY", 0.8f);
-        progressFramesWidth = ini->GetFloat("ProgressImage", "RelativeWidth", 0.0625f);
-        if (progressFramesWidth < 0.0f)
-            progressFramesWidth = 0.0f;
-        if (progressFramesWidth > 10.0f)
-            progressFramesWidth = 10.0f;
-        progressFramesHeight = ini->GetFloat("ProgressImage", "RelativeHeight", 0.0625f);
-        if (progressFramesHeight < 0.0f)
-            progressFramesHeight = 0.0f;
-        if (progressFramesHeight > 10.0f)
-            progressFramesHeight = 10.0f;
-        progressFramesCountX = static_cast<int32_t>(ini->GetFloat("ProgressImage", "HorisontalFramesCount", 8));
-        if (progressFramesCountX < 1)
-            progressFramesCountX = 1;
-        if (progressFramesCountX > 64)
-            progressFramesCountX = 64;
-        progressFramesCountY = static_cast<int32_t>(ini->GetFloat("ProgressImage", "VerticalFramesCount", 8));
-        if (progressFramesCountY < 1)
-            progressFramesCountY = 1;
-        if (progressFramesCountY > 64)
-            progressFramesCountY = 64;
-
-        CreateSphere();
-        auto *pScriptRender = static_cast<VDATA *>(core.GetScriptVariable("Render"));
-        ATTRIBUTES *pARender = pScriptRender->GetAClass();
-
-        pARender->SetAttributeUseDword("full_screen", !bWindow);
-        pARender->SetAttributeUseDword("screen_x", screen_size.x);
-        pARender->SetAttributeUseDword("screen_y", screen_size.y);
     }
+
+    // new renderer settings
+    vSyncEnabled = ini.GetInt(nullptr, "vsync", 0);
+
+    msaa = ini.GetInt(nullptr, "msaa", D3DMULTISAMPLE_16_SAMPLES);
+    if (msaa != D3DMULTISAMPLE_NONE)
+    {
+        if (msaa < D3DMULTISAMPLE_2_SAMPLES || msaa > D3DMULTISAMPLE_16_SAMPLES)
+        {
+            msaa = D3DMULTISAMPLE_16_SAMPLES;
+        }
+    }
+
+    videoAdapterIndex = ini.GetInt(nullptr, "adapter", std::numeric_limits<int32_t>::max());
+
+    // stencil_format = D3DFMT_D24S8;
+    if (!InitDevice(bWindow, static_cast<HWND>(core.GetAppHWND()), screen_size.x, screen_size.y))
+        return false;
+
+    RecompileEffects();
+
+    // get start ini file for fonts
+    if (!ini.ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
+    {
+        rust::log::info("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
+        sprintf_s(str, "resource\\ini\\fonts.ini");
+    }
+    const auto len = strlen(str) + 1;
+    if ((fontIniFileName = new char[len]) == nullptr)
+        throw std::runtime_error("allocate memory error");
+    strcpy_s(fontIniFileName, len, str);
+    // get start font quantity
+    if (!ini.ReadString(nullptr, "font", str, sizeof(str) - 1, ""))
+    {
+        rust::log::info("Start font not defined");
+        sprintf_s(str, "normal");
+    }
+    if (LoadFont(str) == -1L)
+        rust::log::info("can not init start font: %s", str);
+    idFontCurrent = 0L;
+
+    // Progress image parameters
+    progressFramesPosX = ini.GetFloat("ProgressImage", "RelativePosX", 0.85f);
+    progressFramesPosY = ini.GetFloat("ProgressImage", "RelativePosY", 0.8f);
+    progressFramesWidth = ini.GetFloat("ProgressImage", "RelativeWidth", 0.0625f);
+    if (progressFramesWidth < 0.0f)
+        progressFramesWidth = 0.0f;
+    if (progressFramesWidth > 10.0f)
+        progressFramesWidth = 10.0f;
+    progressFramesHeight = ini.GetFloat("ProgressImage", "RelativeHeight", 0.0625f);
+    if (progressFramesHeight < 0.0f)
+        progressFramesHeight = 0.0f;
+    if (progressFramesHeight > 10.0f)
+        progressFramesHeight = 10.0f;
+    progressFramesCountX = static_cast<int32_t>(ini.GetFloat("ProgressImage", "HorisontalFramesCount", 8));
+    if (progressFramesCountX < 1)
+        progressFramesCountX = 1;
+    if (progressFramesCountX > 64)
+        progressFramesCountX = 64;
+    progressFramesCountY = static_cast<int32_t>(ini.GetFloat("ProgressImage", "VerticalFramesCount", 8));
+    if (progressFramesCountY < 1)
+        progressFramesCountY = 1;
+    if (progressFramesCountY > 64)
+        progressFramesCountY = 64;
+
+    CreateSphere();
+    auto *pScriptRender = static_cast<VDATA *>(core.GetScriptVariable("Render"));
+    ATTRIBUTES *pARender = pScriptRender->GetAClass();
+
+    pARender->SetAttributeUseDword("full_screen", !bWindow);
+    pARender->SetAttributeUseDword("screen_x", screen_size.x);
+    pARender->SetAttributeUseDword("screen_y", screen_size.y);
 
     pDropConveyorVBuffer = nullptr;
     rectsVBuffer = nullptr;

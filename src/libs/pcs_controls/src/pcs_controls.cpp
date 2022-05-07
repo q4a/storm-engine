@@ -28,11 +28,8 @@ PCS_CONTROLS::PCS_CONTROLS()
     nMouseWheel = 0;
     memset(&ControlsTab[0], 0, sizeof(ControlsTab));
 
-    auto pIni = fio->OpenIniFile(core.EngineIniFileName());
-    if (pIni)
-    {
-        m_bIsOffDebugKeys = pIni->GetInt("controls", "ondebugkeys", 0) == 0;
-    }
+    auto pIni = core.EngineIni();
+    m_bIsOffDebugKeys = pIni.GetInt("controls", "ondebugkeys", 0) == 0;
 
     input_ = Input::Create();
     inputHandlerID_ = input_->Subscribe([this](const InputEvent &evt) { HandleEvent(evt); });

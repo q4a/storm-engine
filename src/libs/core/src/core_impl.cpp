@@ -205,7 +205,7 @@ void CoreImpl::ProcessEngineIniFile()
 
     bEngineIniProcessed = true;
 
-    auto engine_ini = rust::ini::IniFile();
+    engine_ini = rust::ini::IniFile();
     if (!engine_ini.Load(rust::fs::ENGINE_INI_FILE_NAME))
         throw std::runtime_error("no 'engine.ini' file");
 
@@ -808,9 +808,9 @@ uint32_t CoreImpl::SetScriptFunction(IFUNCINFO *pFuncInfo)
     return Compiler->SetScriptFunction(pFuncInfo);
 }
 
-const char *CoreImpl::EngineIniFileName()
+const rust::ini::IniFile &CoreImpl::EngineIni()
 {
-    return rust::fs::ENGINE_INI_FILE_NAME;
+    return engine_ini;
 }
 
 void *CoreImpl::GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex)
