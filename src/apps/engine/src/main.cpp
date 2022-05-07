@@ -167,23 +167,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     core_private = static_cast<CorePrivate *>(&core);
     core_private->Init();
 
-    // Read config
-    auto ini = fio->OpenIniFile(rust::fs::ENGINE_INI_FILE_NAME);
-
     uint32_t dwMaxFPS = 0;
     bool bSteam = false;
     int width = 1024, height = 768;
     bool fullscreen = false;
 
-    if (ini)
+    // Read config
+    auto ini = rust::ini::IniFile();
+    if (ini.Load(rust::fs::ENGINE_INI_FILE_NAME))
     {
-        dwMaxFPS = static_cast<uint32_t>(ini->GetInt(nullptr, "max_fps", 0));
-        auto bDebugWindow = ini->GetInt(nullptr, "DebugWindow", 0) == 1;
-        auto bAcceleration = ini->GetInt(nullptr, "Acceleration", 0) == 1;
-        width = ini->GetInt(nullptr, "screen_x", 1024);
-        height = ini->GetInt(nullptr, "screen_y", 768);
-        fullscreen = ini->GetInt(nullptr, "full_screen", false) ? true : false;
-        bSteam = ini->GetInt(nullptr, "Steam", 1) != 0;
+        dwMaxFPS = static_cast<uint32_t>(ini.GetInt(nullptr, "max_fps", 0));
+        width = ini.GetInt(nullptr, "screen_x", 1024);
+        height = ini.GetInt(nullptr, "screen_y", 768);
+        fullscreen = ini.GetInt(nullptr, "full_screen", false) ? true : false;
+        bSteam = ini.GetInt(nullptr, "Steam", 1) != 0;
     }
 
     // initialize SteamApi through evaluating its singleton

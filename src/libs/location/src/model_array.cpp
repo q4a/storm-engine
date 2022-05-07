@@ -14,7 +14,6 @@
 #include "core.h"
 #include "entity.h"
 #include "shared/messages.h"
-#include "string_compare.hpp"
 
 // ============================================================================================
 // Construction, destruction
@@ -104,7 +103,7 @@ int32_t ModelArray::CreateModel(const char *modelName, const char *technique, in
         memcpy(model[numModels].name, modelName, MA_MAX_NAME_LENGTH);
         model[numModels].name[MA_MAX_NAME_LENGTH - 1] = 0;
     }
-    model[numModels].hash = CalcHashString(model[numModels].name);
+    model[numModels].hash = ffi_hash_ignore_case(model[numModels].name);
     model[numModels].slider = nullptr;
     model[numModels].rotator = nullptr;
     model[numModels].reflection = nullptr;
@@ -172,7 +171,7 @@ int32_t ModelArray::FindModel(const char *modelName)
         buf[MA_MAX_NAME_LENGTH - 1] = 0;
     }
     // Looking for hash value
-    const auto hash = CalcHashString(buf);
+    const uint32_t hash = ffi_hash_ignore_case(buf);
     // looking for a model
     for (int32_t i = 0; i < numModels; i++)
     {
@@ -333,25 +332,6 @@ void ModelArray::UpdateShadowPath()
 {
     UpdatePath(shadowpath);
 };
-
-uint32_t ModelArray::CalcHashString(const char *str)
-{
-    uint32_t hval = 0;
-    while (*str != '\0')
-    {
-        auto c = *str++;
-        if (c >= 'A' && c <= 'Z')
-            c += 'a' - 'A';
-        hval = (hval << 4) + static_cast<uint32_t>(c);
-        const auto g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
-}
 
 void ModelArray::UVSlider::Set(MODEL *model, VDX9RENDER *rs)
 {

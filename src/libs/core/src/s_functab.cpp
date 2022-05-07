@@ -143,7 +143,7 @@ bool FuncTable::AddFuncVar(size_t func_index, const LocalVarInfo &lvi)
     }
 
     auto &var = funcs_[func_index].local_vars.emplace_back(lvi);
-    var.hash = hasher_(var.name);
+    var.hash = ffi_hash_ignore_case(var.name.data());
 
     return true;
 }
@@ -178,7 +178,7 @@ size_t FuncTable::FindVar(size_t func_index, const std::string &var_name) const
     }
 
     const auto &vars = funcs_[func_index].local_vars;
-    size_t hash = hasher_(var_name);
+    size_t hash = ffi_hash_ignore_case(var_name.data());
     const auto result = std::find_if(vars.begin(), vars.end(), [hash, &var_name](const LocalVarInfo &var) {
         return var.hash == hash && rust::string::iEquals(var.name, var_name); // fast comparison
     });

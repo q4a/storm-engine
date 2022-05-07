@@ -1,7 +1,6 @@
 #include "xi_check_buttons.h"
 #include "xi_util.h"
 #include <stdio.h>
-#include "string_compare.hpp"
 
 #define PicName(bDisable, bSelect)                                                                                     \
     ((bDisable && !m_sDisablePicture.empty()) ? m_sDisablePicture : ((bSelect) ? m_sSelectPicture : m_sNormalPicture))

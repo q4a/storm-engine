@@ -16,7 +16,6 @@
 #include "character.h"
 #include "grass.h"
 #include "lights.h"
-#include "string_compare.hpp"
 #include "c_vector4.h"
 #include "defines.h"
 #include "shared/messages.h"
@@ -447,7 +446,7 @@ LocatorArray *Location::FindLocatorsGroup(const char *gName)
 {
     if (!gName || !gName[0])
         return nullptr;
-    const auto hash = LocatorArray::CalcHashString(gName);
+    const int32_t hash = ffi_hash_ignore_case(gName);
     for (int32_t i = 0; i < numLocators; i++)
     {
         if (locators[i]->CompareGroup(gName, hash))
@@ -508,7 +507,7 @@ int32_t Location::LoadStaticModel(const char *modelName, const char *tech, int32
         g->GetLabel(i, label);
         if (!label.group_name || !label.group_name[0])
             continue;
-        const auto hash = LocatorArray::CalcHashString(label.group_name);
+        const int32_t hash = ffi_hash_ignore_case(label.group_name);
         int32_t j;
         for (j = 0; j < numLocators; j++)
         {

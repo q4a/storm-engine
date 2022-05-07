@@ -12,7 +12,6 @@
 #include "characters_groups.h"
 #include "defines.h"
 #include "shared/messages.h"
-#include "string_compare.hpp"
 
 //============================================================================================
 

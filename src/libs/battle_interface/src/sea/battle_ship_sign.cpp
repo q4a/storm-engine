@@ -767,7 +767,7 @@ float BIShipIcon::GetProgressShipClass(int32_t nShipNum)
 void BIShipIcon::GetShipUVFromPictureIndex(int32_t nPicIndex, FRECT &rUV)
 {
     // TODO: Make picture count configurable
-    const float pictureCount = core.GetTargetEngineVersion() >= storm::ENGINE_VERSION::TO_EACH_HIS_OWN ? 16.f : 8.f;
+    const float pictureCount = core.GetTargetEngineVersion() >= EngineVersion::ToEachHisOwn ? 16.f : 8.f;
     const float pictureWidth = m_dwShipNCols ? 1.0f / m_dwShipNCols : 1.0f / pictureCount;
     const float pictureHeight = m_dwShipNRows ? 1.0f / m_dwShipNRows : 1.0f / pictureCount;
 

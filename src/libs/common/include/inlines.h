@@ -2,22 +2,6 @@
 
 #include "dx9render.h"
 
-inline uint32_t hash_string(const char *str)
-{
-    uint32_t hval = 0;
-    while (*str != '\0')
-    {
-        hval = (hval << 4) + static_cast<uint32_t>(*str++);
-        const auto g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
-}
-
 inline void RotateAroundY(float &x, float &z, float cos, float sin)
 {
     const auto xx = x * cos + z * sin;

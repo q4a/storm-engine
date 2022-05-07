@@ -11,12 +11,14 @@ use std::{
 
 use log::error;
 
-pub const DEFAULT_LOGGER: &str = "system";
+use crate::common::DEFAULT_LOGGER;
 
 #[allow(non_camel_case_types)]
 pub type size_t = usize;
 #[allow(non_camel_case_types)]
 pub type wchar_t = c_ushort;
+#[allow(non_camel_case_types)]
+pub type uint64_t = u64;
 
 #[repr(C)]
 pub struct WCharArray {
@@ -126,7 +128,7 @@ pub unsafe fn copy_to_c_char(s: &str, ptr: *mut c_char, size: size_t) -> bool {
         Err(e) => {
             error!(
                 target: DEFAULT_LOGGER,
-                "Couldn't copy &str to *c_char: {}", &e
+                "Couldn't convert &str to CString: {}", &e
             );
             return false;
         }

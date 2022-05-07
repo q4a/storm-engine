@@ -3,7 +3,6 @@
 #include "entity.h"
 #include "utf8.h"
 #include "xi_scroller.h"
-#include "string_compare.hpp"
 #include <cstdio>
 
 CXI_FORMATEDTEXT::STRING_DESCRIBER::STRING_DESCRIBER(char *ls) : color(0)

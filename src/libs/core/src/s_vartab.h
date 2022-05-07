@@ -1,7 +1,7 @@
 #pragma once
 
 #include "data.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 #include <unordered_map>
 #include <vector>
 

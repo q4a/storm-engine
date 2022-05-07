@@ -1,5 +1,5 @@
 #include "attributes.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 ATTRIBUTES::ATTRIBUTES(VSTRING_CODEC *p): ATTRIBUTES(*p)
 {

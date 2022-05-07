@@ -16,7 +16,6 @@
 #include "wdm_ship.h"
 #include "world_map.h"
 #include "defines.h"
-#include "string_compare.hpp"
 
 // ============================================================================================
 // Collision data
@@ -386,7 +385,7 @@ void WdmIslands::SetIslandsData(ATTRIBUTES *apnt, bool isChange)
             continue;
         }
         // looking for a label among existing
-        const uint32_t hash = TOREMOVE::HashNoCase(id);
+        const uint32_t hash = ffi_hash_ignore_case(id);
         int32_t index = LabelsFind(id, hash);
         if (index < 0)
         {

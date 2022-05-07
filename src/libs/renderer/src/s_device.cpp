@@ -8,7 +8,6 @@
 #include "texture.h"
 #include "v_s_stack.h"
 #include "fs.hpp"
-#include "string_compare.hpp"
 
 #include <string_view>
 
@@ -490,133 +489,130 @@ bool DX9RENDER::Init()
 
     create_directories(rust::fs::GetScreenshotsPath());
 
-    auto ini = fio->OpenIniFile(core.EngineIniFileName());
-    if (ini)
+    auto &ini = core.EngineIni();
+    // bPostProcessEnabled = ini->GetInt(0, "PostProcess", 0) == 1;
+    bPostProcessEnabled = false; //~!~
+
+    // screenshot format and extension
+    ini.ReadString(nullptr, "screenshot_format", str, sizeof(str), "jpg");
+    screenshotExt = str;
+    std::ranges::transform(screenshotExt, screenshotExt.begin(),
+                            [](const unsigned char c) { return std::tolower(c); });
+    screenshotFormat = GetScreenshotFormat(str);
+    if (screenshotFormat == D3DXIFF_FORCE_DWORD)
     {
-        // bPostProcessEnabled = ini->GetInt(0, "PostProcess", 0) == 1;
-        bPostProcessEnabled = false; //~!~
+        screenshotExt = "jpg";
+        screenshotFormat = D3DXIFF_JPG;
+    }
 
-        // screenshot format and extension
-        ini->ReadString(nullptr, "screenshot_format", str, sizeof(str), "jpg");
-        screenshotExt = str;
-        std::ranges::transform(screenshotExt, screenshotExt.begin(),
-                               [](const unsigned char c) { return std::tolower(c); });
-        screenshotFormat = GetScreenshotFormat(str);
-        if (screenshotFormat == D3DXIFF_FORCE_DWORD)
-        {
-            screenshotExt = "jpg";
-            screenshotFormat = D3DXIFF_JPG;
-        }
+    bShowFps = ini.GetInt(nullptr, "show_fps", 0) == 1;
+    bShowExInfo = ini.GetInt(nullptr, "show_exinfo", 0) == 1;
+    bSafeRendering = ini.GetInt(nullptr, "safe_render", 0) == 0;
+    bDropVideoConveyor = ini.GetInt(nullptr, "DropVideoConveyor", 0) != 0;
+    texLog = ini.GetInt(nullptr, "texture_log", 0) == 1;
+    bUseLargeBackBuffer = ini.GetInt(nullptr, "UseLargeBackBuffer", 0) != 0;
 
-        bShowFps = ini->GetInt(nullptr, "show_fps", 0) == 1;
-        bShowExInfo = ini->GetInt(nullptr, "show_exinfo", 0) == 1;
-        bSafeRendering = ini->GetInt(nullptr, "safe_render", 0) == 0;
-        bDropVideoConveyor = ini->GetInt(nullptr, "DropVideoConveyor", 0) != 0;
-        texLog = ini->GetInt(nullptr, "texture_log", 0) == 1;
-        bUseLargeBackBuffer = ini->GetInt(nullptr, "UseLargeBackBuffer", 0) != 0;
+    bWindow = ini.GetInt(nullptr, "full_screen", 1) == 0;
 
-        bWindow = ini->GetInt(nullptr, "full_screen", 1) == 0;
+    nTextureDegradation = ini.GetInt(nullptr, "texture_degradation", 0);
 
-        nTextureDegradation = ini->GetInt(nullptr, "texture_degradation", 0);
+    FovMultiplier = ini.GetFloat(nullptr, "fov_multiplier", 1.0f);
 
-        FovMultiplier = ini->GetFloat(nullptr, "fov_multiplier", 1.0f);
-
-        screen_size.x = ini->GetInt(nullptr, "screen_x", 1024);
-        screen_size.y = ini->GetInt(nullptr, "screen_y", 768);
-        fNearClipPlane = ini->GetFloat(nullptr, "NearClipPlane", 0.1f);
-        fFarClipPlane = ini->GetFloat(nullptr, "FarClipPlane", 4000.0f);
-        bBackBufferCanLock = ini->GetInt(nullptr, "lockable_back_buffer", 0) != 0;
-        ini->ReadString(nullptr, "screen_bpp", str, sizeof(str), "D3DFMT_R5G6B5");
+    screen_size.x = ini.GetInt(nullptr, "screen_x", 1024);
+    screen_size.y = ini.GetInt(nullptr, "screen_y", 768);
+    fNearClipPlane = ini.GetFloat(nullptr, "NearClipPlane", 0.1f);
+    fFarClipPlane = ini.GetFloat(nullptr, "FarClipPlane", 4000.0f);
+    bBackBufferCanLock = ini.GetInt(nullptr, "lockable_back_buffer", 0) != 0;
+    ini.ReadString(nullptr, "screen_bpp", str, sizeof(str), "D3DFMT_R5G6B5");
+    screen_bpp = D3DFMT_R5G6B5;
+    stencil_format = D3DFMT_D16;
+    if (rust::string::iEquals(str, "D3DFMT_A8R8G8B8"))
+    {
+        screen_bpp = D3DFMT_A8R8G8B8;
+        stencil_format = D3DFMT_D24S8;
+    }
+    if (rust::string::iEquals(str, "D3DFMT_X8R8G8B8"))
+    {
+        screen_bpp = D3DFMT_X8R8G8B8;
+        stencil_format = D3DFMT_D24S8;
+    }
+    if (rust::string::iEquals(str, "D3DFMT_R5G6B5"))
+    {
         screen_bpp = D3DFMT_R5G6B5;
         stencil_format = D3DFMT_D16;
-        if (rust::string::iEquals(str, "D3DFMT_A8R8G8B8"))
-        {
-            screen_bpp = D3DFMT_A8R8G8B8;
-            stencil_format = D3DFMT_D24S8;
-        }
-        if (rust::string::iEquals(str, "D3DFMT_X8R8G8B8"))
-        {
-            screen_bpp = D3DFMT_X8R8G8B8;
-            stencil_format = D3DFMT_D24S8;
-        }
-        if (rust::string::iEquals(str, "D3DFMT_R5G6B5"))
-        {
-            screen_bpp = D3DFMT_R5G6B5;
-            stencil_format = D3DFMT_D16;
-        }
-
-        // new renderer settings
-        vSyncEnabled = ini->GetInt(nullptr, "vsync", 0);
-
-        msaa = ini->GetInt(nullptr, "msaa", D3DMULTISAMPLE_16_SAMPLES);
-        if (msaa != D3DMULTISAMPLE_NONE)
-        {
-            if (msaa < D3DMULTISAMPLE_2_SAMPLES || msaa > D3DMULTISAMPLE_16_SAMPLES)
-            {
-                msaa = D3DMULTISAMPLE_16_SAMPLES;
-            }
-        }
-
-        videoAdapterIndex = ini->GetInt(nullptr, "adapter", std::numeric_limits<int32_t>::max());
-
-        // stencil_format = D3DFMT_D24S8;
-        if (!InitDevice(bWindow, static_cast<HWND>(core.GetAppHWND()), screen_size.x, screen_size.y))
-            return false;
-
-        RecompileEffects();
-
-        // get start ini file for fonts
-        if (!ini->ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
-        {
-            rust::log::info("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
-            sprintf_s(str, "resource\\ini\\fonts.ini");
-        }
-        const auto len = strlen(str) + 1;
-        if ((fontIniFileName = new char[len]) == nullptr)
-            throw std::runtime_error("allocate memory error");
-        strcpy_s(fontIniFileName, len, str);
-        // get start font quantity
-        if (!ini->ReadString(nullptr, "font", str, sizeof(str) - 1, ""))
-        {
-            rust::log::info("Start font not defined");
-            sprintf_s(str, "normal");
-        }
-        if (LoadFont(str) == -1L)
-            rust::log::info("can not init start font: %s", str);
-        idFontCurrent = 0L;
-
-        // Progress image parameters
-        progressFramesPosX = ini->GetFloat("ProgressImage", "RelativePosX", 0.85f);
-        progressFramesPosY = ini->GetFloat("ProgressImage", "RelativePosY", 0.8f);
-        progressFramesWidth = ini->GetFloat("ProgressImage", "RelativeWidth", 0.0625f);
-        if (progressFramesWidth < 0.0f)
-            progressFramesWidth = 0.0f;
-        if (progressFramesWidth > 10.0f)
-            progressFramesWidth = 10.0f;
-        progressFramesHeight = ini->GetFloat("ProgressImage", "RelativeHeight", 0.0625f);
-        if (progressFramesHeight < 0.0f)
-            progressFramesHeight = 0.0f;
-        if (progressFramesHeight > 10.0f)
-            progressFramesHeight = 10.0f;
-        progressFramesCountX = static_cast<int32_t>(ini->GetFloat("ProgressImage", "HorisontalFramesCount", 8));
-        if (progressFramesCountX < 1)
-            progressFramesCountX = 1;
-        if (progressFramesCountX > 64)
-            progressFramesCountX = 64;
-        progressFramesCountY = static_cast<int32_t>(ini->GetFloat("ProgressImage", "VerticalFramesCount", 8));
-        if (progressFramesCountY < 1)
-            progressFramesCountY = 1;
-        if (progressFramesCountY > 64)
-            progressFramesCountY = 64;
-
-        CreateSphere();
-        auto *pScriptRender = static_cast<VDATA *>(core.GetScriptVariable("Render"));
-        ATTRIBUTES *pARender = pScriptRender->GetAClass();
-
-        pARender->SetAttributeUseDword("full_screen", !bWindow);
-        pARender->SetAttributeUseDword("screen_x", screen_size.x);
-        pARender->SetAttributeUseDword("screen_y", screen_size.y);
     }
+
+    // new renderer settings
+    vSyncEnabled = ini.GetInt(nullptr, "vsync", 0);
+
+    msaa = ini.GetInt(nullptr, "msaa", D3DMULTISAMPLE_16_SAMPLES);
+    if (msaa != D3DMULTISAMPLE_NONE)
+    {
+        if (msaa < D3DMULTISAMPLE_2_SAMPLES || msaa > D3DMULTISAMPLE_16_SAMPLES)
+        {
+            msaa = D3DMULTISAMPLE_16_SAMPLES;
+        }
+    }
+
+    videoAdapterIndex = ini.GetInt(nullptr, "adapter", std::numeric_limits<int32_t>::max());
+
+    // stencil_format = D3DFMT_D24S8;
+    if (!InitDevice(bWindow, static_cast<HWND>(core.GetAppHWND()), screen_size.x, screen_size.y))
+        return false;
+
+    RecompileEffects();
+
+    // get start ini file for fonts
+    if (!ini.ReadString(nullptr, "startFontIniFile", str, sizeof(str) - 1, ""))
+    {
+        rust::log::info("Not finded 'startFontIniFile' parameter into ENGINE.INI file");
+        sprintf_s(str, "resource\\ini\\fonts.ini");
+    }
+    const auto len = strlen(str) + 1;
+    if ((fontIniFileName = new char[len]) == nullptr)
+        throw std::runtime_error("allocate memory error");
+    strcpy_s(fontIniFileName, len, str);
+    // get start font quantity
+    if (!ini.ReadString(nullptr, "font", str, sizeof(str) - 1, ""))
+    {
+        rust::log::info("Start font not defined");
+        sprintf_s(str, "normal");
+    }
+    if (LoadFont(str) == -1L)
+        rust::log::info("can not init start font: %s", str);
+    idFontCurrent = 0L;
+
+    // Progress image parameters
+    progressFramesPosX = ini.GetFloat("ProgressImage", "RelativePosX", 0.85f);
+    progressFramesPosY = ini.GetFloat("ProgressImage", "RelativePosY", 0.8f);
+    progressFramesWidth = ini.GetFloat("ProgressImage", "RelativeWidth", 0.0625f);
+    if (progressFramesWidth < 0.0f)
+        progressFramesWidth = 0.0f;
+    if (progressFramesWidth > 10.0f)
+        progressFramesWidth = 10.0f;
+    progressFramesHeight = ini.GetFloat("ProgressImage", "RelativeHeight", 0.0625f);
+    if (progressFramesHeight < 0.0f)
+        progressFramesHeight = 0.0f;
+    if (progressFramesHeight > 10.0f)
+        progressFramesHeight = 10.0f;
+    progressFramesCountX = static_cast<int32_t>(ini.GetFloat("ProgressImage", "HorisontalFramesCount", 8));
+    if (progressFramesCountX < 1)
+        progressFramesCountX = 1;
+    if (progressFramesCountX > 64)
+        progressFramesCountX = 64;
+    progressFramesCountY = static_cast<int32_t>(ini.GetFloat("ProgressImage", "VerticalFramesCount", 8));
+    if (progressFramesCountY < 1)
+        progressFramesCountY = 1;
+    if (progressFramesCountY > 64)
+        progressFramesCountY = 64;
+
+    CreateSphere();
+    auto *pScriptRender = static_cast<VDATA *>(core.GetScriptVariable("Render"));
+    ATTRIBUTES *pARender = pScriptRender->GetAClass();
+
+    pARender->SetAttributeUseDword("full_screen", !bWindow);
+    pARender->SetAttributeUseDword("screen_x", screen_size.x);
+    pARender->SetAttributeUseDword("screen_y", screen_size.y);
 
     pDropConveyorVBuffer = nullptr;
     rectsVBuffer = nullptr;
@@ -1354,7 +1350,7 @@ int32_t DX9RENDER::TextureCreate(const char *fname)
 
         _strupr(_fname);
 
-        const uint32_t hf = hash_string(_fname);
+        const uint32_t hf = ffi_hash(_fname);
 
         int32_t t;
         for (t = 0; t < MAX_STEXTURES; t++)
@@ -1753,7 +1749,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
         char s[256];
         if (totSize == 0)
         {
-            fio->_DeleteFile("texLoad.txt");
+            rust::fs::DeleteFile("texLoad.txt");
         }
         auto fileS2 = fio->_CreateFile("texLoad.txt", std::ios::binary | std::ios::out | std::ios::app);
         totSize += Textures[t].dwSize;
@@ -1884,33 +1880,6 @@ bool DX9RENDER::TextureSet(int32_t stage, int32_t texid)
         return true;
     }
 
-    /*
-    if(Textures[texid].loaded==false)
-    {
-    int tex2load[MAX_STEXTURES];
-    int t2l=0;
-    for(int32_t t=0; t<MAX_STEXTURES; t++)
-    if(Textures[t].ref>0 && Textures[t].loaded==false)    tex2load[t2l++] = t;
-    */
-    /*/sort textures
-    for(t=0; t<t2l; t++)
-    for(int32_t tt=t; tt<t2l; tt++)
-    if(_strcmpi(Textures[tex2load[tt]].name, Textures[tex2load[t]].name)<0)
-    {
-    int ttemp = tex2load[t];
-    tex2load[t] = tex2load[tt];
-    tex2load[tt] = ttemp;
-    }*/
-    /*
-    for(t=0; t<t2l; t++)
-    {
-    Textures[tex2load[t]].loaded = true;
-    TextureLoad(tex2load[t]);
-    }
-    //Textures[texid].loaded = true;    TextureLoad(texid);
-    }
-    */
-
     if (CHECKD3DERR(d3d9->SetTexture(stage, Textures[texid].d3dtex)) == true)
     {
         return false;
@@ -1935,7 +1904,7 @@ bool DX9RENDER::TextureRelease(int32_t texid)
         if (texLog)
         {
             auto fileS = fio->_CreateFile("texLoad.txt", std::ios::binary | std::ios::in | std::ios::out);
-            const int bytes = fio->_GetFileSize("texLoad.txt");
+            const int bytes = rust::fs::GetFileSize("texLoad.txt");
             auto buf = new char[bytes + 1];
             fio->_ReadFile(fileS, buf, bytes);
             buf[bytes] = 0;
@@ -2649,7 +2618,7 @@ void DX9RENDER::RecompileEffects()
     effects_.release();
 
     std::filesystem::path cur_path = std::filesystem::current_path();
-    std::filesystem::current_path(std::filesystem::u8path(fio->_GetExecutableDirectory()));
+    std::filesystem::current_path(rust::fs::GetExecutableDirectory());
     for (const auto &p : std::filesystem::recursive_directory_iterator("resource/techniques"))
         if (is_regular_file(p) && p.path().extension() == ".fx")
         {
@@ -2932,7 +2901,7 @@ int32_t DX9RENDER::LoadFont(const char *fontName)
         sDup[sizeof(sDup) - 1] = 0;
     }
     fontName = _strupr(sDup);
-    const uint32_t hashVal = hash_string(fontName);
+    const uint32_t hashVal = ffi_hash(fontName);
 
     int32_t i;
     for (i = 0; i < nFontQuantity; i++)
@@ -2983,7 +2952,7 @@ bool DX9RENDER::UnloadFont(const char *fontName)
         sDup[sizeof(sDup) - 1] = 0;
     }
     fontName = _strupr(sDup);
-    const uint32_t hashVal = hash_string(fontName);
+    const uint32_t hashVal = ffi_hash(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
         if (FontList[i].hash == hashVal && rust::string::iEquals(FontList[i].name, fontName))
@@ -3036,7 +3005,7 @@ bool DX9RENDER::SetCurFont(const char *fontName)
         sDup[sizeof(sDup) - 1] = 0;
     }
     fontName = _strupr(sDup);
-    const uint32_t hashVal = hash_string(fontName);
+    const uint32_t hashVal = ffi_hash(fontName);
 
     for (int i = 0; i < nFontQuantity; i++)
         if (FontList[i].hash == hashVal)
@@ -3843,7 +3812,7 @@ CVideoTexture *DX9RENDER::GetVideoTexture(const char *sVideoName)
     VideoTextureEntity *pVTLcur = pVTL;
 
     // check already loaded
-    const uint32_t newHash = hash_string(sVideoName);
+    const uint32_t newHash = ffi_hash(sVideoName);
     while (pVTLcur != nullptr)
     {
         if (pVTLcur->hash == newHash && rust::string::iEquals(pVTLcur->name, sVideoName))

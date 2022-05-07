@@ -11,7 +11,6 @@
 #include "characters_groups.h"
 #include "np_character.h"
 #include "storm_assert.h"
-#include "string_compare.hpp"
 
 #define CGS_LOOK 15.0f
 #define CGS_HEAR 2.5f
@@ -92,7 +91,7 @@ void CharactersGroups::String::operator=(const char *str)
             name = new char[max];
         }
         strcpy_s(name, len + 1, str);
-        hash = LocatorArray::CalcHashString(str);
+        hash = ffi_hash_ignore_case(str);
     }
 }
 
@@ -115,7 +114,7 @@ int32_t CharactersGroups::String::GetHash(const char *str)
 {
     if (!str)
         return 0;
-    return LocatorArray::CalcHashString(str);
+    return ffi_hash_ignore_case(str);
 }
 
 int32_t CharactersGroups::String::GetLen(const char *str)

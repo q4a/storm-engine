@@ -3,12 +3,10 @@
 #include "core_impl.h"
 #include "resource.h"
 #include "token.h"
-#include "string_compare.hpp"
 #include <ShlObj.h>
 
 LRESULT CALLBACK DebugWndProc(HWND, UINT, WPARAM, LPARAM);
 
-//#define PROJECT_NAME    "project.df"
 int FONT_HEIGHT = 15;
 const wchar_t *DClass = L"SEDebug";
 

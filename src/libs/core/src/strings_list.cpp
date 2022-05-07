@@ -2,8 +2,7 @@
 
 #include <cstring>
 #include <stdexcept>
-
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 STRINGS_LIST::STRINGS_LIST()
 {
@@ -46,7 +45,7 @@ bool STRINGS_LIST::AddString(const char *_char_PTR)
     // GUARD(STRINGS_LIST::AddString)
     if (_char_PTR == nullptr)
         throw std::runtime_error("zero string");
-    const auto hash = MakeHashValue(_char_PTR);
+    const uint32_t hash = ffi_hash_ignore_case(_char_PTR);
     if (String_Table_PTR == nullptr) // first time
     {
         String_Table_PTR = static_cast<char **>(malloc(sizeof(char *) * SL_BLOCK_SIZE));
@@ -95,7 +94,7 @@ uint32_t STRINGS_LIST::GetStringCode(const char *_char_PTR)
     {
         return INVALID_ORDINAL_NUMBER;
     }
-    const auto hash = MakeHashValue(_char_PTR);
+    const uint32_t hash = ffi_hash_ignore_case(_char_PTR);
 
     /*for(n=0;n<CACHE_SIZE;n++)
     {
@@ -195,25 +194,4 @@ void STRINGS_LIST::DeleteString(uint32_t code)
     for (n = 0; n < CACHE_SIZE; n++)
         Cache[n] = INVALID_ORDINAL_NUMBER;
     Cache_Pos = 0;
-}
-
-uint32_t STRINGS_LIST::MakeHashValue(const char *string)
-{
-    uint32_t hval = 0;
-
-    while (*string != 0)
-    {
-        auto v = *string++;
-        if ('A' <= v && v <= 'Z')
-            v += 'a' - 'A';
-
-        hval = (hval << 4) + static_cast<uint32_t>(v);
-        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
 }

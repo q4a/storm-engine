@@ -3,11 +3,19 @@
 
 #pragma once
 
-#include <cstdarg>
-#include <cstdint>
-#include <cstdlib>
-#include <ostream>
-#include <new>
+/* Generated with cbindgen:0.21.0 */
+
+#include <stdint.h>
+
+enum class EngineVersion {
+  Unknown,
+  SeaDogs,
+  PiratesOfTheCaribbean,
+  CaribbeanTales,
+  CityOfAbandonedShips,
+  ToEachHisOwn,
+  Latest,
+};
 
 enum class LogLevel {
   Error,
@@ -58,6 +66,8 @@ void ffi_free_cchar_array(CCharArray *ptr);
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
 void ffi_free_array_of_cchar_arrays(ArrayOfCCharArrays *ptr);
 
+EngineVersion ffi_get_target_engine_version(const char *version);
+
 WCharArray *ffi_home_directory();
 
 WCharArray *ffi_logs_directory();
@@ -67,6 +77,22 @@ WCharArray *ffi_save_directory();
 WCharArray *ffi_screenshot_directory();
 
 CCharArray *ffi_screenshot_filename();
+
+WCharArray *ffi_executable_directory();
+
+uint64_t ffi_file_size(const char *path);
+
+void ffi_delete_directory(const char *path);
+
+bool ffi_delete_file(const char *path);
+
+bool ffi_create_directory(const char *path);
+
+bool ffi_path_exists(const char *path);
+
+bool ffi_read_file_as_string(const char *path, char *buffer, size_t buffer_size);
+
+bool ffi_read_file_as_bytes(const char *path, uint8_t *buffer, size_t buffer_size);
 
 IniData *ffi_load_ini_data(const char *path);
 
@@ -129,6 +155,10 @@ bool ffi_less_ignore_case(const char *first, const char *second);
 bool ffi_less_or_equal_ignore_case(const char *first, const char *second);
 
 bool ffi_glob_ignore_case(const char *s, const char *pattern);
+
+uint64_t ffi_hash(const char *s);
+
+uint64_t ffi_hash_ignore_case(const char *s);
 
 } // extern "C"
 

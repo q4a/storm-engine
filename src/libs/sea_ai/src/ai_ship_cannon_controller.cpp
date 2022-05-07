@@ -1,7 +1,6 @@
 #include "ai_balls.h"
 #include "ai_ship.h"
 #include "inlines.h"
-#include "string_compare.hpp"
 
 float AIShipCannonController::fMaxCannonDamageDistance = 1.0f;
 float AIShipCannonController::fMaxCannonDamageRadiusPoint = 1.0f;

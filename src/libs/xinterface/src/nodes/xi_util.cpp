@@ -1,7 +1,6 @@
 #include "xi_util.h"
 #include "../inode.h"
 #include <stdio.h>
-#include "string_compare.hpp"
 
 CXI_UTILS *CXI_UTILS::pThis = nullptr;
 

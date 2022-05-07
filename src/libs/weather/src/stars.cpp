@@ -1,6 +1,7 @@
 #include "astronomy.h"
 #include "weather_base.h"
 #include "v_file_service.h"
+#include "fs.hpp"
 
 Astronomy::STARS::STARS()
 {
@@ -100,48 +101,6 @@ void Astronomy::STARS::Init(ATTRIBUTES *pAP)
 
     iTexture = sTexture == nullptr ? -1 : pRS->TextureCreate(sTexture);
 
-    /*char * pBuffer = null;
-    uint32_t dwSize = 0;
-    if (fio->LoadFile("resource\\hic.txt", (void**)&pBuffer, &dwSize))
-    {
-    char str[1024], str2[128]; str[0] = 0;
-    uint32_t dwPos = 0;
-    while (dwPos < dwSize)
-    {
-    uint32_t dwStr = 0;
-    while (dwPos < dwSize && (pBuffer[dwPos] != 0xA && pBuffer[dwPos] != 0xd)) { str[dwStr++] = pBuffer[dwPos++];
-    str[dwStr + 1] = 0; } while (dwPos < dwSize && (pBuffer[dwPos] == 0xA || pBuffer[dwPos] == 0xd)) dwPos++;
-
-    Star & s = aStars[aStars.Add()];
-
-    strncpy_s(str2, &str[0], 10);        str2[10] = 0; sscanf(str2, "%f", &s.fRA);
-    strncpy_s(str2, &str[16], 10);    str2[10] = 0; sscanf(str2, "%f", &s.fDec);
-    strncpy_s(str2, &str[56], 6);        str2[6] = 0; sscanf(str2, "%f", &s.fMag);
-    strncpy_s(s.cSpectr, &str[63], 2);
-
-    s.dwSubTexture = rand()%4;
-
-    s.fRA = PIm2 * s.fRA / 360.0f;
-    s.fDec = PIm2 * s.fDec / 360.0f;
-    double RA = 0.0;
-    }
-    }
-
-    HANDLE hFile = fio->_CreateFile("resource\\hic.dat", GENERIC_WRITE, FILE_SHARE_WRITE, CREATE_ALWAYS);
-    if (INVALID_HANDLE_VALUE != hFile)
-    {
-    uint32_t dwSize = aStars.size();
-    fio->_WriteFile(hFile, &dwSize, sizeof(dwSize), null);
-    for (uint32_t i=0; i<aStars.size(); i++)
-    {
-    fio->_WriteFile(hFile, &aStars[i].fRA, sizeof(aStars[i].fRA), null);
-    fio->_WriteFile(hFile, &aStars[i].fDec, sizeof(aStars[i].fDec), null);
-    fio->_WriteFile(hFile, &aStars[i].fMag, sizeof(aStars[i].fMag), null);
-    fio->_WriteFile(hFile, &aStars[i].cSpectr[0], sizeof(aStars[i].cSpectr), null);
-    }
-    fio->_CloseHandle(hFile);
-    }*/
-
     auto fileS = fio->_CreateFile(sCatalog, std::ios::binary | std::ios::in);
     if (fileS.is_open())
     {
@@ -166,7 +125,7 @@ void Astronomy::STARS::Init(ATTRIBUTES *pAP)
         auto outfileS = fio->_CreateFile("resource\\star.dat", std::ios::binary | std::ios::in);
         if (outfileS.is_open())
         {
-            uint32_t dwFileLen = fio->_GetFileSize("resource\\star.dat");
+            uint32_t dwFileLen = rust::fs::GetFileSize("resource\\star.dat");
             const uint32_t stride = (sizeof(Star) + sizeof(CVECTOR) + sizeof(uint32_t));
             if (dwFileLen == dwSize * stride)
             {

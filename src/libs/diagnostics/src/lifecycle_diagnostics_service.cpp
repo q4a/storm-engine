@@ -29,7 +29,7 @@ namespace
 {
 auto& getExecutableDir()
 {
-    static const auto executableDir = std::filesystem::path{std::filesystem::u8path(fio->_GetExecutableDirectory())};
+    static const auto executableDir = std::filesystem::path{rust::fs::GetExecutableDirectory()};
     return executableDir;
 }
 auto &getLogsArchive()

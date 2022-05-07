@@ -3,7 +3,7 @@ use std::{
     collections::HashMap,
     fs::File,
     io::{BufRead, BufReader},
-    path::Path,
+    path::{Path, PathBuf},
     str::FromStr,
 };
 use thiserror::Error;
@@ -32,20 +32,22 @@ pub enum IniParserError {
 /// Comments at the end of value are NOT supported
 pub struct IniData {
     sections: HashMap<String, HashMap<String, Vec<String>>>,
+    path: PathBuf,
 }
 
 impl IniData {
     /// Parse data from `BufRead` into `IniData`.
-    fn parse(reader: &mut dyn BufRead) -> Result<Self, IniParserError> {
+    fn parse(reader: &mut dyn BufRead, path: PathBuf) -> Result<Self, IniParserError> {
         let mut data = Self {
             sections: HashMap::new(),
+            path,
         };
 
         let mut last_section = DEFAULT_SECTION.to_string();
         for line in reader.lines() {
             let original_line = line?;
             let trimmed_line = original_line.trim();
-            if trimmed_line.starts_with(';') || trimmed_line.is_empty() {
+            if trimmed_line.starts_with(';') || trimmed_line.starts_with("//") || trimmed_line.is_empty() {
                 continue;
             }
 
@@ -99,7 +101,7 @@ impl IniData {
         let file = File::open(path)?;
         let mut reader = BufReader::new(file);
 
-        Self::parse(&mut reader)
+        Self::parse(&mut reader, path.to_path_buf())
     }
 
     /// Get single string value by it's `section` and `key`.
@@ -157,7 +159,8 @@ mod export {
     use log::{error, warn};
 
     use crate::common::{
-        c_char_to_str, copy_to_c_char, size_t, ArrayOfCCharArrays, DEFAULT_LOGGER,
+        ffi::{c_char_to_str, copy_to_c_char, size_t, ArrayOfCCharArrays},
+        DEFAULT_LOGGER,
     };
 
     use super::IniData;
@@ -196,25 +199,29 @@ mod export {
         buffer: *mut c_char,
         buffer_size: size_t,
     ) -> bool {
-        let ini_data = match ptr.as_ref() {
-            Some(ini) => ini,
-            None => return false,
-        };
-
-        let section = get_section_name(section);
-        let key = c_char_to_str(key);
-        match ini_data.get_string(section, key) {
-            Some(val) => copy_to_c_char(val, buffer, buffer_size),
-            None => {
-                warn!(
-                    target: DEFAULT_LOGGER,
-                    "Couldn't find the key <{}> in the <{:?}> section", key, section
-                );
-                return false;
+        match ptr.as_ref() {
+            Some(ini) => {
+                let section = get_section_name(section);
+                let key = c_char_to_str(key);
+                match ini.get_string(section, key) {
+                    Some(v) => {
+                        copy_to_c_char(v, buffer, buffer_size);
+                        true
+                    }
+                    None => {
+                        warn!(
+                            target: DEFAULT_LOGGER,
+                            "File <{}>, section <{:?}>, key <{}>: doesn't exist",
+                            &ini.path.to_string_lossy(),
+                            section,
+                            key
+                        );
+                        false
+                    }
+                }
             }
-        };
-
-        true
+            None => false,
+        }
     }
 
     #[no_mangle]
@@ -308,7 +315,10 @@ mod export {
                     None => {
                         warn!(
                             target: DEFAULT_LOGGER,
-                            "Couldn't find the key <{}> in the <{:?}> section", key, section
+                            "File <{}>, section <{:?}>, key <{}>: doesn't exist",
+                            &ini.path.to_string_lossy(),
+                            section,
+                            key
                         );
                         default_value
                     }
@@ -321,13 +331,19 @@ mod export {
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::IniData;
+
+    fn mock_path() -> PathBuf {
+        PathBuf::from("path.txt")
+    }
 
     #[test]
     fn empty_data_test() {
         let mut data = r"".as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -338,7 +354,7 @@ mod tests {
     fn comment_test() {
         let mut data = r"; this is a comment".as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -352,7 +368,7 @@ mod tests {
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -366,7 +382,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -383,7 +399,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -400,7 +416,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -421,7 +437,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -441,7 +457,7 @@ model	= resource\land ;this is a comment
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -462,7 +478,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -480,7 +496,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -497,7 +513,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -518,7 +534,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -539,7 +555,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -560,7 +576,7 @@ MODEL	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -581,7 +597,7 @@ model	= resource\land
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -603,7 +619,7 @@ colquantity = 1
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -646,7 +662,7 @@ bAbsoluteRectangle = 5
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -681,7 +697,7 @@ item	= 100,pc,BUTTON,EXIT_BTN
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();
@@ -703,7 +719,7 @@ item	= 100,pc,BUTTON,EXIT_BTN
         "
         .as_bytes();
 
-        let result = IniData::parse(&mut data);
+        let result = IniData::parse(&mut data, mock_path());
         assert!(result.is_ok());
 
         let result = result.unwrap();

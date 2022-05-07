@@ -2,7 +2,6 @@
 
 #include "defines.h"
 #include "s_debug.h"
-#include "string_compare.hpp"
 
 #include <windows.h>
 

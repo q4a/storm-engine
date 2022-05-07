@@ -11,7 +11,6 @@
 #include "shared/sea_ai/script_defines.h"
 #include "ship_base.h"
 #include "v_file_service.h"
-#include "string_compare.hpp"
 
 #define WIND_SPEED_MAX 12.f
 
@@ -322,7 +321,7 @@ void SAIL::Execute(uint32_t Delta_Time)
         int i;
         // ====================================================
         // If the ini-file has been changed, read the info from it
-        if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+        if (rust::fs::PathExists(RIGGING_INI_FILE))
         {
             auto ft_new = fio->_GetLastWriteTime(RIGGING_INI_FILE);
             if (ft_old != ft_new)
@@ -1341,12 +1340,12 @@ void SAIL::LoadSailIni()
     // GUARD(SAIL::LoadSailIni());
     char section[256], param[256];
 
-    if (fio->_FileOrDirectoryExists(RIGGING_INI_FILE))
+    if (rust::fs::PathExists(RIGGING_INI_FILE))
     {
         ft_old = fio->_GetLastWriteTime(RIGGING_INI_FILE);
     }
-    auto ini = fio->OpenIniFile("resource\\ini\\rigging.ini");
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load("resource\\ini\\rigging.ini"))
     {
         throw std::runtime_error("rigging.ini file not found!");
     }
@@ -1354,89 +1353,89 @@ void SAIL::LoadSailIni()
     sprintf(section, "SAILS");
 
     // load texture names
-    texQuantity = static_cast<int>(ini->GetInt(section, "TextureCount", 1));
+    texQuantity = static_cast<int>(ini.GetInt(section, "TextureCount", 1));
     if (texQuantity == 0)
     {
         texQuantity = 1;
     }
-    texNumCommon = static_cast<float>(ini->GetInt(section, "TexNumCommon", 0)) / static_cast<float>(texQuantity);
-    texNumEnglish = static_cast<float>(ini->GetInt(section, "TexNumEnglish", 0)) / static_cast<float>(texQuantity);
-    texNumTreangle = static_cast<float>(ini->GetInt(section, "TexNumTreangle", 0)) / static_cast<float>(texQuantity);
+    texNumCommon = static_cast<float>(ini.GetInt(section, "TexNumCommon", 0)) / static_cast<float>(texQuantity);
+    texNumEnglish = static_cast<float>(ini.GetInt(section, "TexNumEnglish", 0)) / static_cast<float>(texQuantity);
+    texNumTreangle = static_cast<float>(ini.GetInt(section, "TexNumTreangle", 0)) / static_cast<float>(texQuantity);
 
     // load speed calculate parameters:
-    g_fSailHoleDepend = ini->GetFloat(section, "fHoleDepend", 1.0f);
-    ini->ReadString(section, "TreangleWindSpeed", param, sizeof(param) - 1, "0.2,0.6,0.8");
+    g_fSailHoleDepend = ini.GetFloat(section, "fHoleDepend", 1.0f);
+    ini.ReadString(section, "TreangleWindSpeed", param, sizeof(param) - 1, "0.2,0.6,0.8");
     sscanf(param, "%f,%f,%f", &ts_min, &ts_xdep, &ts_zdep);
-    ini->ReadString(section, "TrapecidalWindSpeed", param, sizeof(param) - 1, "0.4,0.5,0.6");
+    ini.ReadString(section, "TrapecidalWindSpeed", param, sizeof(param) - 1, "0.4,0.5,0.6");
     sscanf(param, "%f,%f,%f", &fs_min, &fs_xdep, &fs_zdep);
-    ini->ReadString(section, "SquareWindSpeed", param, sizeof(param) - 1, "0.4,0.1,0.6");
+    ini.ReadString(section, "SquareWindSpeed", param, sizeof(param) - 1, "0.4,0.1,0.6");
     sscanf(param, "%f,%f,%f", &ss_min, &ss_xdep, &ss_zdep);
 
     // load wind depend parameters
-    SsailWindDepend = ini->GetFloat(section, "fSsailWindDepend", .05f);
-    TsailWindDepend = ini->GetFloat(section, "fTsailWindDepend", .5f);
-    fWindAdding = ini->GetFloat(section, "fWindAdding", .3f);
-    FLEXSPEED = ini->GetFloat(section, "FLEXSPEED", .001f);
-    MAXSUMWIND = ini->GetFloat(section, "MAXSUMWIND", .02f);
-    WINDVECTOR_QUANTITY = static_cast<int>(ini->GetInt(section, "WINDVECTOR_QNT", 60));
-    WINDVECTOR_TINCR = static_cast<int>(ini->GetInt(section, "WINDVECTOR_TINCR", 3));
-    WINDVECTOR_TADD = static_cast<int>(ini->GetInt(section, "WINDVECTOR_TADD", 3));
-    WINDVECTOR_SINCR = static_cast<int>(ini->GetInt(section, "WINDVECTOR_SINCR", 6));
-    WINDVECTOR_SADD = static_cast<int>(ini->GetInt(section, "WINDVECTOR_SADD", 3));
+    SsailWindDepend = ini.GetFloat(section, "fSsailWindDepend", .05f);
+    TsailWindDepend = ini.GetFloat(section, "fTsailWindDepend", .5f);
+    fWindAdding = ini.GetFloat(section, "fWindAdding", .3f);
+    FLEXSPEED = ini.GetFloat(section, "FLEXSPEED", .001f);
+    MAXSUMWIND = ini.GetFloat(section, "MAXSUMWIND", .02f);
+    WINDVECTOR_QUANTITY = static_cast<int>(ini.GetInt(section, "WINDVECTOR_QNT", 60));
+    WINDVECTOR_TINCR = static_cast<int>(ini.GetInt(section, "WINDVECTOR_TINCR", 3));
+    WINDVECTOR_TADD = static_cast<int>(ini.GetInt(section, "WINDVECTOR_TADD", 3));
+    WINDVECTOR_SINCR = static_cast<int>(ini.GetInt(section, "WINDVECTOR_SINCR", 6));
+    WINDVECTOR_SADD = static_cast<int>(ini.GetInt(section, "WINDVECTOR_SADD", 3));
 
     // load rolling sail parameters
-    ROLL_Z_VAL = ini->GetFloat(section, "ROLL_Z_VAL", .01f);
-    ROLL_Z_DELTA = ini->GetFloat(section, "ROLL_Z_DELTA", .001f);
-    ROLL_Y_VAL = ini->GetFloat(section, "ROLL_Y_VAL", .04f);
-    ROLL_Y_DELTA = ini->GetFloat(section, "ROLL_Y_DELTA", .001f);
+    ROLL_Z_VAL = ini.GetFloat(section, "ROLL_Z_VAL", .01f);
+    ROLL_Z_DELTA = ini.GetFloat(section, "ROLL_Z_DELTA", .001f);
+    ROLL_Y_VAL = ini.GetFloat(section, "ROLL_Y_VAL", .04f);
+    ROLL_Y_DELTA = ini.GetFloat(section, "ROLL_Y_DELTA", .001f);
 
     // sail turning parameters
-    WINDANGL_DISCRETE = ini->GetFloat(section, "WINDANGLDISCRETE", .01f);
-    MAXTURNANGL = ini->GetFloat(section, "MAXTURNANGL", .6f);
-    TURNSTEPANGL = ini->GetFloat(section, "TURNSTEPANGL", .002f);
-    ROLLINGSPEED = ini->GetFloat(section, "ROLLINGSPEED", .0003f);
+    WINDANGL_DISCRETE = ini.GetFloat(section, "WINDANGLDISCRETE", .01f);
+    MAXTURNANGL = ini.GetFloat(section, "MAXTURNANGL", .6f);
+    TURNSTEPANGL = ini.GetFloat(section, "TURNSTEPANGL", .002f);
+    ROLLINGSPEED = ini.GetFloat(section, "ROLLINGSPEED", .0003f);
 
     // load material parameters
-    ini->ReadString(section, "Diffuse", param, sizeof(param) - 1, "0.0,0.0,0.0,0.0");
+    ini.ReadString(section, "Diffuse", param, sizeof(param) - 1, "0.0,0.0,0.0,0.0");
     sscanf(param, "%f,%f,%f,%f", &mat.Diffuse.r, &mat.Diffuse.g, &mat.Diffuse.b, &mat.Diffuse.a);
-    ini->ReadString(section, "Ambient", param, sizeof(param) - 1, "0.0,0.0,0.0,0.0");
+    ini.ReadString(section, "Ambient", param, sizeof(param) - 1, "0.0,0.0,0.0,0.0");
     sscanf(param, "%f,%f,%f,%f", &mat.Ambient.r, &mat.Ambient.g, &mat.Ambient.b, &mat.Ambient.a);
-    ini->ReadString(section, "Specular", param, sizeof(param) - 1, "0.0,0.0,0.0,0.0");
+    ini.ReadString(section, "Specular", param, sizeof(param) - 1, "0.0,0.0,0.0,0.0");
     sscanf(param, "%f,%f,%f,%f", &mat.Specular.r, &mat.Specular.g, &mat.Specular.b, &mat.Specular.a);
-    ini->ReadString(section, "Emissive", param, sizeof(param) - 1, "0.7,0.7,0.7,0.7");
+    ini.ReadString(section, "Emissive", param, sizeof(param) - 1, "0.7,0.7,0.7,0.7");
     sscanf(param, "%f,%f,%f,%f", &mat.Emissive.r, &mat.Emissive.g, &mat.Emissive.b, &mat.Emissive.a);
-    mat.Power = ini->GetFloat(section, "Power", 0.f);
+    mat.Power = ini.GetFloat(section, "Power", 0.f);
 
     // load ROLLING SAIL form table
     // load square sail form
-    ini->ReadString(section, "rollSSailForm", param, sizeof(param) - 1,
+    ini.ReadString(section, "rollSSailForm", param, sizeof(param) - 1,
                     "0.2,0.8,1.0,0.8,0.4,1.0,1.3,1.0,0.4,0.8,1.0,0.8,0.2");
     sscanf(param, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", &SSailRollForm[0], &SSailRollForm[1], &SSailRollForm[2],
            &SSailRollForm[3], &SSailRollForm[4], &SSailRollForm[5], &SSailRollForm[6], &SSailRollForm[7],
            &SSailRollForm[8], &SSailRollForm[9], &SSailRollForm[10], &SSailRollForm[11], &SSailRollForm[12]);
     // load treangle sail form
-    ini->ReadString(section, "rollTSailForm", param, sizeof(param) - 1, "0.1,0.6,0.3,0.8,0.2");
+    ini.ReadString(section, "rollTSailForm", param, sizeof(param) - 1, "0.1,0.6,0.3,0.8,0.2");
     sscanf(param, "%f,%f,%f,%f,%f", &TSailRollForm[0], &TSailRollForm[1], &TSailRollForm[2], &TSailRollForm[3],
            &TSailRollForm[4]);
-    TR_FORM_MUL = ini->GetFloat(section, "tr_form_mul", 2.f);
+    TR_FORM_MUL = ini.GetFloat(section, "tr_form_mul", 2.f);
 
     // load hole depend parameters
-    fTHoleFlexDepend = ini->GetFloat(section, "fTHoleFlexDepend", .01f);
+    fTHoleFlexDepend = ini.GetFloat(section, "fTHoleFlexDepend", .01f);
     if (fTHoleFlexDepend > .1f)
         fTHoleFlexDepend = 0.1f;
-    fSHoleFlexDepend = ini->GetFloat(section, "fSHoleFlexDepend", .01f);
+    fSHoleFlexDepend = ini.GetFloat(section, "fSHoleFlexDepend", .01f);
     if (fSHoleFlexDepend > (1.f / 12.f))
         fSHoleFlexDepend = 1.f / 12.f;
 
     // load parameter for sails of fall mast
     // square sails
-    FALL_SSAIL_ADD_MIN = ini->GetFloat(section, "fFallSSailAddMin", 0.2f);
-    FALL_SSAIL_ADD_RAND = ini->GetFloat(section, "fFallSSailAddRand", 0.2f);
+    FALL_SSAIL_ADD_MIN = ini.GetFloat(section, "fFallSSailAddMin", 0.2f);
+    FALL_SSAIL_ADD_RAND = ini.GetFloat(section, "fFallSSailAddRand", 0.2f);
     // treangle sails
-    FALL_TSAIL_ADD_MIN = ini->GetFloat(section, "fFallTSailAddMin", 0.2f);
-    FALL_TSAIL_ADD_RAND = ini->GetFloat(section, "fFallTSailAddRand", 0.2f);
+    FALL_TSAIL_ADD_MIN = ini.GetFloat(section, "fFallTSailAddMin", 0.2f);
+    FALL_TSAIL_ADD_RAND = ini.GetFloat(section, "fFallTSailAddRand", 0.2f);
 
-    GROUP_UPDATE_TIME = ini->GetInt(section, "msecSailUpdateTime", GROUP_UPDATE_TIME);
+    GROUP_UPDATE_TIME = ini.GetInt(section, "msecSailUpdateTime", GROUP_UPDATE_TIME);
 
     // UNGUARD
 }

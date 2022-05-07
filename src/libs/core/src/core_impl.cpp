@@ -4,50 +4,11 @@
 #include "controls.h"
 #include "steam_api.hpp"
 #include "fs.hpp"
-#include "string_compare.hpp"
 #include "logger.hpp"
 
 #include <fstream>
 
 Core& core = core_internal;
-
-namespace storm
-{
-namespace
-{
-ENGINE_VERSION getTargetEngineVersion(const std::string_view &version)
-{
-    using namespace std::string_view_literals;
-
-    if (rust::string::iEquals(version, "sd"sv))
-    {
-        return ENGINE_VERSION::SEA_DOGS;
-    }
-    else if (rust::string::iEquals(version, "potc"sv))
-    {
-        return ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN;
-    }
-    else if (rust::string::iEquals(version, "ct"sv))
-    {
-        return ENGINE_VERSION::CARIBBEAN_TALES;
-    }
-    else if (rust::string::iEquals(version, "coas"sv))
-    {
-        return ENGINE_VERSION::CITY_OF_ABANDONED_SHIPS;
-    }
-    else if (rust::string::iEquals(version, "teho"sv))
-    {
-        return ENGINE_VERSION::TO_EACH_HIS_OWN;
-    }
-    else if (rust::string::iEquals(version, "latest"sv))
-    {
-        return ENGINE_VERSION::LATEST;
-    }
-
-    return ENGINE_VERSION::UNKNOWN;
-}
-} // namespace
-} // namespace storm
 
 uint32_t dwNumberScriptCommandsExecuted = 0;
 
@@ -244,7 +205,7 @@ void CoreImpl::ProcessEngineIniFile()
 
     bEngineIniProcessed = true;
 
-    auto engine_ini = rust::ini::IniFile();
+    engine_ini = rust::ini::IniFile();
     if (!engine_ini.Load(rust::fs::ENGINE_INI_FILE_NAME))
         throw std::runtime_error("no 'engine.ini' file");
 
@@ -280,7 +241,7 @@ void CoreImpl::ProcessEngineIniFile()
             throw std::runtime_error("fail to run program");
 
         // Script version test
-        if (targetVersion_ >= storm::ENGINE_VERSION::LATEST)
+        if (targetVersion_ >= EngineVersion::Latest)
         {
             int32_t iScriptVersion = 0xFFFFFFFF;
             auto *pVScriptVersion = static_cast<VDATA *>(core_internal.GetScriptVariable("iScriptVersion"));
@@ -301,7 +262,7 @@ bool CoreImpl::LoadClassesTable()
 {
     for (auto *c : __STORM_CLASSES_REGISTRY)
     {
-        const auto hash = MakeHashValue(c->GetName());
+        const auto hash = ffi_hash_ignore_case(c->GetName());
         c->SetHash(hash);
     }
 
@@ -435,7 +396,7 @@ VDATA *CoreImpl::Event(const std::string_view &event_name, MESSAGE& message)
 
 void *CoreImpl::MakeClass(const char *class_name)
 {
-    const int32_t hash = MakeHashValue(class_name);
+    const int32_t hash = ffi_hash_ignore_case(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c->CreateClass();
@@ -454,7 +415,7 @@ void CoreImpl::ReleaseServices()
 
 VMA *CoreImpl::FindVMA(const char *class_name)
 {
-    const int32_t hash = MakeHashValue(class_name);
+    const int32_t hash = ffi_hash_ignore_case(class_name);
     for (auto *const c : __STORM_CLASSES_REGISTRY)
         if (c->GetHash() == hash && rust::string::iEquals(class_name, c->GetName()))
             return c;
@@ -491,7 +452,7 @@ void *CoreImpl::GetService(const char *service_name)
 
     auto *service_PTR = static_cast<SERVICE *>(pClass->CreateClass());
 
-    const auto class_code = MakeHashValue(service_name);
+    const auto class_code = ffi_hash_ignore_case(service_name);
     pClass->SetHash(class_code);
 
     if (!service_PTR->Init())
@@ -763,27 +724,6 @@ void CoreImpl::AppState(bool state)
         Controls->AppState(state);
 }
 
-uint32_t CoreImpl::MakeHashValue(const char *string)
-{
-    uint32_t hval = 0;
-
-    while (*string != 0)
-    {
-        char v = *string++;
-        if ('A' <= v && v <= 'Z')
-            v += 'a' - 'A';
-
-        hval = (hval << 4) + static_cast<uint32_t>(v);
-        const uint32_t g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
-}
-
 //==========================================================================================================================
 // end
 //==========================================================================================================================
@@ -868,9 +808,9 @@ uint32_t CoreImpl::SetScriptFunction(IFUNCINFO *pFuncInfo)
     return Compiler->SetScriptFunction(pFuncInfo);
 }
 
-const char *CoreImpl::EngineIniFileName()
+rust::ini::IniFile &CoreImpl::EngineIni()
 {
-    return rust::fs::ENGINE_INI_FILE_NAME;
+    return engine_ini;
 }
 
 void *CoreImpl::GetScriptVariable(const char *pVariableName, uint32_t *pdwVarIndex)
@@ -895,7 +835,7 @@ void *CoreImpl::GetScriptVariable(const char *pVariableName, uint32_t *pdwVarInd
     return real_var->value.get();
 }
 
-storm::ENGINE_VERSION CoreImpl::GetTargetEngineVersion() const noexcept
+EngineVersion CoreImpl::GetTargetEngineVersion() const noexcept
 {
     return targetVersion_;
 }
@@ -904,7 +844,7 @@ ScreenSize CoreImpl::GetScreenSize() const noexcept
 {
     switch (targetVersion_)
     {
-    case storm::ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN: {
+    case EngineVersion::PiratesOfTheCaribbean: {
         return {640, 480};
     }
     default: {
@@ -931,10 +871,10 @@ void CoreImpl::loadCompatibilitySettings(rust::ini::IniFile &inifile)
     inifile.ReadString("compatibility", "target_version", strBuffer.data(), strBuffer.size(), "latest");
     const std::string_view target_engine_version = strBuffer.data();
 
-    targetVersion_ = getTargetEngineVersion(target_engine_version);
-    if (targetVersion_ == ENGINE_VERSION::UNKNOWN)
+    targetVersion_ = ffi_get_target_engine_version(target_engine_version.data());
+    if (targetVersion_ == EngineVersion::Unknown)
     {
         rust::log::warn("Unknown target version '%s' in engine compatibility settings", target_engine_version);
-        targetVersion_ = ENGINE_VERSION::LATEST;
+        targetVersion_ = EngineVersion::Latest;
     }
 }

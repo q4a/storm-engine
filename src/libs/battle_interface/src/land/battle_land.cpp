@@ -3,7 +3,6 @@
 #include "core.h"
 #include "message.h"
 #include "shared/battle_interface/msg_control.h"
-#include "string_compare.hpp"
 
 BATTLE_LAND_INTERFACE::BATTLE_LAND_INTERFACE() : m_bShowCommandos(false)
 {

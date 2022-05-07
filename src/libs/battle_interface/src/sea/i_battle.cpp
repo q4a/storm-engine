@@ -21,7 +21,6 @@
 #include "shared/battle_interface/msg_control.h"
 
 #include "../interface_manager/interface_manager.h"
-#include "string_compare.hpp"
 #include "ship_info_images.h"
 
 CREATE_CLASS(BATTLE_INTERFACE)

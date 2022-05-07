@@ -1,8 +1,6 @@
 #include "data.h"
 #include "core_impl.h"
 
-#include "string_compare.hpp"
-
 #include <fast_float/fast_float.h>
 
 const char *UNINIT_REF = {"Using reference variable without initializing"};

@@ -12,10 +12,10 @@
 class SEA : public SEA_BASE
 {
   private:
-    // uint32_t dwSkyCode = MakeHashValue("sky");
-    uint32_t dwIslandCode = MakeHashValue("island");
-    uint32_t dwShipCode = MakeHashValue("ship");
-    uint32_t dwSailCode = MakeHashValue("sail");
+    // uint32_t dwSkyCode = ffi_hash_ignore_case("sky");
+    uint32_t dwIslandCode = ffi_hash_ignore_case("island");
+    uint32_t dwShipCode = ffi_hash_ignore_case("ship");
+    uint32_t dwSailCode = ffi_hash_ignore_case("sail");
 
     static IDirect3DVertexDeclaration9 *vertexDecl_;
 

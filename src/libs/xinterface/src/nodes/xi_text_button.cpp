@@ -607,7 +607,7 @@ uint32_t CXI_TEXTBUTTON::MessageProc(int32_t msgcode, MESSAGE &message)
                 memcpy(m_sString, param.c_str() + 1, len);
             }
         }
-        else if (core.GetTargetEngineVersion() <= storm::ENGINE_VERSION::PIRATES_OF_THE_CARIBBEAN)
+        else if (core.GetTargetEngineVersion() <= EngineVersion::PiratesOfTheCaribbean)
         {
             const auto len = param.size();
             if ((m_sString = new char[len + 1]) == nullptr)

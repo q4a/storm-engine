@@ -220,7 +220,7 @@ void RAIN::RealizeDrops(uint32_t Delta_Time)
 {
     auto fDeltaTime = static_cast<float>(Delta_Time) * 0.001f;
 
-    static auto dwShipName = MakeHashValue("SHIP");
+    static uint32_t dwShipName = ffi_hash_ignore_case("SHIP");
 
     CMatrix mView;
     rs->GetTransform(D3DTS_VIEW, mView);

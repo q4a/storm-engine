@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <ctype.h>
+#include <string>
 #include "rust_rs.h"
 
 namespace rust::string
@@ -99,13 +101,8 @@ class iStrHasher
   public:
     size_t operator()(const std::string &key) const
     {
-        std::string lower_copy = key;
-        std::transform(lower_copy.begin(), lower_copy.end(), lower_copy.begin(), ::tolower);
-        return inner_hasher_(lower_copy);
+        return ffi_hash_ignore_case(key.data());
     }
-
-  private:
-    std::hash<std::string> inner_hasher_;
 };
 
 struct iStrComparator

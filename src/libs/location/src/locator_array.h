@@ -66,12 +66,6 @@ class LocatorArray
     // Get the radius of the locator
     float GetLocatorRadius(int32_t locIndex);
 
-    // --------------------------------------------------------------------------------------------
-    // Encapsulation
-    // --------------------------------------------------------------------------------------------
-  public:
-    static int32_t CalcHashString(const char *str);
-
   private:
     // Group name
     char *group;

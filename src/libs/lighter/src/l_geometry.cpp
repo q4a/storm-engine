@@ -11,6 +11,7 @@
 #include "l_geometry.h"
 #include "entity.h"
 #include "core.h"
+#include "fs.hpp"
 
 #include <corecrt_io.h>
 
@@ -464,9 +465,9 @@ bool LGeometry::Save()
             if (dir[p] == '\\')
             {
                 dir[p] = 0;
-                if (!fio->_FileOrDirectoryExists(dir))
+                if (!rust::fs::PathExists(dir))
                 {
-                    if (!fio->_CreateDirectory(dir))
+                    if (!rust::fs::CreateDirectory(dir))
                     {
                         isCont = true;
                         break;

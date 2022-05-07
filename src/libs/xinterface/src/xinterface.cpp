@@ -9,7 +9,7 @@
 #include "string_service/str_service.h"
 #include "xservice.h"
 #include <cstdio>
-#include "string_compare.hpp"
+#include "fs.hpp"
 #include <direct.h>
 
 #define CHECK_FILE_NAME "PiratesReadme.txt"
@@ -993,7 +993,7 @@ uint64_t XINTERFACE::ProcessMessage(MESSAGE &message)
         }
         else
         {
-            if (!fio->_FileOrDirectoryExists(param.c_str()))
+            if (!rust::fs::PathExists(param.c_str()))
             {
                 systTime = std::time(nullptr);
             }
@@ -1063,8 +1063,8 @@ void XINTERFACE::LoadIni()
     char section[256];
 
     auto platform = "PC_SCREEN";
-    auto ini = fio->OpenIniFile(RESOURCE_FILENAME);
-    if (!ini)
+    auto ini = rust::ini::IniFile();
+    if (!ini.Load(RESOURCE_FILENAME))
         throw std::runtime_error("ini file not found!");
 
     RECT Screen_Rect;
@@ -1084,23 +1084,23 @@ void XINTERFACE::LoadIni()
     sprintf_s(section, "COMMON");
 
     // set screen parameters
-    if (ini->GetInt(platform, "bDynamicScaling", 0) == 0)
+    if (ini.GetInt(platform, "bDynamicScaling", 0) == 0)
     {
         const auto &canvas_size = core.GetScreenSize();
-        fScale = ini->GetFloat(platform, "fScale", 1.f);
+        fScale = ini.GetFloat(platform, "fScale", 1.f);
         if (fScale < MIN_SCALE || fScale > MAX_SCALE)
             fScale = 1.f;
-        dwScreenWidth = ini->GetInt(platform, "wScreenWidth", canvas_size.width);
-        dwScreenHeight = ini->GetInt(platform, "wScreenHeight", canvas_size.height);
-        GlobalScreenRect.left = ini->GetInt(platform, "wScreenLeft", 0);
-        GlobalScreenRect.top = ini->GetInt(platform, "wScreenTop", canvas_size.height);
-        GlobalScreenRect.right = ini->GetInt(platform, "wScreenRight", canvas_size.width);
-        GlobalScreenRect.bottom = ini->GetInt(platform, "wScreenDown", 0);
+        dwScreenWidth = ini.GetInt(platform, "wScreenWidth", canvas_size.width);
+        dwScreenHeight = ini.GetInt(platform, "wScreenHeight", canvas_size.height);
+        GlobalScreenRect.left = ini.GetInt(platform, "wScreenLeft", 0);
+        GlobalScreenRect.top = ini.GetInt(platform, "wScreenTop", canvas_size.height);
+        GlobalScreenRect.right = ini.GetInt(platform, "wScreenRight", canvas_size.width);
+        GlobalScreenRect.bottom = ini.GetInt(platform, "wScreenDown", 0);
     }
 
-    m_fpMouseOutZoneOffset.x = ini->GetFloat(section, "mouseOutZoneWidth", 0.f);
-    m_fpMouseOutZoneOffset.y = ini->GetFloat(section, "mouseOutZoneHeight", 0.f);
-    m_nMouseLastClickTimeMax = ini->GetInt(section, "mouseDblClickInterval", 300);
+    m_fpMouseOutZoneOffset.x = ini.GetFloat(section, "mouseOutZoneWidth", 0.f);
+    m_fpMouseOutZoneOffset.y = ini.GetFloat(section, "mouseOutZoneHeight", 0.f);
+    m_nMouseLastClickTimeMax = ini.GetInt(section, "mouseDblClickInterval", 300);
 
     CMatrix oldmatp;
     pRenderService->GetTransform(D3DTS_PROJECTION, (D3DMATRIX *)&oldmatp);
@@ -1121,11 +1121,11 @@ void XINTERFACE::LoadIni()
     matv.m[3][1] = -(GlobalScreenRect.top + GlobalScreenRect.bottom) / 2.f;
 
     // set key press data
-    m_nMaxPressDelay = ini->GetInt(section, "RepeatDelay", 500);
+    m_nMaxPressDelay = ini.GetInt(section, "RepeatDelay", 500);
 
     // set mouse cursor
     char param[256];
-    ini->ReadString(section, "MousePointer", param, sizeof(param) - 1, "");
+    ini.ReadString(section, "MousePointer", param, sizeof(param) - 1, "");
     char param2[256];
     sscanf(param, "%[^,],%d,size:(%d,%d),pos:(%d,%d)", param2, &m_lMouseSensitive, &MouseSize.x, &MouseSize.y,
            &m_lXMouse, &m_lYMouse);
@@ -1146,18 +1146,18 @@ void XINTERFACE::LoadIni()
     ShowCursor(false);
 
     // set blind parameters
-    m_fBlindSpeed = ini->GetFloat(section, "BlindTime", 1.f);
+    m_fBlindSpeed = ini.GetFloat(section, "BlindTime", 1.f);
     if (m_fBlindSpeed <= 0.0001f)
         m_fBlindSpeed = 1.f;
     m_fBlindSpeed = 0.002f / m_fBlindSpeed;
 
     // set wave parameters
-    m_nColumnQuantity = ini->GetInt(section, "columnQuantity", m_nColumnQuantity);
-    m_fWaveAmplitude = ini->GetFloat(section, "waveAmplitude", m_fWaveAmplitude);
-    m_fWavePhase = ini->GetFloat(section, "wavePhase", m_fWavePhase);
-    m_fWaveSpeed = ini->GetFloat(section, "waveSpeed", m_fWaveSpeed);
-    m_nBlendStepMax = ini->GetInt(section, "waveStepQuantity", m_nBlendStepMax);
-    m_nBlendSpeed = ini->GetInt(section, "blendSpeed", m_nBlendSpeed);
+    m_nColumnQuantity = ini.GetInt(section, "columnQuantity", m_nColumnQuantity);
+    m_fWaveAmplitude = ini.GetFloat(section, "waveAmplitude", m_fWaveAmplitude);
+    m_fWavePhase = ini.GetFloat(section, "wavePhase", m_fWavePhase);
+    m_fWaveSpeed = ini.GetFloat(section, "waveSpeed", m_fWaveSpeed);
+    m_nBlendStepMax = ini.GetInt(section, "waveStepQuantity", m_nBlendStepMax);
+    m_nBlendSpeed = ini.GetInt(section, "blendSpeed", m_nBlendSpeed);
 
     oldKeyState.dwKeyCode = -1;
     DoControl();
@@ -2828,7 +2828,7 @@ char *XINTERFACE::SaveFileFind(int32_t saveNum, char *buffer, size_t bufSize, in
         const char *sSavePath = AttributesPointer->GetAttribute("SavePath");
         if (sSavePath != nullptr)
         {
-            fio->_CreateDirectory(sSavePath);
+            rust::fs::CreateDirectory(sSavePath);
         }
 
         // start save file finding
@@ -2885,7 +2885,7 @@ bool XINTERFACE::NewSaveFileName(const char *fileName) const
         sprintf(param, "%s\\%s", sSavePath, fileName);
     }
 
-    return !(fio->_FileOrDirectoryExists(param));
+    return !(rust::fs::PathExists(param));
 }
 
 void XINTERFACE::DeleteSaveFile(const char *fileName)
@@ -2904,7 +2904,7 @@ void XINTERFACE::DeleteSaveFile(const char *fileName)
     {
         sprintf(param, "%s\\%s", sSavePath, fileName);
     }
-    fio->_DeleteFile(param);
+    rust::fs::DeleteFile(param);
 }
 
 uint32_t XINTERFACE_BASE::GetBlendColor(uint32_t minCol, uint32_t maxCol, float fBlendFactor)
@@ -3230,37 +3230,23 @@ void XINTERFACE::SaveOptionsFile(const char *fileName, ATTRIBUTES *pAttr)
 
 void XINTERFACE::LoadOptionsFile(std::string_view fileName, ATTRIBUTES *pAttr)
 {
-    constexpr const unsigned int OPTION_NAME_MAX_LENGTH = 512;
-    constexpr const unsigned int OPTION_VALUE_MAX_LENGTH = 1024;
-
     if (fileName.empty() || pAttr == nullptr)
     {
         return;
     }
 
-    auto fileS = fio->_CreateFile(fileName.data(), std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
-    {
-        return;
-    }
-
-    const uint32_t fileSize = fio->_GetFileSize(fileName.data());
-    if (fileSize == 0)
+    auto file_data = rust::fs::ReadFileToString(fileName.data());
+    if (file_data.empty())
     {
         core.Event("evntOptionsBreak");
-        fio->_CloseFile(fileS);
         return;
     }
 
-    std::string buffer(fileSize + 1, '\0'); // + 1 for '\0'
-    fio->_ReadFile(fileS, buffer.data(), fileSize);
     if (pAttr) //~!~
     {
-        storm::removeCarriageReturn(buffer);
-        storm::parseOptions(buffer, *pAttr);
+        storm::removeCarriageReturn(file_data);
+        storm::parseOptions(file_data, *pAttr);
     }
-
-    fio->_CloseFile(fileS);
 }
 
 void XINTERFACE::GetContextHelpData()
@@ -3347,7 +3333,7 @@ int XINTERFACE::LoadIsExist()
     const char *sSavePath = AttributesPointer->GetAttribute("SavePath");
     if (sSavePath != nullptr)
     {
-        fio->_CreateDirectory(sSavePath);
+        rust::fs::CreateDirectory(sSavePath);
     }
 
     bool bFindFile = false;
@@ -3394,7 +3380,7 @@ void XINTERFACE::PrecreateDirForFile(const char *pcFullFileName)
             break;
         }
     if (n > 0)
-        fio->_CreateDirectory(path);
+        rust::fs::CreateDirectory(path);
 }
 
 // controls Container

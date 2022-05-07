@@ -1,7 +1,7 @@
 #include "file_service.h"
 #include "core_impl.h"
 #include "storm_assert.h"
-#include "string_compare.hpp"
+#include "fs.hpp"
 
 #include <SDL2/SDL.h>
 #include <exception>
@@ -63,12 +63,6 @@ void FILE_SERVICE::_SetFilePointer(std::fstream &fileS, std::streamoff off, std:
     fileS.seekp(off, dir);
 }
 
-bool FILE_SERVICE::_DeleteFile(const char *filename)
-{
-    std::filesystem::path path = std::filesystem::u8path(filename);
-    return std::filesystem::remove(path);
-}
-
 bool FILE_SERVICE::_WriteFile(std::fstream &fileS, const void *s, std::streamsize count)
 {
     fileS.exceptions(std::fstream::failbit | std::fstream::badbit);
@@ -97,20 +91,6 @@ bool FILE_SERVICE::_ReadFile(std::fstream &fileS, void *s, std::streamsize count
         rust::log::error("Failed to ReadFile: %s", e.what());
         return false;
     }
-}
-
-bool FILE_SERVICE::_FileOrDirectoryExists(const char *p)
-{
-    std::filesystem::path path = std::filesystem::u8path(p);
-    auto ec = std::error_code{};
-    bool result = std::filesystem::exists(path, ec);
-    if (ec)
-    {
-        rust::log::error("Failed to to check if %s exists: %s", p, ec.message());
-        return false;
-    }
-
-    return result;
 }
 
 std::vector<std::string> FILE_SERVICE::_GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask,
@@ -202,34 +182,10 @@ std::string FILE_SERVICE::_GetCurrentDirectory()
     return result;
 }
 
-std::string FILE_SERVICE::_GetExecutableDirectory()
-{
-    std::string result(SDL_GetBasePath());
-    return result;
-}
-
-std::uintmax_t FILE_SERVICE::_GetFileSize(const char *filename)
-{
-    std::filesystem::path path = std::filesystem::u8path(filename);
-    return std::filesystem::file_size(path);
-}
-
 void FILE_SERVICE::_SetCurrentDirectory(const char *pathName)
 {
     std::filesystem::path path = std::filesystem::u8path(pathName);
     std::filesystem::current_path(path);
-}
-
-bool FILE_SERVICE::_CreateDirectory(const char *pathName)
-{
-    std::filesystem::path path = std::filesystem::u8path(pathName);
-    return std::filesystem::create_directories(path);
-}
-
-std::uintmax_t FILE_SERVICE::_RemoveDirectory(const char *pathName)
-{
-    std::filesystem::path path = std::filesystem::u8path(pathName);
-    return std::filesystem::remove_all(path);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -335,34 +291,6 @@ void FILE_SERVICE::Close()
         delete OpenFiles[n];
         OpenFiles[n] = nullptr;
     }
-}
-
-bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dwSize)
-{
-    if (ppBuffer == nullptr)
-        return false;
-
-    auto fileS = fio->_CreateFile(file_name, std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
-    {
-        rust::log::warn("Can't load file: %s", file_name);
-        return false;
-    }
-    const auto dwLowSize = _GetFileSize(file_name);
-    if (dwSize)
-    {
-        *dwSize = dwLowSize;
-    }
-    if (dwLowSize == 0)
-    {
-        *ppBuffer = nullptr;
-        return false;
-    }
-
-    *ppBuffer = new char[dwLowSize];
-    _ReadFile(fileS, *ppBuffer, dwLowSize);
-    _CloseFile(fileS);
-    return true;
 }
 
 //=================================================================================================

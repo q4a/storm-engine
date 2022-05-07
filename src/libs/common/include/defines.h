@@ -5,28 +5,6 @@
 #include <cstdint>
 #include <cstring>
 
-namespace TOREMOVE
-{
-inline uint32_t HashNoCase(const char *str)
-{
-    uint32_t hval = 0;
-    while (*str != '\0')
-    {
-        auto c = *str++;
-        if (c >= 'A' && c <= 'Z')
-            c += 'a' - 'A';
-        hval = (hval << 4) + static_cast<uint32_t>(c);
-        const auto g = hval & (static_cast<uint32_t>(0xf) << (32 - 4));
-        if (g != 0)
-        {
-            hval ^= g >> (32 - 8);
-            hval ^= g;
-        }
-    }
-    return hval;
-}
-} // namespace TOREMOVE
-
 #define _FILE_ __FILE__
 #define _L __LINE__
 #define _FL_ __FILE__, __LINE__

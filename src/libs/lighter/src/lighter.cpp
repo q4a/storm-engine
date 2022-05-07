@@ -11,7 +11,6 @@
 #include "lighter.h"
 
 #include "core.h"
-#include "string_compare.hpp"
 #include "entity.h"
 // ============================================================================================
 // Construction, destruction

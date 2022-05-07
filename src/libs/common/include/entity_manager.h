@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "shared/layers.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 #include <algorithm>
 #include <array>
@@ -209,7 +209,7 @@ class EntityManager final
     static entid_t CreateEntity(const char *name, ATTRIBUTES *attr = nullptr)
     {
         /* FIND VMA */
-        const auto hash = MakeHashValue(name);
+        const int32_t hash = ffi_hash_ignore_case(name);
         if (hash == 0)
         {
             throw std::runtime_error("null hash");
@@ -316,7 +316,7 @@ class EntityManager final
     // TODO: hash...
     static EntityVector GetEntityIdVector(const char *name)
     {
-        return GetEntityIdVector(MakeHashValue(name));
+        return GetEntityIdVector(ffi_hash_ignore_case(name));
     }
 
     static EntityVector GetEntityIdVector(const uint32_t hash)
@@ -355,7 +355,7 @@ class EntityManager final
 
     static entid_t GetEntityId(const char *name)
     {
-        return GetEntityId(MakeHashValue(name));
+        return GetEntityId(ffi_hash_ignore_case(name));
     }
 
     static entid_t GetEntityId(const uint32_t hash)

@@ -1,6 +1,5 @@
 #include "ai_fort.h"
 #include "shared/messages.h"
-#include "string_compare.hpp"
 
 AIFort *AIFort::pAIFort = nullptr;
 

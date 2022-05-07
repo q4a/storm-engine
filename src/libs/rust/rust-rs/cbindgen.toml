@@ -1,5 +1,9 @@
 include_guard = "rust_h"
 pragma_once = true
+include_version = true
+no_includes = true
+sys_includes = ["stdint.h"]
+includes = []
 
 [export]
 exclude = ["wchar_t"]

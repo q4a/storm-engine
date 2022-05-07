@@ -1,6 +1,5 @@
 #include "s_dbg_breaktable.h"
 #include "file_service.h"
-#include "string_compare.hpp"
 
 #define SECTION_NAME "breakpoints"
 

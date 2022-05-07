@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.h"
-#include "string_compare.hpp"
+#include "string_util.hpp"
 #define HASH_TABLE_SIZE 512 // must be power of 2
 
 struct HTSUBELEMENT
@@ -88,7 +88,7 @@ class STRING_CODEC : public VSTRING_CODEC
         uint32_t n;
         if (pString == nullptr)
             return 0xffffffff;
-        uint32_t nHash = MakeHashValue(pString);
+        uint32_t nHash = ffi_hash_ignore_case(pString);
         uint32_t nTableIndex = nHash & (HASH_TABLE_SIZE - 1);
 
         HTELEMENT *pE = &HTable[nTableIndex];
@@ -133,25 +133,6 @@ class STRING_CODEC : public VSTRING_CODEC
             return "INVALID SCC";
         }
         return HTable[nTableIndex].pElements[n].pStr;
-    }
-
-    uint32_t MakeHashValue(const char *ps)
-    {
-        uint32_t hval = 0;
-        while (*ps != 0)
-        {
-            char v = *ps++;
-            if ('A' <= v && v <= 'Z')
-                v += 'a' - 'A'; // case independent
-            hval = (hval << 4) + (uint32_t)v;
-            uint32_t g = hval & ((uint32_t)0xf << (32 - 4));
-            if (g != 0)
-            {
-                hval ^= g >> (32 - 8);
-                hval ^= g;
-            }
-        }
-        return hval;
     }
 
     char *Get()

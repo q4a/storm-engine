@@ -8,6 +8,7 @@
 #include "core.h"
 
 #include "storm_assert.h"
+#include "fs.hpp"
 
 namespace
 {
@@ -138,7 +139,7 @@ bool QuestFileReader::GetQuestTitle(const std::string_view &questId, const std::
     const auto n = FindQuestByID(questId);
     if (!n.has_value())
     {
-        rust::log::info("Can`t find title whith ID = %s", questId);
+        rust::log::info("Can`t find title whith ID = %s", questId.data());
         return false;
     }
 
@@ -261,35 +262,15 @@ void QuestFileReader::SetQuestTextFileName(const std::string_view &fileName)
 
     questFileNames_.push_back(std::string(fileName));
 
-    /// Open file
-    auto fileS = fio->_CreateFile(fileName.data(), std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
-    {
-        rust::log::warn("Can`t open quest log file %s", std::string(fileName).c_str());
-        return;
-    }
-
-    /// Obtain file size
-    const uint32_t filesize = fio->_GetFileSize(fileName.data());
-    if (filesize == 0)
+    auto file_data = rust::fs::ReadFileToString(fileName.data());
+    if (file_data.empty())
     {
         rust::log::info("Empty quest log file %s", std::string(fileName).c_str());
-        fio->_CloseFile(fileS);
         return;
     }
+    Assert(!file_data.empty());
 
-    /// Create a buffer
-    std::string buffer(filesize, '\0');
-    Assert(!buffer.empty());
-
-    // Read file content into buffer
-    if (!fio->_ReadFile(fileS, buffer.data(), filesize))
-    {
-        rust::log::info("Can`t read quest log file: %s", std::string(fileName).c_str());
-    }
-    fio->_CloseFile(fileS);
-
-    AddQuestsFromBuffer(std::string_view(buffer.c_str()));
+    AddQuestsFromBuffer(std::string_view(file_data.c_str()));
 }
 
 void QuestFileReader::AddQuestsFromBuffer(const std::string_view &srcBuffer)

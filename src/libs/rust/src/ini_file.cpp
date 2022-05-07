@@ -1,4 +1,5 @@
 #include "ini_file.hpp"
+#include <stdexcept>
 
 namespace rust::ini
 {

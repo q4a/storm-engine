@@ -4,7 +4,7 @@
 
 #include "v_file_service.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
+#include "fs.hpp"
 
 bool ReadingAlreadyComplete;
 
@@ -36,25 +36,18 @@ void DataCache::CacheSystem(const char *FileName)
     std::transform(pathStr.begin(), pathStr.end(), pathStr.begin(), tolower);
     // MessageBoxA(NULL, (LPCSTR)path.c_str(), "", MB_OK); //~!~
 
-    auto sysFile = fio->_CreateFile(pathStr.c_str(), std::ios::binary | std::ios::in);
+    uint64_t file_size = 0;
+    const auto data = rust::fs::ReadBytesFromFile(pathStr.c_str(), file_size);
 
-    if (!sysFile.is_open())
+    if (file_size == 0)
     {
-        rust::log::error("Particles: '%s' File not found !!!", pathStr.c_str());
         return;
     }
 
-    const auto FileSize = fio->_GetFileSize(pathStr.c_str());
-
-    auto *pMemBuffer = new uint8_t[FileSize];
-    fio->_ReadFile(sysFile, pMemBuffer, FileSize);
-
     // Create data from file ...
-    CreateDataSource(pMemBuffer, FileSize, pathStr.c_str());
+    CreateDataSource(data, file_size, pathStr.c_str());
 
-    delete[] pMemBuffer;
-
-    fio->_CloseFile(sysFile);
+    delete[] data;
 }
 
 // Reset cache

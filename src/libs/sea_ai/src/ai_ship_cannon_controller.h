@@ -1,6 +1,6 @@
 #pragma once
 
-#include "string_compare.hpp"
+#include "string_util.hpp"
 
 #define INVALID_BORT_INDEX 0xFFFFFFFF
 

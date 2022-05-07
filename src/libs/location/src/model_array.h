@@ -125,7 +125,6 @@ class ModelArray
     // Encapsulation
     // --------------------------------------------------------------------------------------------
   private:
-    uint32_t CalcHashString(const char *str);
     static void UpdatePath(std::string &path);
 
   private:

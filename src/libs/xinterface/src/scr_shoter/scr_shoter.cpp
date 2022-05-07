@@ -1,6 +1,5 @@
 #include "scr_shoter.h"
 #include "../xdefines.h"
-#include "string_compare.hpp"
 #include "core.h"
 
 #define SS_TEXTURE_WIDTH 128

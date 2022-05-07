@@ -11,7 +11,6 @@
 #include "animation_service_imp.h"
 
 #include "core.h"
-#include "string_compare.hpp"
 #include "animation_imp.h"
 #include "an_file.h"
 #include "v_file_service.h"

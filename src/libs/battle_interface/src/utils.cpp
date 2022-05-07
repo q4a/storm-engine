@@ -4,7 +4,6 @@
 
 #include "image/img_render.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
 
 // extern data
 entid_t BIUtils::idBattleInterface;

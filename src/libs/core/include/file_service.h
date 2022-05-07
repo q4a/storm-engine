@@ -94,10 +94,8 @@ class FILE_SERVICE : public VFILE_SERVICE
     std::fstream _CreateFile(const char *filename, std::ios::openmode mode) override;
     void _CloseFile(std::fstream &fileS) override;
     void _SetFilePointer(std::fstream &fileS, std::streamoff off, std::ios::seekdir dir) override;
-    bool _DeleteFile(const char *filename) override;
     bool _WriteFile(std::fstream &fileS, const void *s, std::streamsize count) override;
     bool _ReadFile(std::fstream &fileS, void *s, std::streamsize count) override;
-    bool _FileOrDirectoryExists(const char *p) override;
     std::vector<std::string> _GetPathsOrFilenamesByMask(const char *sourcePath, const char *mask, bool getPaths,
                                                         bool onlyDirs = false, bool onlyFiles = true) override;
     std::vector<std::filesystem::path> _GetFsPathsByMask(const char *sourcePath, const char *mask, bool getPaths,
@@ -106,12 +104,7 @@ class FILE_SERVICE : public VFILE_SERVICE
     std::filesystem::file_time_type _GetLastWriteTime(const char *filename) override;
     void _FlushFileBuffers(std::fstream &fileS) override;
     std::string _GetCurrentDirectory() override;
-    std::string _GetExecutableDirectory() override;
-    std::uintmax_t _GetFileSize(const char *filename) override;
     void _SetCurrentDirectory(const char *pathName) override;
-    bool _CreateDirectory(const char *pathName) override;
-    std::uintmax_t _RemoveDirectory(const char *pathName) override;
-    bool LoadFile(const char *file_name, char **ppBuffer, uint32_t *dwSize) override;
     // ini files section
     void Close();
     std::unique_ptr<INIFILE> CreateIniFile(const char *file_name, bool fail_if_exist) override;

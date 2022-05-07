@@ -1,7 +1,7 @@
 #include "ifs.h"
 #include "core_impl.h"
 #include "v_module_api.h"
-#include "string_compare.hpp"
+#include "fs.hpp"
 
 #define COMMENT ';'
 #define SECTION_A '['
@@ -413,31 +413,12 @@ bool IFS::LoadFile(const char *_file_name)
     {
         return false;
     }
-    auto fileS = fs->_CreateFile(_file_name, std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
+
+    auto file_data = rust::fs::ReadFileToString(_file_name);
+    if (file_data.empty())
     {
-        rust::log::warn("Unable to load file: %s", _file_name);
         return false;
     }
-
-    const auto file_size = fs->_GetFileSize(_file_name);
-
-    auto *const file_data = new char[file_size + 1]; // +1 for zero at the end
-    if (file_data == nullptr)
-    {
-        fs->_CloseFile(fileS);
-        return false;
-    }
-    file_data[file_size] = 0;
-
-    if (!fs->_ReadFile(fileS, file_data, file_size))
-    {
-        delete[] file_data;
-        fs->_CloseFile(fileS);
-        return false;
-    }
-
-    fs->_CloseFile(fileS);
 
     const uint32_t name_size = strlen(_file_name) + 1;
 
@@ -445,15 +426,11 @@ bool IFS::LoadFile(const char *_file_name)
 
     if (FileName == nullptr)
     {
-        delete[] file_data;
-        fs->_CloseFile(fileS);
         return false;
     }
     strcpy_s(FileName, name_size, _file_name);
 
-    Format(file_data, file_size + 1);
-
-    delete[] file_data;
+    Format(file_data.data(), file_data.size());
 
     return true;
 }
@@ -598,7 +575,7 @@ bool IFS::FlushFile()
         return true;
     }
 
-    fs->_DeleteFile(FileName);
+    rust::fs::DeleteFile(FileName);
     auto fileS = fio->_CreateFile(FileName, std::ios::binary | std::ios::out);
     if (!fileS.is_open())
     {
