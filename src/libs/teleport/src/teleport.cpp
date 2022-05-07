@@ -322,41 +322,13 @@ bool FINDDIALOGNODES::Init()
         auto *pA = AttributesPointer->CreateSubAClass(AttributesPointer, "nodelist");
         if (fileName && pA)
         {
-            auto fileS = fio->_CreateFile(fileName, std::ios::binary | std::ios::in);
-            if (!fileS.is_open())
-            {
-                rust::log::warn("Can`t dialog file %s", fileName);
-                return false;
-            }
-
-            const int32_t filesize = rust::fs::GetFileSize(fileName);
-            if (filesize == 0)
+            auto file_data = rust::fs::ReadFileToString(fileName);
+            if (file_data.empty())
             {
                 rust::log::info("Empty dialog file %s", fileName);
-                fio->_CloseFile(fileS);
                 return false;
             }
-
-            auto *const fileBuf = new char[filesize + 1];
-            if (fileBuf == nullptr)
-            {
-                rust::log::info("Can`t create buffer for read dialog file %s", fileName);
-                fio->_CloseFile(fileS);
-                return false;
-            }
-
-            if (!fio->_ReadFile(fileS, fileBuf, filesize))
-            {
-                rust::log::info("Can`t read dialog file: %s", fileName);
-                fio->_CloseFile(fileS);
-                delete[] fileBuf;
-                return false;
-            }
-            fio->_CloseFile(fileS);
-            fileBuf[filesize] = 0;
-
-            // now there is a buffer - start analyzing it
-            auto *pStr = fileBuf;
+            auto *pStr = file_data.data();
             char param[1024];
 
             auto nodIdx = 0;
@@ -374,7 +346,6 @@ bool FINDDIALOGNODES::Init()
                 }
             }
 
-            delete[] fileBuf;
             return true;
         }
     }

@@ -572,36 +572,12 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
     // strings reading
     char param[512];
     sprintf_s(param, "resource\\ini\\TEXTS\\%s\\%s", m_sLanguageDir, fileName);
-    auto fileS = fio->_CreateFile(param, std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
+    auto data = rust::fs::ReadFileToString(param);
+    if (data.empty())
     {
-        rust::log::warn("Strings file \"%s\" does not exist", fileName);
+        rust::log::warn("Strings file \"%s\" has zero size", param);
         return -1;
     }
-
-    const int32_t filesize = rust::fs::GetFileSize(param);
-
-    if (filesize <= 0)
-    {
-        rust::log::warn("Strings file \"%s\" has zero size", fileName);
-        return -1;
-    }
-
-    auto fileBuf = new char[filesize + 1];
-    if (fileBuf == nullptr)
-    {
-        throw std::runtime_error("Allocate memory error");
-    }
-
-    if (!fio->_ReadFile(fileS, fileBuf, filesize))
-    {
-        rust::log::info("Can`t read strings file: %s", fileName);
-        fio->_CloseFile(fileS);
-        STORM_DELETE(fileBuf);
-        return -1;
-    }
-    fio->_CloseFile(fileS);
-    fileBuf[filesize] = 0;
 
     pUSB->nref = 1;
     const auto len = strlen(fileName) + 1;
@@ -618,7 +594,7 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
     pUSB->psString = nullptr;
     for (pUSB->nStringsQuantity = 0;; pUSB->nStringsQuantity++)
     {
-        if (!GetNextUsersString(fileBuf, stridx, nullptr, nullptr))
+        if (!GetNextUsersString(data.data(), stridx, nullptr, nullptr))
         {
             break;
         }
@@ -638,11 +614,11 @@ int32_t STRSERVICE::OpenUsersStringFile(const char *fileName)
         stridx = 0;
         for (i = 0; i < pUSB->nStringsQuantity; i++)
         {
-            GetNextUsersString(fileBuf, stridx, &pUSB->psStrName[i], &pUSB->psString[i]);
+            GetNextUsersString(data.data(), stridx, &pUSB->psStrName[i], &pUSB->psString[i]);
         }
     }
 
-    STORM_DELETE(fileBuf);
+    data.clear();
 
     const int32_t block_id = pUSB->blockID;
     pUSB->next = nullptr;

@@ -224,16 +224,16 @@ bool SEA::Init()
     {
         char str[256];
         char *pFBuffer = nullptr;
-        uint32_t dwSize;
+        uint64_t dwSize = 0;
         sprintf_s(str, "resource\\sea\\sea%.4d.tga", i);
         // sprintf_s(str, "resource\\sea\\sea0000.tga", i);
-        fio->LoadFile(str, &pFBuffer, &dwSize);
-        if (!pFBuffer)
+        auto file_data = rust::fs::ReadBytesFromFile(str, dwSize);
+        if (!file_data)
         {
-            rust::log::info("Sea: Can't load %s", str);
             return false;
         }
 
+        pFBuffer = reinterpret_cast<char *>(file_data);
         auto *pFB = pFBuffer + sizeof(TGA_H);
 
         auto *pBuffer = new uint8_t[XWIDTH * YWIDTH];

@@ -47,7 +47,7 @@ pub fn executable_directory() -> Result<PathBuf, io::Error> {
     std::env::current_dir()
 }
 
-/// Returns file size in bytes or panics if the file doesn't exist or the app doesn't have permissions
+/// Returns the file size in bytes or panics if the file doesn't exist or the app doesn't have permissions
 pub fn file_size(path: &Path) -> Result<u64, io::Error> {
     path.metadata().map(|m| m.len())
 }
@@ -67,24 +67,36 @@ pub fn create_directory(path: &Path) -> Result<(), io::Error> {
     std::fs::create_dir_all(path)
 }
 
-/// Check if file or directory this path points to exists. Any error will be coerced to `false`
+/// Check if a file or a directory this path points to exists. Any error will be coerced to `false`
 pub fn path_exists(path: &Path) -> bool {
     path.exists()
 }
 
+/// Read the entire content of a file as a string
+pub fn read_file_as_string(path: &Path) -> Result<String, io::Error> {
+    std::fs::read_to_string(path)
+}
+
+/// Read the entire content of a file as byte vector
+pub fn read_file_as_bytes(path: &Path) -> Result<Vec<u8>, io::Error> {
+    std::fs::read(path)
+}
+
 mod export {
+    use core::slice;
     use std::os::raw::c_char;
 
     use log::error;
 
     use crate::common::{
-        ffi::{c_char_to_str, uint64_t, CCharArray, WCharArray},
+        ffi::{c_char_to_str, copy_to_c_char, size_t, uint64_t, CCharArray, WCharArray},
         DEFAULT_LOGGER,
     };
 
     use super::{
         create_directory, delete_directory, delete_file, executable_directory, file_size,
-        home_directory, logs_directory, save_directory, screenshot_directory, screenshot_filename, path_exists,
+        home_directory, logs_directory, path_exists, read_file_as_bytes, read_file_as_string,
+        save_directory, screenshot_directory, screenshot_filename,
     };
 
     #[no_mangle]
@@ -119,17 +131,19 @@ mod export {
 
     #[no_mangle]
     pub extern "C" fn ffi_executable_directory() -> *mut WCharArray {
-        let array: WCharArray = match executable_directory() {
-            Ok(dir) => dir.into(),
+        match executable_directory() {
+            Ok(dir) => {
+                let array: WCharArray = dir.into();
+                array.into_raw()
+            }
             Err(e) => {
                 error!(
                     target: DEFAULT_LOGGER,
                     "Couldn't get current directory: {}", &e
                 );
-                panic!("Current dir is unavailable")
+                std::ptr::null_mut()
             }
-        };
-        array.into_raw()
+        }
     }
 
     #[no_mangle]
@@ -144,7 +158,7 @@ mod export {
                     &path.to_string_lossy(),
                     &e
                 );
-                panic!("File is not available")
+                0
             }
         }
     }
@@ -203,5 +217,51 @@ mod export {
     pub unsafe extern "C" fn ffi_path_exists(path: *const c_char) -> bool {
         let path = c_char_to_str(path).as_ref();
         path_exists(path)
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_read_file_as_string(
+        path: *const c_char,
+        buffer: *mut c_char,
+        buffer_size: size_t,
+    ) -> bool {
+        let path = c_char_to_str(path).as_ref();
+        match read_file_as_string(path) {
+            Ok(data) => copy_to_c_char(&data, buffer, buffer_size),
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't read <{}> file: {}",
+                    path.to_string_lossy(),
+                    &e
+                );
+                false
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ffi_read_file_as_bytes(
+        path: *const c_char,
+        buffer: *mut u8,
+        buffer_size: size_t,
+    ) -> bool {
+        let path = c_char_to_str(path).as_ref();
+        match read_file_as_bytes(path) {
+            Ok(data) => {
+                let out = slice::from_raw_parts_mut(buffer as *mut u8, buffer_size);
+                out[..data.len()].copy_from_slice(&data);
+                true
+            }
+            Err(e) => {
+                error!(
+                    target: DEFAULT_LOGGER,
+                    "Couldn't read <{}> file: {}",
+                    path.to_string_lossy(),
+                    &e
+                );
+                false
+            }
+        }
     }
 }

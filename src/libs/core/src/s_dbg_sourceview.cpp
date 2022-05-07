@@ -537,36 +537,25 @@ bool SOURCE_VIEW::OpenSourceFile(const char *_filename)
 
     DirectoryName = DirectoryName + "\\" + ProgramDirectory + "\\" + _filename;
 
-    auto fileS = fio->_CreateFile(DirectoryName.c_str(), std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
+    uint64_t file_size = 0;
+    auto data = rust::fs::ReadCharsFromFile(DirectoryName.c_str(), file_size);
+    if (file_size == 0)
     {
         return false;
     }
-    const uint32_t nDataSize = rust::fs::GetFileSize(DirectoryName.c_str());
 
     nTopLine = 0;
-    delete[] pSourceFile;
-    nSourceFileSize = 0;
     nLinesNum = 0;
     nActiveLine = 0xffffffff;
-
-    pSourceFile = new char[nDataSize + 1];
-    const auto readSuccess = fio->_ReadFile(fileS, pSourceFile, nDataSize);
-    fio->_CloseFile(fileS);
-    if (!readSuccess)
-    {
-        delete[] pSourceFile;
-        pSourceFile = nullptr;
-        return false;
-    }
-    pSourceFile[nDataSize] = 0;
-    nSourceFileSize = nDataSize;
+    delete[] pSourceFile;
+    pSourceFile = data;
+    nSourceFileSize = file_size;
 
     nLinesNum = 1;
     pLineOffset.resize(nLinesNum);
     pLineOffset[0] = 0;
 
-    for (uint32_t n = 0; n < nDataSize; n++)
+    for (uint32_t n = 0; n < nSourceFileSize; n++)
     {
         if (pSourceFile[n] == 0xd)
         {

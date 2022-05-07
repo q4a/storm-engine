@@ -3230,37 +3230,23 @@ void XINTERFACE::SaveOptionsFile(const char *fileName, ATTRIBUTES *pAttr)
 
 void XINTERFACE::LoadOptionsFile(std::string_view fileName, ATTRIBUTES *pAttr)
 {
-    constexpr const unsigned int OPTION_NAME_MAX_LENGTH = 512;
-    constexpr const unsigned int OPTION_VALUE_MAX_LENGTH = 1024;
-
     if (fileName.empty() || pAttr == nullptr)
     {
         return;
     }
 
-    auto fileS = fio->_CreateFile(fileName.data(), std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
-    {
-        return;
-    }
-
-    const uint32_t fileSize = rust::fs::GetFileSize(fileName.data());
-    if (fileSize == 0)
+    auto file_data = rust::fs::ReadFileToString(fileName.data());
+    if (file_data.empty())
     {
         core.Event("evntOptionsBreak");
-        fio->_CloseFile(fileS);
         return;
     }
 
-    std::string buffer(fileSize + 1, '\0'); // + 1 for '\0'
-    fio->_ReadFile(fileS, buffer.data(), fileSize);
     if (pAttr) //~!~
     {
-        storm::removeCarriageReturn(buffer);
-        storm::parseOptions(buffer, *pAttr);
+        storm::removeCarriageReturn(file_data);
+        storm::parseOptions(file_data, *pAttr);
     }
-
-    fio->_CloseFile(fileS);
 }
 
 void XINTERFACE::GetContextHelpData()

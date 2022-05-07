@@ -97,8 +97,8 @@ mod export {
     use crate::common::ffi::{c_char_to_str, size_t, uint64_t, win1251_char_to_str};
 
     use super::{
-        ends_with_ignore_case, equal_ignore_case, find_ignore_case, glob_ignore_case,
-        hash_ignore_case, less_ignore_case, less_or_equal_ignore_case, starts_with_ignore_case, hash,
+        ends_with_ignore_case, equal_ignore_case, find_ignore_case, glob_ignore_case, hash,
+        hash_ignore_case, less_ignore_case, less_or_equal_ignore_case, starts_with_ignore_case,
     };
 
     #[no_mangle]
@@ -220,8 +220,8 @@ mod tests {
     };
 
     use crate::string_utils::{
-        ends_with_ignore_case, find_ignore_case, glob_ignore_case, less_ignore_case,
-        starts_with_ignore_case, hash,
+        ends_with_ignore_case, find_ignore_case, glob_ignore_case, hash, less_ignore_case,
+        starts_with_ignore_case,
     };
 
     use super::hash_ignore_case;

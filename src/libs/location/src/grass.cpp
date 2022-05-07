@@ -164,9 +164,9 @@ bool Grass::LoadData(const char *patchName)
     delete block;
     block = nullptr;
     // Load the data file
-    uint8_t *load = nullptr;
-    uint32_t size = 0;
-    if (!fio->LoadFile(patchName, (char **)&load, &size))
+    uint64_t size = 0;
+    uint8_t *load = rust::fs::ReadBytesFromFile(patchName, size);
+    if (!load)
         return false;
     try
     {
@@ -258,7 +258,7 @@ bool Grass::LoadData(const char *patchName)
         delete block;
         block = nullptr;
     }
-    delete load;
+    delete[] load;
     return true;
 }
 

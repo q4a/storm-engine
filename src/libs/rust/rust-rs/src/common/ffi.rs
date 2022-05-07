@@ -128,7 +128,7 @@ pub unsafe fn copy_to_c_char(s: &str, ptr: *mut c_char, size: size_t) -> bool {
         Err(e) => {
             error!(
                 target: DEFAULT_LOGGER,
-                "Couldn't copy &str to *c_char: {}", &e
+                "Couldn't convert &str to CString: {}", &e
             );
             return false;
         }

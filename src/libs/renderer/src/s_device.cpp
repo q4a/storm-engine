@@ -1880,33 +1880,6 @@ bool DX9RENDER::TextureSet(int32_t stage, int32_t texid)
         return true;
     }
 
-    /*
-    if(Textures[texid].loaded==false)
-    {
-    int tex2load[MAX_STEXTURES];
-    int t2l=0;
-    for(int32_t t=0; t<MAX_STEXTURES; t++)
-    if(Textures[t].ref>0 && Textures[t].loaded==false)    tex2load[t2l++] = t;
-    */
-    /*/sort textures
-    for(t=0; t<t2l; t++)
-    for(int32_t tt=t; tt<t2l; tt++)
-    if(_strcmpi(Textures[tex2load[tt]].name, Textures[tex2load[t]].name)<0)
-    {
-    int ttemp = tex2load[t];
-    tex2load[t] = tex2load[tt];
-    tex2load[tt] = ttemp;
-    }*/
-    /*
-    for(t=0; t<t2l; t++)
-    {
-    Textures[tex2load[t]].loaded = true;
-    TextureLoad(tex2load[t]);
-    }
-    //Textures[texid].loaded = true;    TextureLoad(texid);
-    }
-    */
-
     if (CHECKD3DERR(d3d9->SetTexture(stage, Textures[texid].d3dtex)) == true)
     {
         return false;

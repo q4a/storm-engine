@@ -66,32 +66,33 @@ bool PtcData::Load(const char *path)
 {
     Assert(data == nullptr);
     char *buf = nullptr;
-    uint32_t size = 0;
+    uint64_t size = 0;
     middle = 0.0f;
     // Loading data
-    if (!fio->LoadFile(path, &buf, &size))
+    auto file_data = rust::fs::ReadBytesFromFile(path, size);
+    if (!file_data)
     {
-        rust::log::info("Ptc(\"%s\") -> file not found", path);
         return false;
     }
+    buf = reinterpret_cast<char *>(file_data);
     // Checking the file for correctness
     if (!buf || size < sizeof(PtcHeader))
     {
         rust::log::info("Ptc(\"%s\") -> invalide file size", path);
-        delete buf;
+        delete[] buf;
         return false;
     }
     auto &hdr = *(PtcHeader *)buf;
     if (hdr.id != PTC_ID)
     {
         rust::log::info("Ptc(\"%s\") -> invalide file ID", path);
-        delete buf;
+        delete[] buf;
         return false;
     }
     if (hdr.ver != PTC_VERSION && hdr.ver != PTC_PREVERSION1)
     {
         rust::log::info("Ptc(\"%s\") -> invalide file version", path);
-        delete buf;
+        delete[] buf;
         return false;
     }
     uint32_t tsize = sizeof(PtcHeader);
@@ -106,14 +107,14 @@ bool PtcData::Load(const char *path)
     if (tsize != size)
     {
         rust::log::info("Ptc(\"%s\") -> invalide file size", path);
-        delete buf;
+        delete[] buf;
         return false;
     }
     if (hdr.numTriangles < 1 || hdr.numVerteces < 3 || hdr.numNormals < 1 || hdr.mapL < 1 || hdr.mapW < 1 ||
         hdr.numIndeces < 1 || hdr.lineSize < 1 || hdr.minX >= hdr.maxX || hdr.minY > hdr.maxY || hdr.minZ >= hdr.maxZ)
     {
         rust::log::info("Ptc(\"%s\") -> invalide file header", path);
-        delete buf;
+        delete[] buf;
         return false;
     }
     // form data structures

@@ -298,26 +298,17 @@ bool FILE_SERVICE::LoadFile(const char *file_name, char **ppBuffer, uint32_t *dw
     if (ppBuffer == nullptr)
         return false;
 
-    auto fileS = fio->_CreateFile(file_name, std::ios::binary | std::ios::in);
-    if (!fileS.is_open())
-    {
-        rust::log::warn("Can't load file: %s", file_name);
-        return false;
-    }
-    const auto dwLowSize = rust::fs::GetFileSize(file_name);
-    if (dwSize)
-    {
-        *dwSize = dwLowSize;
-    }
-    if (dwLowSize == 0)
+    uint64_t file_size = 0;
+    auto data = rust::fs::ReadBytesFromFile(file_name, file_size);
+    if (file_size == 0)
     {
         *ppBuffer = nullptr;
         return false;
     }
 
-    *ppBuffer = new char[dwLowSize];
-    _ReadFile(fileS, *ppBuffer, dwLowSize);
-    _CloseFile(fileS);
+    *dwSize = file_size;
+
+    *ppBuffer = reinterpret_cast<char *>(data);
     return true;
 }
 

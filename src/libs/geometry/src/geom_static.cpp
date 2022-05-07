@@ -21,17 +21,14 @@ std::vector<uint32_t> getColData(GEOM_SERVICE &srv, const std::string_view &file
 {
     std::vector<uint32_t> result;
 
-    auto ltfl = srv.OpenFile(file_name.data());
-    if (ltfl.is_open())
+    uint64_t file_size = 0;
+    const auto bytes = rust::fs::ReadBytesFromFile(file_name.data(), file_size);
+    if (file_size > 0)
     {
-        const auto file_size = rust::fs::GetFileSize(file_name.data());
-        if (file_size > 0)
-        {
-            result.resize(file_size / sizeof(uint32_t));
-            srv.ReadFile(ltfl, result.data(), file_size);
-        }
+        result.resize(file_size / sizeof(uint32_t));
+        memcpy(reinterpret_cast<uint8_t *>(result.data()), bytes, file_size);
+        delete[] bytes;
     }
-    srv.CloseFile(ltfl);
 
     return result;
 }

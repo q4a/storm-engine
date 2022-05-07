@@ -90,6 +90,10 @@ bool ffi_create_directory(const char *path);
 
 bool ffi_path_exists(const char *path);
 
+bool ffi_read_file_as_string(const char *path, char *buffer, size_t buffer_size);
+
+bool ffi_read_file_as_bytes(const char *path, uint8_t *buffer, size_t buffer_size);
+
 IniData *ffi_load_ini_data(const char *path);
 
 void ffi_free_ini_data(IniData *ptr);
