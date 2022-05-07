@@ -360,10 +360,10 @@ void COMPILER::SetWarning(const char *data_PTR, ...)
 
 void COMPILER::LoadPreprocess()
 {
-    auto engine_ini = fio->OpenIniFile(core_internal.EngineIniFileName());
-    if (engine_ini)
+    auto engine_ini = rust::ini::IniFile();
+    if (engine_ini.Load(core_internal.EngineIniFileName()))
     {
-        if (engine_ini->GetInt("script", "debuginfo", 0) == 0)
+        if (engine_ini.GetInt("script", "debuginfo", 0) == 0)
         {
             bDebugInfo = false;
             // FuncTab.KeepNameMode(false);
@@ -379,17 +379,17 @@ void COMPILER::LoadPreprocess()
             // DefTab.KeepNameMode(true);
             // EventTab.KeepNameMode(true);
         }
-        if (engine_ini->GetInt("script", "codefiles", 0) == 0)
+        if (engine_ini.GetInt("script", "codefiles", 0) == 0)
             bWriteCodeFile = false;
         else
             bWriteCodeFile = true;
 
-        if (engine_ini->GetInt("script", "runtimelog", 0) == 0)
+        if (engine_ini.GetInt("script", "runtimelog", 0) == 0)
             bRuntimeLog = false;
         else
             bRuntimeLog = true;
 
-        use_script_cache_ = engine_ini->GetInt("script", "use_cache", false);
+        use_script_cache_ = engine_ini.GetInt("script", "use_cache", false);
 
         // if(engine_ini->GetInt("script","tracefiles",0) == 0) bScriptTrace = false;
         // else bScriptTrace = true;
@@ -404,34 +404,6 @@ void COMPILER::LoadPreprocess()
 
 bool COMPILER::CreateProgram(const char *file_name)
 {
-    /*    INIFILE * engine_ini;
-
-    engine_ini = fio->OpenIniFile(core_internal.EngineIniFileName());
-    if(engine_ini != null)
-    {
-      if(engine_ini->GetInt("script","debuginfo",0) == 0)
-      {
-        bDebugInfo = false;
-        FuncTab.KeepNameMode(false);
-        VarTab.KeepNameMode(false);
-        DefTab.KeepNameMode(false);
-        EventTab.KeepNameMode(false);
-      }
-      else
-      {
-        bDebugInfo = true;
-        FuncTab.KeepNameMode(true);
-        VarTab.KeepNameMode(true);
-        DefTab.KeepNameMode(true);
-        EventTab.KeepNameMode(true);
-      }
-      if(engine_ini->GetInt("script","codefiles",0) == 0) bWriteCodeFile = false;
-      else bWriteCodeFile = true;
-
-
-      delete engine_ini;
-    }
-  //*/
     LoadPreprocess();
     const bool bRes = BC_LoadSegment(file_name);
 

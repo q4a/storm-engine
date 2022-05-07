@@ -7,7 +7,6 @@
 
 LRESULT CALLBACK DebugWndProc(HWND, UINT, WPARAM, LPARAM);
 
-//#define PROJECT_NAME    "project.df"
 int FONT_HEIGHT = 15;
 const wchar_t *DClass = L"SEDebug";
 
