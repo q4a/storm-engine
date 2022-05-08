@@ -54,7 +54,7 @@ conan_cmake_run(CONANFILE conanfile.py
 if (NOT WIN32)
     find_package(SDL2 REQUIRED)
     message(STATUS "SDL2_LIBRARIES="${SDL2_LIBRARIES})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${SDL2_INCLUDE_DIRS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${SDL2_INCLUDE_DIRS} -fsigned-char")
     message(STATUS "CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS})
 endif()
 
