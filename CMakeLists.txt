@@ -53,7 +53,7 @@ if (WIN32)
 else()
     find_package(SDL REQUIRED)
     message(STATUS "SDL_LIBRARIES="${SDL_LIBRARIES})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${SDL_INCLUDE_DIR}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${SDL_INCLUDE_DIR} -fsigned-char")
     message(STATUS "CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS})
 
     message("Using DXVK-native for D3D9 API")
