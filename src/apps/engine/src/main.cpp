@@ -57,10 +57,10 @@ void RunFrameWithOverflowCheck()
 
 void mimalloc_fun(const char *msg, void *arg)
 {
-    std::filesystem::path mimalloc_log_path;
-    mimalloc_log_path = fs::GetLogsPath() / "mimalloc.log";
-    if (arg && ((std::string *)arg)->compare("init") == 0)
+    static std::filesystem::path mimalloc_log_path;
+    if (mimalloc_log_path.empty())
     {
+        mimalloc_log_path = fs::GetLogsPath() / "mimalloc.log";
         std::error_code ec;
         remove(mimalloc_log_path, ec);
     }
@@ -133,10 +133,7 @@ int main(int argc, char *argv[])
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance is already running!", nullptr);
         return EXIT_SUCCESS;
     }
-    std::string *mi_arg = new std::string("init");
-    mi_register_output(mimalloc_fun, (void *)mi_arg);
-    mi_arg->clear();
-    std::destroy_at(mi_arg);
+    mi_register_output(mimalloc_fun, nullptr);
     mi_option_set(mi_option_show_errors, 1);
     mi_option_set(mi_option_show_stats, 1);
     mi_option_set(mi_option_eager_commit, 1);
