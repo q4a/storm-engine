@@ -71,13 +71,12 @@ pub fn read_file_as_bytes(path: &Path) -> Result<Vec<u8>, io::Error> {
 }
 
 mod export {
-    use core::slice;
     use std::os::raw::c_char;
 
     use log::error;
 
     use crate::common::{
-        ffi::{c_char_to_str, copy_to_c_char, size_t, CCharArray},
+        ffi::{c_char_to_str, CCharArray, U8Array},
         DEFAULT_LOGGER,
     };
 
@@ -90,14 +89,13 @@ mod export {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ffi_read_file_as_string(
-        path: *const c_char,
-        buffer: *mut c_char,
-        buffer_size: size_t,
-    ) -> bool {
+    pub unsafe extern "C" fn ffi_read_file_as_string(path: *const c_char) -> *mut CCharArray {
         let path = c_char_to_str(path).as_ref();
         match read_file_as_string(path) {
-            Ok(data) => copy_to_c_char(&data, buffer, buffer_size),
+            Ok(data) => {
+                let data: CCharArray = data.into();
+                data.into_raw()
+            }
             Err(e) => {
                 error!(
                     target: DEFAULT_LOGGER,
@@ -105,23 +103,18 @@ mod export {
                     path.to_string_lossy(),
                     &e
                 );
-                false
+                std::ptr::null_mut()
             }
         }
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ffi_read_file_as_bytes(
-        path: *const c_char,
-        buffer: *mut u8,
-        buffer_size: size_t,
-    ) -> bool {
+    pub unsafe extern "C" fn ffi_read_file_as_bytes(path: *const c_char) -> *mut U8Array {
         let path = c_char_to_str(path).as_ref();
         match read_file_as_bytes(path) {
             Ok(data) => {
-                let out = slice::from_raw_parts_mut(buffer as *mut u8, buffer_size);
-                out[..data.len()].copy_from_slice(&data);
-                true
+                let data: U8Array = data.into();
+                data.into_raw()
             }
             Err(e) => {
                 error!(
@@ -130,7 +123,7 @@ mod export {
                     path.to_string_lossy(),
                     &e
                 );
-                false
+                std::ptr::null_mut()
             }
         }
     }

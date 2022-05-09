@@ -43,6 +43,12 @@ struct CCharArray {
   size_t capacity;
 };
 
+struct U8Array {
+  uint8_t *ptr;
+  size_t len;
+  size_t capacity;
+};
+
 struct ArrayOfCCharArrays {
   CCharArray *ptr;
   size_t len;
@@ -64,6 +70,11 @@ void ffi_free_cchar_array(CCharArray *ptr);
 /// # Safety
 ///
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
+void ffi_free_u8_array(U8Array *ptr);
+
+/// # Safety
+///
+/// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
 void ffi_free_array_of_cchar_arrays(ArrayOfCCharArrays *ptr);
 
 EngineVersion ffi_get_target_engine_version(const char *version);
@@ -76,23 +87,23 @@ WCharArray *ffi_save_directory();
 
 WCharArray *ffi_screenshot_directory();
 
-CCharArray *ffi_screenshot_filename();
-
 WCharArray *ffi_executable_directory();
 
-uint64_t ffi_file_size(const char *path);
+bool ffi_path_exists(const char *path);
+
+bool ffi_create_directory(const char *path);
 
 void ffi_delete_directory(const char *path);
 
 bool ffi_delete_file(const char *path);
 
-bool ffi_create_directory(const char *path);
+uint64_t ffi_file_size(const char *path);
 
-bool ffi_path_exists(const char *path);
+CCharArray *ffi_screenshot_filename();
 
-bool ffi_read_file_as_string(const char *path, char *buffer, size_t buffer_size);
+CCharArray *ffi_read_file_as_string(const char *path);
 
-bool ffi_read_file_as_bytes(const char *path, uint8_t *buffer, size_t buffer_size);
+U8Array *ffi_read_file_as_bytes(const char *path);
 
 IniData *ffi_load_ini_data(const char *path);
 
