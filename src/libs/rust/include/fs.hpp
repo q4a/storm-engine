@@ -92,9 +92,9 @@ static char *ReadCharsFromFile(const char *path, uint64_t &file_size)
     const auto r_str = ffi_read_file_as_string(path);
     if (r_str != nullptr)
     {
-        file_size = r_str->len;
-        result = new char[file_size];
-        memcpy(result, r_str->ptr, file_size);
+        result = new char[r_str->len];
+        memcpy(result, r_str->ptr, r_str->len);
+        file_size = r_str->len - 1; // r_str is NULL terminated, but file_size should return the size without \0
         ffi_free_cchar_array(r_str);
     }
 
