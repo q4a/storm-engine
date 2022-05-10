@@ -4,6 +4,10 @@ use std::{
     path::Path,
 };
 
+use log::info;
+
+use crate::common::DEFAULT_LOGGER;
+
 use super::dyn_patches::{self, FileID, CHANGE_SET};
 
 /// Returns `BufReader` with patches applied to its input, if any.
@@ -45,6 +49,7 @@ pub fn get_reader(path: &Path) -> Result<Box<dyn BufRead>, std::io::Error> {
             }
         }
     }
+    info!(target: DEFAULT_LOGGER, "Patched file <{}>", path.to_string_lossy());
 
     Ok(Box::new(Cursor::new(data)))
 }
