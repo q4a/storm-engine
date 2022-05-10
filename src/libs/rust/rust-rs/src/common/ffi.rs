@@ -49,6 +49,20 @@ impl CCharArray {
 }
 
 #[repr(C)]
+pub struct U8Array {
+    ptr: *mut u8,
+    len: size_t,
+    capacity: size_t,
+}
+
+impl U8Array {
+    pub fn into_raw(self) -> *mut Self {
+        let boxed = Box::new(self);
+        Box::into_raw(boxed)
+    }
+}
+
+#[repr(C)]
 pub struct ArrayOfCCharArrays {
     ptr: *mut CCharArray,
     len: size_t,
@@ -79,6 +93,18 @@ pub unsafe extern "C" fn ffi_free_wchar_array(ptr: *mut WCharArray) {
 /// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
 #[no_mangle]
 pub unsafe extern "C" fn ffi_free_cchar_array(ptr: *mut CCharArray) {
+    if ptr.is_null() {
+        return;
+    }
+    let wrapper = Box::from_raw(ptr);
+    Vec::from_raw_parts(wrapper.ptr, wrapper.len, wrapper.capacity);
+}
+
+/// # Safety
+///
+/// This function is meant to be called from C/C++ code. As such, it can try to dereference arbitrary pointers
+#[no_mangle]
+pub unsafe extern "C" fn ffi_free_u8_array(ptr: *mut U8Array) {
     if ptr.is_null() {
         return;
     }
@@ -181,6 +207,20 @@ impl From<String> for CCharArray {
     }
 }
 
+impl From<Vec<u8>> for U8Array {
+    fn from(mut data: Vec<u8>) -> Self {
+        // Vec already stores all data on heap, no need to box it.
+        let ptr = data.as_mut_ptr();
+        let len = data.len();
+        let capacity = data.capacity();
+
+        // Prevent `data` from deallocating by forcing Rust to "forget" about it
+        std::mem::forget(data);
+
+        U8Array { ptr, len, capacity }
+    }
+}
+
 impl From<Vec<String>> for ArrayOfCCharArrays {
     fn from(data: Vec<String>) -> Self {
         let mut data: Vec<_> = data.into_iter().map(|string| string.into()).collect();
@@ -203,7 +243,8 @@ mod tests {
 
     use super::{
         c_char_to_str, copy_to_c_char, ffi_free_array_of_cchar_arrays, ffi_free_cchar_array,
-        ffi_free_wchar_array, ArrayOfCCharArrays, CCharArray, WCharArray,
+        ffi_free_u8_array, ffi_free_wchar_array, ArrayOfCCharArrays, CCharArray, U8Array,
+        WCharArray,
     };
 
     /// Testing correct allocation and deallocation using miri
@@ -231,6 +272,15 @@ mod tests {
         let array: ArrayOfCCharArrays = data.into();
         let ptr = array.into_raw();
         unsafe { ffi_free_array_of_cchar_arrays(ptr) };
+    }
+
+    /// Testing correct allocation and deallocation using miri
+    #[test]
+    fn test_u8_array() {
+        let data = "Test String".as_bytes().to_vec();
+        let array: U8Array = data.into();
+        let ptr = array.into_raw();
+        unsafe { ffi_free_u8_array(ptr) };
     }
 
     /// Testing correct copying from `&str` to `*char` and reading it back to `&str`

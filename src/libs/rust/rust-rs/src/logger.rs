@@ -122,7 +122,7 @@ impl LoggerConfig {
     fn file_config(name: &str, level: LevelFilter) -> Result<LoggerConfig, LoggerError> {
         let roller_pattern = format!("{}_{{}}.gz", name);
 
-        let mut log_path = fs::logs_directory();
+        let mut log_path = fs::dirs::logs_directory();
         log_path.push(roller_pattern);
         let roller_pattern = log_path
             .to_str()

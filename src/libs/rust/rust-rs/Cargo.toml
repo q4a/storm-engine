@@ -17,4 +17,3 @@ chrono = { version = "^0", default-features = false, features = ["alloc", "clock
 globset = "^0"
 thiserror = "^1"
 once_cell = "^1"
-configparser = "^3"

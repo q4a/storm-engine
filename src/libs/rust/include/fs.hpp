@@ -88,14 +88,14 @@ static char *ReadCharsFromFile(const char *path, uint64_t &file_size)
 {
     file_size = 0;
     char *result = nullptr;
-    if (PathExists(path))
+
+    const auto r_str = ffi_read_file_as_string(path);
+    if (r_str != nullptr)
     {
-        file_size = GetFileSize(path);
-        if (file_size != 0)
-        {
-            result = new char[file_size + 1];
-            ffi_read_file_as_string(path, result, file_size + 1);
-        }
+        result = new char[r_str->len];
+        memcpy(result, r_str->ptr, r_str->len);
+        file_size = r_str->len - 1; // r_str is NULL terminated, but file_size should return the size without \0
+        ffi_free_cchar_array(r_str);
     }
 
     return result;
@@ -104,14 +104,12 @@ static char *ReadCharsFromFile(const char *path, uint64_t &file_size)
 static std::string ReadFileToString(const char *path)
 {
     std::string result;
-    if (PathExists(path))
+
+    const auto r_str = ffi_read_file_as_string(path);
+    if (r_str != nullptr)
     {
-        const auto file_size = GetFileSize(path);
-        if (file_size != 0)
-        {
-            result.resize(file_size + 1);
-            ffi_read_file_as_string(path, result.data(), file_size + 1);
-        }
+        result = r_str->ptr;
+        ffi_free_cchar_array(r_str);
     }
 
     return result;
@@ -121,14 +119,14 @@ static uint8_t *ReadBytesFromFile(const char *path, uint64_t &file_size)
 {
     file_size = 0;
     uint8_t *result = nullptr;
-    if (PathExists(path))
+
+    const auto r_bytes = ffi_read_file_as_bytes(path);
+    if (r_bytes != nullptr)
     {
-        file_size = GetFileSize(path);
-        if (file_size != 0)
-        {
-            result = new uint8_t[file_size];
-            ffi_read_file_as_bytes(path, result, file_size);
-        }
+        file_size = r_bytes->len;
+        result = new uint8_t[file_size];
+        memcpy(result, r_bytes->ptr, file_size);
+        ffi_free_u8_array(r_bytes);
     }
 
     return result;

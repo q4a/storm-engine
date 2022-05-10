@@ -1,14 +1,13 @@
 use log::error;
 use std::{
     collections::HashMap,
-    fs::File,
-    io::{BufRead, BufReader},
+    io::BufRead,
     path::{Path, PathBuf},
     str::FromStr,
 };
 use thiserror::Error;
 
-use crate::common::DEFAULT_LOGGER;
+use crate::{common::DEFAULT_LOGGER, fs::file_reader};
 
 const DEFAULT_SECTION: &str = "default";
 
@@ -47,7 +46,7 @@ impl IniData {
         for line in reader.lines() {
             let original_line = line?;
             let trimmed_line = original_line.trim();
-            if trimmed_line.starts_with(';') || trimmed_line.starts_with("//") || trimmed_line.is_empty() {
+            if trimmed_line.starts_with(';') || trimmed_line.is_empty() {
                 continue;
             }
 
@@ -98,9 +97,7 @@ impl IniData {
 
     /// Read file and parse it into `IniData`
     pub fn load(path: &Path) -> Result<Self, IniParserError> {
-        let file = File::open(path)?;
-        let mut reader = BufReader::new(file);
-
+        let mut reader = file_reader::get_reader(path)?;
         Self::parse(&mut reader, path.to_path_buf())
     }
 

@@ -128,7 +128,7 @@ std::vector<std::filesystem::path> FILE_SERVICE::_GetFsPathsByMask(const char *s
     auto it = std::filesystem::directory_iterator(srcPath, ec);
     if (ec)
     {
-        rust::log::warn("Failed to open save folder: %s", ec.message());
+        rust::log::warn("Failed to open save folder: %s", ec.message().data());
         return result;
     }
 
