@@ -15,8 +15,10 @@ struct FunctionLocalVariable
     LocalVarInfo info;
     bool is_extern;
 
-    FunctionLocalVariable(LocalVarInfo info, bool is_extern) : info(std::move(info)), is_extern(std::move(is_extern))
+    FunctionLocalVariable(LocalVarInfo info, bool is_extern)
     {
+        this->info = info;
+        this->is_extern = is_extern;
     }
 };
 
@@ -27,8 +29,9 @@ struct Function
     std::vector<LocalVarInfo> local_variables;
 
     Function(FuncInfo info, std::vector<FunctionLocalVariable> arguments)
-        : info(std::move(info)), arguments(std::move(arguments))
     {
+        this->info = info;
+        this->arguments = arguments;
     }
 };
 
@@ -38,8 +41,9 @@ struct EventHandler
     std::string function_name;
 
     EventHandler(std::string event_name, std::string function_name)
-        : event_name(std::move(event_name)), function_name(std::move(function_name))
     {
+        this->event_name = event_name;
+        this->function_name = function_name;
     }
 };
 
@@ -50,8 +54,10 @@ struct Define
     uintptr_t value;
 
     Define(std::string name, uint32_t type, uintptr_t value)
-        : name(std::move(name)), type(std::move(type)), value(std::move(value))
     {
+        this->name = name;
+        this->type = type;
+        this->value = value;
     }
 };
 

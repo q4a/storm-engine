@@ -34,8 +34,12 @@ class Supervisor
         float d2;         // The square of the distance to the character in xz
 
         FindCharacter(Character *c, float dx, float dy, float dz, float d2)
-            : c(std::move(c)), dx(std::move(dx)), dy(std::move(dy)), dz(std::move(dz)), d2(std::move(d2))
         {
+            this->c = c;
+            this->dx = dx;
+            this->dy = dy;
+            this->dz = dz;
+            this->d2 = d2;
         }
     };
 
@@ -44,8 +48,10 @@ class Supervisor
         Character *c;
         float lastTime;
 
-        CharacterEx(Character *c, float lastTime) : c(std::move(c)), lastTime(std::move(lastTime))
+        CharacterEx(Character *c, float lastTime)
         {
+            this->c = c;
+            this->lastTime = lastTime;
         }
     };
 
