@@ -195,7 +195,7 @@ impl TryFrom<GlobalConfig> for Config {
 
 /// Create default logger with an output to `Documents/My Games/Sea Dogs/Logs/system.log`
 fn init_default_logger(level: LevelFilter) -> Result<Mutex<(Handle, GlobalConfig)>, LoggerError> {
-    let logger_config = LoggerConfig::file_config(DEFAULT_LOGGER, level)?;
+    let logger_config = LoggerConfig::console_config(DEFAULT_LOGGER, level);
 
     let mut global_config = GlobalConfig {
         loggers: HashMap::new(),
