@@ -261,7 +261,7 @@ BOOL SHIP::CalculateNewSpeedVector(CVECTOR *Speed, CVECTOR *Rotate)
 
 BOOL SHIP::ApplyStrength(float dtime, BOOL bCollision)
 {
-    float sign, fK;
+    float fK;
     int32_t i;
 
     // apply impulse strength
@@ -295,48 +295,44 @@ BOOL SHIP::ApplyStrength(float dtime, BOOL bCollision)
         new_rotate.y = SIGN(fInitialPerkAngle) * GetMaxSpeedY();
     }
 
-#define SMALL_DELTA(x) (fabsf((x)-0.00001f) > 0.00001f)
-    for (i = 0; i < 3; i++)
+    #define SMALL_DELTA(x) (fabsf((x)-0.00001f) > 0.00001f)
+    fK = dtime * State.fMassInertia;
+
+    const auto speed_force = new_speed - State.vSpeed;
+    const auto speed_coeff = fK * speed_force;
+
+    if (speed_coeff.x != 0.0 || speed_coeff.y != 0.0)
     {
-        fK = dtime * State.fMassInertia;
-        if (i == 0) // x moving
-        {
-            const auto force = new_speed.v[i] - State.vSpeed.v[i];
-            if (SMALL_DELTA(new_speed.v[i]))
-                State.vSpeed.v[i] += fK * force * State.vInertiaAccel.x;
-            else
-                State.vSpeed.v[i] += fK * -(State.vSpeed.v[i]) * State.vInertiaBrake.x;
-        }
-        if (i == 2) // z moving
-        {
-            vSpeedAccel.z = State.vSpeed.v[i];
-
-            const auto force = new_speed.v[i] - State.vSpeed.v[i];
-            if (SMALL_DELTA(new_speed.v[i]))
-                State.vSpeed.v[i] += fK * force * State.vInertiaAccel.z;
-            else
-            {
-                State.vSpeed.v[i] += fK * -(State.vSpeed.v[i]) * State.vInertiaBrake.z;
-            }
-            // apply water resistance
-
-            /*State.vSpeed.v[i] += dtime * State.fMassInertia * State.vWaterResis.x * force;*/
-            vSpeedAccel.z -= State.vSpeed.v[i];
-        }
-
-        sign = SIGNZ(new_rotate.v[i]);
-        if (i == 1) // y rotating
-        {
-            auto prev_rot = State.vRotate.v[i];
-            const auto force = new_rotate.v[i] - State.vRotate.v[i];
-
-            if (SMALL_DELTA(new_rotate.v[i]))
-                State.vRotate.v[i] += fK * force * State.vInertiaAccel.y;
-            else
-                State.vRotate.v[i] += fK * -State.vRotate.v[i] * State.vInertiaBrake.y;
-        }
+        rust::log::error("speed_coeff: x = <%f>, y = <%f>", speed_coeff.x, speed_coeff.y);
     }
 
+    vSpeedAccel = State.vSpeed;
+    if (SMALL_DELTA(new_speed.z))
+    {
+        State.vSpeed += speed_coeff * State.vInertiaAccel;
+    }
+    else
+    {
+        State.vSpeed += speed_coeff * State.vInertiaBrake;
+    }
+    vSpeedAccel -= State.vSpeed;
+
+    if (vSpeedAccel.x != 0.0 || vSpeedAccel.y != 0.0)
+    {
+        rust::log::error("vSpeedAccel: x = <%f>, y = <%f>", vSpeedAccel.x, vSpeedAccel.y);
+    }
+
+    const auto rotate_force = new_rotate - State.vRotate;
+    const auto rotate_coeff = fK * rotate_force;
+    if (SMALL_DELTA(new_rotate.y))
+        State.vRotate += rotate_coeff * State.vInertiaAccel;
+    else
+        State.vRotate += rotate_coeff * State.vInertiaBrake;
+
+    if (State.vRotate.x != 0.0 || State.vRotate.z != 0.0)
+    {
+        rust::log::error("State.vRotate: x = <%f>, z = <%f>", State.vRotate.x, State.vRotate.z);
+    }
     return true;
 }
 

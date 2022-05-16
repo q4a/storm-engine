@@ -5,14 +5,7 @@
 struct CVECTOR
 {
   public:
-    union {
-        struct
-        {
-            float x, y, z;
-        };
-
-        float v[3];
-    };
+    float x, y, z;
 
     CVECTOR() = default;
 
@@ -171,6 +164,11 @@ struct CVECTOR
     friend float operator|(const CVECTOR &v1, const CVECTOR &v2)
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    friend bool operator==(const CVECTOR &v1, const CVECTOR &v2) 
+    {
+        return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
     }
 };
 
