@@ -50,8 +50,10 @@ struct RS_LINE
     RS_LINE()
     {
     }
-    RS_LINE(CVECTOR vPos, uint32_t dwColor) : vPos(std::move(vPos)), dwColor(std::move(dwColor))
+    RS_LINE(CVECTOR vPos, uint32_t dwColor)
     {
+        this->vPos = vPos;
+        this->dwColor = dwColor;
     }
 };
 
