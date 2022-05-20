@@ -49,7 +49,11 @@ pub fn get_reader(path: &Path) -> Result<Box<dyn BufRead>, std::io::Error> {
             }
         }
     }
-    info!(target: DEFAULT_LOGGER, "Patched file <{}>", path.to_string_lossy());
+    info!(
+        target: DEFAULT_LOGGER,
+        "Patched file <{}>",
+        path.to_string_lossy()
+    );
 
     Ok(Box::new(Cursor::new(data)))
 }

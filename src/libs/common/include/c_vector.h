@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math.h>
+#include "vector_rs.hpp"
 
 struct CVECTOR
 {
@@ -50,7 +51,13 @@ struct CVECTOR
         y = static_cast<float>(a[1]);
         z = static_cast<float>(a[2]);
     };
-    // CVECTOR(const DVECTOR &d) : x((float)d.x), y((float)d.y), z((float)d.z){};
+    
+    CVECTOR(const rust::vec::Vec3F &v)
+    {
+        x = v.X();
+        y = v.Y();
+        z = v.Z();
+    }
 
     CVECTOR &operator+=(const CVECTOR &v)
     {
@@ -170,6 +177,11 @@ struct CVECTOR
     {
         return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
     }
+
+    rust::vec::Vec3F ToVec3F() const
+    {
+        return rust::vec::Vec3F(x, y, z);
+    }
 };
 
 struct DVECTOR
@@ -208,6 +220,13 @@ struct DVECTOR
         y = d.y;
         z = d.z;
     };
+
+    DVECTOR(const rust::vec::Vec3D &v)
+    {
+        x = v.X();
+        y = v.Y();
+        z = v.Z();
+    }
 
     DVECTOR &operator+=(const DVECTOR &v)
     {
@@ -305,5 +324,10 @@ struct DVECTOR
     friend double operator|(const DVECTOR &v1, const DVECTOR &v2)
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    rust::vec::Vec3D ToVec3D() const
+    {
+        return rust::vec::Vec3D(x, y, z);
     }
 };

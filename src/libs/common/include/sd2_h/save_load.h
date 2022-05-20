@@ -208,6 +208,12 @@ class CSaveLoad
         return v;
     }
 
+    rust::vec::Vec3F LoadVec3F()
+    {
+        const auto v = LoadVector();
+        return rust::vec::Vec3F(v.x, v.y, v.z);
+    }
+
     void LoadBuffer(char **pBuffer)
     {
         uint32_t dwSize;
