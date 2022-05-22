@@ -8,6 +8,7 @@
 #include "texture.h"
 #include "v_s_stack.h"
 #include "storm/fs.h"
+#include "portable-snippets/debug-trap.h"
 
 #include <string_view>
 #include <algorithm>
@@ -2533,12 +2534,12 @@ void DX9RENDER::LostRender()
         if (VertexBuffers[b].buff)
         {
             if (VertexBuffers[b].buff->Release() > 0)
-                __debugbreak();
+                psnip_trap();
         }
         if (IndexBuffers[b].buff)
         {
             if (IndexBuffers[b].buff->Release() > 0)
-                __debugbreak();
+                psnip_trap();
         }
     }
 
