@@ -1296,12 +1296,14 @@ bool DX9RENDER::DX9EndScene()
         LostRender();
     }
 
+#ifdef _WIN32 // bSafeRendering
     if (bSafeRendering)
     {
         const HDC dc = GetDC(hwnd);
         SetPixel(dc, 0, 0, 0);
         ReleaseDC(hwnd, dc);
     }
+#endif
 
     return true;
 }
