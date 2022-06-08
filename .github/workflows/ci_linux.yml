@@ -37,6 +37,7 @@ jobs:
         export CXX=clang++-11
         ${CXX} --version
         mkdir build && cd build
+        conan info ../conanfile.py -o=output_directory=/home/runner/work/storm-engine/storm-engine/build -o=watermark_file=/home/runner/work/storm-engine/storm-engine/build/watermark.hpp -o=crash_reports=False -o=steam=False -o=sdl2:pulse=False
         cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{matrix.configuration}}
     - name: Build dependencies
       run: ninja dependencies

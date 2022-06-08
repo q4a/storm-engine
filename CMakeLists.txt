@@ -34,6 +34,7 @@ conan_cmake_run(CONANFILE conanfile.py
         watermark_file=${STORM_WATERMARK_FILE}
         crash_reports=${STORM_ENABLE_CRASH_REPORTS}
         steam=${STORM_ENABLE_STEAM}
+        sdl2:pulse=False
 )
 
 if (NOT WIN32)
