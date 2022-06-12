@@ -146,7 +146,7 @@ int ShipMan::FindRandomPoint(SailorsPoints &sailorsPoints, ShipState &shipState)
     for (auto m = 0; m < sailorsPoints.points.count; m++)
         for (auto i = 0; i < sailorsPoints.points.count; i++)
         {
-            ran = static_cast<int>(rand() * (sailorsPoints.points.count - 1) / static_cast<float>(RAND_MAX));
+            ran = rand() % sailorsPoints.points.count;
 
             if (sailorsPoints.points.point[ran].IsCannon())
 
@@ -165,7 +165,7 @@ int ShipMan::FindRandomPoint(SailorsPoints &sailorsPoints, ShipState &shipState)
         for (auto m = 0; m < sailorsPoints.points.count; m++)
             for (auto i = 0; i < sailorsPoints.points.count; i++)
             {
-                ran = static_cast<int>(rand() * (sailorsPoints.points.count - 1) / static_cast<float>(RAND_MAX));
+                ran = rand() % sailorsPoints.points.count;
 
                 if (!sailorsPoints.points.point[ran].disabled)
 
@@ -183,7 +183,7 @@ int ShipMan::FindRandomPoint(SailorsPoints &sailorsPoints, ShipState &shipState)
     for (auto m = 0; m < sailorsPoints.points.count; m++)
         for (auto i = 0; i < sailorsPoints.points.count; i++)
         {
-            ran = static_cast<int>(rand() * (sailorsPoints.points.count - 1) / static_cast<float>(RAND_MAX));
+            ran = rand() % sailorsPoints.points.count;
 
             if (ran != targetWayPoint && !sailorsPoints.points.point[ran].buisy &&
                 sailorsPoints.points.point[ran].pointType == PT_TYPE_NORMAL)
@@ -204,8 +204,7 @@ int ShipMan::FindRandomPointWithoutType(SailorsPoints &sailorsPoints) const
     int ran;
     for (auto m = 0; m < sailorsPoints.points.count; m++)
         for (auto i = 0; i < sailorsPoints.points.count; i++)
-
-            ran = static_cast<int>(rand() * (sailorsPoints.points.count - 1) / static_cast<float>(RAND_MAX));
+            ran = rand() % sailorsPoints.points.count;
     if (sailorsPoints.points.point[ran].pointType == PT_TYPE_NORMAL)
         return ran;
 
