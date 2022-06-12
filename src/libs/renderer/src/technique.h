@@ -1,4 +1,4 @@
-#ifndef _WIN32 // Effects
+#ifndef false // Effects
 #pragma once
 
 #include "dx9render.h"

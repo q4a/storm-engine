@@ -1,4 +1,4 @@
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
 #pragma once
 
 #include <cstdint>

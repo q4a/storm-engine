@@ -1,4 +1,4 @@
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
 #include "effects.h"
 
 #include "core.h"

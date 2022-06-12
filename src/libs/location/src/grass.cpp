@@ -141,7 +141,7 @@ bool Grass::Init()
 
     // Constants
     static const auto pi2 = 2.0f * 3.141592653f;
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
     for (size_t i = 0; i < 16; i++)
     {
         // Angle table
@@ -398,7 +398,7 @@ void Grass::Execute(uint32_t delta_time)
 
 void Grass::Realize(uint32_t delta_time)
 {
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
     if (quality == rq_off || fx_ == nullptr)
         return;
 #else
@@ -545,7 +545,7 @@ void Grass::Realize(uint32_t delta_time)
     // recalculate the parameters of the angles
     for (int32_t i = 0; i < 16; i++)
     {
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
         aAngles[i].z = fabsf(-aAngles[i].y * lDir.x + aAngles[i].x * lDir.z);
         if (aAngles[i].z < 0.0f)
             aAngles[i].z = 0.0f;
@@ -564,7 +564,7 @@ void Grass::Realize(uint32_t delta_time)
     CMatrix view, prj;
     rs->GetTransform(D3DTS_VIEW, view);
     rs->GetTransform(D3DTS_PROJECTION, prj);
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
     CMatrix cmtx;
     cmtx.EqMultiply(view, prj);
 #else
@@ -608,7 +608,7 @@ void Grass::Realize(uint32_t delta_time)
     rs->TextureSet(0, texture);
     rs->TextureSet(1, texture);
     // set constants
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
     fx_->SetMatrix(hgVP_, cmtx);
     fx_->SetValue(haAngles_, &aAngles[0], sizeof(D3DXVECTOR3) * 16);
     fx_->SetValue(haUV_, &aUV[0], sizeof(D3DXVECTOR2) * 16);
@@ -710,7 +710,7 @@ uint64_t Grass::ProcessMessage(MESSAGE &message)
 
         m_fMaxWidth = message.Float();
         m_fMaxHeight = message.Float();
-#ifndef _WIN32 // Effects
+#ifndef false // Effects
         consts[41] = VSConstant(0.3f * m_fMaxWidth, 0.4f * m_fMaxHeight, 0.7f * m_fMaxWidth, 0.6f * m_fMaxHeight);
 #endif
 
@@ -1044,7 +1044,7 @@ void Grass::CreateVertexDeclaration() const
         rs->CreateVertexDeclaration(VertexElements, &vertexDecl_);
     }
 
-#ifdef _WIN32 // Effects
+#ifdef false // Effects
     fx_ = rs->GetEffectPointer("Grass");
     if (fx_ != nullptr)
     {
