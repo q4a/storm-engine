@@ -5,6 +5,8 @@
 #include <algorithm>
 
 #define WARN(...) fprintf(stdout, __VA_ARGS__)
+#define FIXME WARN
+#define TRACE WARN
 
 ///////////////////////// Parts from WINE source code for d3dx9 licensed under GPLv2 /////////////////////////
 
@@ -227,8 +229,8 @@ HRESULT unlock_surface(IDirect3DSurface9 *surface, const RECT *surface_rect,
  * The source and the destination must be block-aligned.
  */
 void copy_pixels(const BYTE *src, UINT src_row_pitch, UINT src_slice_pitch,
-                 BYTE *dst, UINT dst_row_pitch, UINT dst_slice_pitch, const struct volume *size,
-                 const struct pixel_format_desc *format)
+        BYTE *dst, UINT dst_row_pitch, UINT dst_slice_pitch, const struct volume *size,
+        const struct pixel_format_desc *format)
 {
     UINT row, slice;
     BYTE *dst_addr;
@@ -686,10 +688,10 @@ void point_filter_argb_pixels(const BYTE *src, UINT src_row_pitch, UINT src_slic
  *   negative values for pSrcRect are allowed as we're only looking at the width and height anyway.
  *
  */
-HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
-                                         const PALETTEENTRY *dst_palette, const RECT *dst_rect, const void *src_memory,
-                                         D3DFORMAT src_format, UINT src_pitch, const PALETTEENTRY *src_palette, const RECT *src_rect,
-                                         DWORD filter, D3DCOLOR color_key)
+HRESULT WINAPI D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
+        const PALETTEENTRY *dst_palette, const RECT *dst_rect, const void *src_memory,
+        D3DFORMAT src_format, UINT src_pitch, const PALETTEENTRY *src_palette, const RECT *src_rect,
+        DWORD filter, D3DCOLOR color_key)
 {
     const struct pixel_format_desc *srcformatdesc, *destformatdesc;
     struct volume src_size, dst_size, dst_size_aligned;
@@ -699,21 +701,30 @@ HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
     D3DLOCKED_RECT lockrect;
     HRESULT hr;
 
+    /*
+    TRACE("dst_surface %p, dst_palette %p, dst_rect %s, src_memory %p, src_format %#x, "
+            "src_pitch %u, src_palette %p, src_rect %s, filter %#lx, color_key 0x%08lx.\n",
+            dst_surface, dst_palette, wine_dbgstr_rect(dst_rect), src_memory, src_format,
+            src_pitch, src_palette, wine_dbgstr_rect(src_rect), filter, color_key);
+    */
+
     if (!dst_surface || !src_memory || !src_rect)
     {
+        WARN("Invalid argument specified.\n");
         return D3DERR_INVALIDCALL;
     }
     if (src_format == D3DFMT_UNKNOWN
-        || src_rect->left >= src_rect->right
-        || src_rect->top >= src_rect->bottom)
+            || src_rect->left >= src_rect->right
+            || src_rect->top >= src_rect->bottom)
     {
+        WARN("Invalid src_format or src_rect.\n");
         return E_FAIL;
     }
 
     srcformatdesc = get_format_info(src_format);
     if (srcformatdesc->type == FORMAT_UNKNOWN)
     {
-        WARN("Unsupported format %#x.\n", src_format);
+        FIXME("Unsupported format %#x.\n", src_format);
         return E_NOTIMPL;
     }
 
@@ -734,8 +745,8 @@ HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
     else
     {
         if (dst_rect->left > dst_rect->right || dst_rect->right > surfdesc.Width
-            || dst_rect->top > dst_rect->bottom || dst_rect->bottom > surfdesc.Height
-            || dst_rect->left < 0 || dst_rect->top < 0)
+                || dst_rect->top > dst_rect->bottom || dst_rect->bottom > surfdesc.Height
+                || dst_rect->left < 0 || dst_rect->top < 0)
         {
             WARN("Invalid dst_rect specified.\n");
             return D3DERR_INVALIDCALL;
@@ -754,10 +765,10 @@ HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
         dst_rect_aligned.top = dst_rect_aligned.top & ~(destformatdesc->block_height - 1);
     if (dst_rect_aligned.right & (destformatdesc->block_width - 1) && dst_rect_aligned.right != surfdesc.Width)
         dst_rect_aligned.right = std::min((dst_rect_aligned.right + destformatdesc->block_width - 1)
-                                     & ~(destformatdesc->block_width - 1), surfdesc.Width);
+                & ~(destformatdesc->block_width - 1), surfdesc.Width);
     if (dst_rect_aligned.bottom & (destformatdesc->block_height - 1) && dst_rect_aligned.bottom != surfdesc.Height)
         dst_rect_aligned.bottom = std::min((dst_rect_aligned.bottom + destformatdesc->block_height - 1)
-                                      & ~(destformatdesc->block_height - 1), surfdesc.Height);
+                & ~(destformatdesc->block_height - 1), surfdesc.Height);
 
     dst_size.width = dst_rect->right - dst_rect->left;
     dst_size.height = dst_rect->bottom - dst_rect->top;
@@ -773,38 +784,110 @@ HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
         return hr;
 
     src_memory = (BYTE *)src_memory + src_rect->top / srcformatdesc->block_height * src_pitch
-                 + src_rect->left / srcformatdesc->block_width * srcformatdesc->block_byte_count;
+            + src_rect->left / srcformatdesc->block_width * srcformatdesc->block_byte_count;
 
     if (src_format == surfdesc.Format
-        && dst_size.width == src_size.width
-        && dst_size.height == src_size.height
-        && color_key == 0
-        && !(src_rect->left & (srcformatdesc->block_width - 1))
-        && !(src_rect->top & (srcformatdesc->block_height - 1))
-        && !(dst_rect->left & (destformatdesc->block_width - 1))
-        && !(dst_rect->top & (destformatdesc->block_height - 1)))
+            && dst_size.width == src_size.width
+            && dst_size.height == src_size.height
+            && color_key == 0
+            && !(src_rect->left & (srcformatdesc->block_width - 1))
+            && !(src_rect->top & (srcformatdesc->block_height - 1))
+            && !(dst_rect->left & (destformatdesc->block_width - 1))
+            && !(dst_rect->top & (destformatdesc->block_height - 1)))
     {
-        copy_pixels(static_cast<const BYTE*>(src_memory), src_pitch, 0, static_cast<BYTE*>(lockrect.pBits),
-                    lockrect.Pitch, 0, &src_size, srcformatdesc);
+        TRACE("Simple copy.\n");
+        copy_pixels(static_cast<const BYTE*>(src_memory), src_pitch, 0, static_cast<BYTE*>(lockrect.pBits), lockrect.Pitch, 0,
+                &src_size, srcformatdesc);
     }
     else /* Stretching or format conversion. */
     {
         const struct pixel_format_desc *dst_format;
+        DWORD *src_uncompressed = NULL;
+        BYTE *dst_uncompressed = NULL;
         unsigned int dst_pitch;
         BYTE *dst_mem;
 
         if (!is_conversion_from_supported(srcformatdesc)
-            || !is_conversion_to_supported(destformatdesc))
+                || !is_conversion_to_supported(destformatdesc))
         {
-            WARN("Unsupported format conversion %#x -> %#x.\n", src_format, surfdesc.Format);
+            FIXME("Unsupported format conversion %#x -> %#x.\n", src_format, surfdesc.Format);
             unlock_surface(dst_surface, &dst_rect_aligned, surface, FALSE);
             return E_NOTIMPL;
         }
 
-        if (srcformatdesc->type == FORMAT_DXT || destformatdesc->type == FORMAT_DXT)
+        if (srcformatdesc->type == FORMAT_DXT)
         {
-            WARN("Src/Dst FORMAT_DXT unsupported\n");
-            return E_NOTIMPL;
+            WARN("Src FORMAT_DXT unsupported\n");
+            /*
+            void (*fetch_dxt_texel)(int srcRowStride, const BYTE *pixdata,
+                    int i, int j, void *texel);
+            unsigned int x, y;
+
+            src_pitch = src_pitch * srcformatdesc->block_width / srcformatdesc->block_byte_count;
+
+            src_uncompressed = heap_alloc(src_size.width * src_size.height * sizeof(DWORD));
+            if (!src_uncompressed)
+            {
+                unlock_surface(dst_surface, &dst_rect_aligned, surface, FALSE);
+                return E_OUTOFMEMORY;
+            }
+
+            switch(src_format)
+            {
+                case D3DFMT_DXT1:
+                    fetch_dxt_texel = fetch_2d_texel_rgba_dxt1;
+                    break;
+                case D3DFMT_DXT2:
+                case D3DFMT_DXT3:
+                    fetch_dxt_texel = fetch_2d_texel_rgba_dxt3;
+                    break;
+                case D3DFMT_DXT4:
+                case D3DFMT_DXT5:
+                    fetch_dxt_texel = fetch_2d_texel_rgba_dxt5;
+                    break;
+                default:
+                    FIXME("Unexpected compressed texture format %u.\n", src_format);
+                    fetch_dxt_texel = NULL;
+            }
+
+            TRACE("Uncompressing DXTn surface.\n");
+            for (y = 0; y < src_size.height; ++y)
+            {
+                DWORD *ptr = &src_uncompressed[y * src_size.width];
+                for (x = 0; x < src_size.width; ++x)
+                {
+                    fetch_dxt_texel(src_pitch, src_memory, x + src_rect->left, y + src_rect->top, ptr);
+                    ++ptr;
+                }
+            }
+            src_memory = src_uncompressed;
+            src_pitch = src_size.width * sizeof(DWORD);
+            srcformatdesc = get_format_info(D3DFMT_A8B8G8R8);
+            */
+        }
+
+        if (destformatdesc->type == FORMAT_DXT)
+        {
+            WARN("Src FORMAT_DXT unsupported\n");
+            /*
+            BOOL dst_misaligned = dst_rect->left != dst_rect_aligned.left
+                    || dst_rect->top != dst_rect_aligned.top
+                    || dst_rect->right != dst_rect_aligned.right
+                    || dst_rect->bottom != dst_rect_aligned.bottom;
+
+            dst_uncompressed = HeapAlloc(GetProcessHeap(), dst_misaligned ? HEAP_ZERO_MEMORY : 0,
+                    dst_size_aligned.width * dst_size_aligned.height * sizeof(DWORD));
+            if (!dst_uncompressed)
+            {
+                heap_free(src_uncompressed);
+                unlock_surface(dst_surface, &dst_rect_aligned, surface, FALSE);
+                return E_OUTOFMEMORY;
+            }
+            dst_pitch = dst_size_aligned.width * sizeof(DWORD);
+            dst_format = get_format_info(D3DFMT_A8B8G8R8);
+            dst_mem = dst_uncompressed + (dst_rect->top - dst_rect_aligned.top) * dst_pitch
+                    + (dst_rect->left - dst_rect_aligned.left) * sizeof(DWORD);
+            */
         }
         else
         {
@@ -813,22 +896,52 @@ HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
             dst_format = destformatdesc;
         }
 
-        if ((filter & 0xf) == D3DX_FILTER_NONE || destformatdesc->format == D3DFMT_Q8W8V8U8)
+        if ((filter & 0xf) == D3DX_FILTER_NONE)
         {
             convert_argb_pixels(static_cast<const BYTE*>(src_memory), src_pitch, 0, &src_size, srcformatdesc,
-                                dst_mem, dst_pitch, 0, &dst_size, dst_format, color_key, src_palette);
+                    dst_mem, dst_pitch, 0, &dst_size, dst_format, color_key, src_palette);
         }
         else /* if ((filter & 0xf) == D3DX_FILTER_POINT) */
         {
-            if ((filter & 0xf) != D3DX_FILTER_POINT) {
-                WARN("Unhandled filter %#x.\n", filter);
-            }
+            if ((filter & 0xf) != D3DX_FILTER_POINT)
+                FIXME("Unhandled filter %#lx.\n", filter);
 
             /* Always apply a point filter until D3DX_FILTER_LINEAR,
              * D3DX_FILTER_TRIANGLE and D3DX_FILTER_BOX are implemented. */
             point_filter_argb_pixels(static_cast<const BYTE*>(src_memory), src_pitch, 0, &src_size, srcformatdesc,
-                                     dst_mem, dst_pitch, 0, &dst_size, dst_format, color_key, src_palette);
+                    dst_mem, dst_pitch, 0, &dst_size, dst_format, color_key, src_palette);
         }
+
+        /*
+        heap_free(src_uncompressed);
+
+        if (dst_uncompressed)
+        {
+            GLenum gl_format = 0;
+
+            TRACE("Compressing DXTn surface.\n");
+            switch(surfdesc.Format)
+            {
+                case D3DFMT_DXT1:
+                    gl_format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+                    break;
+                case D3DFMT_DXT2:
+                case D3DFMT_DXT3:
+                    gl_format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+                    break;
+                case D3DFMT_DXT4:
+                case D3DFMT_DXT5:
+                    gl_format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+                    break;
+                default:
+                    ERR("Unexpected destination compressed format %u.\n", surfdesc.Format);
+            }
+            tx_compress_dxtn(4, dst_size_aligned.width, dst_size_aligned.height,
+                    dst_uncompressed, gl_format, lockrect.pBits,
+                    lockrect.Pitch * destformatdesc->block_width / destformatdesc->block_byte_count);
+            heap_free(dst_uncompressed);
+        }
+        */
     }
 
     return unlock_surface(dst_surface, &dst_rect_aligned, surface, TRUE);
@@ -857,7 +970,7 @@ HRESULT D3DXLoadSurfaceFromMemory(IDirect3DSurface9 *dst_surface,
  *            D3DXERR_INVALIDDATA, if one of the surfaces is not lockable
  *
  */
-HRESULT D3DXLoadSurfaceFromSurface(IDirect3DSurface9 *dst_surface,
+HRESULT WINAPI D3DXLoadSurfaceFromSurface(IDirect3DSurface9 *dst_surface,
         const PALETTEENTRY *dst_palette, const RECT *dst_rect, IDirect3DSurface9 *src_surface,
         const PALETTEENTRY *src_palette, const RECT *src_rect, DWORD filter, D3DCOLOR color_key)
 {
@@ -874,7 +987,7 @@ HRESULT D3DXLoadSurfaceFromSurface(IDirect3DSurface9 *dst_surface,
 
     /*
     TRACE("dst_surface %p, dst_palette %p, dst_rect %s, src_surface %p, "
-            "src_palette %p, src_rect %s, filter %#x, color_key 0x%08x.\n",
+            "src_palette %p, src_rect %s, filter %#lx, color_key 0x%08lx.\n",
             dst_surface, dst_palette, wine_dbgstr_rect(dst_rect), src_surface,
             src_palette, wine_dbgstr_rect(src_rect), filter, color_key);
      */
