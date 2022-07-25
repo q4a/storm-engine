@@ -9,5 +9,5 @@ STORM_SETUP(
     TARGET_NAME xinterface
     TYPE storm_module
     DEPENDENCIES common core util ${SYSTEM_DEPS}
-    TEST_DEPENDENCIES catch2
+    TEST_DEPENDENCIES fmt
 )

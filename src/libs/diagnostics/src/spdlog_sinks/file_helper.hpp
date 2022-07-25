@@ -3,6 +3,7 @@
 
 #pragma once
 
+#define SPDLOG_COMPILED_LIB
 #include <spdlog/common.h>
 #include <tuple>
 

@@ -1,9 +1,13 @@
 # this is something I really don't like but it seems there's not better way to ensure mimalloc is linked before c-runtime
-include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
-if (WIN32)
-  set(MIMALLOC_DEP "$<IF:$<CONFIG:Release>,${CONAN_LIB_DIRS_MIMALLOC_RELEASE}/mimalloc.lib,${CONAN_LIB_DIRS_MIMALLOC_DEBUG}/mimalloc-debug.lib>")
+if (STORM_ENABLE_CONAN)
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+  if (WIN32)
+    set(MIMALLOC_DEP "$<IF:$<CONFIG:Release>,${CONAN_LIB_DIRS_MIMALLOC_RELEASE}/mimalloc.lib,${CONAN_LIB_DIRS_MIMALLOC_DEBUG}/mimalloc-debug.lib>")
+  else()
+    set(MIMALLOC_DEP "$<IF:$<CONFIG:Release>,${CONAN_LIB_DIRS_MIMALLOC_RELEASE}/libmimalloc.so,${CONAN_LIB_DIRS_MIMALLOC_DEBUG}/libmimalloc-debug.so>")
+  endif()
 else()
-  set(MIMALLOC_DEP "$<IF:$<CONFIG:Release>,${CONAN_LIB_DIRS_MIMALLOC_RELEASE}/libmimalloc.so,${CONAN_LIB_DIRS_MIMALLOC_DEBUG}/libmimalloc-debug.so>")
+  set(MIMALLOC_DEP "")
 endif()
 
 if (WIN32)
@@ -30,9 +34,10 @@ STORM_SETUP(
 
     # external
     mimalloc
-    sentry-native
-    sdl
-    zlib
+    ${SPDLOG_LIBRARIES}
+    ${SENTRY_NATIVE_LIBRARIES}
+    ${SDL_LIBRARIES}
+    ${ZLIB_LIBRARIES}
 
     # system
     ${SYSTEM_DEPS}

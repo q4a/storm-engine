@@ -1,5 +1,5 @@
 STORM_SETUP(
     TARGET_NAME diagnostics
     TYPE library
-    DEPENDENCIES common core util spdlog sentry-native
+    DEPENDENCIES common core util ${SPDLOG_LIBRARIES} ${SENTRY_NATIVE_LIBRARIES}
 )
