@@ -27,6 +27,7 @@ inline path GetStashPath()
 #else
         char *pref_path = nullptr;
         pref_path = SDL_GetPrefPath("Akella", "Sea Dogs");
+        pref_path[strlen(pref_path) - 1] = '\0'; // remove last '/'
         path = pref_path;
 #endif
     }

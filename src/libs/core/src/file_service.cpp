@@ -2,6 +2,7 @@
 #include "core_impl.h"
 #include "storm_assert.h"
 #include "storm/string_compare.hpp"
+#include "storm/fs.h"
 
 #include <SDL2/SDL.h>
 #include <exception>
@@ -469,6 +470,23 @@ void FILE_SERVICE::ScanResourcePaths()
     {
         AddEntryToResourcePaths(entry, ExePath);
     }
+
+    ExePath = fs::GetStashPath().string();
+    std::string LowPath = ExePath;
+    tolwr(LowPath.data());
+    ResourcePaths[LowPath] = ExePath;
+    ExePath = fs::GetLogsPath().string();
+    LowPath = ExePath;
+    tolwr(LowPath.data());
+    ResourcePaths[LowPath] = ExePath;
+    ExePath = fs::GetSaveDataPath().string();
+    LowPath = ExePath;
+    tolwr(LowPath.data());
+    ResourcePaths[LowPath] = ExePath;
+    ExePath = fs::GetScreenshotsPath().string();
+    LowPath = ExePath;
+    tolwr(LowPath.data());
+    ResourcePaths[LowPath] = ExePath;
 #endif
     ResourcePathsFirstScan = false;
 }
