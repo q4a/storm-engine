@@ -168,7 +168,11 @@ bool SCRSHOTER::MakeScreenShot()
 
     // Add a texture with a frame to the shot
     const int nTextureID = rs->TextureCreate("interfaces\\EmptyBorder.tga");
+#ifdef _WIN32 // DXVK create transparent texture instead of screen texture with borders
     if (nTextureID >= 0)
+#else
+    if (false)
+#endif
     {
         IDirect3DTexture9 *pScrShotTex = nullptr;
         if (D3D_OK == rs->CreateTexture(SS_TEXTURE_WIDTH, SS_TEXTURE_HEIGHT, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
