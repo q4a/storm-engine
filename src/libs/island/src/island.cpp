@@ -97,6 +97,8 @@ void ISLAND::Realize(uint32_t Delta_Time)
     auto *pModel = static_cast<MODEL *>(core.GetEntityPointer(model_id));
     Assert(pModel);
 
+    auto *pSeaBed = static_cast<MODEL *>(core.GetEntityPointer(seabed_id)); // !!
+
     uint32_t bFogEnable;
     uint32_t bLighting;
     pRS->GetRenderState(D3DRS_FOGENABLE, &bFogEnable);
@@ -143,6 +145,10 @@ void ISLAND::Realize(uint32_t Delta_Time)
         pRS->SetNearFarPlane((j == 0) ? fOldNear : fOldFar * static_cast<float>(j),
                              fOldFar * static_cast<float>(j + 1));
         pModel->ProcessStage(Stage::realize, Delta_Time);
+        
+        if (pSeaBed)
+            pSeaBed->ProcessStage(Stage::realize, Delta_Time); // !!
+        
         pRS->SetRenderState(D3DRS_LIGHTING, true);
         D3DLIGHT9 lt, ltold;
         pRS->GetLight(0, &ltold);
@@ -184,7 +190,7 @@ void ISLAND::Realize(uint32_t Delta_Time)
         pRS->SetRenderState(D3DRS_ZWRITEENABLE, true);
     }
     pRS->SetRenderState(D3DRS_FOGDENSITY, F2DW(fOldFogDensity));
-
+/*
     pRS->SetNearFarPlane(fOldNear, fOldFar / 2.0f);
     if (!bDrawReflections)
     {
@@ -197,7 +203,7 @@ void ISLAND::Realize(uint32_t Delta_Time)
     }
 
     pRS->SetNearFarPlane(fOldNear, fOldFar);
-
+*/
     pRS->SetRenderState(D3DRS_LIGHTING, false);
     pRS->SetRenderState(D3DRS_FOGENABLE, bFogEnable);
     pRS->SetRenderState(D3DRS_AMBIENT, dwAmbientOld);
