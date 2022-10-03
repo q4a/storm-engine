@@ -306,7 +306,8 @@ void SUNGLOW::Realize(uint32_t Delta_Time)
             // RS_RECT * pRSR = &aRSR[aRSR.Add()];
             RS_RECT rect;
             rect.dwColor = makeRGB(r, g, b);
-            rect.fAngle = 0.0f;
+            rect.fAngle = fAngle;
+            //rect.fAngle = 0.0f;
             rect.dwSubTexture = pF->dwSubTexIndex;
             rect.fSize = pF->fSize * Flares.fFlareScale;
             rect.vPos = vSun + vDelta * (1.0f - pF->fDist);
