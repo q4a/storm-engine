@@ -4,8 +4,8 @@
 #include "core.h"
 #include "string_compare.hpp"
 
-#define SS_TEXTURE_WIDTH 128
-#define SS_TEXTURE_HEIGHT 128
+#define SS_TEXTURE_WIDTH 256
+#define SS_TEXTURE_HEIGHT 256
 #define SS_TEXTURE_FONECOLOR 0xFF000000
 
 uint32_t GetA8R8G8B8_FromFMT(void *p, uint32_t fmt)
@@ -122,8 +122,7 @@ bool SCRSHOTER::MakeScreenShot()
     // create a new screen shot
     if (hr == D3D_OK)
     {
-        textureIndex_ =
-            rs->TextureCreate(SS_TEXTURE_WIDTH, SS_TEXTURE_HEIGHT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
+        textureIndex_ = rs->TextureCreate(SS_TEXTURE_WIDTH, SS_TEXTURE_HEIGHT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
         texture_ = static_cast<IDirect3DTexture9 *>(rs->GetTextureFromID(textureIndex_));
     }
 
@@ -168,9 +167,9 @@ bool SCRSHOTER::MakeScreenShot()
     pRenderTarg->Release();
 
     // Add a texture with a frame to the shot
-    const int nTextureID = rs->TextureCreate("interfaces\\EmptyBorder.tga");
-    if (nTextureID >= 0)
-    {
+    //const int nTextureID = core.GetTargetEngineVersion() >= storm::ENGINE_VERSION::TO_EACH_HIS_OWN ? -1 : rs->TextureCreate("interfaces\\EmptyBorder.tga");
+    const int nTextureID = -1;
+
         IDirect3DTexture9 *pScrShotTex = nullptr;
         if (D3D_OK == rs->CreateTexture(SS_TEXTURE_WIDTH, SS_TEXTURE_HEIGHT, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
                                         D3DPOOL_DEFAULT, &pScrShotTex))
@@ -208,9 +207,12 @@ bool SCRSHOTER::MakeScreenShot()
                     rs->TextureSet(0, textureIndex_);
                     rs->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, BI_SCRSHOTER_VERTEX_FORMAT, 2, vert,
                                         sizeof(BI_SCRSHOTER_VERTEX), "battle_icons");
+                    if (nTextureID >= 0)
+                    {
                     rs->TextureSet(0, nTextureID);
                     rs->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, BI_SCRSHOTER_VERTEX_FORMAT, 2, vert,
                                         sizeof(BI_SCRSHOTER_VERTEX), "battle_icons");
+                    }
                     rs->SetRenderTarget(pOldRenderTarg, pStencil);
                 }
                 if (pRenderTarg)
@@ -232,8 +234,7 @@ bool SCRSHOTER::MakeScreenShot()
             rs->Release(pScrShotTex);
         }
 
-        rs->TextureRelease(nTextureID);
-    }
+    if (nTextureID >= 0) rs->TextureRelease(nTextureID);
 
     return hr == D3D_OK;
 }
