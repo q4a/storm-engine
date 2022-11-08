@@ -33,17 +33,6 @@ WdmWindUI::WdmWindUI()
     strcpy_s(month[9], "october");
     strcpy_s(month[10], "november");
     strcpy_s(month[11], "december");
-    txBack = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\back.tga");
-    txSky = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\sky.tga");
-    txSkyMask = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\sky_mask.tga");
-    txBar = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\bar.tga");
-    txBarMask = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\bar_mask.tga");
-    txWindPointer = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\wind_pointer.tga");
-    txMorale = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\morale.tga");
-    txMoraleMask = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\morale_mask.tga");
-    txMoraleBar = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\morale_bar.tga");
-    txCoord = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\coord.tga");
-    nationFlagTx = wdmObjects->rs->TextureCreate("WorldMap\\Interfaces\\WorldMapEnsigns.tga");
     dateFont = -1;
     morale = 0.0f;
     resizeRatio = 1.0f;
@@ -121,6 +110,31 @@ void WdmWindUI::SetAttributes(ATTRIBUTES *apnt)
             }
         }
     }
+
+    ap = apnt->FindAClass(apnt, "navigation");
+    const char *tmpstr;
+    tmpstr = BIUtils::GetStringFromAttr(ap, "backTexture", "WorldMap\\Interfaces\\back.tga");
+    txBack = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "skyTexture", "WorldMap\\Interfaces\\sky.tga");
+    txSky = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "skyMaskTexture", "WorldMap\\Interfaces\\sky_mask.tga");
+    txSkyMask = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "barTexture", "WorldMap\\Interfaces\\bar.tga");
+    txBar = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "barMaskTexture", "WorldMap\\Interfaces\\bar_mask.tga");
+    txBarMask = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "windPointerTexture", "WorldMap\\Interfaces\\wind_pointer.tga");
+    txWindPointer = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "moraleTexture", "WorldMap\\Interfaces\\morale.tga");
+    txMorale = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "moraleMaskTexture", "WorldMap\\Interfaces\\morale_mask.tga");
+    txMoraleMask = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "moraleBarTexture", "WorldMap\\Interfaces\\morale_bar.tga");
+    txMoraleBar = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "coordTexture", "WorldMap\\Interfaces\\coord.tga");
+    txCoord = wdmObjects->rs->TextureCreate(tmpstr);
+    tmpstr = BIUtils::GetStringFromAttr(ap, "nationFlagTexture", "WorldMap\\Interfaces\\WorldMapEnsigns.tga");
+    nationFlagTx = wdmObjects->rs->TextureCreate(tmpstr);
 
     ap = apnt->FindAClass(apnt, "nationFlag");
     if (ap)
