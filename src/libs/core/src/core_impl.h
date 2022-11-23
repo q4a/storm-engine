@@ -8,7 +8,9 @@
 #include "timer.h"
 #include "vma.hpp"
 
+#ifndef STORM_MESA_NINE
 #include <windows.h>
+#endif
 
 #define ENGINE_SCRIPT_VERSION 54128
 

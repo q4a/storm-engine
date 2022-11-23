@@ -3,7 +3,9 @@
 #include "rands.h"
 #include <stdlib.h>
 
+#ifndef STORM_MESA_NINE
 #include <windows.h>
+#endif
 #include <d3d9types.h>
 
 #define BALLSPLASH_TRACE_INFORMATION

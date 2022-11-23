@@ -4,7 +4,9 @@
 #include <cstring>
 #include <string>
 
+#ifndef STORM_MESA_NINE
 #include <windows.h>
+#endif
 
 namespace utf8
 {

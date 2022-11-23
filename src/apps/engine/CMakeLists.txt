@@ -13,7 +13,14 @@ set(SYSTEM_DEPS
     "winhttp"
 )
 else()
-set(SYSTEM_DEPS "ffi")
+set(SYSTEM_DEPS
+    "ffi"
+    "tbb"
+)
+endif()
+
+if (STORM_MESA_NINE)
+    set(SYSTEM_DEPS ${SYSTEM_DEPS} "nine-native")
 endif()
 
 STORM_SETUP(
