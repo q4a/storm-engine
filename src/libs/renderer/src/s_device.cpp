@@ -13,6 +13,9 @@
 
 #include <algorithm>
 #include <SDL_timer.h>
+#ifdef STORM_MESA_NINE
+#include "nine_sdl.h"
+#endif
 
 #include <fmt/chrono.h>
 
@@ -556,7 +559,7 @@ bool DX9RENDER::Init()
         videoAdapterIndex = ini->GetInt(nullptr, "adapter", std::numeric_limits<int32_t>::max());
 
         // stencil_format = D3DFMT_D24S8;
-        if (!InitDevice(bWindow, static_cast<HWND>(core.GetWindow()->OSHandle()), screen_size.x, screen_size.y))
+        if (!InitDevice(bWindow, core.GetWindow()->OSHandle(), screen_size.x, screen_size.y))
             return false;
 
 #ifdef _WIN32 // Effects
@@ -691,7 +694,7 @@ DX9RENDER::~DX9RENDER()
     ReleaseDevice();
 }
 
-bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t height)
+bool DX9RENDER::InitDevice(bool windowed, void *_hwnd, int32_t width, int32_t height)
 {
     // GUARD(DX9RENDER::InitDevice)
 
@@ -702,9 +705,13 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
     screen_size.y = height;
     bWindow = windowed;
 
-    hwnd = _hwnd;
+    hwnd = static_cast<HWND>(_hwnd);
     core.Trace("Initializing DirectX 9");
+#ifdef STORM_MESA_NINE
+    d3d = Direct3DCreate9_SDL(static_cast<SDL_Window *>(_hwnd));
+#else
     d3d = Direct3DCreate9(D3D_SDK_VERSION);
+#endif
     if (d3d == nullptr)
     {
         // MessageBox(hwnd, "Direct3DCreate9 error", "InitDevice::Direct3DCreate9", MB_OK);

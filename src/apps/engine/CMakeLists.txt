@@ -16,6 +16,10 @@ else()
 set(SYSTEM_DEPS "ffi")
 endif()
 
+if (STORM_MESA_NINE)
+    set(SYSTEM_DEPS ${SYSTEM_DEPS} "nine-native")
+endif()
+
 STORM_SETUP(
     TARGET_NAME engine
     TYPE executable

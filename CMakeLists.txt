@@ -8,6 +8,9 @@ include(StormSetup)
 option(STORM_ENABLE_CRASH_REPORTS "Enable automatic crash reports" OFF)
 option(STORM_ENABLE_STEAM "Enable Steam integration" OFF)
 option(STORM_ENABLE_SAFE_MODE "Enable additional runtime checks" OFF)
+if (NOT WIN32)
+option(STORM_MESA_NINE "Use Gallium Nine from Mesa (without WINE) for D3D9 API" OFF)
+endif()
 
 ### Set up output paths
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
@@ -47,6 +50,19 @@ endif()
 if (WIN32)
     message("Using Windows D3D9 API")
     set(SDL_LIBRARIES "sdl")
+elseif (STORM_MESA_NINE) # for Gallium Nine
+    message("Using Gallium Nine for native D3D9 API")
+
+    #sudo apt install libd3dadapter9-mesa-dev
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
+
+    add_subdirectory(nine-native)
+    set(NINE_NATIVE_INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
+    )
+    include_directories("${NINE_NATIVE_INCLUDE_DIRS}")
 else() # for DXVK Native
     message("Using DXVK-native for D3D9 API")
 

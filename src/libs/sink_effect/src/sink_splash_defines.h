@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef STORM_MESA_NINE
 #include "windows.h"
+#endif
 #include "d3d9types.h"
 
 #define SINK_SPLASH_TRACE_INFORMATION

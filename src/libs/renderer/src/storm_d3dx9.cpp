@@ -8,6 +8,11 @@
 
 #define WARN(...) fprintf(stdout, __VA_ARGS__)
 
+#ifdef STORM_MESA_NINE // IMPROVE Nine Native, taken from dxvk-native/include/native/windows/windows_base.h
+typedef int32_t HRESULT;
+#define E_NOTIMPL     ((HRESULT)0x80004001)
+#endif
+
 ///////////////////////// Parts from WINE source code for d3dx9 licensed under GPLv2 /////////////////////////
 
 #define D3DX_FILTER_NONE     0x00000001

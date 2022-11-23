@@ -176,7 +176,7 @@ class VDX9RENDER : public SERVICE
     ~VDX9RENDER() override{};
 
     // DX9Render: Init/Release
-    virtual bool InitDevice(bool windowed, HWND hwnd, int32_t width, int32_t height) = 0;
+    virtual bool InitDevice(bool windowed, void *hwnd, int32_t width, int32_t height) = 0;
     virtual bool ReleaseDevice() = 0;
 
     // DX9Render: Animation

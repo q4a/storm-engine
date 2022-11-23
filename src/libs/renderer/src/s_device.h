@@ -105,7 +105,7 @@ class DX9RENDER : public VDX9RENDER
     ~DX9RENDER() override;
 
     // DX9Render: Init/Release
-    bool InitDevice(bool windowed, HWND hwnd, int32_t width, int32_t height) override;
+    bool InitDevice(bool windowed, void *hwnd, int32_t width, int32_t height) override;
     bool ReleaseDevice() override;
 
     // DX9Render: Animation

@@ -6,6 +6,10 @@ if (STORM_ENABLE_STEAM)
     add_definitions(-DSTORM_ENABLE_STEAM=1)
 endif()
 
+if (STORM_MESA_NINE)
+    add_definitions(-DSTORM_MESA_NINE=1)
+endif()
+
 if(STORM_ENABLE_CRASH_REPORTS)
 	add_definitions(-DSTORM_ENABLE_CRASH_REPORTS=1)
 endif()
