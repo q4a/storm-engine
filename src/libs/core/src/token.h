@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef STORM_MESA_NINE
 #include <windows.h>
+#endif
 #include <cstdint>
 #include <cstddef>
 

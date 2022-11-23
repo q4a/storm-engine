@@ -3,7 +3,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_system.h>
 #include <SDL2/SDL_video.h>
+#ifndef STORM_MESA_NINE
 #include <windows.h>
+#endif
 #include <map>
 
 namespace storm
@@ -293,7 +295,7 @@ SDLInput::SDLInput()
     keyStates_ = SDL_GetKeyboardState(nullptr);
 #ifndef _WIN32
     // since SDL 2.0.18 breaks WINAPI mouse api
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    //SDL_SetRelativeMouseMode(SDL_TRUE);
 #endif
     SDL_AddEventWatch(&SDLEventHandler, this);
     OpenController();
