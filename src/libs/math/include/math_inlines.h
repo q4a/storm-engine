@@ -3,7 +3,15 @@
 #include <cstdint>
 #include <cmath>
 
+#include "platform/platform.hpp"
+
+#if defined(ARCH_X86) || defined(ARCH_X64)
 #include <xmmintrin.h>
+#elif defined(ARCH_ARM) || defined(ARCH_ARM64)
+#include "sse2neon.h"
+#else
+#error Add your platform here
+#endif
 
 #include "c_vector.h"
 
