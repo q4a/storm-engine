@@ -18,6 +18,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
 
 set(STORM_WATERMARK_FILE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/watermark.hpp CACHE FILEPATH "Include file containing build revision, etc." FORCE)
 
+message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
+    set(PROJECT_PLATFORM_ARM TRUE)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    set(PROJECT_PLATFORM_ARM64 TRUE)
+endif()
+
+if (PROJECT_PLATFORM_ARM)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -fsigned-char")
+endif()
+
 ### Set up third-party dependencies
 set(ENV{CONAN_REVISIONS_ENABLED} 1)
 conan_add_remote(NAME bincrafters
@@ -67,8 +79,8 @@ else() # for DXVK Native
 
     include(ExternalProject)
     ExternalProject_Add(dxvk-native
-        GIT_REPOSITORY    https://github.com/Joshua-Ashton/dxvk-native
-        GIT_TAG           a2dc99c407340432d4ba5bfa29efa685c27942ea
+        GIT_REPOSITORY    https://github.com/IonAgorria/dxvk-native
+        GIT_TAG           2e91e784a86bc1355100518cd90eee48433551ac
         GIT_SHALLOW       ON
         BUILD_ALWAYS      OFF
         CONFIGURE_HANDLED_BY_BUILD ON
