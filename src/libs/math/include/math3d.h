@@ -8,7 +8,16 @@
 
 #include <cstdint>
 
+#include "platform/platform.hpp"
+
+#include <cstdint>
+#if defined(ARCH_X86) || defined(ARCH_X64)
 #include <xmmintrin.h> // espkk # remove inline asm # 30/Dec/2017
+#elif defined(ARCH_ARM) || defined(ARCH_ARM64)
+#include "sse2neon.h"
+#else
+#error Add your platform here
+#endif
 
 //#define inline __forceinline
 
