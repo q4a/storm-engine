@@ -51,8 +51,16 @@ conan_cmake_run(CONANFILE conanfile.py
         steam=${STORM_ENABLE_STEAM}
 )
 
+if (NOT WIN32)
+    find_package(SDL REQUIRED)
+    message(STATUS "SDL_LIBRARIES="${SDL_LIBRARIES})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${SDL_INCLUDE_DIR}")
+    message(STATUS "CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS})
+endif()
+
 if (WIN32)
     message("Using Windows D3D9 API")
+    set(SDL_LIBRARIES "sdl")
 elseif (STORM_MESA_NINE) # for Gallium Nine
     message("Using Gallium Nine for native D3D9 API")
 
