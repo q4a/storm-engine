@@ -48,6 +48,8 @@
 
 /* Windows errors */
 #define E_OUTOFMEMORY MAKE_HRESULT(1, 0x007, 14)
+#define E_INVALIDARG  MAKE_HRESULT(1, 0x007, 0x0057)
+#define E_NOTIMPL     MAKE_HRESULT(1, 0x000, 0x4001)
 #define E_NOINTERFACE MAKE_HRESULT(1, 0x000, 0x4002)
 #define E_POINTER     MAKE_HRESULT(1, 0x000, 0x4003)
 #define E_FAIL        MAKE_HRESULT(1, 0x000, 0x4005)
@@ -197,6 +199,7 @@ typedef struct _RGNDATA {
 
 /* Adapter */
 #define D3DADAPTER_DEFAULT 0
+#define D3DSGR_NO_CALIBRATION 0x00000000
 
 /********************************************************
  * Return codes                                         *
@@ -309,6 +312,10 @@ typedef struct _RGNDATA {
 #define D3DFVF_TEXTUREFORMAT2   0x00000000
 #define D3DFVF_TEXTUREFORMAT3   0x00000001
 #define D3DFVF_TEXTUREFORMAT4   0x00000002
+#define D3DFVF_TEXCOORDSIZE1(CoordIndex) (D3DFVF_TEXTUREFORMAT1 << (CoordIndex*2 + 16))
+#define D3DFVF_TEXCOORDSIZE2(CoordIndex) (D3DFVF_TEXTUREFORMAT2)
+#define D3DFVF_TEXCOORDSIZE3(CoordIndex) (D3DFVF_TEXTUREFORMAT3 << (CoordIndex*2 + 16))
+#define D3DFVF_TEXCOORDSIZE4(CoordIndex) (D3DFVF_TEXTUREFORMAT4 << (CoordIndex*2 + 16))
 
 #define D3DFVF_POSITION_MASK  0x0000400E
 #define D3DFVF_TEXCOUNT_MASK  0x00000F00
