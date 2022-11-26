@@ -1068,22 +1068,14 @@ void XINTERFACE::LoadIni()
     if (!ini)
         throw std::runtime_error("ini file not found!");
 
-#ifdef _WIN32 // FIX_LINUX GetWindowRect
-    RECT Screen_Rect;
-    GetWindowRect(static_cast<HWND>(core.GetWindow()->OSHandle()), &Screen_Rect);
-#else
     int sdlScreenWidth, sdlScreenHeight;
-    SDL_GetWindowSize(reinterpret_cast<SDL_Window *>(core.GetWindow()->OSHandle()), &sdlScreenWidth, &sdlScreenHeight);
-#endif
+    auto sdlHandle = reinterpret_cast<SDL_Window *>(core.GetWindow()->SDLHandle());
+    SDL_GetWindowSize(sdlHandle, &sdlScreenWidth, &sdlScreenHeight);
 
     fScale = 1.0f;
     const auto screenSize = core.GetScreenSize();
     dwScreenHeight = screenSize.height;
-#ifdef _WIN32 // FIX_LINUX GetWindowRect
-    dwScreenWidth = (Screen_Rect.right - Screen_Rect.left) * dwScreenHeight / (Screen_Rect.bottom - Screen_Rect.top);
-#else
     dwScreenWidth = sdlScreenWidth * dwScreenHeight / sdlScreenHeight;
-#endif
     if (dwScreenWidth < screenSize.width)
         dwScreenWidth = screenSize.width;
     GlobalScreenRect.top = 0;
@@ -1140,13 +1132,7 @@ void XINTERFACE::LoadIni()
     sscanf(param, "%[^,],%d,size:(%d,%d),pos:(%d,%d)", param2, &m_lMouseSensitive, &MouseSize.x, &MouseSize.y,
            &m_lXMouse, &m_lYMouse);
     m_idTex = pRenderService->TextureCreate(param2);
-    //  RECT Screen_Rect;
-    //  GetWindowRect(core.GetAppHWND(), &Screen_Rect);
-#ifdef _WIN32 // FIX_LINUX Cursor
-    lock_x = Screen_Rect.left + (Screen_Rect.right - Screen_Rect.left) / 2;
-    lock_y = Screen_Rect.top + (Screen_Rect.bottom - Screen_Rect.top) / 2;
-    SetCursorPos(lock_x, lock_y);
-#endif
+    SDL_WarpMouseInWindow(sdlHandle, sdlScreenWidth / 2, sdlScreenHeight / 2);
     fXMousePos = static_cast<float>(dwScreenWidth / 2);
     fYMousePos = static_cast<float>(dwScreenHeight / 2);
     for (int i = 0; i < 4; i++)
