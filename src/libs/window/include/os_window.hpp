@@ -63,6 +63,9 @@ class OSWindow
     //! Os-depended window handler (i.e. HWND on Windows)
     virtual void *OSHandle() = 0;
 
+    //! SDL window handler
+    virtual void *SDLHandle() const = 0;
+
     //! Create new window
     static std::shared_ptr<OSWindow> Create(int width, int height, int preferred_display, bool fullscreen,
                                             bool bordered);

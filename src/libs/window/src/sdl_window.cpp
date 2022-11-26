@@ -119,7 +119,7 @@ void *SDLWindow::OSHandle()
 #endif
 }
 
-SDL_Window *SDLWindow::SDLHandle() const
+void *SDLWindow::SDLHandle() const
 {
     return window_.get();
 }
