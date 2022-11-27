@@ -56,6 +56,7 @@ jobs:
         conan profile new default --detect
         conan profile update conf.tools.system.package_manager:mode=install default
         conan profile update conf.tools.system.package_manager:sudo=True default
+        CONAN_SYSREQUIRES_MODE=enabled conan install xkbcommon/1.4.1@ --build=missing -s build_type=${{matrix.configuration}}
         cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{matrix.configuration}}
     - name: Build dependencies
       run: ninja dependencies
