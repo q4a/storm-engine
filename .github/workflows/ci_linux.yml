@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        configuration: [Debug]
+        configuration: [Debug, RelWithDebInfo, Release]
         clang_version: [11, 12]
     name: 'linux [${{ matrix.configuration}}] [clang-${{matrix.clang_version}}]'
     steps:
