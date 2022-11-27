@@ -36,6 +36,13 @@ conan_cmake_run(CONANFILE conanfile.py
         steam=${STORM_ENABLE_STEAM}
 )
 
+foreach(TGT ${CONAN_TARGETS})
+    set_target_properties(${TGT} PROPERTIES
+        MAP_IMPORTED_CONFIG_MINSIZEREL Release
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
+    )
+endforeach()
+
 if (NOT WIN32)
     message("Using DXVK-native for D3D9 API")
 
