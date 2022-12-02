@@ -12,6 +12,7 @@
 #include "string_service/str_service.h"
 #include "xservice.h"
 #include <cstdio>
+#include <numeric>
 
 #define CHECK_FILE_NAME "PiratesReadme.txt"
 
@@ -1063,27 +1064,24 @@ void XINTERFACE::LoadIni()
     // GUARD(XINTERFACE::LoadIni());
     char section[256];
 
-    auto platform = "PC_SCREEN";
     auto ini = fio->OpenIniFile(RESOURCE_FILENAME);
     if (!ini)
         throw std::runtime_error("ini file not found!");
 
+    int sdlScreenWidth, sdlScreenHeight;
 #ifdef _WIN32 // FIX_LINUX GetWindowRect
     RECT Screen_Rect;
     GetWindowRect(static_cast<HWND>(core.GetWindow()->OSHandle()), &Screen_Rect);
+    sdlScreenWidth = Screen_Rect.right - Screen_Rect.left;
+    sdlScreenHeight = Screen_Rect.bottom - Screen_Rect.top;
 #else
-    int sdlScreenWidth, sdlScreenHeight;
     SDL_GetWindowSize(reinterpret_cast<SDL_Window *>(core.GetWindow()->OSHandle()), &sdlScreenWidth, &sdlScreenHeight);
 #endif
 
     fScale = 1.0f;
     const auto screenSize = core.GetScreenSize();
     dwScreenHeight = screenSize.height;
-#ifdef _WIN32 // FIX_LINUX GetWindowRect
-    dwScreenWidth = (Screen_Rect.right - Screen_Rect.left) * dwScreenHeight / (Screen_Rect.bottom - Screen_Rect.top);
-#else
     dwScreenWidth = sdlScreenWidth * dwScreenHeight / sdlScreenHeight;
-#endif
     if (dwScreenWidth < screenSize.width)
         dwScreenWidth = screenSize.width;
     GlobalScreenRect.top = 0;
@@ -1091,21 +1089,28 @@ void XINTERFACE::LoadIni()
     GlobalScreenRect.left = (dwScreenWidth - screenSize.width) / 2;
     GlobalScreenRect.right = screenSize.width + GlobalScreenRect.left;
 
+    int scrGcd = std::gcd(sdlScreenWidth, sdlScreenHeight);
+    std::string platform =
+        "PC_SCREEN_" + std::to_string(int(sdlScreenWidth / scrGcd)) + ":" + std::to_string(int(sdlScreenHeight / scrGcd));
+    if (!ini->TestSection(platform.c_str()))
+    {
+        platform = "PC_SCREEN";
+    }
     sprintf_s(section, "COMMON");
 
     // set screen parameters
-    if (ini->GetInt(platform, "bDynamicScaling", 0) == 0)
+    if (ini->GetInt(platform.c_str(), "bDynamicScaling", 0) == 0)
     {
         const auto &canvas_size = core.GetScreenSize();
-        fScale = ini->GetFloat(platform, "fScale", 1.f);
+        fScale = ini->GetFloat(platform.c_str(), "fScale", 1.f);
         if (fScale < MIN_SCALE || fScale > MAX_SCALE)
             fScale = 1.f;
-        dwScreenWidth = ini->GetInt(platform, "wScreenWidth", canvas_size.width);
-        dwScreenHeight = ini->GetInt(platform, "wScreenHeight", canvas_size.height);
-        GlobalScreenRect.left = ini->GetInt(platform, "wScreenLeft", 0);
-        GlobalScreenRect.top = ini->GetInt(platform, "wScreenTop", canvas_size.height);
-        GlobalScreenRect.right = ini->GetInt(platform, "wScreenRight", canvas_size.width);
-        GlobalScreenRect.bottom = ini->GetInt(platform, "wScreenDown", 0);
+        dwScreenWidth = ini->GetInt(platform.c_str(), "wScreenWidth", canvas_size.width);
+        dwScreenHeight = ini->GetInt(platform.c_str(), "wScreenHeight", canvas_size.height);
+        GlobalScreenRect.left = ini->GetInt(platform.c_str(), "wScreenLeft", 0);
+        GlobalScreenRect.top = ini->GetInt(platform.c_str(), "wScreenTop", canvas_size.height);
+        GlobalScreenRect.right = ini->GetInt(platform.c_str(), "wScreenRight", canvas_size.width);
+        GlobalScreenRect.bottom = ini->GetInt(platform.c_str(), "wScreenDown", 0);
     }
 
     m_fpMouseOutZoneOffset.x = ini->GetFloat(section, "mouseOutZoneWidth", 0.f);
