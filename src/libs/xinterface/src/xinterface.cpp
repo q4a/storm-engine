@@ -1089,13 +1089,21 @@ void XINTERFACE::LoadIni()
     GlobalScreenRect.left = (dwScreenWidth - screenSize.width) / 2;
     GlobalScreenRect.right = screenSize.width + GlobalScreenRect.left;
 
+    std::string platform;
+    bool sectionFound = false;
     int scrGcd = std::gcd(sdlScreenWidth, sdlScreenHeight);
-    std::string platform =
-        "PC_SCREEN_" + std::to_string(int(sdlScreenWidth / scrGcd)) + ":" + std::to_string(int(sdlScreenHeight / scrGcd));
-    if (!ini->TestSection(platform.c_str()))
+    for (int i = 1; !sectionFound && i < 6; i++)
+    {
+        platform = "PC_SCREEN_" +
+                   std::to_string(int(i * sdlScreenWidth / scrGcd)) + ":" +
+                   std::to_string(int(i * sdlScreenHeight / scrGcd));
+        sectionFound = ini->TestSection(platform.c_str());
+    }
+    if (!sectionFound)
     {
         platform = "PC_SCREEN";
     }
+    core.Trace("Using %s parameters", platform.c_str());
     sprintf_s(section, "COMMON");
 
     // set screen parameters
