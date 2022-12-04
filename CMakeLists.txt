@@ -60,7 +60,7 @@ endif()
 
 if (WIN32)
     message("Using Windows D3D9 API")
-    set(SDL_LIBRARIES "sdl")
+    set(SDL2_LIBRARIES "sdl")
 elseif (STORM_MESA_NINE) # for Gallium Nine
     message("Using Gallium Nine for native D3D9 API")
 
