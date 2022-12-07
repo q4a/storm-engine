@@ -12,7 +12,6 @@
 #include "string_service/str_service.h"
 #include "xservice.h"
 #include <cstdio>
-#include <numeric>
 
 #define CHECK_FILE_NAME "PiratesReadme.txt"
 
@@ -1089,36 +1088,48 @@ void XINTERFACE::LoadIni()
     GlobalScreenRect.left = (dwScreenWidth - screenSize.width) / 2;
     GlobalScreenRect.right = screenSize.width + GlobalScreenRect.left;
 
-    std::string platform;
+    char platform[23];
     bool sectionFound = false;
-    int scrGcd = std::gcd(sdlScreenWidth, sdlScreenHeight);
-    for (int i = 1; !sectionFound && i < 6; i++)
+    if (ini->GetSectionName(platform, sizeof(platform) - 1))
     {
-        platform = "PC_SCREEN_" +
-                   std::to_string(int(i * sdlScreenWidth / scrGcd)) + ":" +
-                   std::to_string(int(i * sdlScreenHeight / scrGcd));
-        sectionFound = ini->TestSection(platform.c_str());
+        float windowRatio = (float)sdlScreenWidth / (float)sdlScreenHeight;
+        float iniRatio;
+        char splitPlatform[23], *platformW, *platformH;
+        do
+        {
+            if(starts_with(platform, "PC_SCREEN_"))
+            {
+                strcpy_s(splitPlatform, platform);
+                platformW = std::strtok(splitPlatform, "_:"); // PC
+                platformW = std::strtok(nullptr, "_:"); // SCREEN
+                platformW = std::strtok(nullptr, "_:"); // Width
+                platformH = std::strtok(nullptr, "_:"); // Height
+                iniRatio = (float)atoi(platformW) / (float)atoi(platformH);
+                // +- 3%
+                if (iniRatio*0.97  <= windowRatio && windowRatio <= iniRatio*1.03)
+                    sectionFound = true;
+            }
+        } while (!sectionFound && ini->GetSectionNameNext(platform, sizeof(platform) - 1));
     }
     if (!sectionFound)
-    {
-        platform = "PC_SCREEN";
-    }
-    core.Trace("Using %s parameters", platform.c_str());
+        strcpy_s(platform, "PC_SCREEN");
+    core.Trace("Using %s parameters", platform);
+
     sprintf_s(section, "COMMON");
 
     // set screen parameters
-    if (ini->GetInt(platform.c_str(), "bDynamicScaling", 0) == 0)
+    if (ini->GetInt(platform, "bDynamicScaling", 0) == 0)
     {
         const auto &canvas_size = core.GetScreenSize();
-        fScale = ini->GetFloat(platform.c_str(), "fScale", 1.f);
+        fScale = ini->GetFloat(platform, "fScale", 1.f);
         if (fScale < MIN_SCALE || fScale > MAX_SCALE)
             fScale = 1.f;
-        dwScreenWidth = ini->GetInt(platform.c_str(), "wScreenWidth", canvas_size.width);
-        dwScreenHeight = ini->GetInt(platform.c_str(), "wScreenHeight", canvas_size.height);
-        GlobalScreenRect.left = ini->GetInt(platform.c_str(), "wScreenLeft", 0);
-        GlobalScreenRect.top = ini->GetInt(platform.c_str(), "wScreenTop", canvas_size.height);
-        GlobalScreenRect.right = ini->GetInt(platform.c_str(), "wScreenRight", canvas_size.width);
-        GlobalScreenRect.bottom = ini->GetInt(platform.c_str(), "wScreenDown", 0);
+        dwScreenWidth = ini->GetInt(platform, "wScreenWidth", canvas_size.width);
+        dwScreenHeight = ini->GetInt(platform, "wScreenHeight", canvas_size.height);
+        GlobalScreenRect.left = ini->GetInt(platform, "wScreenLeft", 0);
+        GlobalScreenRect.top = ini->GetInt(platform, "wScreenTop", canvas_size.height);
+        GlobalScreenRect.right = ini->GetInt(platform, "wScreenRight", canvas_size.width);
+        GlobalScreenRect.bottom = ini->GetInt(platform, "wScreenDown", 0);
     }
 
     m_fpMouseOutZoneOffset.x = ini->GetFloat(section, "mouseOutZoneWidth", 0.f);
