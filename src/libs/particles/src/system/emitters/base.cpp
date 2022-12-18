@@ -48,7 +48,10 @@ void BaseEmitter::BornParticles(float DeltaTime)
         BlendMatrix(matWorldTransform, matWorldTransformOld, matWorldTransformNew, MatrixBlend);
 
         const auto TransformPos = Position * matWorldTransform;
-        matWorldTransform.pos = TransformPos;
+        //matWorldTransform.pos = TransformPos;
+        matWorldTransform.m[3][0] = TransformPos.x;
+        matWorldTransform.m[3][1] = TransformPos.y;
+        matWorldTransform.m[3][2] = TransformPos.z;
         MatrixBlend += MatrixBlendInc;
 
         const auto DeltaTimeDiv = DeltaTime / INTERPOLATION_STEPS;
@@ -82,7 +85,8 @@ void BaseEmitter::BornParticles(float DeltaTime)
                 {
                     auto ParticlePos = GetNewParticlePosition(DeltaTime);
                     GetEmissionDirection(matTransform);
-                    auto VelDir = matTransform.vy;
+                    //auto VelDir = matTransform.vy;
+                    auto VelDir = Vector(matTransform.m[1][0], matTransform.m[1][1], matTransform.m[1][2]);
                     switch (ParticleTypes[n].Type)
                     {
                     case BILLBOARD_PARTICLE:
@@ -278,8 +282,10 @@ void BaseEmitter::BlendMatrix(Matrix &result, const Matrix &mat1, const Matrix &
 {
     const Quaternion qRot1(mat1);
     const Quaternion qRot2(mat2);
-    const auto vPos1 = mat1.pos;
-    const auto vPos2 = mat2.pos;
+    //const auto vPos1 = mat1.pos;
+    const auto vPos1 = Vector(mat1.m[3][0], mat1.m[3][1], mat1.m[3][2]);
+    //const auto vPos2 = mat2.pos;
+    const auto vPos2 = Vector(mat2.m[3][0], mat2.m[3][1], mat2.m[3][2]);
 
     Quaternion qBlend;
     qBlend.SLerp(qRot1, qRot2, BlendK);
@@ -288,7 +294,10 @@ void BaseEmitter::BlendMatrix(Matrix &result, const Matrix &mat1, const Matrix &
     vBlend.Lerp(vPos1, vPos2, BlendK);
 
     qBlend.GetMatrix(result);
-    result.pos = vBlend;
+    //result.pos = vBlend;
+    result.m[3][0] = vBlend.x;
+    result.m[3][1] = vBlend.y;
+    result.m[3][2] = vBlend.z;
 }
 
 const char *BaseEmitter::GetName()

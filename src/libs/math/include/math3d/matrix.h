@@ -36,26 +36,6 @@ class Matrix
         alignas(16) float matrix[16]; // espkk # remove inline asm # 30/Dec/2017
         // Two-dimensional array
         float m[4][4];
-
-        struct
-        {
-            // X direction
-            Vector vx;
-            // Weight value of X
-            float wx;
-            // Y direction
-            Vector vy;
-            // Weight value of Y
-            float wy;
-            // Z direction
-            Vector vz;
-            // Weight value of Z
-            float wz;
-            // Position
-            Vector pos;
-            // Added weight value
-            float w;
-        };
     };
 
     // -----------------------------------------------------------
@@ -101,6 +81,8 @@ class Matrix
   public:
     // Set identity matrix
     Matrix &SetIdentity();
+    // Set 3x3 identity matrix
+    Matrix &SetIdentity3X3();
 
     // Set Matrix
     Matrix &Set(const Matrix &matrix);
@@ -314,21 +296,30 @@ inline Matrix &Matrix::operator=(const Matrix &mtx)
 // Assign a number to the position
 inline Matrix &Matrix::operator=(float f)
 {
-    pos = f;
+    //pos = f;
+    m[3][0] = f;
+    m[3][1] = f;
+    m[3][2] = f;
     return *this;
 }
 
 // Assign a number to the position
 inline Matrix &Matrix::operator=(double d)
 {
-    pos = d;
+    //pos = d;
+    m[3][0] = static_cast<float>(d);
+    m[3][1] = static_cast<float>(d);
+    m[3][2] = static_cast<float>(d);
     return *this;
 }
 
 // Assign a vector to the position
 inline Matrix &Matrix::operator=(const Vector &v)
 {
-    pos = v;
+    //pos = v;
+    m[3][0] = v.x;
+    m[3][1] = v.y;
+    m[3][2] = v.z;
     return *this;
 }
 
@@ -411,6 +402,21 @@ inline Matrix &Matrix::SetIdentity()
       mov        [eax + 14*4], ebx
       mov        [eax + 15*4], ecx
     }*/
+    return *this;
+}
+
+inline Matrix &Matrix::SetIdentity3X3()
+{
+    m[0][0] = 1.f;
+    m[0][1] = 0;
+    m[0][2] = 0;
+    m[1][0] = 0;
+    m[1][1] = 1.f;
+    m[1][2] = 0;
+    m[2][0] = 0;
+    m[2][1] = 0;
+    m[2][2] = 1.f;
+
     return *this;
 }
 
@@ -799,7 +805,10 @@ inline bool Matrix::BuildView(Vector lookFrom, Vector lookTo, Vector upVector)
     if (lookTo.Normalize() == 0.0f)
     {
         // Putting a position for a non-rotated matrix
-        pos = -lookFrom;
+        //pos = -lookFrom;
+        m[3][0] = -lookFrom.x;
+        m[3][1] = -lookFrom.y;
+        m[3][2] = -lookFrom.z;
         return false;
     }
     // Directing the vector up in the desired direction
@@ -825,12 +834,19 @@ inline bool Matrix::BuildView(Vector lookFrom, Vector lookTo, Vector upVector)
     else
     {
         // Setting a position for a non-rotated matrix
-        pos = -lookFrom;
+        //pos = -lookFrom;
+        m[3][0] = -lookFrom.x;
+        m[3][1] = -lookFrom.y;
+        m[3][2] = -lookFrom.z;
         return false;
     }
     // set the position
     // pos = -MulNormalByInverse (lookFrom);
-    pos = -MulNormal(lookFrom);
+    //pos = -MulNormal(lookFrom);
+    auto p = -MulNormal(lookFrom);
+    m[3][0] = p.x;
+    m[3][1] = p.y;
+    m[3][2] = p.z;
     return true;
 }
 
@@ -840,22 +856,35 @@ inline bool Matrix::BuildOrient(Vector zAxisDirection, Vector upVector)
     // Normalize the direction vector z
     if (zAxisDirection.Normalize() < 1e-37f || upVector.Normalize() < 1e-37f)
     {
-        vx = Vector(1.0f, 0.0f, 0.0f);
-        vy = Vector(0.0f, 1.0f, 0.0f);
-        vz = Vector(0.0f, 0.0f, 1.0f);
+        //vx = Vector(1.0f, 0.0f, 0.0f);
+        //vy = Vector(0.0f, 1.0f, 0.0f);
+        //vz = Vector(0.0f, 0.0f, 1.0f);
+        SetIdentity3X3();
         return false;
     }
     // calculate
-    vx = zAxisDirection ^ upVector;
-    if (vx.Normalize() == 0.0f)
+    //vx = zAxisDirection ^ upVector;
+    auto vec = zAxisDirection ^ upVector;
+    m[0][0] = vec.x;
+    m[0][1] = vec.y;
+    m[0][2] = vec.z;
+    if (vec.Normalize() == 0.0f)
     {
-        vx = Vector(1.0f, 0.0f, 0.0f);
-        vy = Vector(0.0f, 1.0f, 0.0f);
-        vz = Vector(0.0f, 0.0f, 1.0f);
+        //vx = Vector(1.0f, 0.0f, 0.0f);
+        //vy = Vector(0.0f, 1.0f, 0.0f);
+        //vz = Vector(0.0f, 0.0f, 1.0f);
+        SetIdentity3X3();
         return false;
     }
-    vy = zAxisDirection ^ vx;
-    vz = zAxisDirection;
+    //vy = zAxisDirection ^ vx;
+    vec = zAxisDirection ^ vec;
+    m[1][0] = vec.x;
+    m[1][1] = vec.y;
+    m[1][2] = vec.z;
+    //vz = zAxisDirection;
+    m[2][0] = zAxisDirection.x;
+    m[2][1] = zAxisDirection.y;
+    m[2][2] = zAxisDirection.z;
     return true;
 }
 
@@ -867,37 +896,68 @@ inline bool Matrix::BuildOriented(Vector position, Vector lookTo, Vector upVecto
     // Normalize the direction vector z
     if (lookTo.Normalize() == 0.0f || upVector.Normalize() == 0.0f)
     {
-        vx = Vector(1.0f, 0.0f, 0.0f);
-        wx = 0.0f;
-        vy = Vector(0.0f, 1.0f, 0.0f);
-        wy = 0.0f;
-        vz = Vector(0.0f, 0.0f, 1.0f);
-        wz = 0.0f;
-        pos = position;
-        w = 1.0f;
+        //vx = Vector(1.0f, 0.0f, 0.0f);
+        //wx = 0.0f;
+        //vy = Vector(0.0f, 1.0f, 0.0f);
+        //wy = 0.0f;
+        //vz = Vector(0.0f, 0.0f, 1.0f);
+        //wz = 0.0f;
+        SetIdentity3X3();
+        m[0][3] = 0.0f; // wx
+        m[1][3] = 0.0f; // wy
+        m[2][3] = 0.0f; // wz
+        //pos = position;
+        //w = 1.0f;
+        m[3][0] = position.x;
+        m[3][1] = position.y;
+        m[3][2] = position.z;
+        m[3][3] = 1.0f;
         return false;
     }
     // calculate
-    vx = lookTo ^ upVector;
-    wx = 0.0f;
-    if (vx.Normalize() == 0.0f)
+    //vx = lookTo ^ upVector;
+    auto vec = lookTo ^ upVector;
+    m[0][0] = vec.x;
+    m[0][1] = vec.y;
+    m[0][2] = vec.z;
+    m[0][3] = 0.0f;
+    if (vec.Normalize() == 0.0f)
     {
-        vx = Vector(1.0f, 0.0f, 0.0f);
-        wx = 0.0f;
-        vy = Vector(0.0f, 1.0f, 0.0f);
-        wy = 0.0f;
-        vz = Vector(0.0f, 0.0f, 1.0f);
-        wz = 0.0f;
-        pos = position;
-        w = 1.0f;
+        //vx = Vector(1.0f, 0.0f, 0.0f);
+        //wx = 0.0f;
+        //vy = Vector(0.0f, 1.0f, 0.0f);
+        //wy = 0.0f;
+        //vz = Vector(0.0f, 0.0f, 1.0f);
+        //wz = 0.0f;
+        SetIdentity3X3();
+        m[0][3] = 0.0f; // wx
+        m[1][3] = 0.0f; // wy
+        m[2][3] = 0.0f; // wz
+        //pos = position;
+        //w = 1.0f;
+        m[3][0] = position.x;
+        m[3][1] = position.y;
+        m[3][2] = position.z;
+        m[3][3] = 1.0f;
         return false;
     }
-    vy = lookTo ^ vx;
-    wy = 0.0f;
-    vz = lookTo;
-    wz = 0.0f;
-    pos = position;
-    w = 1.0f;
+    //vy = lookTo ^ vx;
+    vec = lookTo ^ vec;
+    m[1][0] = vec.x;
+    m[1][1] = vec.y;
+    m[1][2] = vec.z;
+    m[1][3] = 0.0f;
+    //vz = lookTo;
+    m[2][0] = lookTo.x;
+    m[2][1] = lookTo.y;
+    m[2][2] = lookTo.z;
+    m[2][3] = 0.0f;
+    //pos = position;
+    //w = 1.0f;
+    m[3][0] = position.x;
+    m[3][1] = position.y;
+    m[3][2] = position.z;
+    m[3][3] = 1.0f;
     return true;
 }
 
@@ -975,18 +1035,24 @@ inline Matrix &Matrix::Rotate(const Vector &ang)
 // Move
 inline Matrix &Matrix::Move(float dX, float dY, float dZ)
 {
-    pos.x += dX;
-    pos.y += dY;
-    pos.z += dZ;
+    //pos.x += dX;
+    //pos.y += dY;
+    //pos.z += dZ;
+    m[3][0] += dX;
+    m[3][1] += dY;
+    m[3][2] += dZ;
     return *this;
 }
 
 // Move
 inline Matrix &Matrix::Move(const Vector &pos)
 {
-    this->pos.x += pos.x;
-    this->pos.y += pos.y;
-    this->pos.z += pos.z;
+    //this->pos.x += pos.x;
+    //this->pos.y += pos.y;
+    //this->pos.z += pos.z;
+    m[3][0] += pos.x;
+    m[3][1] += pos.y;
+    m[3][2] += pos.z;
     return *this;
 }
 
@@ -1054,7 +1120,13 @@ inline Matrix &Matrix::Scale3x3(const Vector &scale)
 // Calculating the inverse matrix
 inline Matrix &Matrix::Inverse()
 {
-    pos = Vector(-(pos | vx), -(pos | vy), -(pos | vz));
+    //pos = Vector(-(pos | vx), -(pos | vy), -(pos | vz));
+    float px = -(m[3][0] * m[0][0] + m[3][1] * m[0][1] + m[3][2] * m[0][2]); //-(pos | vx)
+    float py = -(m[3][0] * m[1][0] + m[3][1] * m[1][1] + m[3][2] * m[1][2]); //-(pos | vy)
+    float pz = -(m[3][0] * m[2][0] + m[3][1] * m[2][1] + m[3][2] * m[2][2]); //-(pos | vz)
+    m[3][0] = px;
+    m[3][1] = py;
+    m[3][2] = pz;
     Transposition3X3();
     return *this;
 }
@@ -1062,16 +1134,19 @@ inline Matrix &Matrix::Inverse()
 // Calculating an inverse matrix from another
 inline Matrix &Matrix::Inverse(const Matrix &mtx)
 {
-    pos = Vector(-(mtx.pos | mtx.vx), -(mtx.pos | mtx.vy), -(mtx.pos | mtx.vz));
-    matrix[0] = mtx.matrix[0];
-    matrix[1] = mtx.matrix[4];
-    matrix[2] = mtx.matrix[8];
-    matrix[4] = mtx.matrix[1];
-    matrix[5] = mtx.matrix[5];
-    matrix[6] = mtx.matrix[9];
-    matrix[8] = mtx.matrix[2];
-    matrix[9] = mtx.matrix[6];
-    matrix[10] = mtx.matrix[10];
+    //pos = Vector(-(mtx.pos | mtx.vx), -(mtx.pos | mtx.vy), -(mtx.pos | mtx.vz));
+    m[3][0] = -(mtx.m[3][0] * mtx.m[0][0] + mtx.m[3][1] * mtx.m[0][1] + mtx.m[3][2] * mtx.m[0][2]); //-(mtx.pos | mtx.vx)
+    m[3][1] = -(mtx.m[3][0] * mtx.m[1][0] + mtx.m[3][1] * mtx.m[1][1] + mtx.m[3][2] * mtx.m[1][2]); //-(mtx.pos | mtx.vy)
+    m[3][2] = -(mtx.m[3][0] * mtx.m[2][0] + mtx.m[3][1] * mtx.m[2][1] + mtx.m[3][2] * mtx.m[2][2]); //-(mtx.pos | mtx.vz)
+    m[0][0] = mtx.m[0][0];
+    m[0][1] = mtx.m[1][0];
+    m[0][2] = mtx.m[2][0];
+    m[1][0] = mtx.m[0][1];
+    m[1][1] = mtx.m[1][1];
+    m[1][2] = mtx.m[2][1];
+    m[2][0] = mtx.m[0][2];
+    m[2][1] = mtx.m[1][2];
+    m[2][2] = mtx.m[2][2];
 
     /*    _asm
       {
@@ -1133,7 +1208,12 @@ inline Matrix &Matrix::InverseWhithScale()
             matrix[i] = 0.0f;
     }
     // Position
+    //pos = -(MulNormal(pos));
+    auto pos = Vector(m[3][0], m[3][1], m[3][2]);
     pos = -(MulNormal(pos));
+    m[3][0] = pos.x;
+    m[3][1] = pos.y;
+    m[3][2] = pos.z;
     return *this;
 }
 
@@ -1341,7 +1421,7 @@ inline Vector Matrix::MulNormalByInverse(const Vector &v) const
 // Get camera position from camera matrix
 inline Vector Matrix::GetCamPos() const
 {
-    return -MulNormalByInverse(pos);
+    return -MulNormalByInverse(Vector(m[3][0], m[3][1], m[3][2]));
 }
 
 // Identity matrix or not
@@ -1387,13 +1467,13 @@ inline bool Matrix::IsIdentity() const
 inline bool Matrix::IsScale() const
 {
     const auto eps = 1e-4f;
-    if (fabsf(~vx - 1.0f) > eps)
+    if (fabsf(m[0][0] * m[0][0] + m[0][1] * m[0][1] + m[0][2] * m[0][2] - 1.0f) > eps) //~vx
         return true;
-    if (fabsf(~vy - 1.0f) > eps)
+    if (fabsf(m[1][0] * m[1][0] + m[1][1] * m[1][1] + m[1][2] * m[1][2] - 1.0f) > eps) //~vy
         return true;
-    if (fabsf(~vz - 1.0f) > eps)
+    if (fabsf(m[2][0] * m[2][0] + m[2][1] * m[2][1] + m[2][2] * m[2][2]  - 1.0f) > eps) //~vz
         return true;
-    if (fabsf(w - 1.0f) > eps)
+    if (fabsf(m[3][3] - 1.0f) > eps)
         return true;
     return false;
 }
@@ -1444,24 +1524,24 @@ inline void Matrix::Projection(Vector4 *dstArray, Vector *srcArray, int32_t num,
 // Get angles from unscaled rotation matrix
 inline void Matrix::GetAngles(float &ax, float &ay, float &az) const
 {
-    if (vz.y < 1.0f)
+    if (m[2][1] < 1.0f) //vz.y
     {
-        if (vz.y > -1.0f)
+        if (m[2][1] > -1.0f) //vz.y
         {
-            ax = static_cast<float>(asin(-vz.y));
-            ay = static_cast<float>(atan2(vz.x, vz.z));
-            az = static_cast<float>(atan2(vx.y, vy.y));
+            ax = static_cast<float>(asin(-m[2][1])); //-vz.y
+            ay = static_cast<float>(atan2(m[2][0], m[2][2])); //vz.x, vz.z
+            az = static_cast<float>(atan2(m[0][1], m[1][1])); //vx.y, vy.y
             return;
         }
         ax = 3.141592654f * 0.5f;
         ay = 0.0f;
-        az = static_cast<float>(atan2(vx.z, vx.x));
+        az = static_cast<float>(atan2(m[0][2], m[0][0])); //vx.z, vx.x
     }
     else
     {
         ax = -3.141592654f * 0.5f;
         ay = 0.0f;
-        az = static_cast<float>(-atan2(vx.z, vx.x));
+        az = static_cast<float>(-atan2(m[0][2], m[0][0])); //vx.z, vx.x
     }
 }
 
