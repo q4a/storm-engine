@@ -35,6 +35,7 @@ class LIGHTNING : public Entity
 
     std::vector<lightning_t> aLightnings;
 
+    bool bLightningEnable;
     uint32_t dwSubTexX, dwSubTexY;
     int32_t iLightningTexture, iFlashTexture;
 

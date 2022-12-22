@@ -279,7 +279,7 @@ void Astronomy::STARS::Realize(double dDeltaTime, double dHour)
 
     auto fMaxMag = Bring2Range(fTelescopeMagnitude, fVisualMagnitude, 0.14f, 1.285f, fFov);
 
-    if (fabsf(fFov - fPrevFov) > 1e-5f)
+//    if (fabsf(fFov - fPrevFov) > 1e-5f)
     {
         float fTmpK[5];
         float fTmpRnd[7];

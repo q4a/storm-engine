@@ -6,6 +6,7 @@ LIGHTNING::LIGHTNING()
 {
     iLightningTexture = -1;
     iFlashTexture = -1;
+    bLightningEnable = false;
 }
 
 LIGHTNING::~LIGHTNING()
@@ -79,7 +80,7 @@ void LIGHTNING::Realize(uint32_t Delta_Time)
     uint32_t i;
     RS_RECT rs_rect;
 
-    if (iLightningTexture >= 0)
+    if (iLightningTexture >= 0 && bLightningEnable)
     {
         pRS->TextureSet(0, iLightningTexture);
         for (i = 0; i < aLightnings.size(); i++)
@@ -97,7 +98,7 @@ void LIGHTNING::Realize(uint32_t Delta_Time)
         }
     }
 
-    if (iFlashTexture >= 0)
+    if (iFlashTexture >= 0 && bLightningEnable)
     {
         pRS->TextureSet(0, iFlashTexture);
         for (i = 0; i < aLightnings.size(); i++)
@@ -195,6 +196,13 @@ uint32_t LIGHTNING::AttributeChanged(ATTRIBUTES *pAttribute)
             iFlashTexture = pRS->TextureCreate(pAttribute->GetThisAttr());
             return 0;
         }
+        return 0;
+    }
+
+    if (*pAttribute == "Enable")
+    {
+        bLightningEnable = pAttribute->GetAttributeAsDword() != 0;
+        core.Trace("bLightningEnable = %d", bLightningEnable);
         return 0;
     }
 

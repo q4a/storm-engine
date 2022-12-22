@@ -723,6 +723,9 @@ uint32_t CXI_TABLE::MessageProc(int32_t msgcode, MESSAGE &message)
     case 1: // get the line number on which the mouse pointer is located (-1 - the pointer is out of bounds)
         return GetLineByPoint(ptrOwner->GetMousePoint());
         break;
+    case 2:
+        SelectLine(message.Long());
+        break;        
     }
 
     return 0;
