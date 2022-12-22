@@ -1159,15 +1159,20 @@ d3dadapter9_new( BOOL ex, Display *dpy,
                  ERR("Failed to load d3d9 lib '%s': %s\n", str, dlerror());
            }
         } else {
-           const char *paths[] = {
-              "/usr/lib32/d3d/d3dadapter9.so",
-              "/usr/lib/d3d/d3dadapter9.so",
-              "/usr/lib/x86_64-linux-gnu/d3d/d3dadapter9.so",
-           };
-           for (unsigned i = 0; !handle && i < 3; i++)
-              handle = dlopen(paths[i], RTLD_LOCAL | RTLD_NOW);
-           if (!handle)
-              ERR("Failed to load d3d9 lib: %s\n", dlerror());
+            const char *paths[] = {
+                "/usr/lib32/d3d/d3dadapter9.so",
+                "/usr/lib/d3d/d3dadapter9.so",
+                "/usr/local/lib/x86_64-linux-gnu/d3d/d3dadapter9.so",
+                "/usr/lib/x86_64-linux-gnu/d3d/d3dadapter9.so",
+                "/usr/local/lib/arm-linux-gnueabihf/d3d/d3dadapter9.so",
+                "/usr/lib/arm-linux-gnueabihf/d3d/d3dadapter9.so",
+                "/usr/local/lib/aarch64-linux-gnu/d3d/d3dadapter9.so",
+                "/usr/lib/aarch64-linux-gnu/d3d/d3dadapter9.so",
+            };
+            for (unsigned i = 0; !handle && i < 8; i++)
+                handle = dlopen(paths[i], RTLD_LOCAL | RTLD_NOW);
+            if (!handle)
+                ERR("Failed to load d3d9 lib: %s\n", dlerror());
         }
         if (!handle) {
             return D3DERR_NOTAVAILABLE;
