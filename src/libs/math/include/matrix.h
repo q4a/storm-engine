@@ -34,6 +34,26 @@ class CMatrix
     union {
         alignas(16) float matrix[16]; // espkk # remove inline asm # 30/Dec/2017
         float m[4][4];
+
+        struct
+        {
+            // X direction
+            CVECTOR vx;
+            // Weight value on X
+            float wx;
+            // Y direction
+            CVECTOR vy;
+            // Weight value on Y
+            float wy;
+            // Z direction
+            CVECTOR vz;
+            // Weight value on Z
+            float wz;
+            // Position
+            CVECTOR pos;
+            // Added weight value
+            float w;
+        };
     };
 
     //-----------------------------------------------------------

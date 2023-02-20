@@ -200,9 +200,7 @@ bool SEA::EnvMap_Render2()
 
     CMatrix mTex;
     mTex.BuildScale(CVECTOR(0.5f, -0.5f, 0.5f));
-    mTex.m[3][0] = 0.5f; //pos.x
-    mTex.m[3][1] = 0.5f; //pos.y
-    mTex.m[3][2] = 0.5f; //pos.z
+    mTex.pos = CVECTOR(0.5f, 0.5f, 0.5f);
 
     CMatrix mProj = rs->GetProjection();
     mProj = mProj * mTex;
