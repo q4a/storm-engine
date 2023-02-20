@@ -764,20 +764,10 @@ bool LocationCamera::LoadCameraTrack(const char *pcTrackFile, float fTrackTime)
     Matrix view;
     m_track.GetPoint(0.f, pos, ang);
     ang.GetMatrix(view);
-    //view.vx = -view.vx;
-    view.m[0][0] = -view.m[0][0];
-    view.m[0][1] = -view.m[0][1];
-    view.m[0][2] = -view.m[0][2];
-    //view.vz = -view.vz;
-    view.m[2][0] = -view.m[2][0];
-    view.m[2][1] = -view.m[2][1];
-    view.m[2][2] = -view.m[2][2];
+    view.vx = -view.vx;
+    view.vz = -view.vz;
     view.Inverse();
-    //view.pos = view * -pos;
-    pos = view * -pos;
-    view.m[3][0] = pos.x;
-    view.m[3][1] = pos.y;
-    view.m[3][2] = pos.z;
+    view.pos = view * -pos;
     rs->SetView(*(CMatrix *)&view);
     rs->SetPerspective(cameraPerspective);
 
@@ -796,14 +786,8 @@ void LocationCamera::TurnOffTrackCamera()
         Matrix view;
         m_track.GetPoint(0.99999f, pos, ang);
         ang.GetMatrix(view);
-        //view.vx = -view.vx;
-        view.m[0][0] = -view.m[0][0];
-        view.m[0][1] = -view.m[0][1];
-        view.m[0][2] = -view.m[0][2];
-        //view.vz = -view.vz;
-        view.m[2][0] = -view.m[2][0];
-        view.m[2][1] = -view.m[2][1];
-        view.m[2][2] = -view.m[2][2];
+        view.vx = -view.vx;
+        view.vz = -view.vz;
         view.Inverse();
 
         oldPos = *(CVECTOR *)&pos;
@@ -827,20 +811,10 @@ void LocationCamera::ProcessTrackCamera()
     Matrix view;
     m_track.GetPoint(fTrackTime / m_fTrackMaxTime, pos, ang);
     ang.GetMatrix(view);
-    //view.vx = -view.vx;
-    view.m[0][0] = -view.m[0][0];
-    view.m[0][1] = -view.m[0][1];
-    view.m[0][2] = -view.m[0][2];
-    //view.vz = -view.vz;
-    view.m[2][0] = -view.m[2][0];
-    view.m[2][1] = -view.m[2][1];
-    view.m[2][2] = -view.m[2][2];
+    view.vx = -view.vx;
+    view.vz = -view.vz;
     view.Inverse();
-    //view.pos = view * -pos;
-    pos = view * -pos;
-    view.m[3][0] = pos.x;
-    view.m[3][1] = pos.y;
-    view.m[3][2] = pos.z;
+    view.pos = view * -pos;
     rs->SetView(*(CMatrix *)&view);
     rs->SetPerspective(cameraPerspective);
 }
