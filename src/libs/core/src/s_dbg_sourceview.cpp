@@ -108,8 +108,10 @@ LRESULT CALLBACK SourceViewWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
                 CDebug->SourceView->DoStep(CDebug->SourceView->nClientLinesSize);
                 break;
             case VK_F4:
+#ifdef false // _WIN32 // S_DEBUG
                 if (!CDebug->SourceView->bDrag)
                     CDebug->WatcherList->StartEditSelectedItem();
+#endif
                 break;
             case VK_F9:
                 CDebug->Breaks.FlipBreakPoint(CDebug->SourceView->SourceFileName, CDebug->SourceView->nActiveLine);
@@ -178,6 +180,7 @@ LRESULT CALLBACK SourceViewWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
                 POINT pnt;
                 GetCursorPos(&pnt);
 
+#ifdef false // _WIN32 // S_DEBUG
                 auto bPointerInWatchWindow = WindowFromPoint(pnt) == CDebug->WatcherList->GetWindowHandle();
                 SetCursor(LoadCursor(CDebug->SourceView->hInst, (bPointerInWatchWindow)
                                                                    ? MAKEINTRESOURCE(IDC_DRAGPOINTER)
@@ -200,6 +203,7 @@ LRESULT CALLBACK SourceViewWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
                         }
                     }
                 }
+#endif
 
                 return 0;
             }
@@ -244,6 +248,7 @@ LRESULT CALLBACK SourceViewWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
                 POINT pnt;
                 GetCursorPos(&pnt);
 
+#ifdef false // _WIN32 // S_DEBUG
                 if (CDebug->SourceView->sCopyPasteBuffer.size() &&
                     WindowFromPoint(pnt) == CDebug->WatcherList->GetWindowHandle())
                 {
@@ -260,6 +265,7 @@ LRESULT CALLBACK SourceViewWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
                         }
                     }
                 }
+#endif
 
                 break;
             }

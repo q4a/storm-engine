@@ -3,6 +3,7 @@
 #include "core_impl.h"
 #include "tm_list.h"
 
+#ifdef false // _WIN32 // S_DEBUG
 class WATCHER_LIST : public TM_LIST
 {
     HMENU hMenu;
@@ -15,3 +16,4 @@ class WATCHER_LIST : public TM_LIST
     void ItemChanged(int32_t Item_index, int32_t Subitem_index);
     void Refresh();
 };
+#endif

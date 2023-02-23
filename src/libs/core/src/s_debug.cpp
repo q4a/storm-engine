@@ -57,10 +57,12 @@ LRESULT CALLBACK DebugWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
     wchar_t WinTextW[MAX_PATH];
     BROWSEINFO bi;
 
+#ifdef false // _WIN32 // S_DEBUG
     if (CDebug->WatcherList)
     {
         CDebug->WatcherList->ProcessMessage(iMsg, wParam, lParam);
     }
+#endif
     if (CDebug->SourceView)
     {
         CDebug->SourceView->ProcessMessage(iMsg, wParam, lParam);
@@ -171,11 +173,13 @@ LRESULT CALLBACK DebugWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
         }
         break;
     case WM_SIZE:
+#ifdef false // _WIN32 // S_DEBUG
         if (CDebug->WatcherList)
         {
             CDebug->WatcherListRect.right = LOWORD(lParam);
             CDebug->WatcherList->SetPosition(CDebug->WatcherListRect);
         }
+#endif
         if (CDebug->SourceView)
         {
             CDebug->SourceViewRect.right = LOWORD(lParam);
@@ -206,6 +210,7 @@ LRESULT CALLBACK DebugWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
     case WM_CREATE: {
         // CursorONOFF(true);
 
+#ifdef false // _WIN32 // S_DEBUG
         if (CDebug->WatcherList)
         {
             GetClientRect(hwnd, &CDebug->WatcherListRect);
@@ -214,6 +219,7 @@ LRESULT CALLBACK DebugWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
             // CDebug->WatcherListRect.bottom = HIWORD(lParam)/2;
             CDebug->WatcherList->SetPosition(CDebug->WatcherListRect);
         }
+#endif
 
         if (CDebug->SourceView)
         {
@@ -287,11 +293,13 @@ void S_DEBUG::BreakOn(const char *filename, uint32_t line)
     strcpy_s(BreakFileName, filename);
     BreakLineCode = line;
     ShowWindow(hMain, SW_NORMAL);
+#ifdef false // _WIN32 // S_DEBUG
     if (WatcherList)
     {
         WatcherList->Refresh();
         InvalidateRect(WatcherList->GetWindowHandle(), nullptr, true);
     }
+#endif
     if (SourceView)
     {
         SourceView->OpenSourceFile(BreakFileName);
@@ -327,8 +335,10 @@ S_DEBUG::~S_DEBUG()
 void S_DEBUG::Release()
 {
     Breaks.Release();
+#ifdef false // _WIN32 // S_DEBUG
     delete WatcherList;
     WatcherList = nullptr;
+#endif
     delete SourceView;
     SourceView = nullptr;
     delete[] pExpResBuffer;
@@ -347,7 +357,9 @@ void S_DEBUG::Init()
     sLastFileName[0] = 0;
     hInst = nullptr;
     hMain = nullptr;
+#ifdef false // _WIN32 // S_DEBUG
     WatcherList = nullptr;
+#endif
     SourceView = nullptr;
     hFont = CreateFont(FONT_HEIGHT, 0, 0, 0,
                        // FW_BOLD,
@@ -446,6 +458,7 @@ bool S_DEBUG::OpenDebugWindow_NT(HINSTANCE hInstance)
     SourceViewRect.bottom = DBGWIN_HEIGHT;
     SourceViewRect.right = DBGWIN_WIDTH;
 
+#ifdef false // _WIN32 // S_DEBUG
     delete WatcherList;
     WatcherList = nullptr;
 
@@ -455,6 +468,7 @@ bool S_DEBUG::OpenDebugWindow_NT(HINSTANCE hInstance)
         SendMessage(WatcherList->GetWindowHandle(), WM_SETFONT, (WPARAM)hFont, 0);
         WatcherList->SetFont(hFont);
     }
+#endif
     delete SourceView;
     SourceView = nullptr;
 
@@ -465,12 +479,14 @@ bool S_DEBUG::OpenDebugWindow_NT(HINSTANCE hInstance)
         SourceView->SetProgramDirectory(ProgramDirectory);
     }
 
+#ifdef false // _WIN32 // S_DEBUG
     if (WatcherList)
     {
         GetClientRect(hMain, &WatcherListRect);
         WatcherListRect.bottom = 199;
         WatcherList->SetPosition(WatcherListRect);
     }
+#endif
 
     if (SourceView)
     {
@@ -495,8 +511,10 @@ void S_DEBUG::CloseDebugWindow()
     if (hMain)
         DestroyWindow(hMain);
     hMain = nullptr;
+#ifdef false // _WIN32 // S_DEBUG
     delete WatcherList;
     WatcherList = nullptr;
+#endif
     delete SourceView;
     SourceView = nullptr;
     SetTraceMode(TMODE_CLOSE);

@@ -59,7 +59,9 @@ class S_DEBUG
     HWND hMain;
     BREAKPOINTS_TABLE Breaks;
     SOURCE_VIEW *SourceView;
+#ifdef false // _WIN32 // S_DEBUG
     WATCHER_LIST *WatcherList;
+#endif
 
     S_DEBUG() = default;
     ~S_DEBUG();
