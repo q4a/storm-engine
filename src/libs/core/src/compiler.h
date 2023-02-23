@@ -79,7 +79,9 @@ class SLIBHOLDER
     }
 };
 
+#ifdef _WIN32 // S_DEBUG
 class S_DEBUG;
+#endif
 
 enum COMPILER_STAGE
 {
@@ -93,7 +95,9 @@ class CoreImpl;
 class COMPILER : public VIRTUAL_COMPILER
 {
     friend CoreImpl;
+#ifdef _WIN32 // S_DEBUG
     friend S_DEBUG;
+#endif
 
   public:
     bool bBreakOnError;
