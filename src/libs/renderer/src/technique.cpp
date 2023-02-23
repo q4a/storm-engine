@@ -1,4 +1,4 @@
-#ifndef _WIN32 // Effects
+#ifndef false // _WIN32 // Effects
 #include "technique.h"
 
 #include "core.h"

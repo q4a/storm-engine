@@ -562,7 +562,7 @@ bool DX9RENDER::Init()
         if (!InitDevice(bWindow, core.GetWindow()->OSHandle(), screen_size.x, screen_size.y))
             return false;
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
         RecompileEffects();
 #else
         pTechnique = std::make_unique<CTechnique>(this);
@@ -814,7 +814,7 @@ bool DX9RENDER::InitDevice(bool windowed, void *_hwnd, int32_t width, int32_t he
             }
         }
     }
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     effects_.setDevice(d3d9);
 #endif
 
@@ -2642,7 +2642,7 @@ void DX9RENDER::RestoreRender()
     }
     SetCommonStates();
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     RecompileEffects();
 #else
     pTechnique = std::make_unique<CTechnique>(this);
@@ -2656,7 +2656,7 @@ void DX9RENDER::RestoreRender()
 
 void DX9RENDER::RecompileEffects()
 {
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     effects_.release();
 
     std::filesystem::path cur_path = std::filesystem::current_path();
@@ -2758,7 +2758,7 @@ void DX9RENDER::RunStart()
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
         InvokeEntitiesLostRender();
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
         RecompileEffects();
 #else
         pTechnique = std::make_unique<CTechnique>(this);
@@ -3362,7 +3362,7 @@ void DX9RENDER::FindPlanes(IDirect3DDevice9 *d3dDevice)
     viewplane[3].D = (pos.x * viewplane[3].Nx + pos.y * viewplane[3].Ny + pos.z * viewplane[3].Nz);
 }
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
 bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 {
     if (!cBlockName)
@@ -3381,7 +3381,7 @@ bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 
 bool DX9RENDER::TechniqueExecuteNext()
 {
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     return effects_.next();
 #else
     return pTechnique->ExecutePassNext();
@@ -3763,7 +3763,7 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);
