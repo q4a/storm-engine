@@ -28,7 +28,7 @@ struct u8_char
     };
 };
 
-#ifdef false // _WIN32 // S_DEBUG
+#ifdef _WIN32 // S_DEBUG
 inline std::string ConvertWideToUtf8(const std::wstring &wstr)
 {
     int count = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.length()), NULL, 0, NULL, NULL);

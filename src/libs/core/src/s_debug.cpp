@@ -1,5 +1,5 @@
 #include "utf8.h"
-#ifdef false // _WIN32 // S_DEBUG
+#ifdef _WIN32 // S_DEBUG
 #include "s_debug.h"
 #include "compiler.h"
 #include "core_impl.h"

@@ -1,4 +1,4 @@
-#ifdef false // _WIN32 // S_DEBUG
+#ifdef _WIN32 // S_DEBUG
 #include "s_dbg_watcherlist.h"
 #include "s_debug.h"
 

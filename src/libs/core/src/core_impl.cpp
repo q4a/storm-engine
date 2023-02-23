@@ -335,7 +335,7 @@ storm::OSWindow *CoreImpl::GetWindow()
     return window_.get();
 }
 
-#ifdef false // _WIN32 // HINSTANCE
+#ifdef _WIN32 // HINSTANCE
 HINSTANCE CoreImpl::GetAppInstance()
 {
     return hInstance;

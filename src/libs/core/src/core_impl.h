@@ -56,7 +56,7 @@ class CoreImpl final : public CorePrivate
     void Exit();
     // return application handle
     storm::OSWindow *GetWindow() override;
-#ifdef false // _WIN32 // HINSTANCE
+#ifdef _WIN32 // HINSTANCE
     HINSTANCE GetAppInstance();
 #endif
     // set time scale; affect on std entity functions DeltaTime parameter
@@ -165,7 +165,7 @@ private:
 
     SERVICES_LIST Services_List; // list for subsequent calls RunStart/RunEnd service functions
 
-#ifdef false // _WIN32 // HINSTANCE
+#ifdef _WIN32 // HINSTANCE
     HINSTANCE hInstance{};
 #endif
 
