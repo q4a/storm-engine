@@ -1,4 +1,4 @@
-#ifdef _WIN32
+#if defined(_WIN32)
 const char *convert_path_sep(const char *cPath)
 {
     return cPath;

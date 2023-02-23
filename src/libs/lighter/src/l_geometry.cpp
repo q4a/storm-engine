@@ -13,7 +13,7 @@
 #include "entity.h"
 #include "core.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <corecrt_io.h>
 #else
 #include <unistd.h>

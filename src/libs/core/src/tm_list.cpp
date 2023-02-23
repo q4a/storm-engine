@@ -1,4 +1,4 @@
-#ifdef _WIN32 // S_DEBUG
+#ifdef false // _WIN32 // S_DEBUG
 #include "tm_list.h"
 
 #include "s_debug.h"

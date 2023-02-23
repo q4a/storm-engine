@@ -1,4 +1,4 @@
-#ifndef _WIN32 // Effects
+#ifndef false // _WIN32 // Effects
 #include "technique.h"
 
 #include "core.h"
@@ -1507,7 +1507,7 @@ uint32_t CTechnique::ProcessShaderAsm(shader_t *pS, char *pFile, uint32_t dwSize
         STORM_DELETE(pTempBuffer);
         TOTAL_SKIP;
     }
-#ifdef _WIN32 // replace D3DXAssembleShader with D3DCompile or similar
+#ifdef false // _WIN32 // replace D3DXAssembleShader with D3DCompile or similar
 #ifndef _XBOX
     ID3DXBuffer *CompiledShader = nullptr, *ErrorShader = nullptr;
 #else
@@ -2106,7 +2106,7 @@ bool CTechnique::ExecutePass(bool bStart)
             switch (dwCode)
             {
             case SUBCODE_SVSCONST_WORLDVIEWPROJ: {
-#ifdef _WIN32 // replace D3DXMATRIX
+#ifdef false // _WIN32 // replace D3DXMATRIX
                 D3DXMATRIX matTemp, matWorldViewProj;
 
                 D3DXMATRIX matWorld;

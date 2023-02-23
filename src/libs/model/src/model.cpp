@@ -3,7 +3,7 @@
 #include "modelr.h"
 #include "shared/messages.h"
 
-#ifdef _WIN32 // FIX_LINUX DirectXMath
+#ifdef false // _WIN32 // FIX_LINUX DirectXMath
 #include <DirectXMath.h>
 #endif
 
@@ -69,7 +69,7 @@ void *VBTransform(void *vb, int32_t startVrt, int32_t nVerts, int32_t totVerts)
     GEOS::VERTEX0 *dst;
     dest_vb->Lock(0, 0, (void **)&dst, D3DLOCK_DISCARD | D3DLOCK_NOSYSLOCK);
 
-#ifndef _WIN32 // FIX_LINUX DirectXMath
+#ifndef false // _WIN32 // FIX_LINUX DirectXMath
     CMatrix mtx;
 #endif
     for (int32_t v = 0; v < totVerts; v++)
@@ -83,7 +83,7 @@ void *VBTransform(void *vb, int32_t startVrt, int32_t nVerts, int32_t totVerts)
         // Inverse blending coefficient
         const auto wNeg = 1.0f - vrt.weight;
 
-#ifdef _WIN32 // FIX_LINUX DirectXMath
+#ifdef false // _WIN32 // FIX_LINUX DirectXMath
 #ifdef __AVX__
         // apparently, _mm256_set1_ps seems to be better using msvc with lat=~7+1*2+4+1*5+5+7+1*2==24 vs ~7+1*2+4+1*5+1+3+1*2==32 for _mm256_broadcast_ss
         // TODO: check clang listings

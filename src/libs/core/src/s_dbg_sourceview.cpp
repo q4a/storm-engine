@@ -1,4 +1,4 @@
-#ifdef _WIN32 // S_DEBUG
+#ifdef false // _WIN32 // S_DEBUG
 #include "s_dbg_sourceview.h"
 #include "core_impl.h"
 #include "data.h"

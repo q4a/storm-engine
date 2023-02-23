@@ -163,7 +163,7 @@ class CMatrix
     void BuildMirrorMatrix(float Nx, float Ny, float Nz, float D);
 
     // D3D extends (return (D3DXMATRIX *)pointer)
-#ifdef _WIN32 // for Effects (see libs/location/src/grass.cpp)
+#ifdef false // _WIN32 // for Effects (see libs/location/src/grass.cpp)
     operator D3DXMATRIX *() const;
 #endif
     operator D3DMATRIX *() const;
@@ -896,7 +896,7 @@ inline void CMatrix::BuildMirrorMatrix(float Nx, float Ny, float Nz, float D)
     m[3][3] = 1.0f;
 }
 
-#ifdef _WIN32 // for Effects (see libs/location/src/grass.cpp)
+#ifdef false // _WIN32 // for Effects (see libs/location/src/grass.cpp)
 // D3D extends (return (D3DXMATRIX *)pointer)
 inline CMatrix::operator D3DXMATRIX *() const
 {

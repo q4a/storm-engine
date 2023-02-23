@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <d3d9.h>
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <d3dx9.h>
 #endif
 #include <string_view>
@@ -371,7 +371,7 @@ class VDX9RENDER : public SERVICE
     virtual HRESULT SetFVF(uint32_t handle) = 0;
     virtual HRESULT GetVertexShader(IDirect3DVertexShader9 **ppShader) = 0;
     virtual HRESULT GetPixelShader(IDirect3DPixelShader9 **ppShader) = 0;
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     virtual ID3DXEffect *GetEffectPointer(const char *techniqueName) = 0;
 #endif
 
