@@ -1,8 +1,7 @@
-//#ifdef _WIN32 // S_DEBUG
+#ifdef false // _WIN32 // S_DEBUG
 #include "s_dbg_watcherlist.h"
 #include "s_debug.h"
 
-#ifdef false // _WIN32 // S_DEBUG
 extern S_DEBUG * CDebug;
 
 WATCHER_LIST::WATCHER_LIST(HWND hwnd, HINSTANCE hinst)

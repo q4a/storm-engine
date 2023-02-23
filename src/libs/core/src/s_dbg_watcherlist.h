@@ -1,9 +1,9 @@
 #pragma once
+#ifdef false // _WIN32 // S_DEBUG
 
 #include "core_impl.h"
 #include "tm_list.h"
 
-#ifdef false // _WIN32 // S_DEBUG
 class WATCHER_LIST : public TM_LIST
 {
     HMENU hMenu;
