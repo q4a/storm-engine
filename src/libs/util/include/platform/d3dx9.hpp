@@ -1,5 +1,5 @@
 #pragma once
-#ifndef _WIN32
+#ifndef false // _WIN32
 
 #include <d3d9.h>
 

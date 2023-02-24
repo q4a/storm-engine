@@ -23,7 +23,7 @@
 #define _tsystem std::system
 #endif
 
-#ifdef _WIN32
+#ifdef false // _WIN32
 #include "logging.hpp"
 #include "seh_extractor.hpp"
 #endif
@@ -41,7 +41,7 @@ auto &getLogsArchive()
     return logsArchive;
 }
 
-#ifdef _WIN32 // FIX_LINUX 7za.exe
+#ifdef false // _WIN32 // FIX_LINUX 7za.exe
 auto assembleArchiveCmd()
 {
     constexpr auto archiverBin = "7za.exe";
@@ -202,7 +202,7 @@ LifecycleDiagnosticsService::Guard LifecycleDiagnosticsService::initialize(const
         sentry_options_set_dsn(options, "https://1798a1bcfb654cbd8ce157b381964525@o572138.ingest.sentry.io/5721165");
         sentry_options_set_release(options, STORM_BUILD_WATERMARK_STRING);
         sentry_options_set_database_path(options, (fs::GetStashPath() / "sentry-db").c_str());
-#ifdef _WIN32
+#if defined(_WIN32)
         sentry_options_set_handler_path(options, (getExecutableDir() / "crashpad_handler.exe").c_str());
 #else
         sentry_options_set_handler_path(options, (getExecutableDir() / "crashpad_handler").c_str());
@@ -255,7 +255,7 @@ sentry_value_t LifecycleDiagnosticsService::beforeCrash(const sentry_ucontext_t 
         self->collectCrashInfo_();
     }
 
-#ifdef _WIN32
+#ifdef false // _WIN32
     // collect exception data
     if (uctx != nullptr)
     {
@@ -271,7 +271,7 @@ sentry_value_t LifecycleDiagnosticsService::beforeCrash(const sentry_ucontext_t 
     // terminate logging
     self->loggingService_->terminate();
 
-#ifdef _WIN32 // FIX_LINUX 7za.exe
+#ifdef false // _WIN32 // FIX_LINUX 7za.exe
     // archive logs for sentry backend
     _tsystem(assembleArchiveCmd().c_str());
 #endif

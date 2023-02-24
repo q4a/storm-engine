@@ -12,7 +12,7 @@
 #error Unsupported architecture
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32)
 
 #define PATH_SEP '\\'
 #define WRONG_PATH_SEP '/'

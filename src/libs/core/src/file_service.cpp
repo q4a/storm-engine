@@ -450,7 +450,7 @@ void FILE_SERVICE::AddEntryToResourcePaths(const std::filesystem::directory_entr
 
 void FILE_SERVICE::ScanResourcePaths()
 {
-#ifndef _WIN32
+#ifndef false // _WIN32
     if (ResourcePathsFirstScan)
     {
         // Seems like if static code calls us we need to do this manually to avoid any bugs
@@ -475,7 +475,7 @@ void FILE_SERVICE::ScanResourcePaths()
 
 std::string FILE_SERVICE::ConvertPathResource(const char *path)
 {
-#ifdef _WIN32
+#ifdef false // _WIN32
     return std::string(path);
 #else
     if (ResourcePathsFirstScan)

@@ -19,7 +19,7 @@
 
 #include <fmt/chrono.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <DxErr.h>
 #include <corecrt_io.h>
 #else
@@ -43,7 +43,7 @@ namespace
 {
 constexpr auto kKeyTakeScreenshot = "TakeScreenshot";
 
-#ifdef _WIN32 // Screenshot
+#ifdef false // _WIN32 // Screenshot
 D3DXIMAGE_FILEFORMAT GetScreenshotFormat(const std::string &fmt)
 {
     if (fmt == "bmp")
@@ -375,7 +375,7 @@ inline bool ErrorHandler(HRESULT hr, const char *file, unsigned line, const char
 {
     if (hr != D3D_OK)
     {
-#ifdef _WIN32
+#ifdef false // _WIN32
         core.Trace("[%s:%s:%d] %s: %s (%s)", file, func, line, DXGetErrorStringA(hr), DXGetErrorDescriptionA(hr), expr);
 #else
         core.Trace("[%s:%s:%d] (%s)", file, func, line, expr);
@@ -498,7 +498,7 @@ bool DX9RENDER::Init()
         screenshotExt = str;
         std::ranges::transform(screenshotExt, screenshotExt.begin(),
                                [](const unsigned char c) { return std::tolower(c); });
-#ifdef _WIN32 // Screenshot
+#ifdef false // _WIN32 // Screenshot
         screenshotFormat = GetScreenshotFormat(str);
         if (screenshotFormat == D3DXIFF_FORCE_DWORD)
         {
@@ -562,7 +562,7 @@ bool DX9RENDER::Init()
         if (!InitDevice(bWindow, core.GetWindow()->OSHandle(), screen_size.x, screen_size.y))
             return false;
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
         RecompileEffects();
 #else
         pTechnique = std::make_unique<CTechnique>(this);
@@ -814,7 +814,7 @@ bool DX9RENDER::InitDevice(bool windowed, void *_hwnd, int32_t width, int32_t he
             }
         }
     }
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     effects_.setDevice(d3d9);
 #endif
 
@@ -1281,7 +1281,7 @@ bool DX9RENDER::DX9EndScene()
         LostRender();
     }
 
-#ifdef _WIN32 // bSafeRendering
+#ifdef false // _WIN32 // bSafeRendering
     if (bSafeRendering)
     {
         const HDC dc = GetDC(hwnd);
@@ -1777,7 +1777,7 @@ bool DX9RENDER::TextureLoad(int32_t t)
 
 bool DX9RENDER::TextureLoadUsingD3DX(const char* path, int32_t t)
 {
-#ifdef _WIN32 // TextureLoadUsingD3DX - used only for loading raw Targa
+#ifdef false // _WIN32 // TextureLoadUsingD3DX - used only for loading raw Targa
     // TODO: reimplement the whole thing in a tidy way
     IDirect3DTexture9 *pTex;
     if(CHECKD3DERR(D3DXCreateTextureFromFileA(d3d9, path, &pTex)))
@@ -2642,7 +2642,7 @@ void DX9RENDER::RestoreRender()
     }
     SetCommonStates();
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     RecompileEffects();
 #else
     pTechnique = std::make_unique<CTechnique>(this);
@@ -2656,7 +2656,7 @@ void DX9RENDER::RestoreRender()
 
 void DX9RENDER::RecompileEffects()
 {
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     effects_.release();
 
     std::filesystem::path cur_path = std::filesystem::current_path();
@@ -2758,7 +2758,7 @@ void DX9RENDER::RunStart()
     if (core.Controls->GetDebugAsyncKeyState(VK_SHIFT) < 0 && core.Controls->GetDebugAsyncKeyState(VK_F11) < 0)
     {
         InvokeEntitiesLostRender();
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
         RecompileEffects();
 #else
         pTechnique = std::make_unique<CTechnique>(this);
@@ -3293,7 +3293,7 @@ void DX9RENDER::MakeScreenShot()
         screenshot_path.replace_filename(screenshot_base_filename + "_" + std::to_string(i));
         screenshot_path.replace_extension(screenshotExt);
     }
-#ifdef _WIN32 // Screenshot
+#ifdef false // _WIN32 // Screenshot
     D3DXSaveSurfaceToFile(screenshot_path.c_str(), screenshotFormat, surface, nullptr, nullptr);
 #endif
 
@@ -3362,7 +3362,7 @@ void DX9RENDER::FindPlanes(IDirect3DDevice9 *d3dDevice)
     viewplane[3].D = (pos.x * viewplane[3].Nx + pos.y * viewplane[3].Ny + pos.z * viewplane[3].Nz);
 }
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
 bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 {
     if (!cBlockName)
@@ -3381,7 +3381,7 @@ bool DX9RENDER::TechniqueExecuteStart(const char *cBlockName)
 
 bool DX9RENDER::TechniqueExecuteNext()
 {
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
     return effects_.next();
 #else
     return pTechnique->ExecutePassNext();
@@ -3763,7 +3763,7 @@ HRESULT DX9RENDER::GetPixelShader(IDirect3DPixelShader9 **ppShader)
     return CHECKD3DERR(d3d9->GetPixelShader(ppShader));
 }
 
-#ifdef _WIN32 // Effects
+#ifdef false // _WIN32 // Effects
 ID3DXEffect *DX9RENDER::GetEffectPointer(const char *techniqueName)
 {
     return effects_.getEffectPointer(techniqueName);

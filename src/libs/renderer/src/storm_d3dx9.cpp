@@ -1,4 +1,4 @@
-#ifndef _WIN32
+#if !defined(_WIN32)
 
 #include "platform/d3dx9.hpp"
 

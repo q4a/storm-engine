@@ -108,7 +108,7 @@ void *SDLWindow::OSHandle()
     if (!window_)
         return nullptr;
 
-#ifdef _WIN32
+#if defined(_WIN32)
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
     SDL_GetWindowWMInfo(window_.get(), &info);

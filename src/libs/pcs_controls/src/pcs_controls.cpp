@@ -433,7 +433,7 @@ bool PCS_CONTROLS::GetControlState(int32_t control_code, CONTROL_STATE &_state_s
 
 void PCS_CONTROLS::Update(uint32_t DeltaTime)
 {
-#ifdef _WIN32
+#ifdef false // _WIN32
     static int nMouseXPrev, nMouseYPrev;
     POINT point;
     GetCursorPos(&point);

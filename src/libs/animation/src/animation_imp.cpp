@@ -385,7 +385,7 @@ void AnimationImp::BuildAnimationMatrices()
     {
         auto &bn = aniInfo->GetBone(j);
         matrix[j] = CMatrix(bn.start) * CMatrix(bn.matrix);
-#ifdef _WIN32 // FIX_LINUX DirectXMath
+#ifdef false // _WIN32 // FIX_LINUX DirectXMath
         // inverse first column in advance
         matrix[j].matrix[0] = -matrix[j].matrix[0];
         matrix[j].matrix[4] = -matrix[j].matrix[4];

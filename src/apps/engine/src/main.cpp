@@ -35,7 +35,7 @@ void RunFrame()
     lifecycleDiagnostics.notifyAfterRun();
 }
 
-#ifdef _WIN32
+#ifdef false // _WIN32
 void RunFrameWithOverflowCheck()
 {
     __try
@@ -118,7 +118,7 @@ void HandleWindowEvent(const storm::OSWindow::Event &event)
 int main(int argc, char *argv[])
 {
     // Prevent multiple instances
-#ifdef _WIN32 // CreateEventA
+#ifdef false // _WIN32 // CreateEventA
     if (!CreateEventA(nullptr, false, false, "Global\\FBBD2286-A9F1-4303-B60C-743C3D7AA7BE") ||
         GetLastError() == ERROR_ALREADY_EXISTS)
     {
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
     core_private->Event("ExitApplication");
     core_private->CleanUp();
     core_private->ReleaseBase();
-#ifdef _WIN32 // FIX_LINUX Cursor
+#ifdef false // _WIN32 // FIX_LINUX Cursor
     ClipCursor(nullptr);
 #endif
     SDL_Quit();

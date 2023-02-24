@@ -4,7 +4,7 @@
 #include <cstring>
 #include <string>
 
-#ifdef _WIN32 // for WideCharToMultiByte / MultiByteToWideChar
+#if defined(_WIN32) // for WideCharToMultiByte / MultiByteToWideChar
 #include <windows.h>
 #endif
 
