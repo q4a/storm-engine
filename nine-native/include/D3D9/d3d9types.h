@@ -23,135 +23,6 @@
 #ifndef _D3D9TYPES_H_
 #define _D3D9TYPES_H_
 
-#ifdef _WIN32
-#include <windows.h>
-#else /* _WIN32 */
-#include <stdint.h>
-
-#ifndef NULL
-#define NULL 0
-#endif
-
-/********************************************************
- * Windows types                                        *
- ********************************************************/
-/* Function macros */
-#define FAILED(x)    ((HRESULT)(x) < 0)
-#define SUCCEEDED(x) ((HRESULT)(x) >= 0)
-
-#define MAKE_HRESULT(sev,fac,code) \
-    ( \
-        ((HRESULT)(sev) << 31) | \
-        ((HRESULT)(fac) << 16) | \
-         (HRESULT)(code) \
-    )
-
-/* Windows errors */
-#define E_OUTOFMEMORY MAKE_HRESULT(1, 0x007, 14)
-#define E_INVALIDARG  MAKE_HRESULT(1, 0x007, 0x0057)
-#define E_NOTIMPL     MAKE_HRESULT(1, 0x000, 0x4001)
-#define E_NOINTERFACE MAKE_HRESULT(1, 0x000, 0x4002)
-#define E_POINTER     MAKE_HRESULT(1, 0x000, 0x4003)
-#define E_FAIL        MAKE_HRESULT(1, 0x000, 0x4005)
-
-#define S_OK          ((HRESULT)0)
-#define S_FALSE       ((HRESULT)1)
-
-/* WORD types */
-typedef uint8_t BYTE;
-typedef uint16_t WORD;
-typedef uint32_t DWORD;
-
-/* Renamed types */
-typedef int BOOL;
-#ifndef FALSE
-#define FALSE 0
-#define TRUE (!FALSE)
-#endif
-
-typedef uint32_t UINT32;
-typedef uint64_t UINT64;
-
-typedef unsigned short USHORT;
-typedef unsigned int UINT;
-typedef unsigned int ULONG;
-typedef unsigned long long ULONGLONG;
-
-typedef short SHORT;
-typedef int INT;
-typedef int LONG;
-typedef long long LONGLONG;
-typedef float FLOAT;
-
-/* Windows types */
-typedef void *HANDLE;
-typedef int32_t HRESULT;
-typedef HANDLE HWND;
-typedef HANDLE HMONITOR;
-typedef HANDLE HDC;
-
-/* Unions */
-typedef union {
-    struct {
-        DWORD LowPart;
-        LONG HighPart;
-    };
-
-    struct {
-        DWORD LowPart;
-        LONG HighPart;
-    } u;
-
-    LONGLONG QuadPart;
-} LARGE_INTEGER, *LPLARGE_INTEGER;
-
-/* Structs */
-
-typedef struct _GUID {
-    DWORD Data1;
-    WORD Data2;
-    WORD Data3;
-    BYTE Data4[8];
-} GUID, IID, *LPGUID, *REFGUID, *REFIID;
-
-typedef struct _LUID {
-    DWORD LowPart;
-    LONG HighPart;
-} LUID, *LPLUID, *PLUID;
-
-typedef struct _PALETTEENTRY {
-    BYTE peRed;
-    BYTE peGreen;
-    BYTE peBlue;
-    BYTE peFlags;
-} PALETTEENTRY, *LPPALETTEENTRY;
-
-typedef struct _POINT {
-    LONG x;
-    LONG y;
-} POINT, *LPPOINT;
-
-typedef struct _RECT {
-    LONG left;
-    LONG top;
-    LONG right;
-    LONG bottom;
-} RECT, *LPRECT;
-
-typedef struct _RGNDATAHEADER {
-    DWORD dwSize;
-    DWORD iType;
-    DWORD nCount;
-    DWORD nRgnSize;
-    RECT rcBound;
-} RGNDATAHEADER, *LPRGNDATAHEADER;
-
-typedef struct _RGNDATA {
-    RGNDATAHEADER rdh;
-    char Buffer[1];
-} RGNDATA, *LPRGNDATA;
-#endif /* _WIN32 */
-
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(a, b, c, d) \
     ( \
@@ -199,7 +70,6 @@ typedef struct _RGNDATA {
 
 /* Adapter */
 #define D3DADAPTER_DEFAULT 0
-#define D3DSGR_NO_CALIBRATION 0x00000000
 
 /********************************************************
  * Return codes                                         *
@@ -270,6 +140,14 @@ typedef struct _RGNDATA {
 #define D3DUSAGE_TEXTAPI                         0x10000000
 #endif
 
+#define D3DWRAP_U        1
+#define D3DWRAP_V        2
+#define D3DWRAP_W        4
+#define D3DWRAPCOORD_0   1
+#define D3DWRAPCOORD_1   2
+#define D3DWRAPCOORD_2   4
+#define D3DWRAPCOORD_3   8
+
 /* Buffer locking */
 /* http://msdn.microsoft.com/en-us/library/ee416503(VS.85).aspx */
 #define D3DLOCK_READONLY        0x00000010
@@ -312,10 +190,6 @@ typedef struct _RGNDATA {
 #define D3DFVF_TEXTUREFORMAT2   0x00000000
 #define D3DFVF_TEXTUREFORMAT3   0x00000001
 #define D3DFVF_TEXTUREFORMAT4   0x00000002
-#define D3DFVF_TEXCOORDSIZE1(CoordIndex) (D3DFVF_TEXTUREFORMAT1 << (CoordIndex*2 + 16))
-#define D3DFVF_TEXCOORDSIZE2(CoordIndex) (D3DFVF_TEXTUREFORMAT2)
-#define D3DFVF_TEXCOORDSIZE3(CoordIndex) (D3DFVF_TEXTUREFORMAT3 << (CoordIndex*2 + 16))
-#define D3DFVF_TEXCOORDSIZE4(CoordIndex) (D3DFVF_TEXTUREFORMAT4 << (CoordIndex*2 + 16))
 
 #define D3DFVF_POSITION_MASK  0x0000400E
 #define D3DFVF_TEXCOUNT_MASK  0x00000F00

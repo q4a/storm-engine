@@ -10,16 +10,6 @@
 #include <algorithm>
 #include <ranges>
 
-#ifdef STORM_MESA_NINE // IMPROVE Nine Native + taken from dxvk-native/include/native/directx/d3d8types.h
-#define D3DWRAP_U        1
-#define D3DWRAP_V        2
-#define D3DWRAP_W        4
-#define D3DWRAPCOORD_0   1
-#define D3DWRAPCOORD_1   2
-#define D3DWRAPCOORD_2   4
-#define D3DWRAPCOORD_3   8
-#endif
-
 #define USE_FX // Will load techniques from fx files
 
 #ifdef USE_FX

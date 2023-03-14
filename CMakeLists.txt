@@ -73,6 +73,7 @@ elseif (STORM_MESA_NINE) # for Gallium Nine
     set(NINE_NATIVE_INCLUDE_DIRS
         "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
+        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/windows"
     )
     include_directories("${NINE_NATIVE_INCLUDE_DIRS}")
 else() # for DXVK Native

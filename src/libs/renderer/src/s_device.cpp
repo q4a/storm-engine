@@ -13,9 +13,6 @@
 
 #include <algorithm>
 #include <SDL_timer.h>
-#ifdef STORM_MESA_NINE
-#include "nine_sdl.h"
-#endif
 
 #include <fmt/chrono.h>
 
@@ -707,11 +704,7 @@ bool DX9RENDER::InitDevice(bool windowed, void *_hwnd, int32_t width, int32_t he
 
     hwnd = static_cast<HWND>(_hwnd);
     core.Trace("Initializing DirectX 9");
-#ifdef STORM_MESA_NINE
-    d3d = Direct3DCreate9_SDL(static_cast<SDL_Window *>(_hwnd));
-#else
     d3d = Direct3DCreate9(D3D_SDK_VERSION);
-#endif
     if (d3d == nullptr)
     {
         // MessageBox(hwnd, "Direct3DCreate9 error", "InitDevice::Direct3DCreate9", MB_OK);
