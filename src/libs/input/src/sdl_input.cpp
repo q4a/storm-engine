@@ -3,9 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_system.h>
 #include <SDL2/SDL_video.h>
-#ifndef STORM_MESA_NINE
 #include <windows.h>
-#endif
 #include <map>
 
 namespace storm
