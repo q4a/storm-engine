@@ -97,7 +97,7 @@ elseif (STORM_MESA_NINE) # for Gallium Nine
     include_directories("${NINE_NATIVE_INCLUDE_DIRS}")
     add_custom_target(dependencies ALL DEPENDS nine-native)
 else() # for DXVK Native
-    message("Using DXVK-native for D3D9 API")
+    message("Using DXVK Native for D3D9 API")
 
     include(ExternalProject)
     ExternalProject_Add(dxvk-native
@@ -106,8 +106,9 @@ else() # for DXVK Native
         GIT_SHALLOW       ON
         BUILD_ALWAYS      OFF
         CONFIGURE_HANDLED_BY_BUILD ON
-        CONFIGURE_COMMAND meson ../dxvk-native
+        CONFIGURE_COMMAND meson setup ../dxvk-native --buildtype=release -Denable_d3d11=false -Denable_d3d10=false -Denable_dxgi=false
         BUILD_COMMAND     ninja
+        BUILD_BYPRODUCTS  <BINARY_DIR>/src/d3d9/libdxvk_d3d9.so
         INSTALL_COMMAND   ""
     )
     ExternalProject_Get_property(dxvk-native SOURCE_DIR BINARY_DIR)
