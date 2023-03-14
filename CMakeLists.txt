@@ -69,12 +69,33 @@ elseif (STORM_MESA_NINE) # for Gallium Nine
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
 
-    add_subdirectory(nine-native)
+    include(ExternalProject)
+    ExternalProject_Add(nine-native
+        GIT_REPOSITORY    https://github.com/q4a/nine-native
+        GIT_TAG           main
+        GIT_SHALLOW       ON
+        BUILD_ALWAYS      OFF
+        BUILD_BYPRODUCTS  <BINARY_DIR>/libnine-native.a
+        INSTALL_COMMAND   ""
+    )
+    ExternalProject_Get_property(nine-native SOURCE_DIR BINARY_DIR)
     set(NINE_NATIVE_INCLUDE_DIRS
-        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
+        "${SOURCE_DIR}/include"
+        "${SOURCE_DIR}/include/D3D9"
+        "${SOURCE_DIR}/include/windows"
+    )
+    set(NATIVE_D3D9_LIBS
+        "${BINARY_DIR}/libnine-native.a"
+        "PkgConfig::D3D"
+        X11
+        xcb
+        xcb-present
+        xcb-dri3
+        xcb-xfixes
+        X11-xcb
     )
     include_directories("${NINE_NATIVE_INCLUDE_DIRS}")
+    add_custom_target(dependencies ALL DEPENDS nine-native)
 else() # for DXVK Native
     message("Using DXVK-native for D3D9 API")
 
@@ -94,9 +115,9 @@ else() # for DXVK Native
         "${SOURCE_DIR}/include/native/directx"
         "${SOURCE_DIR}/include/native/windows"
     )
-    set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
+    set(NATIVE_D3D9_LIBS ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
     include_directories("${DXVK_NATIVE_INCLUDE_DIRS}")
-    ADD_CUSTOM_TARGET(dependencies ALL DEPENDS dxvk-native)
+    add_custom_target(dependencies ALL DEPENDS dxvk-native)
 endif()
 
 ### Define library ALIASes for use without CONAN_PKG:: prefix
