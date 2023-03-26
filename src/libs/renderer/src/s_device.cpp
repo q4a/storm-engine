@@ -233,7 +233,7 @@ bool DX9RENDER_SCRIPT_LIBRIARY::Init()
     return true;
 }
 
-uint64_t _rdtsc;
+uint64_t storm_rdtsc;
 uint32_t dwTotalSize = 0;
 uint32_t dwSplashTime = 0;
 bool bSplash = false;
@@ -556,7 +556,7 @@ bool DX9RENDER::Init()
         videoAdapterIndex = ini->GetInt(nullptr, "adapter", std::numeric_limits<int32_t>::max());
 
         // stencil_format = D3DFMT_D24S8;
-        if (!InitDevice(bWindow, static_cast<HWND>(core.GetWindow()->OSHandle()), screen_size.x, screen_size.y))
+        if (!InitDevice(bWindow, core.GetWindow()->OSHandle(), screen_size.x, screen_size.y))
             return false;
 
 #ifdef _WIN32 // Effects
@@ -691,7 +691,7 @@ DX9RENDER::~DX9RENDER()
     ReleaseDevice();
 }
 
-bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t height)
+bool DX9RENDER::InitDevice(bool windowed, void *_hwnd, int32_t width, int32_t height)
 {
     // GUARD(DX9RENDER::InitDevice)
 
@@ -702,7 +702,7 @@ bool DX9RENDER::InitDevice(bool windowed, HWND _hwnd, int32_t width, int32_t hei
     screen_size.y = height;
     bWindow = windowed;
 
-    hwnd = _hwnd;
+    hwnd = static_cast<HWND>(_hwnd);
     core.Trace("Initializing DirectX 9");
     d3d = Direct3DCreate9(D3D_SDK_VERSION);
     if (d3d == nullptr)
@@ -2373,11 +2373,11 @@ void DX9RENDER::RenderAnimation(int32_t ib, void *src, int32_t numVrts, int32_t 
         }
         // Copy verteces
         uint8_t *ptr;
-        RDTSC_B(_rdtsc);
+        RDTSC_B(storm_rdtsc);
         if (CHECKD3DERR(aniVBuffer->Lock(0, size, (void **)&ptr, 0)) == true)
             return;
         dwNumLV++;
-        RDTSC_E(_rdtsc);
+        RDTSC_E(storm_rdtsc);
         memcpy(ptr, src, size);
         CHECKD3DERR(aniVBuffer->Unlock());
     }

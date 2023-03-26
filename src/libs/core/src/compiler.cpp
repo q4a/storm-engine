@@ -3845,6 +3845,7 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
     S_TOKEN_TYPE Token_type;
     FuncInfo fi;
     const VarInfo *real_var;
+    float float_var;
     DATA *pV;
     DATA *pVResult;
     //    DATA   ExpressionResult;    // while compile expression not ready, each function have its own register
@@ -5386,7 +5387,8 @@ bool COMPILER::BC_Execute(uint32_t function_code, DATA *&pVReturnResult, const c
                 pV->Set(*((int32_t *)&pRunCodeBase[TLR_DataOffset]));
                 break;
             case FLOAT_NUMBER:
-                pV->Set(*((float *)&pRunCodeBase[TLR_DataOffset]));
+                float_var = *((float *)&pRunCodeBase[TLR_DataOffset]);
+                pV->Set(float_var);
                 break;
             case STRING:
                 pV->Set((char *)&pRunCodeBase[TLR_DataOffset + 4]); // 4 - string length
